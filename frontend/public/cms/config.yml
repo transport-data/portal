@@ -1,0 +1,21 @@
+backend:
+  name: github # our repository provider
+  repo: datopian/portaljs-template # username/repo
+  branch: master # the main branch of our repo
+  base_url: "https://datahub-enterprise.vercel.app" # our site's base URL
+  auth_endpoint: "api/auth" # used together with base_url for our custom endpoints (more on this later)
+media_folder: "public/images" # the folder we want to upload new images to
+public_folder: "/images" # the folder our images should be fetched from
+collections: # our content types, this is just an example!
+  - name: "pages"
+    label: "Pages"
+    folder: "_posts/pages"
+    create: true
+    slug: "{{title}}"
+    fields:
+      - { label: "Layout", name: "layout", widget: "hidden", default: "blog" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Thumbnail", name: "thumbnail", widget: "image" }
+      - { label: "Summary", name: "summary", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }

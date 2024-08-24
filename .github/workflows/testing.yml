@@ -1,0 +1,61 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  buildandtest:
+    name: Build and Scan Image with Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Add CKAN url to hosts
+        run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+      - name: Add Minio url to hosts
+        run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+      - name: Copy .env.example into .env
+        run: cp .env.example .env
+      - name: Install `Xvfb` and others to run browsers for end-to-end testing in local CI/CD simulations
+        if: ${{ env.ACT }}
+        run: sudo apt-get update && sudo apt-get install -y xvfb && npx playwright install-deps
+      - name: Set up Docker Containers
+        run: |
+          docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+      - name: Cypress Install and CKAN setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:5000'
+          wait-on-timeout: 120
+          node-version: 18
+          runTests: false
+          working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./scripts/cypress_setup.sh
+      - name: Print Logs
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
+      - name: Wait for ckan-vs-db to be healthy
+        run: |
+          while ! docker exec ckan-vs-db pg_isready -U ckandbuser -d ckandb; do
+            sleep 1
+          done
+      - name: Run Integration tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: node test.js
+          working-directory: ./integration-tests
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: /home/runner/work/ckan-docker-vs-dev/ckan-docker-vs-dev/integration-tests/cypress/screenshots
+          if-no-files-found: ignore
+      - name: Print Error Logs
+        if: failure()
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
+      - name: Tear down containers
+        if: failure() || success()
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans

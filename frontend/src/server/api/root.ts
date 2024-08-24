@@ -1,0 +1,24 @@
+import { createTRPCRouter } from "@/server/api/trpc";
+import { datasetRouter } from "./routers/dataset";
+import { groupRouter } from "./routers/group";
+import { organizationRouter } from "./routers/organization";
+import { resourceRouter } from "./routers/resource";
+import { userRouter } from "./routers/user";
+import { datapackageRouter } from "./routers/datapackage";
+
+/**
+ * This is the primary router for your server.
+ *
+ * All routers added in /api/routers should be manually added here.
+ */
+export const appRouter = createTRPCRouter({
+  dataset: datasetRouter,
+  group: groupRouter,
+  resource: resourceRouter,
+  user: userRouter,
+  organization: organizationRouter,
+  datapackage: datapackageRouter,
+});
+
+// export type definition of API
+export type AppRouter = typeof appRouter;

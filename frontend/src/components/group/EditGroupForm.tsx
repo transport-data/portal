@@ -1,0 +1,75 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GroupForm } from "./GroupForm";
+import { Button } from "@components/ui/button";
+import { useState } from "react";
+import NotificationSuccess from "@components/_shared/Notifications";
+import { api } from "@utils/api";
+import { ErrorAlert } from "@components/_shared/Alerts";
+import type { Group } from "@portaljs/ckan";
+import { GroupFormType, GroupSchema } from "@schema/group.schema";
+import { match } from "ts-pattern";
+import Spinner from "@components/_shared/Spinner";
+import notify from "@utils/notify";
+
+export const EditGroupForm: React.FC<{
+  initialValues: Group;
+}> = ({ initialValues }) => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [groupEdited, setGroupEdited] = useState("");
+  const formObj = useForm<GroupFormType>({
+    resolver: zodResolver(GroupSchema),
+    defaultValues: initialValues,
+  });
+
+  const utils = api.useContext();
+  const editGroup = api.group.patch.useMutation({
+    onSuccess: async () => {
+      notify(`Successfully edited the ${groupEdited} group`);
+      setErrorMessage(null);
+      await utils.group.list.invalidate();
+    },
+    onError: (error) => setErrorMessage(error.message),
+  });
+
+  return (
+    <>
+      <form
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onSubmit={formObj.handleSubmit((data) => {
+          setGroupEdited(data.name);
+          editGroup.mutate(data);
+        })}
+      >
+        <GroupForm formObj={formObj} />
+        <div className="col-span-full">
+          {match(editGroup.isLoading)
+            .with(false, () => (
+              <Button
+                type="submit"
+                variant="secondary"
+                className="mt-8 w-full py-4"
+              >
+                Edit group
+              </Button>
+            ))
+            .otherwise(() => (
+              <Button
+                type="submit"
+                variant="secondary"
+                className="mt-8 flex w-full py-4"
+              >
+                <Spinner className="hover:text-slate-900" />
+                Edit group
+              </Button>
+            ))}
+        </div>
+        {errorMessage && (
+          <div className="py-4">
+            <ErrorAlert text={errorMessage} />
+          </div>
+        )}
+      </form>
+    </>
+  );
+};

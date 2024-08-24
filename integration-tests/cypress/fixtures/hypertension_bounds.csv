@@ -1,0 +1,378 @@
+﻿Indicator,Answer,Demographic Group,Demographic Characteristic,Year,Type of indicator,Metric,Estimated Population,Visualization Filter,Table Filter,Ref_group,National Reference,Lower Bound,Upper Bound
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age,18-29,2015,Estimated,71.9,,viz_age,,Total,6.272,70.8,73.1
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age,30-49,2015,Estimated,77.8,,viz_age,,Total,6.272,77,78.6
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age,50-69,2015,Estimated,82.8,,viz_age,,Total,6.272,81.9,83.7
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age, 18-69,2015,Estimated,77.1,,viz_age,,Total,6.272,76.5,77.7
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Rural 18-29,2015,Estimated,,,viz_age_area,,Rural,12.11,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Rural 30-49,2015,Estimated,,,viz_age_area,,Rural,12.11,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Rural 50-69,2015,Estimated,,,viz_age_area,,Rural,12.11,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Rural  18-69,2015,Estimated,,,viz_age_area,,Rural,12.11,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Urban 18-29,2015,Estimated,,,viz_age_area,,Urban,2.552,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Urban 30-49,2015,Estimated,,,viz_age_area,,Urban,2.552,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Urban 50-69,2015,Estimated,,,viz_age_area,,Urban,2.552,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Age by Area,Urban  18-69,2015,Estimated,,,viz_age_area,,Urban,2.552,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Area,Rural,2015,Estimated,77.5,,viz_area,,Total,6.272,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Area,Urban,2015,Estimated,76.4,,viz_area,,Total,6.272,76.6,78.3
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex,Men,2015,Estimated,79.4,,viz_sex,table_total,Total,6.272,75.6,77.3
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex,Women,2015,Estimated,74.8,,viz_sex,table_total,Total,6.272,78.5,80.3
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Men 18-29,2015,Estimated,74.5,,viz_men_age,,Men,9.949,74.1,75.6
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Men 30-49,2015,Estimated,80.4,,viz_men_age,,Men,9.949,72.9,76
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Men 50-69,2015,Estimated,84.6,,viz_men_age,,Men,9.949,79.2,81.5
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Men  18-69,2015,Estimated,79.4,,viz_men_age,,Men,9.949,83.3,86
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Women 18-29,2015,Estimated,69.3,,viz_women_age,,Women,9.414,78.5,80.3
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Women 30-49,2015,Estimated,75.2,,viz_women_age,,Women,9.414,68,70.6
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Women 50-69,2015,Estimated,81.2,,viz_women_age,,Women,9.414,74.3,76.1
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Age,Women  18-69,2015,Estimated,74.8,,viz_women_age,,Women,9.414,80.1,82.4
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Area,Rural Men,2015,Estimated,,,viz_sex_area,,Men,9.949,74.1,75.6
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Area,Rural Women,2015,Estimated,,,viz_sex_area,,Women,9.414,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Area,Urban Men,2015,Estimated,,,viz_sex_area,,Men,9.949,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Sex by Area,Urban Women,2015,Estimated,,,viz_sex_area,,Women,9.414,,
+"Mean diastolic blood pressure - DBP (mmHg), including currently on medication for raised BP",Mean DBP,Total,Total,2015,Estimated,77.1,,viz_total,table_total,,,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age,18-29,2015,Estimated,112.1,,viz_age,,Total,2.841,76.5,77.7
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age,30-49,2015,Estimated,119.4,,viz_age,,Total,2.841,110.7,113.6
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age,50-69,2015,Estimated,131.4,,viz_age,,Total,2.841,118.2,120.6
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age, 18-69,2015,Estimated,119.9,,viz_age,,Total,2.841,129.7,133.1
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Rural 18-29,2015,Estimated,,,viz_age_area,,Rural,8.135,119,120.8
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Rural 30-49,2015,Estimated,,,viz_age_area,,Rural,8.135,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Rural 50-69,2015,Estimated,,,viz_age_area,,Rural,8.135,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Rural  18-69,2015,Estimated,,,viz_age_area,,Rural,8.135,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Urban 18-29,2015,Estimated,,,viz_age_area,,Urban,12.93,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Urban 30-49,2015,Estimated,,,viz_age_area,,Urban,12.93,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Urban 50-69,2015,Estimated,,,viz_age_area,,Urban,12.93,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Age by Area,Urban  18-69,2015,Estimated,,,viz_age_area,,Urban,12.93,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Area,Rural,2015,Estimated,120.8,,viz_area,,Total,2.841,119.5,122
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Area,Urban,2015,Estimated,118.4,,viz_area,,Total,2.841,117.1,119.6
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex,Men,2015,Estimated,124.4,,viz_sex,table_total,Total,2.841,123.1,125.7
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex,Women,2015,Estimated,115.5,,viz_sex,table_total,Total,2.841,114.4,116.6
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Men 18-29,2015,Estimated,118,,viz_men_age,,Men,10.19,116,120
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Men 30-49,2015,Estimated,124.2,,viz_men_age,,Men,10.19,122.5,125.9
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Men 50-69,2015,Estimated,134.3,,viz_men_age,,Men,10.19,131.7,137
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Men  18-69,2015,Estimated,124.4,,viz_men_age,,Men,10.19,123.1,125.7
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Women 18-29,2015,Estimated,106.1,,viz_women_age,,Women,11.18,104.6,107.6
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Women 30-49,2015,Estimated,114.6,,viz_women_age,,Women,11.18,113.2,116
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Women 50-69,2015,Estimated,128.8,,viz_women_age,,Women,11.18,126.7,130.8
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Age,Women  18-69,2015,Estimated,115.5,,viz_women_age,,Women,11.18,114.4,116.6
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Area,Rural Men,2015,Estimated,,,viz_sex_area,,Men,10.19,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Area,Rural Women,2015,Estimated,,,viz_sex_area,,Women,11.18,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Area,Urban Men,2015,Estimated,,,viz_sex_area,,Men,10.19,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Sex by Area,Urban Women,2015,Estimated,,,viz_sex_area,,Women,11.18,,
+"Mean systolic blood pressure - SBP (mmHg), including currently on medication for raised BP",Mean SBP,Total,Total,2015,Estimated,119.9,,viz_total,table_total,,,119,120.8
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age,18-29,2015,Estimated,12.8,75587445,viz_age,,Total,70,0,32.5
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age,30-49,2015,Estimated,15.3,28858189,viz_age,,Total,70,7.7,22.9
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age,50-69,2015,Estimated,34.4,118028139,viz_age,,Total,70,25.9,42.9
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age, 18-69,2015,Estimated,24.9,32615315,viz_age,,Total,70,18.9,30.8
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Rural 18-29,2015,Estimated,,18699118,viz_age_area,,Rural,13.49,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Rural 30-49,2015,Estimated,,92543948,viz_age_area,,Rural,13.49,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Rural 50-69,2015,Estimated,,86512772,viz_age_area,,Rural,13.49,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Rural  18-69,2015,Estimated,,23964038,viz_age_area,,Rural,13.49,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Urban 18-29,2015,Estimated,,16672247,viz_age_area,,Urban,4.917,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Urban 30-49,2015,Estimated,,107337632,viz_age_area,,Urban,4.917,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Urban 50-69,2015,Estimated,,69358525,viz_age_area,,Urban,4.917,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Age by Area,Urban  18-69,2015,Estimated,,63611605,viz_age_area,,Urban,4.917,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Area,Rural,2015,Estimated,22.2,16672247,viz_area,,Total,70,14.5,30
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Area,Urban,2015,Estimated,30.1,6076904,viz_area,,Total,70,20.7,39.3
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex,Men,2015,Estimated,20.4,63611605,viz_sex,table_total,Total,70,13.4,27.6
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex,Women,2015,Estimated,31.5,23964038,viz_sex,table_total,Total,70,22.2,40.6
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Men 18-29,2015,Estimated,9.4,86512772,viz_men_age,,Men,51.47,0,27.8
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Men 30-49,2015,Estimated,9.4,63611605,viz_men_age,,Men,51.47,3,16.1
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Men 50-69,2015,Estimated,33.7,23964038,viz_men_age,,Men,51.47,22.1,45.4
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Men  18-69,2015,Estimated,20.4,75587445,viz_men_age,,Men,51.47,13.4,27.6
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Women 18-29,2015,Estimated,28.8,18699118,viz_women_age,,Women,19.39,0,75.6
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Women 30-49,2015,Estimated,25.4,107337632,viz_women_age,,Women,19.39,9.5,41.3
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Women 50-69,2015,Estimated,35.2,92543948,viz_women_age,,Women,19.39,23.8,46.6
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Age,Women  18-69,2015,Estimated,31.5,69358525,viz_women_age,,Women,19.39,22.2,40.6
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Area,Rural Men,2015,Estimated,,118028139,viz_sex_area,,Men,51.47,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Area,Rural Women,2015,Estimated,,6076904,viz_sex_area,,Women,19.39,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Area,Urban Men,2015,Estimated,,28858189,viz_sex_area,,Men,51.47,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Sex by Area,Urban Women,2015,Estimated,,32615315,viz_sex_area,,Women,19.39,,
+Percentage who are currently taking any medication for hypertension prescribed by a health worker,Under treatment,Total,Total,2015,Estimated,24.9,86512772,viz_total,table_total,,,18.9,30.8
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age,18-29,2015,Estimated,0,16672247,viz_age,,Total,95.5,0,0
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age,30-49,2015,Estimated,4.3,18699118,viz_age,,Total,95.5,1.4,7.3
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age,50-69,2015,Estimated,7.5,107337632,viz_age,,Total,95.5,4.3,10.7
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age, 18-69,2015,Estimated,5.8,92543948,viz_age,,Total,95.5,3.7,7.8
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Rural 18-29,2015,Estimated,,63611605,viz_age_area,,Rural,70,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Rural 30-49,2015,Estimated,,75587445,viz_age_area,,Rural,70,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Rural 50-69,2015,Estimated,,118028139,viz_age_area,,Rural,70,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Rural  18-69,2015,Estimated,,6076904,viz_age_area,,Rural,70,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Urban 18-29,2015,Estimated,,86512772,viz_age_area,,Urban,56.12,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Urban 30-49,2015,Estimated,,23964038,viz_age_area,,Urban,56.12,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Urban 50-69,2015,Estimated,,28858189,viz_age_area,,Urban,56.12,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Age by Area,Urban  18-69,2015,Estimated,,32615315,viz_age_area,,Urban,56.12,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Area,Rural,2015,Estimated,7.2,86512772,viz_area,,Total,95.5,4.6,9.7
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Area,Urban,2015,Estimated,4.3,69358525,viz_area,,Total,95.5,2.7,5.8
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex,Men,2015,Estimated,5.9,32615315,viz_sex,table_total,Total,95.5,2.9,8.9
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex,Women,2015,Estimated,5.6,6076904,viz_sex,table_total,Total,95.5,2.8,8.4
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Men 18-29,2015,Estimated,0,118028139,viz_men_age,,Men,26.39,0,0
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Men 30-49,2015,Estimated,4.5,32615315,viz_men_age,,Men,26.39,0.5,8.6
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Men 50-69,2015,Estimated,7.9,6076904,viz_men_age,,Men,26.39,2.7,13.2
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Men  18-69,2015,Estimated,5.9,16672247,viz_men_age,,Men,26.39,2.9,8.9
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Women 18-29,2015,Estimated,0,63611605,viz_women_age,,Women,4.917,0,0
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Women 30-49,2015,Estimated,4.1,23964038,viz_women_age,,Women,4.917,0,8.4
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Women 50-69,2015,Estimated,7.1,75587445,viz_women_age,,Women,4.917,3,11.3
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Age,Women  18-69,2015,Estimated,5.6,28858189,viz_women_age,,Women,4.917,2.8,8.4
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Area,Rural Men,2015,Estimated,,107337632,viz_sex_area,,Men,26.39,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Area,Rural Women,2015,Estimated,,69358525,viz_sex_area,,Women,4.917,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Area,Urban Men,2015,Estimated,,18699118,viz_sex_area,,Men,26.39,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Sex by Area,Urban Women,2015,Estimated,,92543948,viz_sex_area,,Women,4.917,,
+Percentage who are currently taking herbal or traditional remedies for hypertension,Taking traditional remedies,Total,Total,2015,Estimated,5.8,118028139,viz_total,table_total,,,3.7,7.8
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age,18-29,2015,Estimated,0,69358525,viz_age,,Total,15.13,0,0
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age,30-49,2015,Estimated,8.3,86512772,viz_age,,Total,15.13,3.5,13
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age,50-69,2015,Estimated,9.1,63611605,viz_age,,Total,15.13,5.6,12.6
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age, 18-69,2015,Estimated,8,23964038,viz_age,,Total,15.13,5.3,10.7
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Rural 18-29,2015,Estimated,,118028139,viz_age_area,,Rural,23.35,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Rural 30-49,2015,Estimated,,6076904,viz_age_area,,Rural,23.35,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Rural 50-69,2015,Estimated,,18699118,viz_age_area,,Rural,23.35,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Rural  18-69,2015,Estimated,,92543948,viz_age_area,,Rural,23.35,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Urban 18-29,2015,Estimated,,28858189,viz_age_area,,Urban,61.16,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Urban 30-49,2015,Estimated,,32615315,viz_age_area,,Urban,61.16,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Urban 50-69,2015,Estimated,,16672247,viz_age_area,,Urban,61.16,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Age by Area,Urban  18-69,2015,Estimated,,107337632,viz_age_area,,Urban,61.16,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Area,Rural,2015,Estimated,9.6,28858189,viz_area,,Total,15.13,6.3,12.8
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Area,Urban,2015,Estimated,6.4,75587445,viz_area,,Total,15.13,4.2,8.5
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex,Men,2015,Estimated,8.9,107337632,viz_sex,table_total,Total,15.13,4.8,13
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex,Women,2015,Estimated,7.1,92543948,viz_sex,table_total,Total,15.13,3.3,10.9
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Men 18-29,2015,Estimated,0,18699118,viz_men_age,,Men,86.85,0,0
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Men 30-49,2015,Estimated,9.4,107337632,viz_men_age,,Men,86.85,2.2,16.6
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Men 50-69,2015,Estimated,10.3,92543948,viz_men_age,,Men,86.85,4.1,16.5
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Men  18-69,2015,Estimated,8.9,69358525,viz_men_age,,Men,86.85,4.8,13
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Women 18-29,2015,Estimated,0,118028139,viz_women_age,,Women,74.88,0,0
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Women 30-49,2015,Estimated,7.1,32615315,viz_women_age,,Women,74.88,0.6,13.6
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Women 50-69,2015,Estimated,8.2,6076904,viz_women_age,,Women,74.88,3.9,12.4
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Age,Women  18-69,2015,Estimated,7.1,16672247,viz_women_age,,Women,74.88,3.3,10.9
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Area,Rural Men,2015,Estimated,,63611605,viz_sex_area,,Men,86.85,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Area,Rural Women,2015,Estimated,,75587445,viz_sex_area,,Women,74.88,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Area,Urban Men,2015,Estimated,,86512772,viz_sex_area,,Men,86.85,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Sex by Area,Urban Women,2015,Estimated,,23964038,viz_sex_area,,Women,74.88,,
+Percentage who had seen a traditional healer for hypertension,Seen a traditional healer,Total,Total,2015,Estimated,8,18699118,viz_total,table_total,,,5.3,10.7
+Percentage who had their blood pressure measured,Measured,Age,18-29,2015,Estimated,67.4,32615315,viz_age,,Total,61.16,72.2,62.7
+Percentage who had their blood pressure measured,Measured,Age,30-49,2015,Estimated,67.9,6076904,viz_age,,Total,61.16,70.6,65.3
+Percentage who had their blood pressure measured,Measured,Age,50-69,2015,Estimated,79.3,16672247,viz_age,,Total,61.16,81.9,76.6
+Percentage who had their blood pressure measured,Measured,Age, 18-69,2015,Estimated,70.5,18699118,viz_age,,Total,61.16,72.6,68.4
+Percentage who had their blood pressure measured,Measured,Age by Area,Rural 18-29,2015,Estimated,,69358525,viz_age_area,,Rural,74.88,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Rural 30-49,2015,Estimated,,63611605,viz_age_area,,Rural,74.88,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Rural 50-69,2015,Estimated,,75587445,viz_age_area,,Rural,74.88,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Rural  18-69,2015,Estimated,,118028139,viz_age_area,,Rural,74.88,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Urban 18-29,2015,Estimated,,92543948,viz_age_area,,Urban,86.85,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Urban 30-49,2015,Estimated,,86512772,viz_age_area,,Urban,86.85,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Urban 50-69,2015,Estimated,,23964038,viz_age_area,,Urban,86.85,,
+Percentage who had their blood pressure measured,Measured,Age by Area,Urban  18-69,2015,Estimated,,28858189,viz_age_area,,Urban,86.85,,
+Percentage who had their blood pressure measured,Measured,Area,Rural,2015,Estimated,73.5,92543948,viz_area,,Total,61.16,75.4,71.6
+Percentage who had their blood pressure measured,Measured,Area,Urban,2015,Estimated,67.6,107337632,viz_area,,Total,61.16,69.9,65.3
+Percentage who had their blood pressure measured,Measured,Sex,Men,2015,Estimated,66.2,28858189,viz_sex,table_total,Total,61.16,69.3,63
+Percentage who had their blood pressure measured,Measured,Sex,Women,2015,Estimated,74.7,118028139,viz_sex,table_total,Total,61.16,77.3,72.2
+Percentage who had their blood pressure measured,Measured,Sex by Age,Men 18-29,2015,Estimated,62.4,75587445,viz_men_age,,Men,23.35,69.2,55.6
+Percentage who had their blood pressure measured,Measured,Sex by Age,Men 30-49,2015,Estimated,62.9,28858189,viz_men_age,,Men,23.35,66.6,59.2
+Percentage who had their blood pressure measured,Measured,Sex by Age,Men 50-69,2015,Estimated,77.9,118028139,viz_men_age,,Men,23.35,82,73.8
+Percentage who had their blood pressure measured,Measured,Sex by Age,Men  18-69,2015,Estimated,66.2,32615315,viz_men_age,,Men,23.35,69.3,63
+Percentage who had their blood pressure measured,Measured,Sex by Age,Women 18-29,2015,Estimated,72.6,69358525,viz_women_age,,Women,95.5,77.8,67.4
+Percentage who had their blood pressure measured,Measured,Sex by Age,Women 30-49,2015,Estimated,72.9,86512772,viz_women_age,,Women,95.5,76.5,69.4
+Percentage who had their blood pressure measured,Measured,Sex by Age,Women 50-69,2015,Estimated,80.5,63611605,viz_women_age,,Women,95.5,84.2,76.7
+Percentage who had their blood pressure measured,Measured,Sex by Age,Women  18-69,2015,Estimated,74.7,23964038,viz_women_age,,Women,95.5,77.3,72.2
+Percentage who had their blood pressure measured,Measured,Sex by Area,Rural Men,2015,Estimated,,16672247,viz_sex_area,,Men,23.35,,
+Percentage who had their blood pressure measured,Measured,Sex by Area,Rural Women,2015,Estimated,,107337632,viz_sex_area,,Women,95.5,,
+Percentage who had their blood pressure measured,Measured,Sex by Area,Urban Men,2015,Estimated,,6076904,viz_sex_area,,Men,23.35,,
+Percentage who had their blood pressure measured,Measured,Sex by Area,Urban Women,2015,Estimated,,18699118,viz_sex_area,,Women,95.5,,
+Percentage who had their blood pressure measured,Measured,Total,Total,2015,Estimated,70.5,75587445,viz_total,table_total,,,72.6,68.4
+Percentage who had their blood pressure measured,Never measured,Age,18-29,2015,Estimated,32.6,107337632,viz_age,,Total,4.917,27.8,37.3
+Percentage who had their blood pressure measured,Never measured,Age,30-49,2015,Estimated,32.1,92543948,viz_age,,Total,4.917,29.4,34.7
+Percentage who had their blood pressure measured,Never measured,Age,50-69,2015,Estimated,20.7,69358525,viz_age,,Total,4.917,18.1,23.4
+Percentage who had their blood pressure measured,Never measured,Age, 18-69,2015,Estimated,29.5,86512772,viz_age,,Total,4.917,27.4,31.6
+Percentage who had their blood pressure measured,Never measured,Age by Area,Rural 18-29,2015,Estimated,,75587445,viz_age_area,,Rural,19.39,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Rural 30-49,2015,Estimated,,118028139,viz_age_area,,Rural,19.39,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Rural 50-69,2015,Estimated,,6076904,viz_age_area,,Rural,19.39,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Rural  18-69,2015,Estimated,,18699118,viz_age_area,,Rural,19.39,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Urban 18-29,2015,Estimated,,23964038,viz_age_area,,Urban,51.47,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Urban 30-49,2015,Estimated,,28858189,viz_age_area,,Urban,51.47,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Urban 50-69,2015,Estimated,,32615315,viz_age_area,,Urban,51.47,,
+Percentage who had their blood pressure measured,Never measured,Age by Area,Urban  18-69,2015,Estimated,,16672247,viz_age_area,,Urban,51.47,,
+Percentage who had their blood pressure measured,Never measured,Area,Rural,2015,Estimated,26.5,23964038,viz_area,,Total,4.917,24.6,28.4
+Percentage who had their blood pressure measured,Never measured,Area,Urban,2015,Estimated,32.4,63611605,viz_area,,Total,4.917,30.1,34.7
+Percentage who had their blood pressure measured,Never measured,Sex,Men,2015,Estimated,33.8,16672247,viz_sex,table_total,Total,4.917,30.7,37
+Percentage who had their blood pressure measured,Never measured,Sex,Women,2015,Estimated,25.3,18699118,viz_sex,table_total,Total,4.917,22.7,27.8
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Men 18-29,2015,Estimated,37.6,6076904,viz_men_age,,Men,13.49,30.8,44.4
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Men 30-49,2015,Estimated,37.1,16672247,viz_men_age,,Men,13.49,33.4,40.8
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Men 50-69,2015,Estimated,22.1,18699118,viz_men_age,,Men,13.49,18,26.2
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Men  18-69,2015,Estimated,33.8,107337632,viz_men_age,,Men,13.49,30.7,37
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Women 18-29,2015,Estimated,27.4,75587445,viz_women_age,,Women,15.13,22.2,32.6
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Women 30-49,2015,Estimated,27.1,28858189,viz_women_age,,Women,15.13,23.5,30.6
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Women 50-69,2015,Estimated,19.5,118028139,viz_women_age,,Women,15.13,15.8,23.3
+Percentage who had their blood pressure measured,Never measured,Sex by Age,Women  18-69,2015,Estimated,25.3,32615315,viz_women_age,,Women,15.13,22.7,27.8
+Percentage who had their blood pressure measured,Never measured,Sex by Area,Rural Men,2015,Estimated,,69358525,viz_sex_area,,Men,13.49,,
+Percentage who had their blood pressure measured,Never measured,Sex by Area,Rural Women,2015,Estimated,,63611605,viz_sex_area,,Women,15.13,,
+Percentage who had their blood pressure measured,Never measured,Sex by Area,Urban Men,2015,Estimated,,92543948,viz_sex_area,,Men,13.49,,
+Percentage who had their blood pressure measured,Never measured,Sex by Area,Urban Women,2015,Estimated,,86512772,viz_sex_area,,Women,15.13,,
+Percentage who had their blood pressure measured,Never measured,Total,Total,2015,Estimated,29.5,6076904,viz_total,table_total,,,27.4,31.6
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age,18-29,2015,Estimated,64,23964038,viz_age,,Total,56.12,59.4,68.6
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age,30-49,2015,Estimated,59.4,75587445,viz_age,,Total,56.12,56.6,62.1
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age,50-69,2015,Estimated,51.3,28858189,viz_age,,Total,56.12,47.9,54.6
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age, 18-69,2015,Estimated,58.9,118028139,viz_age,,Total,56.12,56.8,61
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Rural 18-29,2015,Estimated,,16672247,viz_age_area,,Rural,4.917,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Rural 30-49,2015,Estimated,,107337632,viz_age_area,,Rural,4.917,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Rural 50-69,2015,Estimated,,69358525,viz_age_area,,Rural,4.917,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Rural  18-69,2015,Estimated,,63611605,viz_age_area,,Rural,4.917,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Urban 18-29,2015,Estimated,,6076904,viz_age_area,,Urban,26.39,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Urban 30-49,2015,Estimated,,18699118,viz_age_area,,Urban,26.39,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Urban 50-69,2015,Estimated,,92543948,viz_age_area,,Urban,26.39,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Age by Area,Urban  18-69,2015,Estimated,,86512772,viz_age_area,,Urban,26.39,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Area,Rural,2015,Estimated,50.1,6076904,viz_area,,Total,56.12,48.3,51.8
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Area,Urban,2015,Estimated,67.7,32615315,viz_area,,Total,56.12,65.3,71.2
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex,Men,2015,Estimated,54.9,86512772,viz_sex,table_total,Total,56.12,51.8,57.9
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex,Women,2015,Estimated,62.8,63611605,viz_sex,table_total,Total,56.12,60.1,65.6
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Men 18-29,2015,Estimated,58.9,69358525,viz_men_age,,Men,70,52.3,65.4
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Men 30-49,2015,Estimated,54.1,86512772,viz_men_age,,Men,70,50.3,58
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Men 50-69,2015,Estimated,50.6,63611605,viz_men_age,,Men,70,45.8,55.5
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Men  18-69,2015,Estimated,54.9,23964038,viz_men_age,,Men,70,51.8,57.9
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Women 18-29,2015,Estimated,69.3,16672247,viz_women_age,,Women,51.47,63.8,74.7
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Women 30-49,2015,Estimated,64.6,18699118,viz_women_age,,Women,51.47,60.8,68.4
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Women 50-69,2015,Estimated,51.8,107337632,viz_women_age,,Women,51.47,47.3,56.3
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Age,Women  18-69,2015,Estimated,62.8,92543948,viz_women_age,,Women,51.47,60.1,65.6
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Area,Rural Men,2015,Estimated,,28858189,viz_sex_area,,Men,70,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Area,Rural Women,2015,Estimated,,32615315,viz_sex_area,,Women,51.47,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Area,Urban Men,2015,Estimated,,75587445,viz_sex_area,,Men,70,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Sex by Area,Urban Women,2015,Estimated,,118028139,viz_sex_area,,Women,51.47,,
+Percentage who had their blood pressure measured but not diagnosed,Measured not diagnosed,Total,Total,2015,Estimated,58.9,69358525,viz_total,table_total,,,56.8,61
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age,18-29,2015,Estimated,8.9,63611605,viz_age,,Total,74.88,0,21.1
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age,30-49,2015,Estimated,3.8,23964038,viz_age,,Total,74.88,0.9,6.7
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age,50-69,2015,Estimated,14.4,75587445,viz_age,,Total,74.88,10.4,18.3
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age, 18-69,2015,Estimated,9.7,28858189,viz_age,,Total,74.88,7,12.4
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Rural 18-29,2015,Estimated,,6076904,viz_age_area,,Rural,26.39,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Rural 30-49,2015,Estimated,,18699118,viz_age_area,,Rural,26.39,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Rural 50-69,2015,Estimated,,92543948,viz_age_area,,Rural,26.39,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Rural  18-69,2015,Estimated,,86512772,viz_age_area,,Rural,26.39,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Urban 18-29,2015,Estimated,,32615315,viz_age_area,,Urban,95.5,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Urban 30-49,2015,Estimated,,16672247,viz_age_area,,Urban,95.5,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Urban 50-69,2015,Estimated,,107337632,viz_age_area,,Urban,95.5,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Age by Area,Urban  18-69,2015,Estimated,,69358525,viz_age_area,,Urban,95.5,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Area,Rural,2015,Estimated,7.8,32615315,viz_area,,Total,74.88,4.4,11.2
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Area,Urban,2015,Estimated,13.5,118028139,viz_area,,Total,74.88,8.9,18
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex,Men,2015,Estimated,7.5,69358525,viz_sex,table_total,Total,74.88,4.7,10.4
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex,Women,2015,Estimated,13,86512772,viz_sex,table_total,Total,74.88,8.3,17.6
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Men 18-29,2015,Estimated,4.7,92543948,viz_men_age,,Men,56.12,0,13.9
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Men 30-49,2015,Estimated,1.2,69358525,viz_men_age,,Men,56.12,0,2.7
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Men 50-69,2015,Estimated,14.1,86512772,viz_men_age,,Men,56.12,9,19.3
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Men  18-69,2015,Estimated,7.5,63611605,viz_men_age,,Men,56.12,4.7,10.4
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Women 18-29,2015,Estimated,28.8,6076904,viz_women_age,,Women,70,0,75.6
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Women 30-49,2015,Estimated,8.3,16672247,viz_women_age,,Women,70,1.2,15.4
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Women 50-69,2015,Estimated,14.7,18699118,viz_women_age,,Women,70,9.1,20.3
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Age,Women  18-69,2015,Estimated,13,107337632,viz_women_age,,Women,70,8.3,17.6
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Area,Rural Men,2015,Estimated,,75587445,viz_sex_area,,Men,56.12,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Area,Rural Women,2015,Estimated,,118028139,viz_sex_area,,Women,70,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Area,Urban Men,2015,Estimated,,23964038,viz_sex_area,,Men,56.12,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Sex by Area,Urban Women,2015,Estimated,,28858189,viz_sex_area,,Women,70,,
+Percentage with controlled BP (SBP<=140 and/or DBP<=90 mmHg) and currently on medication,Raised BP on medication,Total,Total,2015,Estimated,9.7,92543948,viz_total,table_total,,,7,12.4
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age,18-29,2015,Estimated,4.7,118028139,viz_age,,Total,19.39,2.5,6.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age,30-49,2015,Estimated,15.1,32615315,viz_age,,Total,19.39,12.8,17.5
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age,50-69,2015,Estimated,30.7,6076904,viz_age,,Total,19.39,27.2,34.2
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age, 18-69,2015,Estimated,15,16672247,viz_age,,Total,19.39,13.5,16.5
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Rural 18-29,2015,Estimated,,92543948,viz_age_area,,Rural,86.85,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Rural 30-49,2015,Estimated,,86512772,viz_age_area,,Rural,86.85,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Rural 50-69,2015,Estimated,,23964038,viz_age_area,,Rural,86.85,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Rural  18-69,2015,Estimated,,28858189,viz_age_area,,Rural,86.85,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Urban 18-29,2015,Estimated,,107337632,viz_age_area,,Urban,15.13,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Urban 30-49,2015,Estimated,,69358525,viz_age_area,,Urban,15.13,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Urban 50-69,2015,Estimated,,63611605,viz_age_area,,Urban,15.13,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Age by Area,Urban  18-69,2015,Estimated,,75587445,viz_age_area,,Urban,15.13,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Area,Rural,2015,Estimated,15.7,107337632,viz_area,,Total,19.39,13.7,17.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Area,Urban,2015,Estimated,13.7,18699118,viz_area,,Total,19.39,11.6,15.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex,Men,2015,Estimated,19.4,75587445,viz_sex,table_total,Total,19.39,16.7,22.1
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex,Women,2015,Estimated,10.7,28858189,viz_sex,table_total,Total,19.39,9,12.4
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Men 18-29,2015,Estimated,8,23964038,viz_men_age,,Men,61.16,3.9,12.1
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Men 30-49,2015,Estimated,20.7,75587445,viz_men_age,,Men,61.16,16.8,24.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Men 50-69,2015,Estimated,35.9,28858189,viz_men_age,,Men,61.16,30.2,41.5
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Men  18-69,2015,Estimated,19.4,118028139,viz_men_age,,Men,61.16,16.7,22.1
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Women 18-29,2015,Estimated,1.4,92543948,viz_women_age,,Women,23.35,0,2.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Women 30-49,2015,Estimated,9.5,69358525,viz_women_age,,Women,23.35,7.1,11.8
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Women 50-69,2015,Estimated,26.3,86512772,viz_women_age,,Women,23.35,21.5,31.2
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Age,Women  18-69,2015,Estimated,10.7,63611605,viz_women_age,,Women,23.35,9,12.4
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Area,Rural Men,2015,Estimated,,6076904,viz_sex_area,,Men,61.16,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Area,Rural Women,2015,Estimated,,18699118,viz_sex_area,,Women,23.35,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Area,Urban Men,2015,Estimated,,32615315,viz_sex_area,,Men,61.16,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Sex by Area,Urban Women,2015,Estimated,,16672247,viz_sex_area,,Women,23.35,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) excluding currently on medication for raised BP,"Raised BP, no medication",Total,Total,2015,Estimated,15,23964038,viz_total,table_total,,,13.5,16.5
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age,18-29,2015,Estimated,5.4,18699118,viz_age,,Total,26.39,3.1,7.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age,30-49,2015,Estimated,17.3,107337632,viz_age,,Total,26.39,14.9,19.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age,50-69,2015,Estimated,40.2,92543948,viz_age,,Total,26.39,36.5,43.8
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age, 18-69,2015,Estimated,18.9,69358525,viz_age,,Total,26.39,17.3,20.5
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Rural 18-29,2015,Estimated,,23964038,viz_age_area,,Rural,51.47,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Rural 30-49,2015,Estimated,,28858189,viz_age_area,,Rural,51.47,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Rural 50-69,2015,Estimated,,32615315,viz_age_area,,Rural,51.47,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Rural  18-69,2015,Estimated,,16672247,viz_age_area,,Rural,51.47,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Urban 18-29,2015,Estimated,,63611605,viz_age_area,,Urban,70,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Urban 30-49,2015,Estimated,,75587445,viz_age_area,,Urban,70,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Urban 50-69,2015,Estimated,,118028139,viz_age_area,,Urban,70,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Age by Area,Urban  18-69,2015,Estimated,,6076904,viz_age_area,,Urban,70,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Area,Rural,2015,Estimated,19.2,63611605,viz_area,,Total,26.39,17,21.3
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Area,Urban,2015,Estimated,18.4,86512772,viz_area,,Total,26.39,16.1,20.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex,Men,2015,Estimated,23.1,6076904,viz_sex,table_total,Total,26.39,20.3,25.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex,Women,2015,Estimated,14.9,16672247,viz_sex,table_total,Total,26.39,13,16.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Men 18-29,2015,Estimated,8.7,32615315,viz_men_age,,Men,4.917,4.6,12.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Men 30-49,2015,Estimated,22.3,6076904,viz_men_age,,Men,4.917,18.4,26.2
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Men 50-69,2015,Estimated,45.5,16672247,viz_men_age,,Men,4.917,39.9,51
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Men  18-69,2015,Estimated,23.1,18699118,viz_men_age,,Men,4.917,20.3,25.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Women 18-29,2015,Estimated,1.9,23964038,viz_women_age,,Women,13.49,0.1,3.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Women 30-49,2015,Estimated,12.3,75587445,viz_women_age,,Women,13.49,9.6,14.9
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Women 50-69,2015,Estimated,35.4,28858189,viz_women_age,,Women,13.49,30.5,40.4
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Age,Women  18-69,2015,Estimated,14.9,118028139,viz_women_age,,Women,13.49,13,16.7
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Area,Rural Men,2015,Estimated,,92543948,viz_sex_area,,Men,4.917,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Area,Rural Women,2015,Estimated,,86512772,viz_sex_area,,Women,13.49,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Area,Urban Men,2015,Estimated,,107337632,viz_sex_area,,Men,4.917,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Sex by Area,Urban Women,2015,Estimated,,69358525,viz_sex_area,,Women,13.49,,
+Percentage with raised BP (SBP >= 140 and/or DBP >= 90 mmHg) or currently on medication for raised BP,Hypertensive,Total,Total,2015,Estimated,18.9,32615315,viz_total,table_total,,,17.3,20.5
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age,18-29,2015,Estimated,3.5,,viz_age,,Total,12.93,1.3,5.6
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age,30-49,2015,Estimated,8.6,,viz_age,,Total,12.93,6.5,10.7
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age,50-69,2015,Estimated,28,,viz_age,,Total,12.93,23.7,32.3
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age, 18-69,2015,Estimated,11.6,,viz_age,,Total,12.93,9.9,13.3
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural 18-29,2015,Estimated,,,viz_age_area,,Rural,11.18,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural 30-49,2015,Estimated,,,viz_age_area,,Rural,11.18,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural 50-69,2015,Estimated,,,viz_age_area,,Rural,11.18,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural  18-69,2015,Estimated,,,viz_age_area,,Rural,11.18,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban 18-29,2015,Estimated,,,viz_age_area,,Urban,10.19,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban 30-49,2015,Estimated,,,viz_age_area,,Urban,10.19,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban 50-69,2015,Estimated,,,viz_age_area,,Urban,10.19,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban  18-69,2015,Estimated,,,viz_age_area,,Urban,10.19,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Area,Rural,2015,Estimated,7,,viz_area,,Total,12.93,5.8,8
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Area,Urban,2015,Estimated,16.2,,viz_area,,Total,12.93,13.8,18.6
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex,Men,2015,Estimated,11.3,,viz_sex,table_total,Total,12.93,8.9,13.6
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex,Women,2015,Estimated,11.9,,viz_sex,table_total,Total,12.93,9.6,14.2
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men 18-29,2015,Estimated,3.6,,viz_men_age,,Men,8.135,0.5,6.7
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men 30-49,2015,Estimated,8.8,,viz_men_age,,Men,8.135,5.6,12.1
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men 50-69,2015,Estimated,27.2,,viz_men_age,,Men,8.135,21.4,33.1
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men  18-69,2015,Estimated,11.3,,viz_men_age,,Men,8.135,8.9,13.6
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women 18-29,2015,Estimated,3.3,,viz_women_age,,Women,6.272,0.6,6.3
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women 30-49,2015,Estimated,8.3,,viz_women_age,,Women,6.272,5.5,11.1
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women 50-69,2015,Estimated,28.7,,viz_women_age,,Women,6.272,22.6,34.7
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women  18-69,2015,Estimated,11.9,,viz_women_age,,Women,6.272,9.6,14.2
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Rural Men,2015,Estimated,,,viz_sex_area,,Men,8.135,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Rural Women,2015,Estimated,,,viz_sex_area,,Women,6.272,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Urban Men,2015,Estimated,,,viz_sex_area,,Men,8.135,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Urban Women,2015,Estimated,,,viz_sex_area,,Women,6.272,,
+Prevalence of self-reported hypertension (measured and diagnosed by a health worker),Measured diagnosed,Total,Total,2015,Estimated,11.6,,viz_total,table_total,,,9.9,13.3
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age,18-29,2015,Estimated,1.5,,viz_age,,Total,2.552,0.4,2.6
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age,30-49,2015,Estimated,5.5,,viz_age,,Total,2.552,4.3,6.7
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age,50-69,2015,Estimated,20.3,,viz_age,,Total,2.552,17.7,22.9
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age, 18-69,2015,Estimated,7.8,,viz_age,,Total,2.552,6.8,8.8
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural 18-29,2015,Estimated,,,viz_age_area,,Rural,9.414,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural 30-49,2015,Estimated,,,viz_age_area,,Rural,9.414,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural 50-69,2015,Estimated,,,viz_age_area,,Rural,9.414,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Rural  18-69,2015,Estimated,,,viz_age_area,,Rural,9.414,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban 18-29,2015,Estimated,,,viz_age_area,,Urban,9.949,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban 30-49,2015,Estimated,,,viz_age_area,,Urban,9.949,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban 50-69,2015,Estimated,,,viz_age_area,,Urban,9.949,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Age by Area,Urban  18-69,2015,Estimated,,,viz_age_area,,Urban,9.949,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Area,Rural,2015,Estimated,4.7,,viz_area,,Total,2.552,4,5.3
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Area,Urban,2015,Estimated,10.9,,viz_area,,Total,2.552,9.5,12.3
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex,Men,2015,Estimated,7.9,,viz_sex,table_total,Total,2.552,6.4,9.3
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex,Women,2015,Estimated,7.7,,viz_sex,table_total,Total,2.552,6.4,8.9
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men 18-29,2015,Estimated,1.9,,viz_men_age,,Men,12.11,0.2,3.6
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men 30-49,2015,Estimated,5.4,,viz_men_age,,Men,12.11,3.5,7.3
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men 50-69,2015,Estimated,21.4,,viz_men_age,,Men,12.11,17.7,25.2
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Men  18-69,2015,Estimated,7.9,,viz_men_age,,Men,12.11,6.4,9.3
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women 18-29,2015,Estimated,1.1,,viz_women_age,,Women,5.707,0,2.5
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women 30-49,2015,Estimated,5.6,,viz_women_age,,Women,5.707,3.9,7.2
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women 50-69,2015,Estimated,19.4,,viz_women_age,,Women,5.707,16,22.7
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Age,Women  18-69,2015,Estimated,7.7,,viz_women_age,,Women,5.707,6.4,8.9
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Rural Men,2015,Estimated,,,viz_sex_area,,Men,12.11,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Rural Women,2015,Estimated,,,viz_sex_area,,Women,5.707,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Urban Men,2015,Estimated,,,viz_sex_area,,Men,12.11,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Sex by Area,Urban Women,2015,Estimated,,,viz_sex_area,,Women,5.707,,
+Prevalence of self-reported hypertension within past 12 months (measured and diagnosed by a health worker),Measured diagnosed,Total,Total,2015,Estimated,7.8,,viz_total,table_total,,,6.8,8.8

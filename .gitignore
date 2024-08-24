@@ -1,0 +1,16 @@
+# generic
+.DS_Store
+.vagrant
+
+# code & config
+_service-provider/*
+_solr/schema.xml
+_src/*
+src/*
+local/*
+.env
+
+# remove node_modules
+node_modules/*
+*/node_modules/*
+integration-tests/node_modules/*
