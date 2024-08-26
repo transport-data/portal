@@ -95,6 +95,10 @@ body {
   padding-bottom: min(7vh, 10rem);
 }
 
+.inline-size-88 {
+  inline-size: 88%;
+}
+
 .tag-checkbox:checked + label {
   background-color: #00bbc2;
   color: white;
