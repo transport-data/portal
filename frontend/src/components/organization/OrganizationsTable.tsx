@@ -170,7 +170,7 @@ export const OrganizationsTable: React.FC<{ publicUrl: string }> = ({
                               (org) => org.name === organization.name
                             ) && (
                               <a
-                                href={`/organizations/${organization.name}/edit`}
+                                href={`/dashboard/organizations/${organization.name}/edit`}
                                 className="opacity-75 hover:opacity-100"
                               >
                                 Edit
