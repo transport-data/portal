@@ -11,6 +11,10 @@ import { z } from "zod";
 import type { Dataset } from "@portaljs/ckan";
 import type { CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import R2 from "@server/r2";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { env } from "@env.mjs";
 
 export const datapackageRouter = createTRPCRouter({
   createDatasetFromDatapackage: protectedProcedure
@@ -52,14 +56,35 @@ export const datapackageRouter = createTRPCRouter({
                 url: descriptor.path,
               };
             }
-            const table = await Table.load(file);
-            await table.read({ keyed: true, limit: 500 });
-            await table.infer(500);
-            return {
-              ...descriptor,
-              url: descriptor.path,
-              schema: table.schema.descriptor,
-            };
+            const fileKey = new URL(file).pathname.split('/');
+            const s3key =
+                env.R2_ACCESS_KEY_ID === 'minioadmin'
+                    ? fileKey.slice(2, fileKey.length).join('/')
+                    : fileKey.join('/')
+            const signedUrl = await getSignedUrl(
+              R2,
+              new GetObjectCommand({
+                Bucket: env.R2_BUCKET_NAME,
+                Key: s3key,
+              }),
+              { expiresIn: 3600 }
+            );
+            try {
+              const table = await Table.load(signedUrl);
+              await table.read({ keyed: true, limit: 500 });
+              await table.infer(500);
+              return {
+                ...descriptor,
+                url: descriptor.path,
+                schema: table.schema.descriptor,
+              };
+            } catch (e) {
+              console.log("e", e);
+              return {
+                ...descriptor,
+                url: descriptor.path,
+              };
+            }
           })
         )) as Resource[];
         if (resources.length === 0) return null;
