@@ -36,6 +36,8 @@ FROM ckan/ckan-dev:2.11.0
 RUN pip install -r https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt && \
     pip install -e git+https://github.com/datopian/ckanext-s3filestore.git@ckan-2.10#egg=ckanext-s3filestore
 
+RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+
 
 # Copy custom initialization scripts
 COPY docker-entrypoint.d/* /docker-entrypoint.d/

@@ -26,31 +26,31 @@ export const Dashboard: React.FC<{
     {
       id: "dashboard",
       name: "Dashboard",
-      href: "/",
+      href: "/dashboard",
       icon: ChartBarIcon,
     },
     {
       id: "datasets",
       name: "Datasets",
-      href: "/datasets",
+      href: "/dashboard/datasets",
       icon: CircleStackIcon,
     },
     {
       id: "groups",
       name: "Groups",
-      href: "/groups",
+      href: "/dashboard/groups",
       icon: FolderIcon,
     },
     {
       id: "organizations",
       name: "Organizations",
-      href: "/organizations",
+      href: "/dashboard/organizations",
       icon: BuildingLibraryIcon,
     },
     {
       id: "users",
       name: "Users",
-      href: "/users",
+      href: "/dashboard/users",
       icon: UsersIcon,
     },
   ];
