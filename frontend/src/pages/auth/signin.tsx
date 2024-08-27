@@ -1,5 +1,6 @@
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Spinner from "@components/_shared/Spinner";
+import { Button } from "@components/ui/button";
 import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken, signIn } from "next-auth/react";
 import { NextSeo } from "next-seo";
@@ -37,10 +38,6 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
 
     if (parsedData.username) {
       setValue("username", parsedData.username);
-    }
-
-    if (parsedData.password) {
-      setValue("password", parsedData.password);
     }
 
     if (parsedData.remember) {
@@ -123,9 +120,15 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                 void handleSubmit(async (data) => {
                   setLogin(true);
                   if (data.remember) {
+                    const copiedData: {
+                      username: string;
+                      password?: string;
+                      remember?: boolean;
+                    } = { ...data };
+                    delete copiedData.password;
                     localStorage.setItem(
                       REMEMBER_LOGIN_DATA_KEY,
-                      JSON.stringify(data)
+                      JSON.stringify(copiedData)
                     );
                   } else {
                     localStorage.removeItem(REMEMBER_LOGIN_DATA_KEY);
@@ -225,7 +228,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                 <div className="col-span-full">
                   {match(loggingIn)
                     .with(false, () => (
-                      <button
+                      <Button
                         disabled={!!errors.password || !!errors.username}
                         type="submit"
                         className={
@@ -236,15 +239,15 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                         }
                       >
                         Log in
-                      </button>
+                      </Button>
                     ))
                     .otherwise(() => (
-                      <button
+                      <Button
                         disabled
                         className="flex w-full justify-center rounded-md bg-[#006064] px-3 py-3 text-sm font-semibold leading-6 text-primary shadow-sm hover:bg-[#004D51] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
                       >
                         <Spinner />
-                      </button>
+                      </Button>
                     ))}
                 </div>
               </div>
