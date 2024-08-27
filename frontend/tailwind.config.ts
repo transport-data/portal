@@ -13,19 +13,24 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "8px",
       screens: {
-        "2xl": "1400px",
-        "8xl": "88rem",
-        "9xl": "1440px",
+        "2xl": "1280px",
+        "xl" : "1140px",
+        "lg" : "1024px",
+        "md" : "768px",
+        "sm" : "640px"
       },
     },
     extend: {
-      maxWidth: {
+        maxWidth: {
         "8xl": "88rem",
         "9xl": "1440px",
       },
       colors: {
+        "gray-900" : "#111928",
+        "gray-500" : "#6B7280",
+        "gray-400" : "#9CA3AF",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

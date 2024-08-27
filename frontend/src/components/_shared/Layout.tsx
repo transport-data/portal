@@ -1,10 +1,12 @@
 import React from "react";
 import Footer from "./Footer";
+import Header from "./Header";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children?: React.ReactNode }) {
   return (
-    <div className="bg-gradient-to-b from-gray-50 via-gray-50 to-lightaccent">
-      {children}
+    <div className="layout-default relative">
+      <Header />
+      <main className="min-h-[calc(100vh-89px)]">{children}</main>
       <Footer />
     </div>
   );
