@@ -15,26 +15,25 @@ export const CKANUserSchema = z.object({
 
 export type CKANUserFormType = z.infer<typeof CKANUserSchema>;
 
-export const UserSchema = z
-  .object({
-    name: z
-      .string()
-      .regex(
-        /^[a-z0-9_-]+$/,
-        "Please, use only letters (a-z), numbers, hyphens (-) and underscores (_)."
-      ),
-    email: z.string().email(),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-    fullname: z.string().optional(),
-    organizationTitle: z
-      .string()
-      .min(1, { message: "Title must be at least 1 characters long" }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirm"],
-  });
+export const UserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z
+    .string()
+    .regex(/^[a-zA-ZÀ-ÿ'-]+(?: [a-zA-ZÀ-ÿ'-]+)*$/, "Invalid name"),
+  lastName: z
+    .string()
+    .regex(/^[a-zA-ZÀ-ÿ'-]+(?: [a-zA-ZÀ-ÿ'-]+)*$/, "Invalid last name"),
+  hasAcceptedTerms: z
+    .boolean()
+    .refine((value) => value, {
+      message: "You must accept the terms to proceed",
+    }),
+  hasConsentedToReceiveEmails: z.boolean().optional(),
+  organizationTitle: z
+    .string()
+    .min(1, { message: "Title must be at least 1 characters long" }),
+});
 
 export type UserFormType = z.infer<typeof UserSchema>;
 
