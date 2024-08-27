@@ -12,6 +12,10 @@ import { pageview } from "@portaljs/core";
 import NotificationContainer from "@components/_shared/NotificationContainer";
 import { DefaultSeo } from "next-seo";
 
+import { Inter } from "@next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
+
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
@@ -34,8 +38,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
       defaultTheme={"light"}
     >
       <DefaultSeo
-        defaultTitle="PortalJS Cloud"
-        titleTemplate="%s - PortalJS Cloud"
+        defaultTitle="Transport Data Commons"
+        titleTemplate="%s - Transport Data Commons"
       />
       <Script
         strategy="afterInteractive"
@@ -57,7 +61,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
       />
       <NotificationContainer />
       <SessionProvider session={session}>
-        <Component {...pageProps} />
+        <div className={inter.className}>
+          <Component {...pageProps} />
+        </div>
       </SessionProvider>
     </ThemeProvider>
   );
