@@ -54,10 +54,10 @@ export default function Header() {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:items-center lg:flex">
-            <Button variant="ghost" className="relative">
-              Log In
+            <Button variant="ghost" className="relative" asChild>
+              <Link href="/auth/signin">Log In</Link>
             </Button>
-            <Button variant="tdc-primary">Sign up</Button>
+            <Button>Sign up</Button>
           </div>
           <div className="-mr-2 flex items-center lg:hidden">
             {/* Mobile menu button */}

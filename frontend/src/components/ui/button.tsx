@@ -9,9 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        "tdc-primary": "border-transparent bg-tdc-primary text-white",
         primary:
-          "border-transparent bg-secondary hover:bg-secondary-hover text-black",
+          "bg-primary text-primary-foreground hover:bg-primary/90",
         danger: "border-transparent bg-red-500 hover:bg-red-400 text-black",
         success:
           "border-transparent bg-green-500 hover:bg-green-400 text-black",
@@ -22,7 +21,7 @@ const buttonVariants = cva(
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         input:
           "shadow-sm w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0",
