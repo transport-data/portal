@@ -14,7 +14,7 @@ const buttonVariants = cva(
         danger: "border-transparent bg-red-500 hover:bg-red-400 text-black",
         success:
           "border-transparent bg-green-500 hover:bg-green-400 text-black",
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-accent text-accent-foreground hover:bg-accent/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
