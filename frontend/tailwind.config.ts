@@ -30,6 +30,7 @@ const config = {
         "tdc-primary" : "#006064",
         "gray-900" : "#111928",
         "gray-500" : "#6B7280",
+        "gray-400" : "#9CA3AF"
       }
     },
   },
