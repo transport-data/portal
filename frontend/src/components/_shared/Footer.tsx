@@ -102,12 +102,13 @@ const Footer: React.FC = () => {
             </p>
             <div className="mt-[20px] flex gap-[20px]">
               {navigation.social.map((social, i) => (
-                <Link href={social.href} target="_blank" className="block">
-                  <social.icon
-                    className="w-[18px] text-gray-400"
-                    aria-hidden
-                    key={`footer-social-${i}`}
-                  />
+                <Link
+                  key={`footer-social-${i}`}
+                  href={social.href}
+                  target="_blank"
+                  className="block"
+                >
+                  <social.icon className="w-[18px] text-gray-400" aria-hidden />
                 </Link>
               ))}
             </div>
