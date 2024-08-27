@@ -10,7 +10,7 @@ import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
 
 export async function getStaticProps() {
-  const backend_url = env.NEXT_PUBLIC_CKAN_URL
+  const backend_url = env.NEXT_PUBLIC_CKAN_URL;
   const ckan = new CKAN(backend_url);
   const datasets = await ckan.packageSearch({
     offset: 0,
@@ -45,14 +45,14 @@ export default function Home({
   return (
     <>
       <Head>
-        <title>Open Data Portal Demo</title>
-        <meta name="description" content="Open Data Portal Demo" />
+        <title>Transport Data Commons</title>
+        <meta name="description" content="Transport Data Commons" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Layout>
-        <Hero stats={stats} />
+        {/*<Hero stats={stats} />
         <MainSection groups={groups} datasets={datasets} />
-        <BlogSection />
+        <BlogSection />*/}
       </Layout>
     </>
   );
