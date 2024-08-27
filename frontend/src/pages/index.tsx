@@ -50,7 +50,6 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Layout>
-        content
         {/*<Hero stats={stats} />
         <MainSection groups={groups} datasets={datasets} />
         <BlogSection />*/}

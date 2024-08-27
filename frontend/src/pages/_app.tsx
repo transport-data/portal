@@ -38,8 +38,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
       defaultTheme={"light"}
     >
       <DefaultSeo
-        defaultTitle="PortalJS Cloud"
-        titleTemplate="%s - PortalJS Cloud"
+        defaultTitle="Transport Data Commons"
+        titleTemplate="%s - Transport Data Commons"
       />
       <Script
         strategy="afterInteractive"

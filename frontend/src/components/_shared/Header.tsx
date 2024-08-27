@@ -29,7 +29,7 @@ const navigation = [
 
 export default function Header() {
   return (
-    <Disclosure as="nav" className="">
+    <Disclosure as="nav" className="sticky top-0 bg-white">
       <div className="container py-[24px]">
         <div className="flex justify-between py-[4.5px]">
           <div className="flex items-center">
@@ -41,7 +41,7 @@ export default function Header() {
                 height={32}
               />
             </Link>
-            <div className="hidden sm:ml-[32px] sm:space-x-8 lg:flex">
+            <div className="ml-6 hidden space-x-6 lg:flex xl:ml-8 xl:space-x-8">
               {navigation.map((nav, i) => (
                 <a
                   key={i}
@@ -62,7 +62,6 @@ export default function Header() {
           <div className="-mr-2 flex items-center lg:hidden">
             {/* Mobile menu button */}
             <Disclosure.Button className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-              <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
               <Bars3Icon
                 aria-hidden="true"
