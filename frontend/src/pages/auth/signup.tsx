@@ -240,6 +240,9 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
                     <label htmlFor="hasAcceptedTerms">
                       By signing up, you are creating a Transport Data Commons
                       account, and you agree to our{" "}
+                      {
+                        // TODO change these links to the correct one when it's available
+                      }
                       <Link
                         className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
                         href={"https://google.com"}
