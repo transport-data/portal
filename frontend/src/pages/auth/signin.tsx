@@ -232,7 +232,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                         disabled={!!errors.password || !!errors.username}
                         type="submit"
                         className={
-                          "flex w-full justify-center rounded-md bg-[#006064] px-3 py-3 text-sm font-semibold leading-6 text-primary shadow-sm hover:bg-[#004D51] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary" +
+                          "flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary" +
                           (!!errors.password || !!errors.username
                             ? " cursor-not-allowed"
                             : "")
@@ -244,7 +244,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                     .otherwise(() => (
                       <Button
                         disabled
-                        className="flex w-full justify-center rounded-md bg-[#006064] px-3 py-3 text-sm font-semibold leading-6 text-primary shadow-sm hover:bg-[#004D51] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                        className="flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
                       >
                         <Spinner />
                       </Button>
