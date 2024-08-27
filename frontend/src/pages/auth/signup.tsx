@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Spinner from "@components/_shared/Spinner";
+import { Button } from "@components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type UserFormType, UserSchema } from "@schema/user.schema";
 import { getServerAuthSession } from "@server/auth";
@@ -285,7 +286,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
                 <div className="col-span-full">
                   {match(createUser.isLoading)
                     .with(false, () => (
-                      <button
+                      <Button
                         disabled={
                           !!errors.password ||
                           !!errors.email ||
@@ -304,15 +305,15 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
                         }
                       >
                         Sign up
-                      </button>
+                      </Button>
                     ))
                     .otherwise(() => (
-                      <button
+                      <Button
                         disabled
                         className="flex w-full justify-center rounded-md bg-[#006064] px-3 py-3 text-sm font-semibold leading-6 text-primary shadow-sm hover:bg-[#004D51] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
                       >
                         <Spinner />
-                      </button>
+                      </Button>
                     ))}
                 </div>
               </div>
