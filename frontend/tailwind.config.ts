@@ -10,17 +10,30 @@ const config = {
     "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
+
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "8px",
       screens: {
-        "2xl": "1400px",
-        "8xl": "88rem",
-        "9xl": "1440px",
+        "2xl": "1280px",
+        "xl" : "1140px",
+        "lg" : "1024px",
+        "md" : "768px",
+        "sm" : "640px"
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+      colors:{
+        "tdc-primary" : "#006064",
+        "gray-900" : "#111928",
+        "gray-500" : "#6B7280",
+      }
+    },
+    /*extend: {
       maxWidth: {
         "8xl": "88rem",
         "9xl": "1440px",
@@ -83,7 +96,7 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-    },
+    },*/
   },
   plugins: [
     require("tailwindcss-animate"),

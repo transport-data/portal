@@ -1,3 +1,6 @@
+import Image from "next/image";
+import Link from "next/link";
+
 interface IconProps {
   className: string;
   "aria-hidden": boolean;
@@ -5,17 +8,30 @@ interface IconProps {
 
 const Footer: React.FC = () => {
   const navigation = {
-    about: [
-      { name: "About Us", href: "https://www.datopian.com/about/" },
+    resources: [
       {
-        name: "DataHub Open Data",
-        href: "https://datahub.io/opendata",
+        name: "Datasets",
+        href: "#",
+      },
+      {
+        name: "Geography",
+        href: "#",
+      },
+      {
+        name: "FAQ",
+        href: "#",
       },
     ],
-    useful: [
-      { name: "Datasets", href: "/search" },
-      { name: "Organisations", href: "/organizations" },
-      { name: "Groups", href: "/groups" },
+    organisation: [
+      { name: "About Us", href: "#" },
+      { name: "Partners", href: "#" },
+      { name: "Events", href: "#" },
+      { name: "Contact", href: "#" },
+    ],
+    legal: [
+      { name: "Privacy and Policy", href: "#" },
+      { name: "Terms and Conditions", href: "#" },
+      { name: "EULA", href: "#" },
     ],
     social: [
       {
@@ -62,84 +78,74 @@ const Footer: React.FC = () => {
           </svg>
         ),
       },
-      {
-        name: "email",
-        href: "mailto:hello@datopian.com",
-        // eslint-disable-next-line
-        icon: (props: IconProps) => (
-          <svg fill="currentColor" viewBox="0 0 64 64" {...props}>
-            <path fillRule="evenodd" d="M2 12h60v40H2z" clipRule="evenodd" />
-            <path
-              fillRule="evenodd"
-              stroke="#fff"
-              strokeWidth="2"
-              d="M2 12l30 27.4L62 12"
-              clipRule="evenodd"
-            />
-          </svg>
-        ),
-      },
     ],
   };
 
   return (
-    <footer className="bg-white">
-      <div className="custom-container flex flex-col flex-wrap py-10 mx-auto md:items-center lg:items-start md:flex-row md:flex-nowrap">
-        <div className="justify-between w-full text-center md:text-left lg:flex">
-          <div className="w-full lg:w-1/3 md:w-1/2">
-            <h2 className="mt-4 mb-4 font-roboto font-black">ABOUT DATOPIAN</h2>
-            <ul className="space-y-4 text-sm list-none">
-              {navigation.about.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className="font-roboto font-normal hover:text-gray-400"
-                  >
-                    {item.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+    <footer className="py-[64px]">
+      <div className="container">
+        <div className="flex">
+          <div className="lg:w-[384px]">
+            <Link href="/" className="flex flex-shrink-0 items-center">
+              <Image
+                alt="Transport Data Commons"
+                src="/images/logos/tdc-logo.svg"
+                width={300}
+                height={32}
+              />
+            </Link>
+            <p className="mt-[20px] text-sm text-gray-500">
+              Transport Data Commons is an initiative of individuals and
+              organizations who are passionate about sustainable transportation
+              and want to increase the use and impact of data in this sector.
+            </p>
+            <div className="mt-[20px]"></div>
           </div>
-
-          <div className="w-full lg:w-1/3 md:w-1/2">
-            <h2 className="mt-4 mb-4 font-roboto font-black">USEFUL LINKS</h2>
-            <ul className="space-y-4 text-sm list-none">
-              {navigation.useful.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className="font-roboto font-normal hover:text-gray-400"
-                  >
-                    {item.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="ml-auto flex gap-[32px]">
+            <div className="lg:w-[176px]">
+              <h4 className="mb-[16px] text-sm font-semibold uppercase text-gray-900">
+                Resources
+              </h4>
+              <ul className="flex flex-col gap-y-[16px]">
+                {navigation.resources.map((item, i) => (
+                  <li key={`resources-menu-${i}`}>
+                    <a href={item.href} className="text-gray-500">
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="lg:w-[176px]">
+              <h4 className="mb-[16px] text-sm font-semibold uppercase text-gray-900">
+                Organisation
+              </h4>
+              <ul className="flex flex-col gap-y-[16px]">
+                {navigation.organisation.map((item, i) => (
+                  <li key={`org-menu-${i}`}>
+                    <a href={item.href} className="text-gray-500">
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="lg:w-[176px]">
+              <h4 className="mb-[16px] text-sm font-semibold uppercase text-gray-900">
+                Legal
+              </h4>
+              <ul className="flex flex-col gap-y-[16px]">
+                {navigation.legal.map((item, i) => (
+                  <li key={`legal-menu-${i}`}>
+                    <a href={item.href} className="text-gray-500">
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-        <div className="w-full md:w-1/2 flex flex-col justify-between text-center md:text-left">
-          <h2 className="mt-4 mb-4 font-roboto font-black">
-            STAY UP TO DATE WITH THE NEWS
-          </h2>
-          <div className="flex mt-5 space-x-5 justify-center md:justify-start">
-            {navigation.social.map((item) => (
-              <a key={item.name} href={item.href}>
-                <span className="sr-only">{item.name}</span>
-                <item.icon className="flex h-6 w-6" aria-hidden={true} />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="custom-container flex flex-col flex-wrap py-6 mx-auto md:items-center lg:items-start md:flex-row md:flex-nowrap">
-        <a
-          href="https://portaljs.org"
-          target="_blank"
-          className="text-xl font-medium"
-        >
-          🌀 PortalJS
-        </a>
       </div>
     </footer>
   );
