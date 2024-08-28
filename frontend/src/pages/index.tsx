@@ -1,14 +1,10 @@
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
-import BlogSection from "../components/home/blogSection/BlogSection";
 import Hero from "../components/home/heroSection/Hero";
 import { StatsProps } from "../components/home/heroSection/Stats";
-import MainSection from "../components/home/mainSection/MainSection";
 import Layout from "../components/_shared/Layout";
-import getConfig from "next/config";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
-import PartnersCarousel from "@components/_shared/PartnersCarousel";
 import DatasetsSection from "@components/home/mainSection/DatasetsSection";
 import ContributeSection from "@components/home/mainSection/ContributeSection";
 import FaqsSection from "@components/home/mainSection/FaqsSection";

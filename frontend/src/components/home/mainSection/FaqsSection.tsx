@@ -7,15 +7,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import {
-  ArrowRightIcon,
-  ArrowUturnRightIcon,
-  BuildingLibraryIcon,
-  ClipboardIcon,
-  GlobeAltIcon,
-  ShieldCheckIcon,
-} from "@heroicons/react/20/solid";
-import { Dataset } from "@portaljs/ckan";
 import { useState } from "react";
 
 interface FaqsProps {
