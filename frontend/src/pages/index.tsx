@@ -8,6 +8,7 @@ import { env } from "@env.mjs";
 import DatasetsSection from "@components/home/mainSection/DatasetsSection";
 import ContributeSection from "@components/home/mainSection/ContributeSection";
 import FaqsSection from "@components/home/mainSection/FaqsSection";
+import TestimonialsSection from "@components/home/mainSection/TestimonialsSection";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -53,6 +54,7 @@ export default function Home({
         <Hero />
         <DatasetsSection datasets={datasets} />
         <ContributeSection />
+        <TestimonialsSection />
         <FaqsSection />
       </Layout>
     </>
