@@ -13,7 +13,7 @@ export default function Hero() {
           <div className="w-full">
             <Link
               href="#"
-              className="flex w-fit items-center rounded-[14px] bg-[#F3F4F6] p-2"
+              className="flex w-fit items-center rounded-[14px] bg-[#F3F4F6] p-1.5"
             >
               <span className="block min-w-fit rounded-[10px] bg-accent px-[12px] py-[2px] text-[12px] font-medium leading-[18px] text-white">
                 Add data
