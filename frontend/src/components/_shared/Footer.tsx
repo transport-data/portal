@@ -83,7 +83,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="py-[64px]">
+    <footer className="bg-gray-50 py-[64px]">
       <div className="container flex flex-col gap-[48px]">
         <div className="flex flex-col gap-x-16 lg:flex-row">
           <div className="lg:w-[384px]">
