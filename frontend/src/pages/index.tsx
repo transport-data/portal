@@ -8,6 +8,9 @@ import Layout from "../components/_shared/Layout";
 import getConfig from "next/config";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
+import PartnersCarousel from "@components/_shared/PartnersCarousel";
+import DatasetsSection from "@components/home/mainSection/DatasetsSection";
+import ContributeSection from "@components/home/mainSection/ContributeSection";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -50,8 +53,10 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Layout>
-        {/*<Hero stats={stats} />
-        <MainSection groups={groups} datasets={datasets} />
+        <Hero />
+        <DatasetsSection datasets={datasets} />
+        <ContributeSection />
+        {/*<MainSection groups={groups} datasets={datasets} />
         <BlogSection />*/}
       </Layout>
     </>
