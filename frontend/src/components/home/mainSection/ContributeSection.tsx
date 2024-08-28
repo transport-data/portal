@@ -14,7 +14,7 @@ export default function ContributeSection() {
         </p>
       </div>
       <div className="mt-[96px] flex flex-col gap-[80px] sm:flex-row sm:items-center">
-        <div className="w-full max-w-[560px]">
+        <div className="hidden w-full max-w-[560px] lg:block">
           <Image
             alt="Contribute"
             src="/images/contribute-section.png"
