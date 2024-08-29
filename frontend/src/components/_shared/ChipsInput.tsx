@@ -124,7 +124,7 @@ function transToGroupOption(options: Option[], groupBy?: string) {
     if (!groupOption[key]) {
       groupOption[key] = [];
     }
-    groupOption[key].push(option);
+    groupOption[key]!.push(option);
   });
   return groupOption;
 }
