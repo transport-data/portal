@@ -61,7 +61,7 @@ export function Citation({
                   index !== 0 && "p-0"
                 )}
               >
-                <div className="border-t-4 border-gray-200">
+                <div className="border-t-2">
                   <TabsTrigger asChild value={option.label}>
                     <Button
                       variant="secondary"

@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Citation } from "./Citation";
+import { Badge } from "@components/ui/badge";
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
   return (
@@ -125,22 +126,22 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             <TableBody>
               <TableRow>
                 <TableCell className="text-gray-500">23/03/2023</TableCell>
-                <TableCell></TableCell>
+                <TableCell><Badge variant="success">Latest</Badge></TableCell>
                 <TableCell>March 2023</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-gray-500">11/07/2022</TableCell>
-                <TableCell></TableCell>
+                <TableCell><Badge variant="muted">Past</Badge></TableCell>
                 <TableCell>March 2022 - Revisited</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-gray-500">17/03/2022</TableCell>
-                <TableCell></TableCell>
+                <TableCell><Badge variant="muted">Past</Badge></TableCell>
                 <TableCell>March 2022</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-gray-500">17/06/2022</TableCell>
-                <TableCell></TableCell>
+                <TableCell><Badge variant="muted">Past</Badge></TableCell>
                 <TableCell>March 2021</TableCell>
               </TableRow>
             </TableBody>

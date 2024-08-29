@@ -13,6 +13,8 @@ import { EnvelopeIcon, ShareIcon } from "@heroicons/react/24/outline";
 import { Overview } from "@components/dataset/individualPage/Overview";
 import { DatasetPreview } from "@components/dataset/individualPage/DatasetPreview";
 import { Metadata } from "@components/dataset/individualPage/Metadata";
+import { Downloads } from "@components/dataset/individualPage/Downloads";
+import { Badge } from "@components/ui/badge";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -82,7 +84,7 @@ export default function DatasetPage({
     },
     {
       id: "downloads",
-      content: <></>,
+      content: <Downloads dataset={dataset} />,
       title: "Downloads",
     },
   ];
@@ -135,6 +137,7 @@ export default function DatasetPage({
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                   {dataset.title || dataset.name}
                 </h2>
+                <Badge className="my-2" variant="warning">TDC Harmonized</Badge>
                 <div className="mt-4 w-96 text-justify text-base font-normal leading-normal text-gray-500">
                   {dataset.notes ?? "-"}
                 </div>

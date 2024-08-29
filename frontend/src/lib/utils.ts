@@ -15,3 +15,17 @@ export const chunkArray = (arr: Array<any>, size: number) => {
     return chunks;
   }, []);
 };
+
+export const formatIcon = (format: string) => {
+  const icon = {
+    'csv': '/images/fileIcons/csv.png',
+    'json': '/images/fileIcons/json.png',
+    'pdf': '/images/fileIcons/pdf.png',
+    'xls': '/images/fileIcons/xls.png',
+    'xml': '/images/fileIcons/xml.png',
+  }[format]
+  if (icon) {
+    return icon
+  }
+  return '/images/fileIcons/undefined.png'
+}
