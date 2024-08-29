@@ -175,7 +175,7 @@ export default ({
 }) => {
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
-    TextStyle.configure({ types: [ListItem.name] }),
+    TextStyle.configure({ types: [ListItem.name] } as any),
     StarterKit.configure({
       bulletList: {
         keepMarks: true,
