@@ -10,7 +10,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$script_dir"
 
 # Generate a token
-token=$(docker exec ckan-vs-dev ckan -c ckan.ini user token add ckan_admin cypress | awk '/API Token created:/ {getline; print $1}' | tr -d '\n' | tr -d '\r')
+token=$(docker exec ckan-tdc-dev ckan -c ckan.ini user token add ckan_admin cypress | awk '/API Token created:/ {getline; print $1}' | tr -d '\n' | tr -d '\r')
 
 # Replace the token placeholder with the generated token
 sed -i "s/CKAN_API_TOKEN/$token/g" ../integration-tests/cypress.config.js
