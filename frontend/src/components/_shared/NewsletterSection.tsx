@@ -30,7 +30,7 @@ export default function NewsLetterSection() {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
-      title: "You submitted the following values:",
+      title: "You submitted the following email:",
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
@@ -78,7 +78,10 @@ export default function NewsLetterSection() {
                     )}
                   />
                 </div>
-                <Button className="mt-2 border border-accent py-[14px]">
+                <Button
+                  type="submit"
+                  className="mt-2 border border-accent py-[14px]"
+                >
                   Subscribe
                 </Button>
               </div>
