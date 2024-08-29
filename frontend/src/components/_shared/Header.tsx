@@ -29,7 +29,7 @@ const navigation = [
 
 export default function Header() {
   return (
-    <Disclosure as="nav" className="sticky top-0 bg-white">
+    <Disclosure as="nav" className="sticky top-0 z-10 bg-white">
       <div className="container py-[24px]">
         <div className="flex justify-between py-[4.5px]">
           <div className="flex items-center">

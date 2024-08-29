@@ -1,13 +1,15 @@
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
-import BlogSection from "../components/home/blogSection/BlogSection";
 import Hero from "../components/home/heroSection/Hero";
 import { StatsProps } from "../components/home/heroSection/Stats";
-import MainSection from "../components/home/mainSection/MainSection";
 import Layout from "../components/_shared/Layout";
-import getConfig from "next/config";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
+import DatasetsSection from "@components/home/mainSection/DatasetsSection";
+import ContributeSection from "@components/home/mainSection/ContributeSection";
+import FaqsSection from "@components/home/mainSection/FaqsSection";
+import TestimonialsSection from "@components/home/mainSection/TestimonialsSection";
+import NewsLetterSignUpSection from "@components/_shared/NewsletterSection";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -50,9 +52,12 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Layout>
-        {/*<Hero stats={stats} />
-        <MainSection groups={groups} datasets={datasets} />
-        <BlogSection />*/}
+        <Hero />
+        <DatasetsSection datasets={datasets} />
+        <ContributeSection />
+        <TestimonialsSection />
+        <FaqsSection />
+        <NewsLetterSignUpSection />
       </Layout>
     </>
   );

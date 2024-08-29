@@ -145,3 +145,22 @@ snap-tabs {
   gap: 20px;
   -webkit-mask: linear-gradient(90deg, white 70%, transparent)
 }
+
+@media (min-width: 1024px) {
+  .bordered-grid.grid > * {
+    padding: 16px 32px;
+  }
+
+  .bordered-grid.grid > *:nth-child(3n + 1) {
+    border-right: 1px solid #e5e7eb;
+    padding-right: 32px;
+    padding-left: 0;
+  }
+
+  .bordered-grid.grid > *:nth-child(3n) {
+    border-left: 1px solid #e5e7eb;
+    padding-left: 32px;
+    padding-right: 0;
+    /* Your styles here */
+  }
+}
