@@ -37,9 +37,9 @@ jobs:
         run: bash ./scripts/cypress_setup.sh
       - name: Print Logs
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
-      - name: Wait for ckan-vs-db to be healthy
+      - name: Wait for ckan-tdc-db to be healthy
         run: |
-          while ! docker exec ckan-vs-db pg_isready -U ckandbuser -d ckandb; do
+          while ! docker exec ckan-tdc-db pg_isready -U ckandbuser -d ckandb; do
             sleep 1
           done
       - name: Run Integration tests 🧪
@@ -51,7 +51,7 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: /home/runner/work/ckan-docker-vs-dev/ckan-docker-vs-dev/integration-tests/cypress/screenshots
+          path: /home/runner/work/ckan-docker-tdc-dev/ckan-docker-tdc-dev/integration-tests/cypress/screenshots
           if-no-files-found: ignore
       - name: Print Error Logs
         if: failure()
