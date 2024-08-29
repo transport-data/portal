@@ -164,3 +164,13 @@ snap-tabs {
     /* Your styles here */
   }
 }
+
+.blur-on-left {
+  gap: 20px;
+  -webkit-mask: linear-gradient(90deg, white 80%, transparent)
+}
+
+.blur-on-left-2xl {
+  gap: 20px;
+  -webkit-mask: linear-gradient(90deg, white 70%, transparent)
+}
