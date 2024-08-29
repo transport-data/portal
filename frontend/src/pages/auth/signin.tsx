@@ -1,15 +1,10 @@
-import { ErrorAlert } from "@components/_shared/Alerts";
 import { SingInLayout } from "@components/_shared/SignInLayout";
-import Spinner from "@components/_shared/Spinner";
-import { Button } from "@components/ui/button";
 import type { GetServerSidePropsContext } from "next";
-import { getCsrfToken, signIn } from "next-auth/react";
+import { getCsrfToken } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { match } from "ts-pattern";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
@@ -54,13 +49,13 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
             analysing transportation data for a more sustainable future."
         subtitleText="Unlock the Power of Transportation Data"
       >
-        <div className="w-full bg-white px-28 py-36">
+        <div className="flex h-[100vh] w-full flex-col justify-center bg-white px-28 py-36">
           <h2 className="text-xl font-bold text-[#111928]">Welcome back</h2>
           <div>
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-12 gap-4">
               <a
-                href="#"
-                className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent"
+                href="/onboarding"
+                className="col-span-12 flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
                   <path
@@ -81,13 +76,13 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                   />
                 </svg>
                 <span className="text-sm font-semibold leading-6">
-                  Sign up with Google
+                  Sign in with Google
                 </span>
               </a>
 
               <a
-                href="#"
-                className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent"
+                href="/onboarding"
+                className="col-span-12 flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
               >
                 <svg
                   fill="currentColor"
@@ -102,171 +97,10 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                   />
                 </svg>
                 <span className="text-sm font-semibold leading-6">
-                  Sign up with GitHub
+                  Sign in with GitHub
                 </span>
               </a>
             </div>
-          </div>
-          <div className="relative my-5">
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 flex items-center"
-            >
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm font-medium leading-6">
-              <span className="bg-white px-6 text-[#6B7280]">or</span>
-            </div>
-          </div>
-          <div>
-            <form
-              className="space-y-5"
-              onSubmit={(event) =>
-                void handleSubmit(async (data) => {
-                  setLogin(true);
-                  if (data.remember) {
-                    const copiedData: {
-                      username: string;
-                      password?: string;
-                      remember?: boolean;
-                    } = { ...data };
-                    delete copiedData.password;
-                    localStorage.setItem(
-                      REMEMBER_LOGIN_DATA_KEY,
-                      JSON.stringify(copiedData)
-                    );
-                  } else {
-                    localStorage.removeItem(REMEMBER_LOGIN_DATA_KEY);
-                  }
-
-                  const signInStatus = await signIn("credentials", {
-                    callbackUrl: "/dashboard/datasets",
-                    redirect: false,
-                    ...data,
-                  });
-                  if (signInStatus?.error) {
-                    setLogin(false);
-                    setErrorMessage(
-                      "Could not find user please check your login and password"
-                    );
-                  } else {
-                    void router.push("/dashboard/datasets");
-                  }
-                })(event)
-              }
-            >
-              <input
-                name="csrfToken"
-                type="hidden"
-                defaultValue={csrfToken ? csrfToken : ""}
-              />
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium leading-6 text-[#111928]"
-                >
-                  Email
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="username"
-                    placeholder="name@example.com"
-                    {...register("username", {
-                      required: true,
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
-                      },
-                    })}
-                    className="block w-full rounded-md border-0 py-3.5 text-[#111928] shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                  />
-                </div>
-                {errors && errors.username && (
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{errors.username.message}</p>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium leading-6 text-[#111928]"
-                  >
-                    Password
-                  </label>
-                </div>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    placeholder="••••••••••"
-                    type="password"
-                    {...register("password")}
-                    autoComplete="current-password"
-                    className="block w-full rounded-md border-0 py-3.5 text-[#111928] shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-between">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-                    id="remember"
-                    {...register("remember")}
-                  />
-                  <div className=" text-[#6B7280]">
-                    <label htmlFor="remember">Remember me</label>
-                  </div>
-                </div>
-                <div className="text-sm">
-                  <a
-                    href="#"
-                    className="text-[#00ACC1] hover:text-[#008E9D]"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div>
-                <div className="col-span-full">
-                  {match(loggingIn)
-                    .with(false, () => (
-                      <Button
-                        disabled={!!errors.password || !!errors.username}
-                        type="submit"
-                        className={
-                          "flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary" +
-                          (!!errors.password || !!errors.username
-                            ? " cursor-not-allowed"
-                            : "")
-                        }
-                      >
-                        Log in
-                      </Button>
-                    ))
-                    .otherwise(() => (
-                      <Button
-                        disabled
-                        className="flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
-                      >
-                        <Spinner />
-                      </Button>
-                    ))}
-                </div>
-              </div>
-              <p className="text-sm leading-6 text-[#6B7280]">
-                Don't have an account yet?{" "}
-                <Link
-                  href="/auth/signup"
-                  className="text-[#00ACC1] hover:text-[#008E9D]"
-                >
-                  Sign up
-                </Link>
-              </p>
-              {errorMessage && <ErrorAlert text={errorMessage} />}
-            </form>
           </div>
         </div>
       </SingInLayout>

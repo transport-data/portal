@@ -44,7 +44,7 @@ export const TagsButtonsSelectionGroup = ({
             onClick={() => {
               setIndexToShowMoreButton(invalidIndex);
             }}
-            className="cursor-pointer rounded-2xl border px-3 py-2 text-xs text-[#006064]"
+            className="cursor-pointer rounded-2xl border px-3 py-2 text-xs text-[#006064] hover:opacity-60"
           >
             + More
           </span>
@@ -57,7 +57,7 @@ export const TagsButtonsSelectionGroup = ({
               setData([...data]);
             }}
             className={
-              "cursor-pointer rounded-2xl border px-3 py-2 text-xs text-[#006064] " +
+              "cursor-pointer rounded-2xl border px-3 py-2 text-xs text-[#006064] hover:opacity-60 " +
               (x.selected ? "bg-[#006064] text-white" : "")
             }
           >

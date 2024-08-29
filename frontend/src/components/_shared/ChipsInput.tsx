@@ -30,8 +30,9 @@ interface GroupOption {
 interface MultipleSelectorProps {
   value?: Option[];
   defaultOptions?: Option[];
+  transformInputValueInLowercase?: boolean;
   validationOptions?: {
-    validateData: (value: string) => boolean;
+    isDataValid: (value: string) => boolean;
     errorMessage: string;
   };
   removeSuggestions?: boolean;
@@ -206,13 +207,14 @@ const MultipleSelector = React.forwardRef<
       triggerSearchOnFocus = false,
       commandProps,
       inputProps,
+      transformInputValueInLowercase,
       validationOptions,
       removeSuggestions = false,
       hideClearAllButton = false,
     }: MultipleSelectorProps,
     ref: React.Ref<MultipleSelectorRef>
   ) => {
-    const { errorMessage, validateData } = validationOptions || {};
+    const { errorMessage, isDataValid } = validationOptions || {};
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [open, setOpen] = React.useState(false);
     const [showErrorMessage, setShowErrorMessage] = React.useState(false);
@@ -364,6 +366,7 @@ const MultipleSelector = React.forwardRef<
     const CreatableItem = () => {
       if (!creatable) return undefined;
       if (
+        showErrorMessage ||
         isOptionsExist(options, [{ value: inputValue, label: inputValue }]) ||
         selected.find((s) => s.value === inputValue)
       ) {
@@ -531,7 +534,9 @@ const MultipleSelector = React.forwardRef<
                   value={inputValue}
                   disabled={disabled}
                   onValueChange={(value) => {
-                    if (validateData) setShowErrorMessage(validateData(value));
+                    if (transformInputValueInLowercase)
+                      value = value.toLowerCase();
+                    if (isDataValid) setShowErrorMessage(isDataValid(value));
                     setInputValue(value);
                     inputProps?.onValueChange?.(value);
                   }}

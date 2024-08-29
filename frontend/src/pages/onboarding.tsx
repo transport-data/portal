@@ -1,27 +1,19 @@
 import { ErrorAlert } from "@components/_shared/Alerts";
 import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
-import TextDivisor from "@components/_shared/TextDivisor";
-import TextEditor from "@components/_shared/TextEditor";
 import { Button } from "@components/ui/button";
-import { TagsButtonsSelectionGroup } from "@components/ui/tags-buttons-selection-group";
-import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-} from "@headlessui/react";
-import Image from "next/image";
 
-import MultipleSelector from "@components/_shared/ChipsInput";
+import { Option } from "@components/_shared/ChipsInput";
+import InterestsSteps from "@components/onboarding-steps/InterestsSteps";
+import OrganizationSelectionStep from "@components/onboarding-steps/OrganizationSelectionStep";
 import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
+import InviteUsersStep from "@components/onboarding-steps/InviteUsersStep";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
@@ -35,6 +27,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loggingIn, setLogin] = useState(false);
   const [messageToOrg, setMessageToOrg] = useState("");
+  const router = useRouter();
   const [messageToInvitation, setMessageToInvitation] = useState("");
   const [disableButton, setDisableButton] = useState(false);
   const { register, handleSubmit, formState, setValue } = useForm<{
@@ -65,6 +58,24 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
     { selected: false, name: "Africa" },
     { selected: false, name: "Africa" },
     { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
+    { selected: false, name: "Africa" },
   ]);
 
   const [organizations, setOrganizations] = useState([
@@ -76,6 +87,20 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
     { selected: false, name: "Eurostat" },
     { selected: false, name: "IEA" },
     { selected: false, name: "KFW" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
     { selected: false, name: "ITDP" },
     { selected: false, name: "ITDP" },
     { selected: false, name: "ITDP" },
@@ -96,9 +121,25 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
     { selected: false, name: "ITDP" },
     { selected: false, name: "ITDP" },
     { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
+    { selected: false, name: "ITDP" },
   ]);
 
-  const [stepNumber, setStep] = useState(2);
+  const [stepNumber, setStep] = useState(0);
+  const [emailValidationErrorMessage, setEmailValidationErrorMessage] =
+    useState<string>("");
 
   const steps = [
     { name: "Data interest", href: "1" },
@@ -106,15 +147,8 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
     { name: "Invite colleagues", href: "invite" },
   ];
 
-  const [query, setQuery] = useState("");
+  const [emailsToInvite, setEmailsToInvite] = useState(new Set<Option>());
   const [selectedOrg, setSelectedOrg] = useState(null);
-
-  const filteredOrgs =
-    query === ""
-      ? orgs
-      : orgs.filter((org) => {
-          return org.name.toLowerCase().includes(query.toLowerCase());
-        });
 
   const [paragraphText, setParagraphText] = useState<string | ReactNode>(
     "The changes appear as a running list on your dashboard."
@@ -122,10 +156,6 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   const [subtitleText, setSubtitleText] = useState(
     "Track the changes being made to the data you are interested in."
   );
-
-  useEffect(() => {
-    setDisableButton(!(selectedOrg && messageToOrg));
-  }, [selectedOrg, messageToOrg]);
 
   useEffect(() => {
     if (stepNumber === 1) {
@@ -145,38 +175,20 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
           <Button className="flex h-[41px] w-[144px] justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"></Button>
         </>
       );
-    }
-
-    if (stepNumber === 2) {
+      setDisableButton(!(selectedOrg && messageToOrg));
+    } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
         "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
+      setDisableButton(emailsToInvite.size < 1);
+    } else {
+      setDisableButton(false);
     }
-  }, [stepNumber]);
-
-  const [isComboboxOpened, setIsComboBoxOpened] = useState(false);
-
-  const comboboxRef = useRef<any>();
-
-  if (
-    comboboxRef?.current?.attributes["data-headlessui-state"].value.includes(
-      "open"
-    ) &&
-    !isComboboxOpened
-  ) {
-    setIsComboBoxOpened(true);
-  } else if (
-    !comboboxRef?.current?.attributes["data-headlessui-state"].value.includes(
-      "open"
-    ) &&
-    isComboboxOpened
-  ) {
-    setIsComboBoxOpened(false);
-  }
+  }, [selectedOrg, messageToOrg, emailsToInvite, stepNumber]);
 
   const nextStep = () => {
-    if (stepNumber === steps.length - 1) return;
+    if (stepNumber === steps.length - 1) return router.push("/");
     setStep(stepNumber + 1);
   };
 
@@ -262,170 +274,30 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
             </div>
           </div>
           {stepNumber === 0 ? (
-            <>
-              <h2 className="text-xl font-bold text-[#111928]">
-                Select locations, topics and organisations you want to follow
-              </h2>
-              <div>
-                <div className="space-y-5">
-                  <TextDivisor text="Locations" />
-                  <TagsButtonsSelectionGroup
-                    data={locations}
-                    setData={setLocations}
-                  />
-                  <TextDivisor text="Topics" />
-                  <TagsButtonsSelectionGroup
-                    data={topics}
-                    setData={setTopics}
-                  />
-                  <TextDivisor text="Organisations" />
-                  <TagsButtonsSelectionGroup
-                    data={organizations}
-                    setData={setOrganizations}
-                  />
-                </div>
-              </div>
-            </>
+            <InterestsSteps
+              locations={locations}
+              setLocations={setLocations}
+              topics={topics}
+              setTopics={setTopics}
+              organizations={organizations}
+              setOrganizations={setOrganizations}
+            />
           ) : stepNumber === 1 ? (
-            <div className="space-y-5">
-              <div>
-                <h2 className="mb-2.5 text-xl font-bold text-[#111928]">
-                  Find your organisation
-                </h2>
-                <p className="text-gray-500">
-                  Please note that that your account must be associated with an
-                  organisation to submit data.
-                </p>
-              </div>
-              <TextDivisor text="Select organisation*" />
-              <div className="space-y-1">
-                <Combobox
-                  as="div"
-                  value={selectedOrg}
-                  onChange={(org) => {
-                    setQuery("");
-                    setSelectedOrg(org);
-                  }}
-                >
-                  <div className="relative mt-2">
-                    <ComboboxInput
-                      placeholder="Select an organization"
-                      className="icon-at-left w-full rounded-md border-0 bg-white py-1.5 pl-11 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                      onChange={(event) => {
-                        setQuery(event.target.value);
-                      }}
-                      onBlur={() => {
-                        setQuery("");
-                      }}
-                      displayValue={(org: any) => org?.name}
-                    />
-                    <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none data-[open]:rotate-180">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="10"
-                        height="6"
-                        viewBox="0 0 10 6"
-                        fill="none"
-                      >
-                        <path
-                          d="M8.5 1.5L5 5L1.5 1.5"
-                          stroke="#6B7280"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    </ComboboxButton>
-
-                    {filteredOrgs.length > 0 && (
-                      <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                        {filteredOrgs.map((org) => (
-                          <ComboboxOption
-                            key={org.id}
-                            value={org}
-                            className="group relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-500"
-                          >
-                            <div className="flex items-center gap-3.5">
-                              <Image
-                                alt="Small building icon"
-                                src="/assets/organization-icon.svg"
-                                width={14}
-                                height={16}
-                              />
-                              <span className="block truncate group-data-[selected]:font-semibold">
-                                {org.name}
-                              </span>
-                            </div>
-                          </ComboboxOption>
-                        ))}
-                      </ComboboxOptions>
-                    )}
-                  </div>
-                </Combobox>
-                <p className="text-sm text-gray-500">
-                  Don’t see your organisation?{" "}
-                  <Link
-                    href={"https://google.com"}
-                    className="text-[#00ACC1] hover:text-[#008E9D]"
-                  >
-                    Request a new organisation
-                  </Link>
-                </p>
-              </div>
-              <TextDivisor text="Message for organisation owner*" />
-              <TextEditor
-                placeholder="Message for organisation admin..."
-                setText={setMessageToOrg}
-              />
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-                  id="remember"
-                  {...register("remember")}
-                />
-                <div className="pb-1 text-sm text-[#6B7280]">
-                  <label htmlFor="remember">
-                    I confirm that I work for this organisation
-                  </label>
-                </div>
-              </div>
-            </div>
+            <OrganizationSelectionStep
+              orgs={orgs}
+              selectedOrg={selectedOrg}
+              setSelectedOrg={setSelectedOrg}
+              setMessageToOrg={setMessageToOrg}
+              setConfirmationWorkingForTheOrg={register("remember").onChange}
+            />
           ) : (
-            <div className="space-y-5">
-              <h2 className="mb-2.5 text-xl font-bold text-[#111928]">
-                Invite friends & colleagues
-              </h2>
-
-              <div className="space-y-4">
-                <TextDivisor text="Emails*" />
-                <MultipleSelector
-                  removeSuggestions={true}
-                  hidePlaceholderWhenSelected={true}
-                  inputProps={{
-                    className:
-                      "border-0 text-[#111928] ring-0 border-[#00000000]",
-                  }}
-                  badgeClassName="px-3 py-[2px] bg-[#E3F9ED] rounded-md text-[#006064] overflow-wrap-anywhere"
-                  placeholder="name1@email.com; name2@email.com;"
-                  creatable
-                  validationOptions={{
-                    errorMessage: "Invalid e-mail",
-                    validateData: (v) =>
-                      !!v &&
-                      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(v),
-                  }}
-                  triggerSearchOnFocus={false}
-                  className="mail-icon-at-left pl-11 pr-4"
-                  hideClearAllButton={true}
-                />
-              </div>
-              <TextDivisor text="Attach a message" />
-              <TextEditor
-                placeholder="Message for friends and colleagues..."
-                setText={setMessageToInvitation}
-              />
-            </div>
+            <InviteUsersStep
+              emailValidationErrorMessage={emailValidationErrorMessage}
+              emailsToInvite={emailsToInvite}
+              setEmailValidationErrorMessage={setEmailValidationErrorMessage}
+              setEmailsToInvite={setEmailsToInvite}
+              setMessageToInvitation={setMessageToInvitation}
+            />
           )}
           <div className="mt-5">
             <div className="mb-5">
