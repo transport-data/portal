@@ -50,13 +50,13 @@ export default function TestimonialsSection() {
         value={openItem}
         onValueChange={(item) => setOpenItem(item)}
       >
-        <TabsList className="flex w-full flex-row overflow-x-auto md:max-w-[384px] md:flex-col ">
+        <TabsList className="h-auto justify-normal items-center rounded-md p-1 flex w-full flex-row overflow-x-auto md:max-w-[384px] md:flex-col ">
           {testimonials.map((item, i) => {
             return (
               <TabsTrigger
                 key={`testimonial-${i}`}
                 value={`testimonial-${i}`}
-                className="flex w-fit max-w-[300px] flex-none cursor-pointer gap-[10px] rounded-[8px] p-4 data-[state=active]:bg-gray-100 md:w-full md:max-w-none md:justify-start"
+                className="whitespace-normal items-center px-3 py-1.5 text-sm font-medium transition-all duration-150 focus-visible:outline-normal disabled:pointer-events-none disabled:opacity-50 flex w-fit max-w-[300px] flex-none cursor-pointer gap-[10px] rounded-[8px] p-4 data-[state=active]:bg-gray-100 md:w-full md:max-w-none md:justify-start"
                 asChild
               >
                 <div>

@@ -161,22 +161,27 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             dataset={dataset}
             options={[
               {
+                type: 'quotation',
                 label: "APA",
                 content: <p>teste</p>,
               },
               {
+                type: 'quotation',
                 label: "Chicago",
                 content: <p>teste 2</p>,
               },
               {
+                type: 'quotation',
                 label: "Harvard",
                 content: <></>,
               },
               {
+                type: 'quotation',
                 label: "MLA",
                 content: <></>,
               },
               {
+                type: 'quotation',
                 label: "Bluebook",
                 content: <></>,
               },
@@ -186,50 +191,62 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             dataset={dataset}
             options={[
               {
+                type: 'code',
                 label: "APA",
                 content: <p>teste</p>,
               },
               {
+                type: 'code',
                 label: "Chicago",
                 content: <p>teste 2</p>,
               },
               {
+                type: 'code',
                 label: "Harvard",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "MLA",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "Bluebook",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "BibTex",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "APA 2",
                 content: <p>teste</p>,
               },
               {
+                type: 'code',
                 label: "MLA 2",
                 content: <p>teste 2</p>,
               },
               {
+                type: 'code',
                 label: "Chicago 2",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "Harvard 2",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "Vancouver 2",
                 content: <></>,
               },
               {
+                type: 'code',
                 label: "BibTex 2",
                 content: <></>,
               },

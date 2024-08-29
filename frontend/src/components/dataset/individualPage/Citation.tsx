@@ -9,12 +9,14 @@ import { Dataset } from "@portaljs/ckan";
 import { Button } from "@/components/ui/button";
 import { cn } from "@lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClipboardCopy } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { ClipboardCopy, QuoteIcon } from "lucide-react";
 import { CodeBracketIcon } from "@heroicons/react/24/outline";
 
 export interface Option {
   label: string;
   content: React.ReactNode;
+  type: "code" | "quotation";
 }
 
 export function Citation({
@@ -40,6 +42,12 @@ export function Citation({
    url = {https://doi.org/10.5281/TDC.7911779}
 }
 `;
+  function onClick(content: string) {
+    toast({
+      title: "Success",
+      description: content 
+    });
+  }
   return (
     <Tabs defaultValue={options[0]?.label ?? ""} className="max-w-[80vw]">
       <TabsList className="w-full justify-start overflow-hidden p-0">
@@ -48,24 +56,23 @@ export function Citation({
             {options.map((option, index) => (
               <CarouselItem
                 className={cn(
-                  "w-fit min-w-0 max-w-full basis-auto border-0",
+                  "w-fit min-w-0 max-w-full basis-auto",
                   index === 0 && "pl-4 pr-0",
                   index !== 0 && "p-0"
                 )}
               >
-                <TabsTrigger asChild value={option.label}>
-                  <Button
-                    variant="secondary"
-                    className={cn(
-                      "border-1 w-fit min-w-0 max-w-full rounded-none border border-b-0 bg-transparent underline-offset-4 shadow-none outline-none ring-0 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground",
-                      index === 0 ? "rounded-bl-none rounded-tr-md" : "",
-                      index !== options.length - 1 ? "border-r-0" : "",
-                      index === options.length - 1 ? "rounded-tr-md" : ""
-                    )}
-                  >
-                    {option.label}
-                  </Button>
-                </TabsTrigger>
+                <div className="border-t-4 border-gray-200">
+                  <TabsTrigger asChild value={option.label}>
+                    <Button
+                      variant="secondary"
+                      className={cn(
+                        "z-10 w-fit min-w-0 max-w-full rounded-none border bg-transparent shadow-none outline-none ring-0 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                      )}
+                    >
+                      {option.label}
+                    </Button>
+                  </TabsTrigger>
+                </div>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -80,7 +87,11 @@ export function Citation({
         >
           <div className="flex items-start gap-x-4 pb-4">
             <div>
-              <CodeBracketIcon className="h-8 w-8 text-black" />
+              {option.type === "quotation" ? (
+                <QuoteIcon className="h-8 w-8 text-black" />
+              ) : (
+                <CodeBracketIcon className="h-8 w-8 text-black" />
+              )}
             </div>
             <pre className="text-sm font-normal leading-tight text-gray-500">{citationCode}</pre>
           </div>
