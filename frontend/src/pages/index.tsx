@@ -9,6 +9,7 @@ import DatasetsSection from "@components/home/mainSection/DatasetsSection";
 import ContributeSection from "@components/home/mainSection/ContributeSection";
 import FaqsSection from "@components/home/mainSection/FaqsSection";
 import TestimonialsSection from "@components/home/mainSection/TestimonialsSection";
+import NewsLetterSignUpSection from "@components/_shared/NewsletterSection";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -56,6 +57,7 @@ export default function Home({
         <ContributeSection />
         <TestimonialsSection />
         <FaqsSection />
+        <NewsLetterSignUpSection />
       </Layout>
     </>
   );

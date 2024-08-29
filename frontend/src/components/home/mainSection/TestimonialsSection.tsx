@@ -1,6 +1,7 @@
 import { Button } from "@components/ui/button";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 
 interface FaqsProps {
@@ -59,16 +60,20 @@ export default function TestimonialsSection() {
                 asChild
               >
                 <div>
-                  <Image
-                    src={
-                      item.image ||
-                      `https://ui-avatars.com/api/?name=${item.name}`
-                    }
-                    width={48}
-                    height={48}
-                    alt={item.name}
-                    className="rounded-full"
-                  />
+                  <Avatar className="h-[48px] w-[48px]">
+                    <AvatarImage src={item.image} alt={item.name} />
+                    <AvatarFallback className="bg-gray-300">
+                      {item.name
+                        .trim()
+                        .split(" ")
+                        .map((word) => word[0])
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
                   <div className="flex flex-col items-start">
                     <span className="text-lg font-semibold leading-tight text-gray-900">
                       {item.name}
