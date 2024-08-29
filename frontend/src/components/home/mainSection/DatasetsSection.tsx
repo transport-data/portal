@@ -1,9 +1,11 @@
 import Heading from "@components/_shared/Heading";
+import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import {
   ArrowRightIcon,
   ArrowUturnRightIcon,
   BuildingLibraryIcon,
+  CheckCircleIcon,
   ClipboardIcon,
   GlobeAltIcon,
   ShieldCheckIcon,
@@ -64,10 +66,23 @@ export default function DatasetsSection({
             <div key={`recent-${i}`}>
               <div className="dataset-card flex flex-col gap-4">
                 {/*Badge*/}
-                <span className=" flex w-fit gap-1 rounded-[6px] bg-[#FDF6B2] px-[10px] py-[2px] text-xs font-medium text-[#723B13]">
-                  <ShieldCheckIcon width={14} />
-                  {dataset.state}
-                </span>
+                {dataset.state === "TDC Harmonised" && (
+                  <Badge
+                    icon={<ShieldCheckIcon width={14} />}
+                    variant="warning"
+                  >
+                    {dataset.state}
+                  </Badge>
+                )}
+                {dataset.state === "TDC Formatted" && (
+                  <Badge
+                    icon={<CheckCircleIcon width={14} />}
+                    variant="success"
+                  >
+                    {dataset.state}
+                  </Badge>
+                )}
+
                 {/*Title*/}
                 <h4 className="text-2xl font-bold leading-tight">
                   {dataset.title}
@@ -75,12 +90,9 @@ export default function DatasetsSection({
                 {/*Tags*/}
                 <div className="flex gap-2">
                   {dataset.tags.map((tag, x) => (
-                    <span
-                      key={`dataset-${tag}${x}`}
-                      className="flex w-fit gap-1 rounded-[6px] bg-indigo-100 px-[10px] py-[2px] text-xs font-medium text-indigo-800"
-                    >
+                    <Badge key={`dataset-${tag}${x}`} variant="info">
                       {tag}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
                 {/*Description*/}
