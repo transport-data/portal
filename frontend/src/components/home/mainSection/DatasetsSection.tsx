@@ -84,7 +84,7 @@ export default function DatasetsSection({
         </p>
       </div>
 
-      <div className="bordered-grid mt-16 grid grid-cols-1 gap-[32px] md:grid-cols-2 lg:grid-cols-3 lg:gap-0">
+      <div className="grid-3-separated mt-16 grid grid-cols-1 gap-[32px] md:grid-cols-2 lg:grid-cols-3 lg:gap-x-[64px]">
         {_datasets.map((dataset, i) => {
           return (
             <div key={`recent-${i}`} className="">
