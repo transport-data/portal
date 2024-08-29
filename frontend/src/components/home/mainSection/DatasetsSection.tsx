@@ -10,6 +10,7 @@ import {
   GlobeAltIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
+import { chunkArray } from "@lib/utils";
 import { Dataset } from "@portaljs/ckan";
 
 export default function DatasetsSection({
@@ -48,7 +49,30 @@ export default function DatasetsSection({
       organization: "TDC",
       region: "Worldwide",
     },
+
+    {
+      state: "",
+      title: "TDC Global Vehicle Registration",
+      tags: ["Vehicle registration", "Transport data"],
+      description:
+        "This dataset and documentation contains detailed information on vehicle registration around the world, a harmonised and up to date transport data set of historical values, 1970 - 2022.",
+      metadata_modified: "2024-02-20T14:00:00Z",
+      organization: "TDC",
+      region: "Worldwide",
+    },
+    {
+      state: "TDC Harmonised",
+      title: "TDC Global Passenger Activity",
+      tags: ["Passenger activity", "Transportation behaviour"],
+      description:
+        "This dataset contains survey data collected from residents of various urban areas, providing insights into transportation behaviors, preferences, and challenges. It can be used to inform the development of sustainable urban mobility solutions and policies.",
+      metadata_modified: "2024-02-20T14:00:00Z",
+      organization: "TDC",
+      region: "Worldwide",
+    },
   ];
+
+  const chunkedDatasets = chunkArray(_datasets, 3);
 
   return (
     <div className="container py-[96px]">
@@ -60,10 +84,10 @@ export default function DatasetsSection({
         </p>
       </div>
 
-      <div className="mt-16 grid grid-cols-1 gap-[65px] md:grid-cols-2 lg:grid-cols-3">
+      <div className="bordered-grid mt-16 grid grid-cols-1 gap-[32px] md:grid-cols-2 lg:grid-cols-3 lg:gap-0">
         {_datasets.map((dataset, i) => {
           return (
-            <div key={`recent-${i}`}>
+            <div key={`recent-${i}`} className="">
               <div className="dataset-card flex flex-col gap-4">
                 {/*Badge*/}
                 {dataset.state === "TDC Harmonised" && (
@@ -96,7 +120,9 @@ export default function DatasetsSection({
                   ))}
                 </div>
                 {/*Description*/}
-                <p className=" text-gray-500">{dataset.description}</p>
+                <p className=" line-clamp-4 overflow-hidden text-ellipsis text-gray-500">
+                  {dataset.description}
+                </p>
                 {/*Other Metadatas*/}
                 <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
                   <div className="flex gap-[4px]">
