@@ -14,7 +14,7 @@ export const chunkArray = (arr: Array<any>, size: number) => {
     }
     return chunks;
   }, []);
-};
+}
 
 export const formatIcon = (format: string) => {
   const icon = {

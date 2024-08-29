@@ -167,3 +167,45 @@ snap-tabs {
   gap: 20px;
   -webkit-mask: linear-gradient(90deg, white 70%, transparent)
 }
+
+.grid-3-separated {
+  position: relative;
+}
+
+.grid-3-separated:after {
+  display: none;
+  position: absolute;
+  content: "";
+  width: 1px;
+  height: 100%;
+  background: #e5e7eb;
+}
+.grid-3-separated:before {
+  display: none;
+  position: absolute;
+  content: "";
+  width: 1px;
+  height: 100%;
+  background: #e5e7eb;
+}
+
+@media (min-width: 768px) {
+  .grid-3-separated:after {
+    display: block;
+    left: 50%;
+    margin-left: -5px;
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-3-separated:after {
+    display: block;
+    left: 33%;
+    margin-left: -5px;
+  }
+  .grid-3-separated:before {
+    display: block;
+    right: 33%;
+    margin-right: -5px;
+  }
+}
