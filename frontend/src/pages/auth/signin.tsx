@@ -1,4 +1,5 @@
 import { ErrorAlert } from "@components/_shared/Alerts";
+import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
 import type { GetServerSidePropsContext } from "next";
@@ -48,8 +49,12 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   return (
     <>
       <NextSeo title="Sign in" />
-      <div className="dark:bg-background-dark dark:text-primary-dark flex h-full flex-1 items-center justify-center bg-white text-primary">
-        <div className="w-[50%] px-28">
+      <SingInLayout
+        paragraphText="Transport Data Commons aims to improve access, sharing, and
+            analysing transportation data for a more sustainable future."
+        subtitleText="Unlock the Power of Transportation Data"
+      >
+        <div className="w-full bg-white px-28 py-36">
           <h2 className="text-xl font-bold text-[#111928]">Welcome back</h2>
           <div>
             <div className="mt-6 grid grid-cols-2 gap-4">
@@ -211,14 +216,14 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                     id="remember"
                     {...register("remember")}
                   />
-                  <div className="pb-1 text-[#6B7280]">
+                  <div className=" text-[#6B7280]">
                     <label htmlFor="remember">Remember me</label>
                   </div>
                 </div>
                 <div className="text-sm">
                   <a
                     href="#"
-                    className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
+                    className="text-[#00ACC1] hover:text-[#008E9D]"
                   >
                     Forgot password?
                   </a>
@@ -255,7 +260,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                 Don't have an account yet?{" "}
                 <Link
                   href="/auth/signup"
-                  className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
+                  className="text-[#00ACC1] hover:text-[#008E9D]"
                 >
                   Sign up
                 </Link>
@@ -264,19 +269,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
             </form>
           </div>
         </div>
-        <div className="flex h-[100vh] w-[50%] flex-col justify-center bg-[#DFF64D] px-20">
-          <h2 className="pb-7 text-2xl font-semibold text-[#006064]">
-            Transport Data Commons
-          </h2>
-          <h1 className="inline-size-88 pb-3 text-4xl font-extrabold text-[#006064]">
-            Unlock the Power of Transportation Data
-          </h1>
-          <p className="text-[#006064]">
-            Transport Data Commons aims to improve access, sharing, and
-            analysing transportation data for a more sustainable future.
-          </p>
-        </div>
-      </div>
+      </SingInLayout>
     </>
   );
 }

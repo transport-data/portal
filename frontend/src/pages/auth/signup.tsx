@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { ErrorAlert } from "@components/_shared/Alerts";
+import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,8 +49,12 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
   return (
     <>
       <NextSeo title="Register an account" />
-      <div className="dark:bg-background-dark dark:text-primary-dark flex h-full flex-1 items-center justify-center bg-white text-primary">
-        <div className="w-[50%] px-28">
+      <SingInLayout
+        paragraphText="Transport Data Commons aims to improve access, sharing, and
+            analysing transportation data for a more sustainable future."
+        subtitleText="Unlock the Power of Transportation Data"
+      >
+        <div className="w-full bg-white px-28 py-20">
           <h2 className="text-xl font-bold text-[#111928]">
             Contribute to the Transport Data Commons
           </h2>
@@ -235,7 +240,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
                         // TODO change these links to the correct one when it's available
                       }
                       <Link
-                        className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
+                        className="text-[#006064] hover:text-[#007b83]"
                         href={"https://google.com"}
                         target="_blank"
                       >
@@ -243,7 +248,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
                       </Link>{" "}
                       and{" "}
                       <Link
-                        className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
+                        className="text-[#006064] hover:text-[#007b83]"
                         href={"https://google.com"}
                         target="_blank"
                       >
@@ -311,7 +316,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
                 Already have an account?{" "}
                 <Link
                   href="/auth/signin"
-                  className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
+                  className="text-[#006064] hover:text-[#007b83]"
                 >
                   Login here
                 </Link>
@@ -320,19 +325,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
             </form>
           </div>
         </div>
-        <div className="flex h-[100vh] w-[50%] flex-col justify-center bg-[#DFF64D] px-20">
-          <h2 className="pb-7 text-2xl font-semibold text-[#006064]">
-            Transport Data Commons
-          </h2>
-          <h1 className="inline-size-88 pb-3 text-4xl font-extrabold text-[#006064]">
-            Unlock the Power of Transportation Data
-          </h1>
-          <p className="text-[#006064]">
-            Transport Data Commons aims to improve access, sharing, and
-            analysing transportation data for a more sustainable future.
-          </p>
-        </div>
-      </div>
+      </SingInLayout>
     </>
   );
 }
