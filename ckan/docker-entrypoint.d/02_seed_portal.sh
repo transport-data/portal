@@ -25,7 +25,7 @@ LOGFILE="/var/log/seed_script.log"
 
     echo "Waiting for the database to be ready..."
     while true; do
-        pg_isready -h ckan-vs-db -p 5432 -U ckandbuser -d ckandb
+        pg_isready -h ckan-tdc-db -p 5432 -U ckandbuser -d ckandb
         if [ $? -eq 0 ]; then
             echo "Database is ready!"
             break

@@ -1,62 +1,45 @@
-import TopBar from "../../_shared/TopBar";
-import { Organizations, FindData, Groups } from "./Options";
-import SearchForm from "./SearchForm";
-import Stats, { StatsProps } from "./Stats";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
+import SearchBar from "@components/search/SearchBar";
+import Video from "./Video";
+import InfoCards from "./InfoCards";
+import PartnersCarousel from "@components/_shared/PartnersCarousel";
 
-export default function Hero({ stats }: { stats: StatsProps }) {
+export default function Hero() {
   return (
-    <section className="sm:grid sm:grid-rows-frontpage-hero">
-      <section className="row-start-1 row-span-3 col-span-full">
-        <div
-          className="bg-cover bg-center bg-no-repeat bg-black flex flex-col h-full"
-          style={{
-            backgroundImage: "url('/images/backgrounds/HomeHero.png')",
-            minHeight: "95vh",
-          }}
-        >
-          <TopBar />
-          <div className="grid lg:grid-cols-2 mx-auto items-center grow custom-container">
-            <div className="col-span-1">
-              <h3 className="text-xs font-medium pb-2 uppercase text-gray-400 tracking-widest sm:text-base lg:text-sm xl:text-base">
-                Quality Data ready to Integrate
-              </h3>
-              <h1 className="text-6xl font-black text-white">Find and Share</h1>
-              <h1 className="text-6xl font-black text-cyan-500">
-                Quality Data
-              </h1>
-              <h3 className="text-xl text-gray-300 py-6">
-                At Portal, we have over thousands of datasets for free and a
-                Premium Data Service for additional or customised data with
-                guaranteed updates.
-              </h3>
-              <div className="sm:max-w-lg sm:text-center lg:text-left lg:mx-0">
-                <SearchForm />
-              </div>
-              <div className="sm:max-w-lg py-4 lg:pb-12 sm:py-0">
-                <Stats
-                  datasetCount={stats.datasetCount}
-                  orgCount={stats.orgCount}
-                  groupCount={stats.groupCount}
-                />
-              </div>
-            </div>
+    <section className="pb-[96px] pt-[64px]">
+      <div className="container">
+        <div className="flex items-center gap-x-16 xl:items-start">
+          <div className="w-full">
+            <Link
+              href="#"
+              className="flex w-fit items-center rounded-[14px] bg-[#F3F4F6] p-1.5"
+            >
+              <span className="block min-w-fit rounded-[10px] bg-accent px-[12px] py-[2px] text-[12px] font-medium leading-[18px] text-white">
+                Add data
+              </span>
+              <span className="ml-8 block text-sm font-medium text-gray-500">
+                Learn how to contribute to the TDC
+              </span>
+              <ChevronRightIcon className="ml-4 text-gray-500" width={20} />
+            </Link>
+
+            <h2 className=" mb-[24px] mt-[20px] text-[40px] font-extrabold leading-none text-gray-900 sm:text-[40px] lg:text-[60px]">
+              Making high quality transport data accessible
+            </h2>
+            <p className="text-[20px] leading-[30px] text-gray-500">
+              Transport Data Commons aims to improve access, sharing, and
+              analysing transportation data for a more sustainable future.
+            </p>
+            <SearchBar />
+          </div>
+          <div className="hidden min-w-[420px] lg:block xl:min-w-[540px]">
+            <Video />
           </div>
         </div>
-      </section>
-      <section
-        className="custom-container homepage-padding grid grid-cols-1 sm:grid-cols-3 gap-6 row-start-3 row-span-2 col-span-full pt-8 sm:pt-0"
-        style={{ minHeight: "300px" }}
-      >
-        <section className="col-span-1">
-          <FindData />
-        </section>
-        <section className="col-span-1">
-          <Organizations />
-        </section>
-        <section className="col-span-1">
-          <Groups />
-        </section>
-      </section>
+        <InfoCards />
+        <PartnersCarousel />
+      </div>
     </section>
   );
 }
