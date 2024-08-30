@@ -4,7 +4,7 @@ import Layout from "@/components/_shared/Layout";
 import { Dataset as DatasetType } from "@portaljs/ckan";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
-import { Building2Icon, ChevronLeftIcon, DownloadIcon } from "lucide-react";
+import { Building2Icon, ChevronLeftIcon, DownloadIcon, ArrowDownToLineIcon, Landmark } from "lucide-react";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -152,7 +152,7 @@ export default function DatasetPage({
                 </div>
                 <div className="flex flex-col pt-2 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-2.5">
                   <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
-                    <Building2Icon
+                    <Landmark
                       aria-hidden="true"
                       className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
                     />
@@ -172,7 +172,7 @@ export default function DatasetPage({
                     •
                   </div>
                   <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
-                    <DownloadIcon
+                    <ArrowDownToLineIcon
                       aria-hidden="true"
                       className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
                     />
