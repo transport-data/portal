@@ -97,7 +97,9 @@ export default function Header({
             <Button variant="ghost" className="relative" asChild>
               <Link href="/auth/signin">Log In</Link>
             </Button>
-            <Button>Sign up</Button>
+            <Button>
+              <Link href="/auth/signup">Sign up</Link>
+            </Button>
           </div>
           <div className="-mr-2 flex items-center lg:hidden">
             {/* Mobile menu button */}

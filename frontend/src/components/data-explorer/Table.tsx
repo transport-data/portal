@@ -136,7 +136,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
         leaveTo="transform opacity-0 scale-95"
       >
         <Popover.Panel
-          ref={setPopperElement}
+          ref={setPopperElement as any}
           style={styles.popper}
           {...attributes.popper}
           className="absolute right-0 z-10 mt-2 max-h-[200px] w-64 origin-top-left overflow-hidden overflow-y-auto rounded-md bg-white py-4 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"

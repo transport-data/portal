@@ -1,18 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { ErrorAlert } from "@components/_shared/Alerts";
-import Spinner from "@components/_shared/Spinner";
-import { Button } from "@components/ui/button";
+import { SingInLayout } from "@components/_shared/SignInLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type UserFormType, UserSchema } from "@schema/user.schema";
-import { getServerAuthSession } from "@server/auth";
 import { api } from "@utils/api";
 import type { GetServerSideProps } from "next";
 import { getCsrfToken, signIn } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { match } from "ts-pattern";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const csrfToken = await getCsrfToken(context);
@@ -48,16 +43,20 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
   return (
     <>
       <NextSeo title="Register an account" />
-      <div className="dark:bg-background-dark dark:text-primary-dark flex h-full flex-1 items-center justify-center bg-white text-primary">
-        <div className="w-[50%] px-28">
+      <SingInLayout
+        paragraphText="Transport Data Commons aims to improve access, sharing, and
+            analysing transportation data for a more sustainable future."
+        subtitleText="Unlock the Power of Transportation Data"
+      >
+        <div className="flex h-[100vh] w-full flex-col justify-center bg-white px-28 py-20">
           <h2 className="text-xl font-bold text-[#111928]">
             Contribute to the Transport Data Commons
           </h2>
           <div>
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-12 gap-4">
               <a
-                href="#"
-                className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent"
+                href="/onboarding"
+                className="col-span-12 flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
                   <path
@@ -83,8 +82,8 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
               </a>
 
               <a
-                href="#"
-                className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent"
+                href="/onboarding"
+                className="col-span-12 flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
               >
                 <svg
                   fill="currentColor"
@@ -104,235 +103,8 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
               </a>
             </div>
           </div>
-          <div className="relative my-5">
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 flex items-center"
-            >
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm font-medium leading-6">
-              <span className="bg-white px-6 text-[#6B7280]">or</span>
-            </div>
-          </div>
-          <div>
-            <form
-              className="space-y-5"
-              onSubmit={handleSubmit((data) => {
-                setErrorMessage(null);
-                createUser.mutate(data);
-              })}
-            >
-              <input
-                name="csrfToken"
-                type="hidden"
-                defaultValue={csrfToken ? csrfToken : ""}
-              />
-              <div className="flex justify-between gap-5">
-                <div className="w-full">
-                  <label
-                    htmlFor="username"
-                    className="block text-sm font-medium leading-6 text-[#111928]"
-                  >
-                    Name
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="name"
-                      placeholder="e.g. Bonnie"
-                      {...register("name")}
-                      className="block w-full rounded-md border-0 py-3.5 text-[#111928] shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                  {errors && errors.name && (
-                    <div className="mt-2 text-sm text-red-700">
-                      <p>{errors.name.message}</p>
-                    </div>
-                  )}
-                </div>
-                <div className="w-full">
-                  <label
-                    htmlFor="username"
-                    className="block text-sm font-medium leading-6 text-[#111928]"
-                  >
-                    Last name
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="lastName"
-                      placeholder="e.g. Green"
-                      {...register("lastName")}
-                      className="block w-full rounded-md border-0 py-3.5 text-[#111928] shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                  {errors && errors.lastName && (
-                    <div className="mt-2 text-sm text-red-700">
-                      <p>{errors.lastName.message}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium leading-6 text-[#111928]"
-                >
-                  Email
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    placeholder="name@email.com"
-                    {...register("email")}
-                    className="block w-full rounded-md border-0 py-3.5 text-[#111928] shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                  />
-                </div>
-                {errors && errors.email && (
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{errors.email.message}</p>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium leading-6 text-[#111928]"
-                  >
-                    Password
-                  </label>
-                </div>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    placeholder="••••••••••"
-                    type="password"
-                    {...register("password")}
-                    autoComplete="current-password"
-                    className="block w-full rounded-md border-0 py-3.5 text-[#111928] shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
-                  />
-                </div>
-                {errors && errors.password && (
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{errors.password.message}</p>
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-                    id="hasAcceptedTerms"
-                    {...register("hasAcceptedTerms")}
-                  />
-                  <div className="text-xs text-[#6B7280]">
-                    <label htmlFor="hasAcceptedTerms">
-                      By signing up, you are creating a Transport Data Commons
-                      account, and you agree to our{" "}
-                      {
-                        // TODO change these links to the correct one when it's available
-                      }
-                      <Link
-                        className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
-                        href={"https://google.com"}
-                        target="_blank"
-                      >
-                        Terms of Use
-                      </Link>{" "}
-                      and{" "}
-                      <Link
-                        className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
-                        href={"https://google.com"}
-                        target="_blank"
-                      >
-                        Privacy Policy
-                      </Link>
-                      .
-                    </label>
-                    {errors && errors.hasAcceptedTerms && (
-                      <div className="mt-2 text-xs text-red-700">
-                        <p>{errors.hasAcceptedTerms.message}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-                    id="hasConsentedToReceiveEmails"
-                    {...register("hasConsentedToReceiveEmails")}
-                  />
-                  <div className="pb-0.5 text-xs text-[#6B7280]">
-                    <label htmlFor="hasConsentedToReceiveEmails">
-                      Email me about product updates and resources.
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="col-span-full">
-                  {match(createUser.isLoading)
-                    .with(false, () => (
-                      <Button
-                        disabled={
-                          !!errors.password ||
-                          !!errors.email ||
-                          !!errors.name ||
-                          !!errors.lastName
-                        }
-                        type="submit"
-                        className={
-                          "flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary" +
-                          (!!errors.password ||
-                          !!errors.email ||
-                          !!errors.name ||
-                          !!errors.lastName
-                            ? " cursor-not-allowed"
-                            : "")
-                        }
-                      >
-                        Sign up
-                      </Button>
-                    ))
-                    .otherwise(() => (
-                      <Button
-                        disabled
-                        className="flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
-                      >
-                        <Spinner />
-                      </Button>
-                    ))}
-                </div>
-              </div>
-              <p className="text-sm leading-6 text-[#6B7280]">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/signin"
-                  className="font-semibold text-[#00ACC1] hover:text-[#008E9D]"
-                >
-                  Login here
-                </Link>
-              </p>
-              {errorMessage && <ErrorAlert text={errorMessage} />}
-            </form>
-          </div>
         </div>
-        <div className="flex h-[100vh] w-[50%] flex-col justify-center bg-[#DFF64D] px-20">
-          <h2 className="pb-7 text-2xl font-semibold text-[#006064]">
-            Transport Data Commons
-          </h2>
-          <h1 className="inline-size-88 pb-3 text-4xl font-extrabold text-[#006064]">
-            Unlock the Power of Transportation Data
-          </h1>
-          <p className="text-[#006064]">
-            Transport Data Commons aims to improve access, sharing, and
-            analysing transportation data for a more sustainable future.
-          </p>
-        </div>
-      </div>
+      </SingInLayout>
     </>
   );
 }
