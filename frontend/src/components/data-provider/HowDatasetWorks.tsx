@@ -3,7 +3,7 @@ import { CheckCircleIcon, CheckIcon } from "@heroicons/react/20/solid";
 
 export default () => {
   return (
-    <div className="container bg-white py-6 text-gray-500 md:py-[96px]">
+    <div className="container min-w-full md:px-20 bg-white py-6 text-gray-500 md:py-[96px]">
       <div>
         <h1 className="text-4xl font-extrabold text-gray-900">
           How TDC datasets work?
