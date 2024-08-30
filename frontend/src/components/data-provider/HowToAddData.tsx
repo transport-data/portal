@@ -22,7 +22,11 @@ export default () => {
           Data submission FAQ
         </Button>
       </div>
-      <Video />
+      <div className="flex w-full items-center justify-center">
+        <div className="w-[804px] max-w-[804px]">
+          <Video heightInPx="460px" />
+        </div>
+      </div>
     </div>
   );
 };
