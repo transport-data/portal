@@ -50,7 +50,7 @@ export function Citation({
   }
   return (
     <Tabs defaultValue={options[0]?.label ?? ""} className="max-w-[80vw]">
-      <TabsList className="w-full justify-start overflow-hidden p-0">
+      <TabsList className="w-full justify-start overflow-hidden p-0 bg-transparent">
         <Carousel className="w-full">
           <CarouselContent>
             {options.map((option, index) => (

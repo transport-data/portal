@@ -177,7 +177,7 @@ export default function DatasetPage({
         <Tabs defaultValue="overview">
           <div className="border-b border-gray-200 shadow-sm">
           <div className="container flex items-center justify-between pb-4">
-            <TabsList>
+            <TabsList className="bg-transparent">
               {tabs.map((tab) => (
                 <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
               ))}

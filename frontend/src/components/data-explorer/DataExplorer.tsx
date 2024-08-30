@@ -32,8 +32,8 @@ export function DataExplorer({ resourceId }: { resourceId: string }) {
   if (!tableData)
     return (
       <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
-        <Spinner className="text-blue-800 w-12 h-12" />
-        <h2 className="text-center text-xl font-semibold text-blue-800">
+        <Spinner className="text-accent w-12 h-12" />
+        <h2 className="text-center text-xl font-semibold text-accent">
           Loading...
         </h2>
       </div>
@@ -157,10 +157,10 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
   if (pageCount < pagination.pageIndex) resetPagination();
   return (
     <div className={`w-full relative grow flex flex-col gap-y-2`}>
-      <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center px-6">
+      <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center">
         <TopBar table={table} numOfRows={numOfRows ?? 0} />
       </div>
-      <div className="flex flex-row justify-between gap-x-2 px-6">
+      <div className="flex flex-row justify-between gap-x-2">
         <div className="flex flex-row justify-between grow">
           <ListOfFilters
             filters={filteredColumns}
@@ -168,9 +168,9 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
           />
         </div>
       </div>
-      <div className="flex flex-col grow border border-gray-200">
+      <div className="flex flex-col grow shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
         {isFetching && isPlaceholderData && (
-          <span className="w-full h-1.5 animate-pulse-fast bg-blue-400" />
+          <span className="w-full h-1.5 animate-pulse-fast bg-accent/10" />
         )}
         <Table
           table={table}
