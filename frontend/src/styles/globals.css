@@ -213,21 +213,44 @@ snap-tabs {
   display: none !important;
 }
 
-@media (min-width: 1024px) {
-  .bordered-grid.grid > * {
-    padding: 16px 32px;
-  }
+.grid-3-separated {
+  position: relative;
+}
 
-  .bordered-grid.grid > *:nth-child(3n + 1) {
-    border-right: 1px solid #e5e7eb;
-    padding-right: 32px;
-    padding-left: 0;
-  }
+.grid-3-separated:after {
+  display: none;
+  position: absolute;
+  content: "";
+  width: 1px;
+  height: 100%;
+  background: #e5e7eb;
+}
+.grid-3-separated:before {
+  display: none;
+  position: absolute;
+  content: "";
+  width: 1px;
+  height: 100%;
+  background: #e5e7eb;
+}
 
-  .bordered-grid.grid > *:nth-child(3n) {
-    border-left: 1px solid #e5e7eb;
-    padding-left: 32px;
-    padding-right: 0;
-    /* Your styles here */
+@media (min-width: 768px) {
+  .grid-3-separated:after {
+    display: block;
+    left: 50%;
+    margin-left: -5px;
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-3-separated:after {
+    display: block;
+    left: 33%;
+    margin-left: -5px;
+  }
+  .grid-3-separated:before {
+    display: block;
+    right: 33%;
+    margin-right: -5px;
   }
 }
