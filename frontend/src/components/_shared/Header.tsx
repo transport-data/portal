@@ -14,7 +14,7 @@ const navigation = [
     name: "Geography",
   },
   {
-    href: "#",
+    href: "/data-provider",
     name: "Data Provider",
   },
   {
@@ -27,14 +27,56 @@ const navigation = [
   },
 ];
 
-export default function Header() {
+export default function Header({
+  greenGradiendBackground,
+}: {
+  greenGradiendBackground?: boolean;
+}) {
   return (
-    <Disclosure as="nav" className="sticky top-0 z-10 bg-white">
+    <Disclosure
+      as="nav"
+      className={
+        "sticky top-0 z-10 " +
+        (greenGradiendBackground ? "bg-[#E3F9ED]" : "bg-white")
+      }
+    >
       <div className="container py-[24px]">
         <div className="flex justify-between py-[4.5px]">
           <div className="flex items-center">
             <Link href="/" className="flex flex-shrink-0 items-center">
+              <svg
+                className="sm:hidden"
+                width="29"
+                height="29"
+                viewBox="0 0 29 29"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g clip-path="url(#clip0_1831_13231)">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M28.4444 0.5H0V28.9444H28.4444V0.5ZM13.037 15.1964V24.2038H15.4074V14.2483L8.77035 7.61124H11.8518V5.24087H4.74072V12.352H7.11109V9.2705L13.037 15.1964Z"
+                    fill="#006064"
+                  />
+                  <path
+                    d="M19.6739 7.61134L15.8813 11.3447L17.5999 13.0632L21.3332 9.2706V12.3521H23.7036V5.24097H16.5925V7.61134H19.6739Z"
+                    fill="#DFF64D"
+                  />
+                </g>
+                <defs>
+                  <clipPath id="clip0_1831_13231">
+                    <rect
+                      width="28.4444"
+                      height="28.4444"
+                      fill="white"
+                      transform="translate(0 0.5)"
+                    />
+                  </clipPath>
+                </defs>
+              </svg>
               <Image
+                className="hidden sm:block"
                 alt="Transport Data Commons"
                 src="/images/logos/tdc-logo.svg"
                 width={300}
