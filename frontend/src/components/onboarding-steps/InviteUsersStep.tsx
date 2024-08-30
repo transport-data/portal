@@ -32,7 +32,7 @@ export default ({
             className:
               "border-0 text-[#111928] ring-0 border-[#00000000] lowercase",
           }}
-          badgeClassName="px-3 py-[2px] hover:opacity:90 hover:bg-[#E3F9ED] bg-[#E3F9ED] rounded-md text-[#006064] overflow-wrap-anywhere
+          badgeClassName="px-3 py-[2px] hover:opacity-75 hover:bg-[#E3F9ED] bg-[#E3F9ED] rounded-md text-[#006064] overflow-wrap-anywhere
           inline-flex items-center border font-semibold
           "
           placeholder="name1@email.com; name2@email.com;"
