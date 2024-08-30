@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const navigation = [
   {
-    href: "#",
+    href: "/datasets",
     name: "Datasets",
   },
   {
@@ -27,9 +27,17 @@ const navigation = [
   },
 ];
 
-export default function Header() {
+export default function Header({
+  backgroundColor = "bg-white",
+}: {
+  backgroundColor?: string;
+}) {
   return (
-    <Disclosure as="nav" className="sticky top-0 z-10 bg-white">
+    <Disclosure
+      as="nav"
+      className="sticky top-0 z-10"
+      style={{ background: backgroundColor }}
+    >
       <div className="container py-[24px]">
         <div className="flex justify-between py-[4.5px]">
           <div className="flex items-center">
@@ -43,13 +51,13 @@ export default function Header() {
             </Link>
             <div className="ml-6 hidden space-x-6 lg:flex xl:ml-8 xl:space-x-8">
               {navigation.map((nav, i) => (
-                <a
+                <Link
                   key={i}
                   className="font-medium text-gray-900"
                   href={nav.href}
                 >
                   {nav.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
