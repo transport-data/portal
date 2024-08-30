@@ -3,7 +3,7 @@ import { SearchIcon } from "lucide-react";
 
 export default function SearchBar() {
   return (
-    <div className="relative mt-8 lg:max-w-[576px]">
+    <div className="relative mt-8 ">
       <input
         type="email"
         placeholder="Find statistics, forecasts & studies"

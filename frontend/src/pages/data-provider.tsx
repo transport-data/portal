@@ -15,7 +15,7 @@ export default function Home(): JSX.Element {
         <meta name="description" content="Transport Data Commons" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Layout greenGradiendBackground>
+      <Layout backgroundEffect>
         <Hero />
         <HowDatasetWorks />
         <AddDataSection />

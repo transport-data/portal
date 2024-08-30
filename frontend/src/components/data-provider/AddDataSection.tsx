@@ -12,7 +12,7 @@ export default () => {
           individuals and organisations to contribute their valuable data to
           drive insights and innovations in sustainable transportation.
         </p>
-        <Button className="bg-[#006064] px-6 py-3.5">Add data</Button>
+        <Button className="bg-[#006064] px-6 max-w-fit py-3.5">Add data</Button>
       </div>
 
       <div className="grid w-full grid-cols-2 grid-rows-2 gap-8">
