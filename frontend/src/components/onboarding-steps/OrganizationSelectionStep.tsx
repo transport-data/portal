@@ -89,7 +89,8 @@ export default ({
                   <ComboboxOption
                     key={org.id}
                     value={org}
-                    className="group relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-500"
+                    className="group relative cursor-pointer select-none
+ py-2 pl-3 pr-9 text-gray-500 hover:bg-accent hover:text-accent-foreground"
                   >
                     <div className="flex items-center gap-3.5">
                       <Image
