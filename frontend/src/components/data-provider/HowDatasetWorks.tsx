@@ -3,7 +3,7 @@ import { CheckCircleIcon, CheckIcon } from "@heroicons/react/20/solid";
 
 export default () => {
   return (
-    <div className="container min-w-full md:px-20 bg-white py-6 text-gray-500 md:py-[96px]">
+    <div className="container min-w-full bg-white py-6 text-gray-500 lg:px-20 lg:py-[96px]">
       <div>
         <h1 className="text-4xl font-extrabold text-gray-900">
           How TDC datasets work?
@@ -15,9 +15,9 @@ export default () => {
         </p>
       </div>
 
-      <div className="mt-16 flex w-full flex-col gap-32 md:flex-row md:gap-8">
-        <div className="flex flex-col-reverse gap-8 md:flex-col">
-          <div className="flex min-h-fit flex-col items-center gap-32 md:flex-row md:gap-8">
+      <div className="mt-16 flex w-full flex-col flex-wrap gap-32 lg:flex-row lg:gap-8 xl:justify-center">
+        <div className="flex flex-col-reverse gap-8 lg:w-[296px] lg:min-w-[296px] lg:flex-col">
+          <div className="flex min-h-fit flex-col items-center gap-32 lg:flex-row lg:gap-8">
             <div className="flex h-16 w-16 items-center justify-center rounded-md bg-[#E1EFFE]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +34,7 @@ export default () => {
                 />
               </svg>
             </div>
-            <LongArrowRightIcon className="rotate-90 md:rotate-0" />
+            <LongArrowRightIcon className="rotate-90 lg:rotate-0" />
           </div>
           <section className="space-y-4">
             <h1 className="text-xl font-bold text-gray-900">Public Data</h1>
@@ -57,8 +57,8 @@ export default () => {
           </section>
         </div>
 
-        <div className="flex flex-col-reverse gap-8 md:flex-col">
-          <div className="flex min-h-fit flex-col items-center gap-32 md:flex-row md:gap-8">
+        <div className="flex flex-col-reverse gap-8 lg:w-[296px] lg:min-w-[296px] lg:flex-col">
+          <div className="flex min-h-fit flex-col items-center gap-32 lg:flex-row lg:gap-8">
             <Badge
               className="flex h-16 w-16 items-center"
               icon={
@@ -85,7 +85,7 @@ export default () => {
               }
               variant="purple"
             />
-            <LongArrowRightIcon className="rotate-90 md:rotate-0" />
+            <LongArrowRightIcon className="rotate-90 lg:rotate-0" />
           </div>
           <section className="space-y-4">
             <h1 className="text-xl font-bold text-gray-900">Community Data</h1>
@@ -111,14 +111,14 @@ export default () => {
             </p>
           </section>
         </div>
-        <div className="flex flex-col-reverse gap-8 md:flex-col">
-          <div className="flex min-h-fit flex-col items-center gap-32 md:flex-row md:gap-8">
+        <div className="flex flex-col-reverse gap-8 lg:w-[296px] lg:min-w-[296px] lg:flex-col">
+          <div className="flex min-h-fit flex-col items-center gap-32 lg:flex-row lg:gap-8">
             <Badge
               className="flex h-16 w-16 items-center pl-3"
               icon={<CheckCircleIcon width={40} height={40} />}
               variant="success"
             ></Badge>
-            <LongArrowRightIcon className="rotate-90 md:rotate-0" />
+            <LongArrowRightIcon className="rotate-90 lg:rotate-0" />
           </div>
           <section className="space-y-4">
             <h1 className="text-xl font-bold text-gray-900">TDC Formatted</h1>
@@ -147,8 +147,8 @@ export default () => {
             </p>
           </section>
         </div>
-        <div className="flex flex-col-reverse gap-8 md:flex-col">
-          <div className="flex min-h-fit flex-col items-center gap-32 md:flex-row md:gap-8">
+        <div className="flex flex-col-reverse gap-8 lg:w-[296px] lg:min-w-[296px] lg:flex-col">
+          <div className="flex min-h-fit flex-col items-center gap-32 lg:flex-row lg:gap-8">
             <Badge
               className="flex h-16 w-16 items-center pl-4"
               icon={
