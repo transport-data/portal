@@ -14,7 +14,7 @@ const navigation = [
     name: "Geography",
   },
   {
-    href: "#",
+    href: "/data-provider",
     name: "Data Provider",
   },
   {
@@ -27,9 +27,19 @@ const navigation = [
   },
 ];
 
-export default function Header() {
+export default function Header({
+  greenGradiendBackground,
+}: {
+  greenGradiendBackground?: boolean;
+}) {
   return (
-    <Disclosure as="nav" className="sticky top-0 z-10 bg-white">
+    <Disclosure
+      as="nav"
+      className={
+        "sticky top-0 z-10 " +
+        (greenGradiendBackground ? "bg-[#E3F9ED]" : "bg-white")
+      }
+    >
       <div className="container py-[24px]">
         <div className="flex justify-between py-[4.5px]">
           <div className="flex items-center">
