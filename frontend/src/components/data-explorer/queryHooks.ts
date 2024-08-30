@@ -74,7 +74,7 @@ export function useNumberOfRows({
                     .filter((v) => v.value !== "")
                     .map(
                       (v) =>
-                        `"${filter.id}" ${v.operation.value} '${v.value}' ${
+                        `"${filter.id}" ${v.operation} '${v.value}' ${
                           v.link ?? ""
                         }`
                     )
@@ -125,6 +125,7 @@ export function useTableData({
   return useQuery({
     queryKey: ["query", resourceId, pagination, columns, sorting, filters],
     queryFn: async () => {
+      console.log('FILTERS', filters)
       const paginationSql = `LIMIT ${
         pagination.pageSize
       } OFFSET ${pagination.pageIndex * pagination.pageSize}`;
@@ -145,7 +146,7 @@ export function useTableData({
                     .filter((v: any) => v.value !== "")
                     .map(
                       (v) =>
-                        `"${filter.id}" ${v.operation.value} '${v.value}' ${
+                        `"${filter.id}" ${v.operation} '${v.value}' ${
                           v.link ?? ""
                         }`
                     )
@@ -153,6 +154,7 @@ export function useTableData({
               )
               .join(" AND ")
           : "";
+      console.log('FILTERS SQL', filtersSql)
       const parsedColumns = columns.map((column) => `"${column}"`);
       const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
         " , "

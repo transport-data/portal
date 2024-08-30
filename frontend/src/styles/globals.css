@@ -10,14 +10,12 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 182 100% 20%;
+    --primary: 219 40% 11%;
     --primary-foreground: 210 40% 98%;
     --accent: 182 100% 20%;
     --accent-foreground: 0 0% 100%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
@@ -29,6 +27,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --transparent: rgba(255, 255, 255, 0);
   }
 
   .dark {
@@ -59,14 +58,6 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
 
 a {
   color: inherit;
@@ -211,6 +202,45 @@ snap-tabs {
 
 .css-7eceai-Grid-1 {
   display: none !important;
+}
+
+.blur-on-left {
+  gap: 20px;
+  -webkit-mask: linear-gradient(90deg, white 80%, transparent)
+}
+
+.blur-on-left-2xl {
+  gap: 20px;
+  -webkit-mask: linear-gradient(90deg, white 70%, transparent)
+}
+
+@media (min-width: 1024px) {
+  .bordered-grid.grid > * {
+    padding: 16px 32px;
+  }
+
+  .bordered-grid.grid > *:nth-child(3n + 1) {
+    border-right: 1px solid #e5e7eb;
+    padding-right: 32px;
+    padding-left: 0;
+  }
+
+  .bordered-grid.grid > *:nth-child(3n) {
+    border-left: 1px solid #e5e7eb;
+    padding-left: 32px;
+    padding-right: 0;
+    /* Your styles here */
+  }
+}
+
+.blur-on-left {
+  gap: 20px;
+  -webkit-mask: linear-gradient(90deg, white 80%, transparent)
+}
+
+.blur-on-left-2xl {
+  gap: 20px;
+  -webkit-mask: linear-gradient(90deg, white 70%, transparent)
 }
 
 .grid-3-separated {
