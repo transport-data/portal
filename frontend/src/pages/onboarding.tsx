@@ -3,17 +3,17 @@ import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
 
-import { Option } from "@components/_shared/ChipsInput";
 import InterestsSteps from "@components/onboarding-steps/InterestsSteps";
+import InviteUsersStep from "@components/onboarding-steps/InviteUsersStep";
 import OrganizationSelectionStep from "@components/onboarding-steps/OrganizationSelectionStep";
+import { OnboardingFormType } from "@schema/onboarding.schema";
 import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
-import InviteUsersStep from "@components/onboarding-steps/InviteUsersStep";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
@@ -24,17 +24,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 export default function LoginPage({ csrfToken }: { csrfToken: string }) {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loggingIn, setLogin] = useState(false);
-  const [messageToOrg, setMessageToOrg] = useState("");
+  const [errorMessage] = useState<string | null>(null);
+  const [loggingIn] = useState(false);
   const router = useRouter();
-  const [messageToInvitation, setMessageToInvitation] = useState("");
   const [disableButton, setDisableButton] = useState(false);
-  const { register, handleSubmit, formState, setValue } = useForm<{
-    username: string;
-    password: string;
-    remember?: boolean;
-  }>();
+  const form = useForm<OnboardingFormType>();
+  const { handleSubmit, watch } = form;
 
   const orgs = [
     { id: 1, name: "Asia Development Bank (ADB)" },
@@ -138,17 +133,11 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   ]);
 
   const [stepNumber, setStep] = useState(0);
-  const [emailValidationErrorMessage, setEmailValidationErrorMessage] =
-    useState<string>("");
-
   const steps = [
     { name: "Data interest", href: "1" },
     { name: "Organisation", href: "Organisation" },
     { name: "Invite colleagues", href: "invite" },
   ];
-
-  const [emailsToInvite, setEmailsToInvite] = useState(new Set<Option>());
-  const [selectedOrg, setSelectedOrg] = useState(null);
 
   const [paragraphText, setParagraphText] = useState<string | ReactNode>(
     "The changes appear as a running list on your dashboard."
@@ -175,17 +164,27 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
           <Button className="flex h-[41px] w-[144px] justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"></Button>
         </>
       );
-      setDisableButton(!(selectedOrg && messageToOrg));
+      setDisableButton(
+        !(
+          watch("orgInWhichItParticipates") &&
+          watch("messageToParticipateOfTheOrg")
+        )
+      );
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
         "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
-      setDisableButton(emailsToInvite.size < 1);
+      setDisableButton((watch("newUsersEmailsToInvite") || [])?.length < 1);
     } else {
       setDisableButton(false);
     }
-  }, [selectedOrg, messageToOrg, emailsToInvite, stepNumber]);
+  }, [
+    watch("orgInWhichItParticipates"),
+    watch("messageToParticipateOfTheOrg"),
+    watch("newUsersEmailsToInvite"),
+    stepNumber,
+  ]);
 
   const nextStep = () => {
     if (stepNumber === steps.length - 1) return router.push("/");
@@ -283,21 +282,9 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
               setOrganizations={setOrganizations}
             />
           ) : stepNumber === 1 ? (
-            <OrganizationSelectionStep
-              orgs={orgs}
-              selectedOrg={selectedOrg}
-              setSelectedOrg={setSelectedOrg}
-              setMessageToOrg={setMessageToOrg}
-              setConfirmationWorkingForTheOrg={register("remember").onChange}
-            />
+            <OrganizationSelectionStep orgs={orgs} form={form} />
           ) : (
-            <InviteUsersStep
-              emailValidationErrorMessage={emailValidationErrorMessage}
-              emailsToInvite={emailsToInvite}
-              setEmailValidationErrorMessage={setEmailValidationErrorMessage}
-              setEmailsToInvite={setEmailsToInvite}
-              setMessageToInvitation={setMessageToInvitation}
-            />
+            <InviteUsersStep form={form} />
           )}
           <div className="mt-5">
             <div className="mb-5">

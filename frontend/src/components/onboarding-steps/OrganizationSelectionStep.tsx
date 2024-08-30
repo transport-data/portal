@@ -9,21 +9,17 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/react";
-import { useState } from "react";
+import { OnboardingFormType } from "@schema/onboarding.schema";
 import Link from "next/link";
+import { useState } from "react";
+import { UseFormReturn } from "react-hook-form";
 
 export default ({
+  form,
   orgs,
-  setSelectedOrg,
-  selectedOrg,
-  setMessageToOrg,
-  setConfirmationWorkingForTheOrg,
 }: {
-  orgs: any;
-  setSelectedOrg: any;
-  selectedOrg: any;
-  setMessageToOrg: any;
-  setConfirmationWorkingForTheOrg: any;
+  form: UseFormReturn<OnboardingFormType, any, undefined>;
+  orgs: any[];
 }) => {
   const [query, setQuery] = useState("");
   const filteredOrgs =
@@ -47,10 +43,10 @@ export default ({
       <div className="space-y-1">
         <Combobox
           as="div"
-          value={selectedOrg}
+          value={form.watch("orgInWhichItParticipates")}
           onChange={(org) => {
             setQuery("");
-            setSelectedOrg(org);
+            form.setValue("orgInWhichItParticipates", org || undefined);
           }}
         >
           <div className="relative mt-2">
@@ -121,14 +117,14 @@ export default ({
       <TextDivisor text="Message for organisation owner*" />
       <TextEditor
         placeholder="Message for organisation admin..."
-        setText={setMessageToOrg}
+        setText={(text) => form.setValue("messageToParticipateOfTheOrg", text)}
       />
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
           className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-          id="confirmationWorkingForTheOrg"
-          onChange={(e) => setConfirmationWorkingForTheOrg(e)}
+          {...form.register("confirmThatItParticipatesOfTheOrg")}
+          id="confirmThatItParticipatesOfTheOrg"
         />
         <div className="pb-1 text-sm text-[#6B7280]">
           <label htmlFor="confirmationWorkingForTheOrg">

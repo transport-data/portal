@@ -170,7 +170,7 @@ export default ({
   setText,
   placeholder,
 }: {
-  setText: Dispatch<SetStateAction<string>>;
+  setText: (text: string) => void;
   placeholder?: string;
 }) => {
   const extensions = [
