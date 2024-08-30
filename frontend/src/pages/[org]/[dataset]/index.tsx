@@ -15,6 +15,13 @@ import { DatasetPreview } from "@components/dataset/individualPage/DatasetPrevie
 import { Metadata } from "@components/dataset/individualPage/Metadata";
 import { Downloads } from "@components/dataset/individualPage/Downloads";
 import { Badge } from "@components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@components/ui/select";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -137,8 +144,10 @@ export default function DatasetPage({
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                   {dataset.title || dataset.name}
                 </h2>
-                <Badge className="my-2" variant="warning">TDC Harmonized</Badge>
-                <div className="mt-4 w-96 text-justify text-base font-normal leading-normal text-gray-500">
+                <Badge className="my-2" variant="warning">
+                  TDC Harmonized
+                </Badge>
+                <div className="mt-4 text-justify text-base font-normal leading-normal text-gray-500">
                   {dataset.notes ?? "-"}
                 </div>
                 <div className="flex flex-col pt-2 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-2.5">
@@ -149,7 +158,7 @@ export default function DatasetPage({
                     />
                     {dataset.organization?.title || dataset.organization?.name}
                   </div>
-                  <div className="mt-2.5 text-center font-['Inter'] text-xs font-medium leading-none text-gray-500">
+                  <div className="mt-2.5 hidden text-center font-['Inter'] text-xs font-medium leading-none text-gray-500 lg:block">
                     •
                   </div>
                   <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
@@ -159,7 +168,7 @@ export default function DatasetPage({
                     />
                     Updated {new Date(dataset.metadata_modified).toDateString()}
                   </div>
-                  <div className="mt-2.5 text-center font-['Inter'] text-xs font-medium leading-none text-gray-500">
+                  <div className="mt-2.5 hidden text-center font-['Inter'] text-xs font-medium leading-none text-gray-500 lg:block">
                     •
                   </div>
                   <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
@@ -176,26 +185,28 @@ export default function DatasetPage({
         </div>
         <Tabs defaultValue="overview">
           <div className="border-b border-gray-200 shadow-sm">
-          <div className="container flex items-center justify-between pb-4">
-            <TabsList className="bg-transparent">
-              {tabs.map((tab) => (
-                <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
-              ))}
-            </TabsList>
-            <div className="space-x-4">
-              <Button variant="secondary">
-                <EnvelopeIcon className="mr-2 h-5 w-5" />
-                Contact the contributor
-              </Button>
-              <Button variant="secondary">
-                <ShareIcon className="mr-2 h-4 w-4" />
-                Share
-              </Button>
+            <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
+              <TabsList className="bg-transparent overflow-x-auto max-w-[95vw] h-14 justify-start">
+                  {tabs.map((tab) => (
+                    <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
+                  ))}
+              </TabsList>
+              <div className="flex w-full items-center justify-end space-x-4 lg:w-auto">
+                <Button variant="secondary">
+                  <EnvelopeIcon className="mr-2 h-5 w-5" />
+                  Contact the contributor
+                </Button>
+                <Button variant="secondary">
+                  <ShareIcon className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
+              </div>
             </div>
           </div>
-          </div>
           {tabs.map((tab) => (
-            <TabsContent className="mt-0" value={tab.id}>{tab.content}</TabsContent>
+            <TabsContent className="mt-0" value={tab.id}>
+              {tab.content}
+            </TabsContent>
           ))}
         </Tabs>
       </Layout>

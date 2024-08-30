@@ -49,7 +49,7 @@ export function Citation({
     });
   }
   return (
-    <Tabs defaultValue={options[0]?.label ?? ""} className="max-w-[80vw]">
+    <Tabs defaultValue={options[0]?.label ?? ""} className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[80vw]">
       <TabsList className="w-full justify-start overflow-hidden p-0 bg-transparent">
         <Carousel className="w-full">
           <CarouselContent>
@@ -86,16 +86,16 @@ export function Citation({
           className="mt-0 rounded-b-md border border-gray-300 p-6 "
         >
           <div className="flex items-start gap-x-4 pb-4">
-            <div>
+            <div className="hidden lg:block">
               {option.type === "quotation" ? (
                 <QuoteIcon className="h-8 w-8 text-black" />
               ) : (
                 <CodeBracketIcon className="h-8 w-8 text-black" />
               )}
             </div>
-            <pre className="text-sm font-normal leading-tight text-gray-500">{citationCode}</pre>
+            <pre className="text-sm font-normal leading-tight text-gray-500 overflow-hidden">{citationCode}</pre>
           </div>
-          <Button variant="secondary" className="bg-gray-400">
+          <Button variant="secondary" className="bg-gray-200 border-gray-200 outline-gray-200 ring-gray-200 gap-x-2">
             <ClipboardCopy className="h-4 w-4" />
             Copy to clipboard
           </Button>

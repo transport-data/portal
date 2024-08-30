@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Citation } from "./Citation";
 import { cn, formatIcon } from "@lib/utils";
-import { ChevronRightIcon, DownloadIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowDownToLineIcon, ChevronRightIcon, DownloadIcon } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -137,9 +137,9 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                 <div className="ml-4 flex-shrink-0">
                   <a
                     href={r.url}
-                    className="font-medium text-primary hover:text-accent"
+                    className="font-medium text-gray-500 hover:text-accent"
                   >
-                    <DownloadIcon className="h-5 w-5" />
+                    <ArrowDownToLineIcon className="h-5 w-5" />
                   </a>
                 </div>
               </li>
