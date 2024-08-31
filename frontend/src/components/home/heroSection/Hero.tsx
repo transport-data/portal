@@ -31,7 +31,7 @@ export default function Hero() {
               Transport Data Commons aims to improve access, sharing, and
               analysing transportation data for a more sustainable future.
             </p>
-            <div className="lg:max-w-[576px]">
+            <div className="mt-8 lg:max-w-[576px]">
               <SearchBar />
             </div>
           </div>
