@@ -8,7 +8,7 @@ import PartnersCarousel from "@components/_shared/PartnersCarousel";
 export default function Hero() {
   return (
     <section className="pb-[96px] pt-[64px]">
-      <div className="container">
+      <div className="container flex flex-col gap-[72px]">
         <div className="flex items-center gap-x-16 xl:items-start">
           <div className="w-full">
             <Link
