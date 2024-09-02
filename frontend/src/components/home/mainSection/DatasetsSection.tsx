@@ -72,8 +72,6 @@ export default function DatasetsSection({
     },
   ];
 
-  const chunkedDatasets = chunkArray(_datasets, 3);
-
   return (
     <div className="container py-[96px]">
       <div className="mx-auto text-center lg:max-w-[640px]">

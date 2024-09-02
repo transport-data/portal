@@ -35,7 +35,7 @@ export default function Header({
   return (
     <Disclosure
       as="nav"
-      className="sticky top-0 z-10"
+      className="sticky top-0 z-20"
       style={{ background: backgroundColor }}
     >
       <div className="container py-[24px]">
