@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
+import { HomeIcon } from "@heroicons/react/20/solid";
 
 import { cn } from "@/lib/utils";
 
@@ -118,8 +119,12 @@ const DefaultBreadCrumb = ({ links }: { links: Link[] }) => {
       <BreadcrumbList>
         {links.map((link, index) => (
           <>
-            <BreadcrumbItem key={index}>
-              <BreadcrumbLink href={link.href}>{link.label}</BreadcrumbLink>
+            <BreadcrumbItem key={index} className={index < links.length - 1 ? 'text-primary' : ''}>
+              <BreadcrumbLink href={link.href} className="flex items-center gap-x-3">
+                {link.href === '/' ? 
+                  <HomeIcon className="h-5 w-5 mb-1" /> : <></>
+                }
+                {link.label}</BreadcrumbLink>
             </BreadcrumbItem>
             {index < links.length - 1 && <BreadcrumbSeparator />}
           </>
