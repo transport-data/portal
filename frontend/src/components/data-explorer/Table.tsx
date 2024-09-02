@@ -6,9 +6,15 @@ import {
 } from "@tanstack/react-table";
 import {
   ArrowUpDownIcon,
+  ChevronDown,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronUp,
+  ChevronsUpDownIcon,
+  ListFilter,
   MapPinIcon as MapPinIconSolid,
+  Pin,
+  PinOff,
   TableIcon,
 } from "lucide-react";
 import { Fragment, Ref, useEffect, useState } from "react";
@@ -37,6 +43,7 @@ import { DataExplorerColumnFilter } from "./DataExplorer";
 import { DatePicker } from "./DatePicker";
 import { Button } from "@/components/ui/button";
 import { Reference, usePopper } from "react-popper";
+import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
 
 type TableProps = {
   table: TableType<any>;
@@ -57,8 +64,8 @@ export function TopBar({
   const numOfColumns = table.getAllColumns().length;
   return (
     <>
-      <span className="text-base font-regular leading-5 text-[#3E3E3E] flex items-center">
-        <TableIcon className="w-5 h-5 mr-2 text-blue-800" />
+      <span className="font-regular flex items-center text-base leading-5 text-[#3E3E3E]">
+        <TableIcon className="mr-2 h-5 w-5 text-accent" />
         {numOfColumns} columns, {numOfRows} rows
       </span>
       <div>
@@ -69,7 +76,7 @@ export function TopBar({
             {numOfRows}
           </span>
           <button
-            className={`w-4 h-4 ${
+            className={`h-4 w-4 ${
               !table.getCanPreviousPage() ? "opacity-25" : "opacity-100"
             }`}
             onClick={() => table.previousPage()}
@@ -78,7 +85,7 @@ export function TopBar({
             <ChevronLeftIcon />
           </button>
           <button
-            className={`w-4 h-4 ${
+            className={`h-4 w-4 ${
               !table.getCanNextPage() ? "opacity-25" : "opacity-100"
             }`}
             onClick={() => table.nextPage()}
@@ -115,7 +122,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
         ref={setReferenceElement as Ref<HTMLButtonElement>}
         as="div"
       >
-        <Button className="flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
+        <Button className="flex h-8 items-center justify-center rounded-md bg-accent text-xs text-accent-foreground hover:bg-accent/90 hover:text-white ">
           Show Columns
         </Button>
       </Popover.Button>
@@ -129,22 +136,22 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
         leaveTo="transform opacity-0 scale-95"
       >
         <Popover.Panel
-          ref={setPopperElement}
+          ref={setPopperElement as any}
           style={styles.popper}
           {...attributes.popper}
-          className="absolute overflow-hidden max-h-[200px] overflow-y-auto right-0 z-10 mt-2 py-4 w-64 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 z-10 mt-2 max-h-[200px] w-64 origin-top-left overflow-hidden overflow-y-auto rounded-md bg-white py-4 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
           <div className="px-4 pb-2">
             <div className="relative w-full rounded-md">
               <input
-                className="py-1.5 shadow-wri-small block w-full rounded-md border-0 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm min-w-0"
+                className="shadow-wri-small block w-full min-w-0 rounded-md border-0 px-3 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-accent focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 disabled:bg-gray-100 sm:text-sm"
                 onChange={(e) => setQ(e.target.value)}
                 value={q}
               />
-              <div className="z-10 absolute inset-y-0 right-0 flex items-center pr-3">
+              <div className="absolute inset-y-0 right-0 z-10 flex items-center pr-3">
                 <Tooltip content="Clear input" side="left">
-                  <button onClick={() => setQ("")} className="w-4 h-4">
-                    <XCircleIcon className="text-gray-400 w-4 h-4" />
+                  <button onClick={() => setQ("")} className="h-4 w-4">
+                    <XCircleIcon className="h-4 w-4 text-gray-400" />
                   </button>
                 </Tooltip>
               </div>
@@ -160,7 +167,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
                     onChange: table.getToggleAllColumnsVisibilityHandler(),
                   }}
                   name="toggle-all"
-                  className="h-4 w-4 rounded border-gray-300 text-blue-800 focus:ring-blue-800"
+                  className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
                 />
               </div>
               <div className="ml-3 text-sm leading-6">
@@ -183,13 +190,13 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
                     onChange: column.getToggleVisibilityHandler(),
                   }}
                   name={column.id}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-800 focus:ring-blue-800"
+                  className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
                 />
               </div>
               <div className="ml-3 text-sm leading-6">
                 <label
                   htmlFor={column.id}
-                  className="font-medium text-gray-900 truncate"
+                  className="truncate font-medium text-gray-900"
                 >
                   {typeof column.columnDef.header === "string"
                     ? column.columnDef.header
@@ -207,15 +214,15 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
 export function Table({ table, isLoading }: TableProps) {
   const numOfColumns = table.getAllColumns().length;
   return (
-    <div className="max-w-full grow flex">
-      <table className="block shadow">
-        <thead className="text-left bg-[#FBFBFB]">
+    <div className="flex max-w-full grow">
+      <table className="block shadow w-max">
+        <thead className="bg-gray-100 text-left">
           {table.getLeftHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((h) => (
                 <th
                   key={h.id}
-                  className="pl-12 min-w-[200px] py-8 text-base font-semibold"
+                  className="min-w-[200px] py-8 pl-12 text-sm text-gray-500 font-semibold"
                 >
                   <Column h={h} />
                 </th>
@@ -228,7 +235,7 @@ export function Table({ table, isLoading }: TableProps) {
             <tr key={r.id} className="border-b border-b-slate-200">
               {r.getLeftVisibleCells().map((c) => (
                 <td key={c.id} className="py-2 pl-12">
-                  <div className="min-h-[65px] flex items-center text-base">
+                  <div className="flex min-h-[65px] items-center text-base">
                     {" "}
                     {flexRender(c.column.columnDef.cell, c.getContext())}
                   </div>
@@ -238,88 +245,93 @@ export function Table({ table, isLoading }: TableProps) {
           ))}
         </tbody>
       </table>
-      <table className="w-full block overflow-x-scroll ">
-        <thead className="text-left bg-[#FBFBFB]">
-          {table.getCenterHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((h) => (
-                <th
-                  key={h.id}
-                  className="pl-12 min-w-[200px] py-8 text-base font-semibold"
-                >
-                  <Column h={h} />
-                </th>
+      <ScrollArea>
+        <div className="shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+          <table className="block w-max divide-y divide-gray-300">
+            <thead className="bg-gray-100 text-left">
+              {table.getCenterHeaderGroups().map((hg) => (
+                <tr key={hg.id}>
+                  {hg.headers.map((h) => (
+                    <th
+                      key={h.id}
+                      className="min-w-[200px] py-8 pl-12 text-sm text-gray-500 font-semibold"
+                    >
+                      <Column h={h} />
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        {isLoading && (
-          <tbody>
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((r) => (
-              <tr key={r} className="border-b border-b-slate-200">
-                {Array.from(Array(numOfColumns).keys()).map((c) => (
-                  <td key={c} className="py-2 pl-12">
-                    <div className="min-h-[65px] flex items-center text-base">
-                      <span className="w-24 h-4 animate-pulse rounded-md bg-blue-100" />
-                    </div>
-                  </td>
+            </thead>
+            {isLoading && (
+              <tbody>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((r) => (
+                  <tr key={r} className="border-b border-b-slate-200">
+                    {Array.from(Array(numOfColumns).keys()).map((c) => (
+                      <td key={c} className="py-2 pl-12">
+                        <div className="flex min-h-[65px] items-center text-base">
+                          <span className="h-4 w-24 animate-pulse rounded-md bg-accent/20" />
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        )}
-        <tbody>
-          {table.getRowModel().rows.map((r) => (
-            <tr key={r.id} className="border-b border-b-slate-200">
-              {r.getCenterVisibleCells().map((c) => {
-                if (c.getValue() === "" || c.getValue() === " ") {
-                  return (
-                    <td key={c.id} className="py-2 pl-12">
-                      <div className="min-h-[65px] flex items-center text-base">
-                        {c.column.columnDef.meta?.default ?? ""}
-                      </div>
-                    </td>
-                  );
-                }
-                return (
-                  <td key={c.id} className="py-2 pl-12">
-                    <div className="min-h-[65px] flex items-center text-base">
-                      {flexRender(c.column.columnDef.cell, c.getContext())}
-                    </div>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </tbody>
+            )}
+            <tbody>
+              {table.getRowModel().rows.map((r) => (
+                <tr key={r.id} className="border-b border-b-slate-200">
+                  {r.getCenterVisibleCells().map((c) => {
+                    if (c.getValue() === "" || c.getValue() === " ") {
+                      return (
+                        <td key={c.id} className="py-2 pl-12">
+                          <div className="flex min-h-[65px] items-center text-base">
+                            {c.column.columnDef.meta?.default ?? ""}
+                          </div>
+                        </td>
+                      );
+                    }
+                    return (
+                      <td key={c.id} className="py-2 pl-12">
+                        <div className="flex min-h-[65px] items-center text-base">
+                          {flexRender(c.column.columnDef.cell, c.getContext())}
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </div>
   );
 }
 
 function Column({ h }: { h: Header<any, unknown> }) {
   return (
-    <div className="relative flex gap-x-2 items-center pr-4">
+    <div className="relative flex items-center gap-x-2 pr-4">
       {flexRender(h.column.columnDef.header, h.getContext())}
       {match(h.column.getIsSorted())
         .with(false, () => (
           <Tooltip content="Sort by this column">
             <button onClick={() => h.column.toggleSorting(false, true)}>
-              <ArrowUpDownIcon className="w-4 h-4 opacity-75" />
+              <ChevronsUpDownIcon className="h-4 w-4 opacity-75" />
             </button>
           </Tooltip>
         ))
         .with("asc", () => (
           <Tooltip content="Sorting asc">
             <button onClick={() => h.column.toggleSorting(true, true)}>
-              <ArrowUpIcon className="w-4 h-4" />
+              <ChevronUp className="h-4 w-4" />
             </button>
           </Tooltip>
         ))
         .with("desc", () => (
           <Tooltip content="Sorting desc">
             <button onClick={() => h.column.clearSorting()}>
-              <ArrowDownIcon className="w-4 h-4" />
+              <ChevronDown className="h-4 w-4" />
             </button>
           </Tooltip>
         ))
@@ -328,7 +340,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
         ))}
       <FilterColumn column={h.column} />
       {!h.isPlaceholder && h.column.getCanPin() && (
-        <div className="flex gap-1 justify-center">
+        <div className="flex justify-center gap-1">
           {h.column.getIsPinned() !== "left" ? (
             <Tooltip content="Pin to left">
               <button
@@ -336,7 +348,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                   h.column.pin("left");
                 }}
               >
-                <MapPinIconOutline className="w-4 h-4" />
+                <Pin className="h-4 w-4" />
               </button>
             </Tooltip>
           ) : (
@@ -346,7 +358,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                   h.column.pin(false);
                 }}
               >
-                <MapPinIconSolid className="w-4 h-4" />
+                <PinOff className="h-4 w-4" />
               </button>
             </Tooltip>
           )}
@@ -363,7 +375,7 @@ function FilterColumn({ column }: { column: ColumnType<any, unknown> }) {
         <>
           <Popover.Button>
             <Tooltip content="Filter">
-              <Filter className="w-4 h-4" />
+              <ListFilter className="h-4 w-4" />
             </Tooltip>
           </Popover.Button>
           <Transition
@@ -375,7 +387,7 @@ function FilterColumn({ column }: { column: ColumnType<any, unknown> }) {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Popover.Panel className="absolute top-0 left-0 z-10 mt-6 w-56 origin-bottom rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Popover.Panel className="absolute left-0 top-0 z-10 mt-6 w-56 origin-bottom rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <FilterForm column={column} />
             </Popover.Panel>
           </Transition>
@@ -412,8 +424,8 @@ function FilterForm({ column }: { column: ColumnType<any, unknown> }) {
 
   return (
     <FormProvider {...formObj}>
-      <div className="flex flex-col gap-y-2 py-4 px-4">
-        <div className="flex flex-col gap-y-2 justify-center items-center">
+      <div className="flex flex-col gap-y-2 px-4 py-4">
+        <div className="flex flex-col items-center justify-center gap-y-2">
           <Filters datePicker={column.columnDef.meta?.type === "timestamp"} />
         </div>
       </div>
@@ -454,7 +466,7 @@ export default function Filters({
       {fields.map((field, index) => (
         <div
           key={field.id}
-          className="flex flex-col items-center gap-y-2 w-full"
+          className="flex w-full flex-col items-center gap-y-2"
         >
           <SimpleSelect
             formObj={formObj}
@@ -518,24 +530,24 @@ export default function Filters({
             }
           />
           {field.link && (
-            <span className="text-xs text-gray-500 uppercase">
+            <span className="text-xs uppercase text-gray-500">
               {field.link}
             </span>
           )}
         </div>
       ))}
-      <div className="grid grid-cols-2 w-full gap-x-2">
+      <div className="grid w-full grid-cols-2 gap-x-2">
         <Button
           type="button"
           onClick={() => addFilter("and")}
-          className="flex items-center w-full justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs "
+          className="flex h-8 w-full items-center justify-center rounded-md bg-accent text-xs text-accent-foreground hover:bg-accent/90 hover:text-white "
         >
           AND
         </Button>
         <Button
           type="button"
           onClick={() => addFilter("or")}
-          className="flex items-center w-full justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs "
+          className="flex h-8 w-full items-center justify-center rounded-md bg-accent text-xs text-accent-foreground hover:bg-accent/90 hover:text-white "
         >
           OR
         </Button>
@@ -566,14 +578,14 @@ export function ListOfFilters({
         {filters.map((f, i) => (
           <div
             key={f.id}
-            className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 hover:bg-neutral-200 transition px-3 py-1 shadow"
+            className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 px-3 py-1 shadow transition hover:bg-neutral-200"
           >
             <div className="font-['Acumin Pro SemiCondensed'] text-xs font-semibold leading-none text-black">
               {f.id}
             </div>
             <Tooltip content="Remove filter">
               <button onClick={() => removeFilter(i)}>
-                <XCircleIcon className="h-4 w-4 text-red-600 cursor-pointer" />
+                <XCircleIcon className="h-4 w-4 cursor-pointer text-red-600" />
               </button>
             </Tooltip>
           </div>

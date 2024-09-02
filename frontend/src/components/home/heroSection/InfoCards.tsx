@@ -23,7 +23,7 @@ const infoCards = [
   },
   {
     icon: (props: IconProps) => <MagnifyingGlassCircleIcon {...props} />,
-    title: "Open Data",
+    title: "Data standardisation",
     description:
       "TDC provides SDMX standardised data sets for transport, including transparent metadata.",
   },
@@ -31,7 +31,7 @@ const infoCards = [
 
 export default function InfoCards() {
   return (
-    <div className="mt-[72px] grid grid-cols-1 gap-8 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
       {infoCards.map((card, i) => (
         <div key={`info-card-${i}`} className="flex items-start gap-[10px]">
           <card.icon className="w-[20px] shrink-0 text-accent" />

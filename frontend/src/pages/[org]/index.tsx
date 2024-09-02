@@ -4,7 +4,6 @@ import OrgNavCrumbs from "../../components/organization/individualPage/OrgNavCru
 import OrgInfo from "../../components/organization/individualPage/OrgInfo";
 import Layout from "../../components/_shared/Layout";
 import Tabs from "../../components/_shared/TabsPublic";
-import TopBar from "../../components/_shared/TopBar";
 import { CKAN } from "@portaljs/ckan";
 import styles from "@/styles/DatasetInfo.module.scss";
 import DatasetList from "../../components/_shared/DatasetList";
@@ -84,7 +83,6 @@ export default function OrgPage({
                   backgroundImage: "url('/images/backgrounds/SearchHero.avif')",
                 }}
               >
-                <TopBar />
                 <OrgNavCrumbs
                   org={{
                     name: org?.name,

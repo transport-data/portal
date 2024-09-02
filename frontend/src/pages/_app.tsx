@@ -6,13 +6,10 @@ import "react-toastify/dist/ReactToastify.css";
 import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import Script from "next/script";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
-import { pageview } from "@portaljs/core";
 import NotificationContainer from "@components/_shared/NotificationContainer";
 import { DefaultSeo } from "next-seo";
 
-import { Inter } from "@next/font/google";
+import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,17 +17,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleRouteChange = (url: { url: string; analyticsID: string }) => {
-      pageview(url);
-    };
-    router.events.on("routeChangeComplete", handleRouteChange);
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router.events]);
   return (
     <ThemeProvider
       disableTransitionOnChange
