@@ -1,6 +1,6 @@
 import { CommandGroup, CommandItem } from "@components/ui/command";
 import SearchDropdownHeader from "./SearchDropdownHeader";
-import SearchNarrowItem from "./SearchNarrowItem";
+import SearchNarrowItem from "./SearchFacetItem";
 
 export const facets: any = {
   in: {
@@ -26,7 +26,7 @@ export const facets: any = {
   },
 };
 
-export default function SearchNarrow({
+export default function SearchFacets({
   showAll,
   headerAction,
   onSelect,

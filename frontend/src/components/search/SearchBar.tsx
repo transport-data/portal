@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/command";
 import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
-import SearchNarrow from "./SearchNarrow";
+import SearchNarrow from "./SearchFacets";
 
 import { datasets } from "@static-db/datasets";
 import SearchDatasetItem from "./SearchDatasetItem";
-import SearchNarrowItem from "./SearchNarrowItem";
+import SearchFacetItem from "./SearchFacetItem";
 import { VariableIcon } from "@heroicons/react/20/solid";
 
 export default function SearchBar() {
@@ -87,17 +87,17 @@ export default function SearchBar() {
                 <CommandGroup
                   heading={<CommandListHeader title="Recent searches" />}
                 >
-                  <SearchNarrowItem
+                  <SearchFacetItem
                     text={"passanger activity"}
                     icon={<VariableIcon width={20} className="text-gray-500" />}
                     context={"Indicator"}
                   />
-                  <SearchNarrowItem
+                  <SearchFacetItem
                     badge={"in: Asia"}
                     text={"passenger transport activity"}
                   />
-                  <SearchNarrowItem text={"heavy duty vehicles"} />
-                  <SearchNarrowItem text={"passenger vehicles"} />
+                  <SearchFacetItem text={"heavy duty vehicles"} />
+                  <SearchFacetItem text={"passenger vehicles"} />
                 </CommandGroup>
               )}
             </>
@@ -111,12 +111,12 @@ export default function SearchBar() {
               </CommandGroup>
 
               <CommandGroup heading={<CommandListHeader title="Indicators" />}>
-                <SearchNarrowItem
+                <SearchFacetItem
                   text={"passanger activity"}
                   icon={<VariableIcon width={20} className="text-gray-500" />}
                   context={"Indicator"}
                 />
-                <SearchNarrowItem
+                <SearchFacetItem
                   text={"vehicle fleet"}
                   icon={<VariableIcon width={20} className="text-gray-500" />}
                   context={"Indicator"}
@@ -124,10 +124,10 @@ export default function SearchBar() {
               </CommandGroup>
 
               <CommandGroup heading={<CommandListHeader title="Others" />}>
-                <SearchNarrowItem text={"vehicle fleet France"} />
-                <SearchNarrowItem text={"vehicle registration Thailand"} />
-                <SearchNarrowItem text={"heavy duty vehicles"} />
-                <SearchNarrowItem text={"passenger vehicles"} />
+                <SearchFacetItem text={"vehicle fleet France"} />
+                <SearchFacetItem text={"vehicle registration Thailand"} />
+                <SearchFacetItem text={"heavy duty vehicles"} />
+                <SearchFacetItem text={"passenger vehicles"} />
               </CommandGroup>
             </>
           )}

@@ -2,7 +2,7 @@ import { CommandItem } from "@components/ui/command";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import FacetBadge from "./FacetBadge";
 
-export default function SearchNarrowItem({
+export default function SearchFacetItem({
   badge,
   text,
   icon,
