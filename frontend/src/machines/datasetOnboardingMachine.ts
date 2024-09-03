@@ -33,18 +33,18 @@ const datasetOnboardingMachine = createMachine({
     fileUrls: [],
   } as DatasetOnboardingContext,
   states: {
-    idle: {
+    general: {
       on: {
         addFileUrls: {
           actions: assign<DatasetOnboardingContext, AddFileUrls>({
             fileUrls: (_, event) => event.data,
           }),
         },
-        parseFiles: "parsingFiles",
+        next: "metadata",
       },
     },
 
-    parsingFiles: {
+    metadata: {
       on: {
         addInitialDatapackage: {
           actions: assign<DatasetOnboardingContext, AddInitialDatapackageEvent>(
@@ -69,29 +69,6 @@ const datasetOnboardingMachine = createMachine({
         },
         goBackToStart: "idle",
         editMetadata: "editingMetadata",
-      },
-    },
-
-    editingMetadata: {
-      on: {
-        goBackToOverview: "showingOverview",
-        updateDatapackage: {
-          actions: assign<DatasetOnboardingContext, UpdateDatapackage>({
-            datapackage: (_, event) => event.data,
-          }),
-        },
-        resetValues: {
-          actions: assign<DatasetOnboardingContext>({
-            datapackage: () => null,
-            fileUrls: () => [],
-          }),
-        },
-        goBackToStart: "idle",
-      },
-    },
-    showingError: {
-      on: {
-        resetValues: "idle",
       },
     },
   },

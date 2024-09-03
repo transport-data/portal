@@ -11,6 +11,14 @@ export const SearchDatasetSchema = z.object({
   include_private: z.boolean().optional(),
 });
 
+export const ResourceSchema = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  package_id: z.string(),
+  type: z.enum(["file", "doc"]),
+  url: z.string().url(),
+});
+
 export const DatasetSchema = z.object({
   id: z.string().optional(),
   name: z
@@ -21,36 +29,20 @@ export const DatasetSchema = z.object({
     ),
   title: z.string(),
   notes: z.string().optional().nullable(),
+  tags: z.array(z.string()),
+  userRepresents: z.boolean().default(false),
+  sources: z.array(z.object({
+    name: z.string(),
+    url: z.string().url().optional(),
+  })),
+  language: z.string().optional(),
+  referencePeriodStart: z.date(),
+  referencePeriodEnd: z.date(),
+  countries: z.array(z.string()).default([]),
+  region: z.string().optional(),
+  license: z.string().optional(),
   private: z.boolean().default(true),
-  groupsId: z.array(z.string()).optional(),
-  author: z.string().optional(),
-  author_email: z.string().optional(),
-  language: z.string().optional(),
-  coverage: z.string().optional(),
-  rights: z.string().optional(),
-  conforms_to: z.string().optional(),
-  has_version: z.string().optional(),
-  is_version_of: z.string().optional(),
-  contact_point: z.string().optional(),
-  owner_org: z.string().optional(),
-});
-
-export const DcatSchema = z.object({
-  language: z.string().optional(),
-  coverage: z.string().optional(),
-  rights: z.string().optional(),
-  conforms_to: z.string().optional(),
-  has_version: z.string().optional(),
-  is_version_of: z.string().optional(),
-  contact_point: z.string().optional(),
-});
-
-export const ResourceSchema = z.object({
-  id: z.string().optional(),
-  name: z.string(),
-  description: z.string(),
-  package_id: z.string(),
-  url: z.string().url(),
+  resources: z.array(ResourceSchema),
 });
 
 export type SearchDatasetType = z.infer<typeof SearchDatasetSchema>;
