@@ -11,7 +11,24 @@
       "tasks": []
     },
     "tags": [],
-    "links": [],
+    "links": [
+      {
+        "from": "faq/intro.md",
+        "to": "https://google.com",
+        "toRaw": "https://google.com",
+        "text": "The full list of participating groups includes",
+        "embed": false,
+        "internal": false
+      },
+      {
+        "from": "faq/intro.md",
+        "to": "https://google.com",
+        "toRaw": "https://google.com",
+        "text": "TDC organizing group",
+        "embed": false,
+        "internal": false
+      }
+    ],
     "tasks": []
   },
   {

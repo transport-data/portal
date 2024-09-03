@@ -1,6 +1,6 @@
 import { MarkdownDB } from "mddb";
 
-const dbPath = "db/markdown.db";
+const dbPath = "markdown.db";
 
 const client = new MarkdownDB({
   client: "sqlite3",

@@ -6,6 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
+    "prebuild": "npm run mddb",
+    "mddb": "mddb md",
     "start": "next start"
   },
   "dependencies": {
