@@ -49,9 +49,7 @@ export default function Faq({
 }: {
   faqFiles: Record<string, MddbFile[]>;
 }) {
-  const router = useRouter();
   const hash = useHash();
-  console.log("FAQ FILES", faqFiles);
   return (
     <Layout backgroundEffect effectSize="1.5%">
       <div className="w-full">
@@ -233,7 +231,7 @@ export default function Faq({
   );
 }
 
-export const getServerSideProps = async () => {
+export const getStaticProps = async () => {
   const mddb = await clientPromise;
   // get all files that are not marked as draft in the frontmatter
   const faqFiles = await mddb.getFiles({
@@ -250,7 +248,6 @@ export const getServerSideProps = async () => {
     }),
     R.prop("category")
   );
-  console.log("FAQ FILES", _faqFiles);
   return {
     props: {
       faqFiles: _faqFiles,
