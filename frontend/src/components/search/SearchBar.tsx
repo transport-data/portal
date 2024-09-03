@@ -1,6 +1,5 @@
 import { Button } from "@components/ui/button";
 import { SearchIcon } from "lucide-react";
-import { useSearchContext } from "@components/search/SearchProvider";
 import {
   Command,
   CommandDialog,
