@@ -18,6 +18,7 @@ import Heading from "@components/_shared/Heading";
 import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
+import { SearchProvider } from "@components/search/SearchProvider";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -317,7 +318,9 @@ export default function DatasetsPage({
               Transport and mobility insights and facts across 32 institutions
               and 120+ countries.
             </p>
-            <SearchBar />
+            <div className="mt-8 ">
+              <SearchBar />
+            </div>
             <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
               You can also browse the topics below to find what you are looking
               for.

@@ -13,65 +13,13 @@ import {
 import { chunkArray } from "@lib/utils";
 import { Dataset } from "@portaljs/ckan";
 
+import { datasets as _datasets } from "@static-db/datasets";
+
 export default function DatasetsSection({
   datasets,
 }: {
   datasets: Array<Dataset>;
 }) {
-  const _datasets = [
-    {
-      state: "TDC Formatted",
-      title: "ADB Asian Transport Outlook Database",
-      tags: ["Transport data", "Economic Impact of Transport"],
-      description:
-        "Asian Transport Outlook (ATO) is initiated by the Asian Development Bank (ADB) to strengthen the knowledge base on transport in the Asia-Pacific region. The ATO is developed in support of the planning and delivery of ADB Transport Sector Assistance. The ATO also supports Asian governments in transport policy development and delivery. ADB is working with other interested parties in developing the ATO as an instrument to track the implementation of the Sustainable Development Goals (SDG), the Paris Agreement and other relevant international agreements on sustainable development in the transport sector.",
-      metadata_modified: "2024-02-20T14:00:00Z",
-      organization: "TDC",
-      region: "Worldwide",
-    },
-    {
-      state: "TDC Harmonised",
-      title: "TDC Global Vehicle Registration",
-      tags: ["Vehicle registration", "Transport data"],
-      description:
-        "This dataset and documentation contains detailed information on vehicle registration around the world, a harmonised and up to date transport data set of historical values, 1970 - 2022.",
-      metadata_modified: "2024-02-20T14:00:00Z",
-      organization: "TDC",
-      region: "Worldwide",
-    },
-    {
-      state: "TDC Harmonised",
-      title: "TDC Global Passenger Activity",
-      tags: ["Passenger activity", "Transportation behaviour"],
-      description:
-        "This dataset contains survey data collected from residents of various urban areas, providing insights into transportation behaviors, preferences, and challenges. It can be used to inform the development of sustainable urban mobility solutions and policies.",
-      metadata_modified: "2024-02-20T14:00:00Z",
-      organization: "TDC",
-      region: "Worldwide",
-    },
-
-    {
-      state: "",
-      title: "TDC Global Vehicle Registration",
-      tags: ["Vehicle registration", "Transport data"],
-      description:
-        "This dataset and documentation contains detailed information on vehicle registration around the world, a harmonised and up to date transport data set of historical values, 1970 - 2022.",
-      metadata_modified: "2024-02-20T14:00:00Z",
-      organization: "TDC",
-      region: "Worldwide",
-    },
-    {
-      state: "TDC Harmonised",
-      title: "TDC Global Passenger Activity",
-      tags: ["Passenger activity", "Transportation behaviour"],
-      description:
-        "This dataset contains survey data collected from residents of various urban areas, providing insights into transportation behaviors, preferences, and challenges. It can be used to inform the development of sustainable urban mobility solutions and policies.",
-      metadata_modified: "2024-02-20T14:00:00Z",
-      organization: "TDC",
-      region: "Worldwide",
-    },
-  ];
-
   return (
     <div className="container py-[96px]">
       <div className="mx-auto text-center lg:max-w-[640px]">
