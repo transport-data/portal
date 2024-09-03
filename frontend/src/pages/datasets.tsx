@@ -1,24 +1,16 @@
-import { useEffect } from "react";
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { SWRConfig, unstable_serialize } from "swr";
-import ListOfDatasets from "../components/search/ListOfDatasets";
+import { unstable_serialize } from "swr";
 import Layout from "../components/_shared/Layout";
-import TopBar from "../components/_shared/TopBar";
 import { PackageSearchOptions } from "@portaljs/ckan";
-import getConfig from "next/config";
 import { CKAN } from "@portaljs/ckan";
-import DatasetSearchForm from "@/components/search/DatasetSearchForm";
-import DatasetSearchFilters from "@/components/search/DatasetSearchFilters";
 import { env } from "@env.mjs";
-import Section from "@components/_shared/Section";
 import Heading from "@components/_shared/Heading";
 import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
-import { SearchProvider } from "@components/search/SearchProvider";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
