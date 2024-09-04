@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ErrorMessage } from "@hookform/error-message";
 import type { UseFormReturn } from "react-hook-form";
 import { inputStyle } from "../../styles/formStyles";

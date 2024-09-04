@@ -70,7 +70,7 @@ export default function NewsLetterSection() {
                           <Input
                             placeholder="Enter your email"
                             {...field}
-                            className="mt-0 h-auto  w-full max-w-none py-[14px] pl-[40px] focus-visible:border-0 focus-visible:outline-0 "
+                            className="pl-10 mt-0 w-full max-w-none h-12 focus-visible:border-0 focus-visible:outline-0 "
                           />
                         </FormControl>
                         <FormMessage className="text-left" />
@@ -80,7 +80,7 @@ export default function NewsLetterSection() {
                 </div>
                 <Button
                   type="submit"
-                  className="mt-2 border border-accent py-[14px]"
+                  className="h-12 mt-2 border border-accent"
                 >
                   Subscribe
                 </Button>

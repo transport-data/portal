@@ -25,4 +25,33 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+const DefaultTooltip = ({
+  children,
+  content,
+  disabled = false,
+  side = "top",
+  contentClassName = "",
+}: {
+  children: React.ReactNode;
+  content: React.ReactNode | string;
+  disabled?: boolean;
+  side?: "top" | "bottom" | "left" | "right";
+  contentClassName?: string;
+}) => {
+  if (disabled) return <>{children}</>;
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent
+          className={`bg-white z-[10000] ${contentClassName}`}
+          side={side}
+        >
+          <p>{content}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, DefaultTooltip }
