@@ -64,6 +64,7 @@ const CreateDatasetDashboard: NextPage = () => {
   });
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
+    console.log('TESTING')
     toast({
       title: "You submitted the following dataset:",
       description: (
@@ -79,6 +80,7 @@ const CreateDatasetDashboard: NextPage = () => {
     .with("uploads", () => 2)
     .otherwise(() => 4);
   const disableNext = Object.keys(form.formState.errors).length > 0;
+  console.log('ERRORS', form.formState.errors)
 
   return (
     <>

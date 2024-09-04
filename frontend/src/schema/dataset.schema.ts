@@ -14,7 +14,9 @@ export const SearchDatasetSchema = z.object({
 export const ResourceSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
-  package_id: z.string(),
+  package_id: z.string().optional(),
+  format: z.string().optional(),
+  size: z.number().optional(),
   type: z.enum(["file", "doc"]),
   url: z.string().url(),
 });
