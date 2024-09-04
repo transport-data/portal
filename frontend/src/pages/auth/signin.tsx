@@ -3,7 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -15,7 +15,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 export default function LoginPage({ csrfToken }: { csrfToken: string }) {
-  const REMEMBER_LOGIN_DATA_KEY = "REMEMBER_LOGIN_DATA";
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loggingIn, setLogin] = useState(false);
   const router = useRouter();
@@ -26,20 +25,6 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   }>();
 
   const { errors } = formState;
-
-  useEffect(() => {
-    const parsedData = JSON.parse(
-      localStorage.getItem(REMEMBER_LOGIN_DATA_KEY) ?? "{}"
-    );
-
-    if (parsedData.username) {
-      setValue("username", parsedData.username);
-    }
-
-    if (parsedData.remember) {
-      setValue("remember", parsedData.remember);
-    }
-  }, []);
 
   return (
     <>
