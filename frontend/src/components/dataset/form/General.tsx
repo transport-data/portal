@@ -10,23 +10,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@lib/utils";
-import { CalendarIcon, FlagIcon } from "@heroicons/react/20/solid";
+import { RTEForm } from "@components/ui/formRte";
 import {
   Command,
   CommandEmpty,
@@ -35,260 +21,209 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import listOfCountries from "@lib/listOfCountries";
-import { Check } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@lib/utils";
+import { MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { match } from "ts-pattern";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
-function SourcesForm() {
-  const { control, register } = useFormContext<DatasetFormType>();
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control, // control props comes from useForm (optional: if you are using FormProvider)
-      name: "sources", // unique name for your Field Array
-    }
-  );
-  return (
-    <div className="py-4">
-      <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-        Sources
-      </div>
-      {fields.map((field, index) => (
-        <div className="flex items-center gap-x-4 py-4" key={field.id}>
-          <FormField
-            control={control}
-            name={`sources.${index}.name`}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Source name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name={`sources.${index}.url`}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Link (Optional)" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      ))}
-      <Button
-        onClick={() =>
-          append({
-            name: "",
-            url: "",
-          })
-        }
-        variant="secondary"
-      >
-        Add a source
-      </Button>
-    </div>
-  );
-}
+const exampleTags = [
+  "Public Transport",
+  "Mobility",
+  "Transportation",
+  "Data",
+  "Infrastructure",
+  "Open Data",
+  "Transport",
+  "Urban Mobility",
+  "Traffic",
+  "Transportation Planning",
+  "Cars",
+  "Electric Vehicles",
+  "Sustainable Transport",
+  "Transportation Infrastructure",
+];
 
 export function GeneralForm() {
-  const { control, setValue, getValues } = useFormContext<DatasetFormType>();
+  const formObj = useFormContext<DatasetFormType>();
+  const { getValues, setValue, control, register, watch } = formObj;
   return (
-    <div className="w-full max-w-[560px]">
+    <div className="flex flex-col gap-y-4 py-4">
       <div className="text-xl font-bold leading-normal text-primary">
-        Add metadata
+        General
       </div>
-      <SourcesForm />
-      <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-        Language
-      </div>
-      <FormField
-        control={control}
-        name="language"
-        render={({ field }) => (
-          <FormItem className="py-4">
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Title
+        </div>
+        <FormField
+          control={control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
               <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select language..." />
-                </SelectTrigger>
+                <Input placeholder="Title..." {...field} />
               </FormControl>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="fr">French</SelectItem>
-                <SelectItem value="es">Spanish</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-        Reference Period
-      </div>
-      <div className="flex items-center gap-x-4 py-4">
-        <FormField
-          control={control}
-          name="referencePeriodStart"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="h-4 w-4 opacity-50" />
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>From...</span>
-                      )}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="referencePeriodEnd"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="h-4 w-4 opacity-50" />
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>To...</span>
-                      )}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
-      <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-        Geographies
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Slug
+        </div>
+        <FormField
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Dataset slug" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
-      <FormField
-        control={control}
-        name="countries"
-        render={({ field }) => (
-          <FormItem className="flex flex-col py-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Description
+        </div>
+        <RTEForm
+          name="notes"
+          placeholder="Write a short description of this dataset"
+          formObj={formObj}
+        />
+      </div>
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Are you or the organization you represent the owner of this dataset?
+        </div>
+        <FormField
+          control={control}
+          name="userRepresents"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <div className="" role="group">
+                <button
+                  onClick={() => field.onChange(true)}
+                  type="button"
+                  className={cn(
+                    "rounded-l-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-accent focus:z-10 focus:ring-2 focus:ring-accent",
+                    field.value === true && "bg-accent text-white"
+                  )}
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => field.onChange(false)}
+                  type="button"
+                  className={cn(
+                    "rounded-r-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-accent focus:z-10 focus:ring-2 focus:ring-accent",
+                    field.value === false && "bg-accent text-white"
+                  )}
+                >
+                  No
+                </button>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Keywords (max. 3)
+        </div>
+        <FormField
+          control={control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem className="flex flex-wrap items-end gap-2 flex-row py-4">
+              <Popover>
+                {field.value.map((tag, index) => (
                   <Button
+                    key={index}
+                    size="pill"
                     variant="outline"
                     role="combobox"
-                    className={cn(
-                        "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
-                      !field.value && "text-muted-foreground"
-                    )}
+                    type="button"
+                    className="w-fit border-accent text-xs text-accent gap-x-2"
+                    onClick={() =>
+                      setValue(
+                        "tags",
+                        getValues("tags").filter((v) => v !== tag)
+                      )
+                    }
                   >
-                    <FlagIcon className="h-4 w-4 text-primary" />
-                    {field.value && field.value.length > 0
-                      ? listOfCountries
-                          .filter((c) => field.value.includes(c.code))
-                          ?.map((v) => v.name)
-                          .join(", ")
-                      : "Select country"}
+                    {tag}
+                    <XMarkIcon className="h-4 w-4" />
                   </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="Search language..." />
-                  <CommandList>
-                    <CommandEmpty>No language found.</CommandEmpty>
-                    <CommandGroup>
-                      {listOfCountries.map((c) => (
-                        <CommandItem
-                          value={c.name}
-                          key={c.code}
-                          onSelect={() => {
-                            match(field.value.includes(c.code))
-                              .with(true, () =>
-                                setValue(
-                                  "countries",
-                                  getValues("countries").filter(
-                                    (v) => v !== c.code
+                ))}
+                <PopoverTrigger asChild>
+                  <FormControl>
+                      <Button
+                        size="pill"
+                        variant="outline"
+                      disabled={field.value.length >= 3}
+                        role="combobox"
+                        type="button"
+                        className="w-fit border-accent text-xs text-accent gap-x-2"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                        Add a keyword
+                      </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Search keywords..." />
+                    <CommandList>
+                      <CommandEmpty>No keyword found.</CommandEmpty>
+                      <CommandGroup>
+                        {exampleTags.map((t) => (
+                          <CommandItem
+                            value={t}
+                            key={t}
+                            onSelect={() => {
+                              match(field.value.includes(t))
+                                .with(true, () =>
+                                  setValue(
+                                    "tags",
+                                    getValues("tags").filter((v) => v !== t)
                                   )
                                 )
-                              )
-                              .with(false, () =>
-                                setValue(
-                                  "countries",
-                                  getValues("countries").concat(c.code)
-                                )
-                              );
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              field.value.includes(c.code)
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                          {c.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                                .with(false, () =>
+                                  setValue("tags", getValues("tags").concat(t))
+                                );
+                            }}
+                          >
+                            <CheckIcon
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                field.value.includes(t)
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {t}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
   );
 }

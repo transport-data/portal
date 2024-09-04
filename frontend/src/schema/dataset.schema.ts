@@ -39,7 +39,7 @@ export const DatasetSchema = z.object({
   referencePeriodStart: z.date(),
   referencePeriodEnd: z.date(),
   countries: z.array(z.string()).default([]),
-  region: z.string().optional(),
+  regions: z.array(z.string()).default([]),
   license: z.string().optional(),
   private: z.boolean().default(true),
   resources: z.array(ResourceSchema),

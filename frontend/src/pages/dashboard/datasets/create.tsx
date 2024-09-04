@@ -15,11 +15,16 @@ import Spinner from "@components/_shared/Spinner";
 import { NextSeo } from "next-seo";
 import { formatIcon } from "@lib/utils";
 import { Steps } from "@components/dataset/form/Steps";
-import { GeneralForm } from "@components/dataset/form/General";
+import { MetadataForm } from "@components/dataset/form/Metadata";
 import { useForm } from "react-hook-form";
 import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
+import { Button } from "@components/ui/button";
+import { GeneralForm } from "@components/dataset/form/General";
+import { UploadsForm } from "@components/dataset/form/Uploads";
+import { toast } from "@components/ui/use-toast";
+import { match } from "ts-pattern";
 
 const docs = [
   {
@@ -46,26 +51,103 @@ const docs = [
 
 const CreateDatasetDashboard: NextPage = () => {
   const { data: sessionData } = useSession();
-  //const [current, send] = useMachine(datasetOnboardingMachine);
+  const [current, send] = useMachine(datasetOnboardingMachine);
   const form = useForm<DatasetFormType>({
     resolver: zodResolver(DatasetSchema),
+    mode: "onBlur",
     defaultValues: {
-      countries: []
-    }
+      countries: [],
+      regions: [],
+      userRepresents: false,
+      tags: [],
+    },
   });
   if (!sessionData) return <Loading />;
+  function onSubmit(data: DatasetFormType) {
+    toast({
+      title: "You submitted the following dataset:",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    });
+  }
+  const currentStep = match(current.value)
+    .with("general", () => 0)
+    .with("metadata", () => 1)
+    .with("uploads", () => 2)
+    .otherwise(() => 4);
+  const disableNext = Object.keys(form.formState.errors).length > 0;
 
   return (
     <>
       <NextSeo title="Create dataset" />
       <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
-        <div className="flex flex-col justify-center gap-y-4 px-20">
-          <Steps currentStep={1} />
+        <div className="flex flex-col justify-center gap-y-4 px-4 py-8 lg:px-20">
+          <Steps currentStep={currentStep} />
           <Form {...form}>
-            <GeneralForm />
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              {current.matches("general") && (
+                <>
+                  <GeneralForm />
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={() => {
+                      send("next");
+                    }}
+                  >
+                    Next
+                  </Button>
+                </>
+              )}
+              {current.matches("metadata") && (
+                <>
+                  <MetadataForm />
+                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => send("prev")}
+                    >
+                      Prev
+                    </Button>
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={() => {
+                        send("next");
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
+              )}
+              {current.matches("uploads") && (
+                <>
+                  <UploadsForm />
+                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => send("prev")}
+                    >
+                      Prev
+                    </Button>
+                    <Button className="w-full" type="submit">
+                      Submit
+                    </Button>
+                  </div>
+                </>
+              )}
+            </form>
           </Form>
         </div>
-        <div className="flex flex-col items-center bg-gray-50 px-20">
+        <div className="flex flex-col items-center bg-gray-50 py-8 px-4 lg:px-20 order-first lg:order-last">
           <div className="flex h-full flex-col items-center justify-center gap-3">
             <h1 className="self-stretch text-4xl font-extrabold leading-9 text-black">
               Before you add data.
