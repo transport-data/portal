@@ -14,7 +14,7 @@ export default function PartnersPage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Partnets and Doners</title>
+        <title>Partners and Doners</title>
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -59,7 +59,7 @@ export default function PartnersPage(): JSX.Element {
                     size="sm"
                   >
                     <ArrowTopRightOnSquareIcon width={16} />
-                    Vistit website
+                    Visit website
                   </Button>
                 </div>
               );
