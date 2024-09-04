@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Citation } from "./Citation";
-import { cn, formatIcon } from "@lib/utils";
+import { formatBytes, cn, formatIcon, getFileName } from "@lib/utils";
 import { ArrowDownIcon, ArrowDownToLineIcon, ChevronRightIcon, DownloadIcon } from "lucide-react";
 import {
   Bar,
@@ -27,23 +27,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
-
-function getFileName(url: string) {
-  return url.split("/").pop();
-}
-
-//convert bytes to human readable format
-function formatBytes(bytes: number, decimals = 2) {
-  if (bytes === 0) return "0 Bytes";
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-}
 
 //convert date string to Month Year format
 function formatDate(date: string) {
