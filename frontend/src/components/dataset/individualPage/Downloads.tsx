@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Citation } from "./Citation";
-import { cn, formatIcon, getFileName } from "@lib/utils";
+import { formatBytes, cn, formatIcon, getFileName } from "@lib/utils";
 import { ArrowDownIcon, ArrowDownToLineIcon, ChevronRightIcon, DownloadIcon } from "lucide-react";
 import {
   Bar,
