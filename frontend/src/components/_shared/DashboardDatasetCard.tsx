@@ -73,7 +73,7 @@ export default ({
         </div>
       )}
       <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-4 justify-between">
+        <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-bold">{title}</h2>
           {tdcValidated && (
             <Badge variant={"success"} className="text-[#03543F]">
@@ -89,7 +89,7 @@ export default ({
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
+        <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center">
           <Badge
             variant={"success"}
             className="capitalize"
@@ -129,7 +129,7 @@ export default ({
           >
             {visibility}
           </Badge>
-          <span className="hidden sm:block">•</span>
+          <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <svg
               width="14"
@@ -149,7 +149,7 @@ export default ({
           </span>
           {updateFrequency && (
             <>
-              <span className="hidden sm:block">•</span>
+              <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
                 <svg
                   width="14"
@@ -169,7 +169,7 @@ export default ({
               </span>
             </>
           )}
-          <span className="hidden sm:block">•</span>
+          <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <svg
               width="14"
@@ -187,7 +187,7 @@ export default ({
             </svg>
             {region}
           </span>
-          <span className="hidden sm:block">•</span>
+          <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <span>Contributors</span>
             <div className="flex -space-x-2 rtl:space-x-reverse">

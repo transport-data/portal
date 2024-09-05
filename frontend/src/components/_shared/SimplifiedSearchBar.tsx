@@ -22,48 +22,30 @@ export default ({ children }: { children?: ReactNode }) => {
         <SimpleSearchInput onTextInput={(x) => setSearchText(x)} />
       </div>
       <div className={classNames("col-span-12 xl:col-span-2")}>
-        <Listbox value={{ title: "Latest activity" }} onChange={() => ""}>
-          <div className="relative text-sm text-[#6B7280]">
-            <div className="inline-flex h-[37px] w-full rounded-md shadow-sm">
-              <div className="inline-flex items-center gap-x-1.5 rounded-l-md border-y-[1px] border-l-[1px] border-gray-300 bg-white py-2 pl-3 shadow-sm">
-                <span>Sort by:</span>
-              </div>
-              <ListboxButton className="inline-flex flex-grow items-center justify-between rounded-l-none rounded-r-md border-y-[1px] border-r-[1px] border-gray-300 bg-white p-2 placeholder:text-gray-400 hover:opacity-90 focus:outline-none">
-                <p className="mr-2 text-sm text-[#1F2A37]">
-                  {"Latest activity"}
-                </p>
-                <ChevronDownIcon
-                  aria-hidden="true"
-                  className="h-5 w-5 text-[#111928]"
-                />
-              </ListboxButton>
-            </div>
-
-            <ListboxOptions
-              transition
-              className="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none data-[closed]:data-[leave]:opacity-0 data-[leave]:transition data-[leave]:duration-100 data-[leave]:ease-in"
-            >
-              {[{ title: "Latest activity" }].map((option) => (
-                <ListboxOption
-                  key={option.title}
-                  value={option}
-                  className="group cursor-default select-none p-4 text-sm text-gray-900 data-[focus]:bg-accent data-[focus]:text-white"
-                >
-                  <div className="flex flex-col">
-                    <div className="flex justify-between">
-                      <p className="font-normal group-data-[selected]:font-semibold">
-                        {option.title}
-                      </p>
-                      <span className="group-data-[focus]:text-white [.group:not([data-selected])_&]:hidden">
-                        <CheckIcon aria-hidden="true" className="h-5 w-5" />
-                      </span>
-                    </div>
-                  </div>
-                </ListboxOption>
-              ))}
-            </ListboxOptions>
-          </div>
-        </Listbox>
+        <div
+          className="flex  
+            h-[36px]
+            items-center
+            rounded-lg
+            rounded-e-lg
+            border
+            border-s
+            border-gray-300 border-l-gray-300
+            border-s-gray-100 bg-white
+          text-black shadow-sm
+           focus-within:ring-[1px] focus-within:ring-[#111928]"
+        >
+          <span className="z-10 inline-flex flex-shrink-0 items-end rounded-xl  pl-3 text-center text-sm font-medium text-[#6B7280] dark:bg-gray-700 dark:text-white ">
+            Sort by:
+          </span>
+          <select
+            id="states"
+            className="remove-input-ring block w-full rounded-lg rounded-e-lg border-0 bg-white p-0 pl-[3px]
+            text-sm text-gray-900 ring-0 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 "
+          >
+            <option selected>Latest activity</option>
+          </select>
+        </div>
       </div>
       <div className={classNames("col-span-12 xl:col-span-2")}>
         <select

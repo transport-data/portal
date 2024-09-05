@@ -2,7 +2,7 @@ import DatasetsFilter from "@components/_shared/DatasetsFilter";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import DashboardDatasetCard, {
   DashboardDatasetCardProps,
-} from "src/components/_shared/DasboardDatasetCard";
+} from "@components/_shared/DashboardDatasetCard";
 
 export default () => {
   const datasets: DashboardDatasetCardProps[] = [
@@ -61,7 +61,7 @@ export default () => {
 
   return (
     <div className="mt-6 flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
-      <div className="order-1 space-y-12 sm:w-[152px]">
+      <div className="order-1 space-y-12">
         <SelectableItemsList
           items={[
             {
@@ -197,6 +197,9 @@ export default () => {
           onSelectedItem={() => ""}
           title="Contributors"
         />
+        <div className="lg:hidden space-y-2.5">
+          <DatasetsFilter />
+        </div>
       </div>
       <div className="order-3 w-fit">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
@@ -206,7 +209,7 @@ export default () => {
           ))}
         </section>
       </div>
-      <div className="order-2 space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3">
+      <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
         <DatasetsFilter />
       </div>
     </div>
