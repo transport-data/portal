@@ -59,32 +59,34 @@ function SourcesForm() {
         Sources
       </div>
       {fields.map((field, index) => (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" key={field.id}>
-          <FormField
-            control={control}
-            name={`sources.${index}.name`}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Source name" {...field} />metadata
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name={`sources.${index}.url`}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Link (Optional)" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 pb-2" key={field.id}>
+            <FormField
+              control={control}
+              name={`sources.${index}.name`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Source name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name={`sources.${index}.url`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Link (Optional)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </>
       ))}
       <Button
         onClick={() =>
@@ -93,6 +95,7 @@ function SourcesForm() {
             url: "",
           })
         }
+        type="button"
         variant="secondary"
       >
         Add a source
@@ -234,7 +237,8 @@ export function MetadataForm() {
                     role="combobox"
                     className={cn(
                       "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
-                      (!field.value || field.value.length === 0) && "text-gray-400"
+                      (!field.value || field.value.length === 0) &&
+                        "text-gray-400"
                     )}
                   >
                     <FlagIcon className="h-4 w-4" />
@@ -249,7 +253,7 @@ export function MetadataForm() {
               </PopoverTrigger>
               <PopoverContent
                 className="w-full p-0"
-                style={{ width: 'var(--radix-popover-trigger-width)' }}
+                style={{ width: "var(--radix-popover-trigger-width)" }}
               >
                 <Command>
                   <CommandInput placeholder="Search countries..." />
@@ -311,7 +315,8 @@ export function MetadataForm() {
                     role="combobox"
                     className={cn(
                       "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
-                      (!field.value || field.value.length === 0) && "text-gray-400"
+                      (!field.value || field.value.length === 0) &&
+                        "text-gray-400"
                     )}
                   >
                     <GlobeAltIcon className="h-4 w-4" />
@@ -326,7 +331,7 @@ export function MetadataForm() {
               </PopoverTrigger>
               <PopoverContent
                 className="w-full p-0"
-                style={{ width: 'var(--radix-popover-trigger-width)' }}
+                style={{ width: "var(--radix-popover-trigger-width)" }}
               >
                 <Command>
                   <CommandInput placeholder="Search regions..." />
