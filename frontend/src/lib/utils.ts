@@ -29,3 +29,15 @@ export const formatIcon = (format: string) => {
   }
   return '/images/fileIcons/undefined.png'
 }
+
+export const formatDatePeriod = (from:string,to:string)=>{
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const fromDate = new Date(from);
+  const toDate = new Date(to);
+  const dayFrom = fromDate.getDate();
+  const dayTo = toDate.getDate();
+  const month = months[fromDate.getMonth()];
+  const year = fromDate.getFullYear();
+
+  return `${dayFrom} - ${dayTo} ${month} ${year}`;
+}
