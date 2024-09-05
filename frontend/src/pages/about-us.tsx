@@ -39,7 +39,7 @@ export default function AboutUsPage({
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Layout backgroundEffect={true}>
+      <Layout backgroundEffect effectSize="8%">
         {/* hero section*/}
         <HeroSection />
         {/* people section*/}
