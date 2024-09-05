@@ -117,7 +117,7 @@ export default () => {
 
       <Accordion type="single" collapsible className="w-full text-[#6B7280]">
         <AccordionItem value="keyword">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Keyword</span>
             <span className="mr-2">
               {keywordItems.every((x) => x.selected) ||
@@ -152,7 +152,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="location">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>
             <span className="hide mr-2">
               {regions.every((x) => x.selected) ||
@@ -239,7 +239,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="yearsCovered">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
             <span className="hide mr-2">
               {years.every((x) => x.selected) || years.every((x) => !x.selected)
@@ -304,7 +304,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="format">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Format</span>
             <span className="hide mr-2">
               {formats.every((x) => x.selected) ||
@@ -339,7 +339,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="org">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Organisation</span>
             <span className="hide mr-2">
               {orgs.every((x) => x.selected) || orgs.every((x) => !x.selected)
@@ -373,7 +373,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="publicationDate">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Publication date</span>
             <span className="hide mr-2">
               {publicationDates.every((x) => x.selected) ||
@@ -408,9 +408,11 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="archived">
-          <AccordionTrigger className="group mb-3 justify-start py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
-            <span className="flex w-full">Archived</span>
-            <span className="hide mr-2">Without archived</span>
+          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.full]:w-full [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+            <span className="full flex">Archived</span>
+            <span className="hide mx-2 flex w-full justify-end">
+              Without archived
+            </span>
           </AccordionTrigger>
           <AccordionContent>
             <p className="mb-6">

@@ -13,7 +13,7 @@ export const SelectableItemsList = ({
   return (
     <div className="space-y-6">
       <h1 className="text-sm font-semibold">{title}</h1>
-      <div className="flex flex-row flex-wrap items-center gap-3 sm:flex-col sm:flex-nowrap sm:items-start">
+      <div className="flex flex-row whitespace-nowrap flex-wrap items-center gap-3 sm:flex-col sm:flex-nowrap sm:items-start">
         {items.map((x) => (
           <div
             className={classNames(

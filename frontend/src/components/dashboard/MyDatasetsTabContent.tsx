@@ -133,7 +133,7 @@ export default () => {
           ))}
         </section>
       </div>
-      <div className="order-2 space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-l-[1px] sm:pl-3">
+      <div className="order-2 space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3">
         <DatasetsFilter />
       </div>
     </div>

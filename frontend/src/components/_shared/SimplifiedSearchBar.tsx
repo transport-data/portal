@@ -2,29 +2,29 @@ import SimpleSearchInput from "@components/ui/simple-search-input";
 import {
   Listbox,
   ListboxButton,
-  ListboxOptions,
   ListboxOption,
+  ListboxOptions,
 } from "@headlessui/react";
 import classNames from "@utils/classnames";
-import { ChevronDownIcon, CheckIcon } from "lucide-react";
+import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
 
 export default ({ children }: { children?: ReactNode }) => {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <div className="grid grid-cols-12 gap-2">
+    <div className="grid grid-cols-12 gap-2 xl:max-h-[36px] ">
       <div
         className={
-          children ? "col-span-12 sm:col-span-5" : "col-span-12 sm:col-span-6"
+          children ? "col-span-12 xl:col-span-5" : "col-span-12 xl:col-span-6"
         }
       >
         <SimpleSearchInput onTextInput={(x) => setSearchText(x)} />
       </div>
-      <div className={classNames("col-span-12 sm:col-span-2")}>
+      <div className={classNames("col-span-12 xl:col-span-2")}>
         <Listbox value={{ title: "Latest activity" }} onChange={() => ""}>
           <div className="relative text-sm text-[#6B7280]">
-            <div className="inline-flex w-full rounded-md shadow-sm">
+            <div className="inline-flex h-[37px] w-full rounded-md shadow-sm">
               <div className="inline-flex items-center gap-x-1.5 rounded-l-md border-y-[1px] border-l-[1px] border-gray-300 bg-white py-2 pl-3 shadow-sm">
                 <span>Sort by:</span>
               </div>
@@ -65,7 +65,7 @@ export default ({ children }: { children?: ReactNode }) => {
           </div>
         </Listbox>
       </div>
-      <div className={classNames("col-span-12 sm:col-span-2")}>
+      <div className={classNames("col-span-12 xl:col-span-2")}>
         <select
           id="label"
           name="label"
@@ -74,7 +74,7 @@ export default ({ children }: { children?: ReactNode }) => {
           <option>Label</option>
         </select>
       </div>
-      <div className={classNames("col-span-12 sm:col-span-2")}>
+      <div className={classNames("col-span-12 xl:col-span-2")}>
         <select
           id="filter"
           name="filter"
@@ -83,7 +83,7 @@ export default ({ children }: { children?: ReactNode }) => {
           <option>Filter</option>
         </select>
       </div>
-      <div className="col-span-12 sm:col-span-1">{children}</div>
+      <div className="col-span-12 xl:col-span-1">{children}</div>
     </div>
   );
 };

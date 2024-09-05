@@ -32,7 +32,7 @@ export default ({
   return (
     <div
       onClick={() => router.push(href)}
-      className="flex cursor-pointer gap-8"
+      className="flex cursor-pointer gap-6"
     >
       {variant === "success" ? (
         <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
@@ -73,7 +73,7 @@ export default ({
         </div>
       )}
       <div className="space-y-2 text-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4 justify-between">
           <h2 className="text-lg font-bold">{title}</h2>
           {tdcValidated && (
             <Badge variant={"success"} className="text-[#03543F]">
