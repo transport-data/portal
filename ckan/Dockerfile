@@ -19,7 +19,7 @@ RUN apk --no-cache add patch
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
-ENV CKAN__PLUGINS envvars datatables_view image_view text_view  s3filestore datastore datapusher
+ENV CKAN__PLUGINS envvars datatables_view image_view text_view auth s3filestore datastore datapusher
 USER ckan
 
 COPY licenses.json /ext/licenses.json
