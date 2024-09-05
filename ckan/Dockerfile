@@ -9,6 +9,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@109ac1672cf458919e2736d95c516f43c6768021#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
     pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@80598beda6e7121d247b0a0893ff48d7e6af3632#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
+
+RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
     
 ## Install the 'patch' command
 USER root
