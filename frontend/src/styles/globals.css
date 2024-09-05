@@ -58,7 +58,6 @@
   }
 }
 
-
 a {
   color: inherit;
   text-decoration: none;
@@ -101,14 +100,46 @@ body {
   overflow-wrap: anywhere;
 }
 
-
 .mail-icon-at-left {
-  background: url("../../public/assets/mail-icon.svg") no-repeat left
-    16px center;
+  background: url("../../public/assets/mail-icon.svg") no-repeat left 16px
+    center;
 }
 
 .remove-input-ring {
   --tw-ring-shadow: 0 0 #000 !important;
+}
+
+input.remove-input-number-arrows::-webkit-outer-spin-button,
+input.remove-input-number-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input.remove-input-number-arrows[type="number"]{
+  -moz-appearance: textfield;
+}
+
+/* width */
+.customized-scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 6px;
+}
+
+/* Track */
+.customized-scroll::-webkit-scrollbar-track {
+  background: none;
+  border-radius: 5px;
+}
+
+/* Handle */
+.customized-scroll::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+.customized-scroll::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
 }
 
 /* TEXT EDITOR CLASSES */
@@ -206,12 +237,12 @@ snap-tabs {
 
 .blur-on-left {
   gap: 20px;
-  -webkit-mask: linear-gradient(90deg, white 80%, transparent)
+  -webkit-mask: linear-gradient(90deg, white 80%, transparent);
 }
 
 .blur-on-left-2xl {
   gap: 20px;
-  -webkit-mask: linear-gradient(90deg, white 70%, transparent)
+  -webkit-mask: linear-gradient(90deg, white 70%, transparent);
 }
 
 @media (min-width: 1024px) {
@@ -235,12 +266,12 @@ snap-tabs {
 
 .blur-on-left {
   gap: 20px;
-  -webkit-mask: linear-gradient(90deg, white 80%, transparent)
+  -webkit-mask: linear-gradient(90deg, white 80%, transparent);
 }
 
 .blur-on-left-2xl {
   gap: 20px;
-  -webkit-mask: linear-gradient(90deg, white 70%, transparent)
+  -webkit-mask: linear-gradient(90deg, white 70%, transparent);
 }
 
 .grid-3-separated {
