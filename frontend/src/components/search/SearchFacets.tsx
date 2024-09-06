@@ -34,7 +34,7 @@ export default function SearchFacets({
         .map(([facetName, facet]) => (
           <SearchNarrowItem
             key={facetName}
-            badge={facetName}
+            badge={`${facetName}:`}
             text={facet.description}
             onSelect={() => {
               onSelect && onSelect(facetName);
