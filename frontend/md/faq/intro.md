@@ -2,7 +2,7 @@
 category: intro
 ---
 
-TDC uniquely convenes groups which approach transport and energy from broadly different directions, and with different immediate objectives. [The full list of participating groups includes](https://google.com):
+TDC uniquely convenes groups which approach transport and energy from broadly different directions, and with different immediate objectives. [The full list of participating groups includes](/partners):
 
 - Academic groups at universities and independent research organizations,
 - Departments within national governments,

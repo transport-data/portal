@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
       },
       {
         name: "FAQ",
-        href: "#",
+        href: "/faq",
       },
     ],
     organisation: [
