@@ -1,41 +1,21 @@
 import { CommandGroup, CommandItem } from "@components/ui/command";
 import SearchDropdownHeader from "./SearchDropdownHeader";
 import SearchNarrowItem from "./SearchFacetItem";
-
-export const facets: any = {
-  in: {
-    description: "a region, country or a city",
-  },
-  after: {
-    description: "referencing data after a date",
-  },
-  before: {
-    description: "referencing data before a date",
-  },
-  sector: {
-    description: "road, rail, aviation, water transportation",
-  },
-  mode: {
-    description: "car, 2W, 3W, multi-modal etc.",
-  },
-  service: {
-    description: "passenger or freight",
-  },
-  fuel: {
-    description: "battery electric, petrol, diesel etc.",
-  },
-};
+import { useState } from "react";
 
 export default function SearchFacets({
+  facets,
   showAll,
   headerAction,
   onSelect,
 }: {
+  facets: any;
   showAll: boolean;
   headerAction: Function;
   onSelect?: Function;
 }) {
-  const entries: Array<any> = Object.entries(facets);
+  const [items, setItems] = useState(facets);
+  const entries: Array<any> = Object.entries(items);
   return (
     <CommandGroup
       heading={
@@ -56,7 +36,10 @@ export default function SearchFacets({
             key={facetName}
             badge={facetName}
             text={facet.description}
-            onSelect={onSelect}
+            onSelect={() => {
+              onSelect && onSelect(facetName);
+              //onSelect();
+            }}
           />
         ))}
     </CommandGroup>

@@ -22,7 +22,7 @@ export default function SearchFacetItem({
   return (
     <CommandItem
       className="flex items-center gap-2 text-gray-700"
-      onSelect={() => onSelect && onSelect(name)}
+      onSelect={() => onSelect && onSelect()}
     >
       {showIcon &&
         (icon || <MagnifyingGlassIcon width={20} className="text-gray-500" />)}
