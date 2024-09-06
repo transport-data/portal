@@ -18,7 +18,7 @@ const navigation = [
     name: "Data Provider",
   },
   {
-    href: "#",
+    href: "/about-us",
     name: "About Us",
   },
   {

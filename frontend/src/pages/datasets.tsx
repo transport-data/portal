@@ -1,19 +1,12 @@
-import { useEffect } from "react";
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { SWRConfig, unstable_serialize } from "swr";
-import ListOfDatasets from "../components/search/ListOfDatasets";
+import { unstable_serialize } from "swr";
 import Layout from "../components/_shared/Layout";
-import TopBar from "../components/_shared/TopBar";
 import { PackageSearchOptions } from "@portaljs/ckan";
-import getConfig from "next/config";
 import { CKAN } from "@portaljs/ckan";
-import DatasetSearchForm from "@/components/search/DatasetSearchForm";
-import DatasetSearchFilters from "@/components/search/DatasetSearchFilters";
 import { env } from "@env.mjs";
-import Section from "@components/_shared/Section";
 import Heading from "@components/_shared/Heading";
 import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
@@ -317,7 +310,9 @@ export default function DatasetsPage({
               Transport and mobility insights and facts across 32 institutions
               and 120+ countries.
             </p>
-            <SearchBar />
+            <div className="mt-8 ">
+              <SearchBar />
+            </div>
             <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
               You can also browse the topics below to find what you are looking
               for.

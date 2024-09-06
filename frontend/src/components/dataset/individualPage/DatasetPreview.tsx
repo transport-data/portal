@@ -13,7 +13,7 @@ import { Label } from "@components/ui/label";
 
 export function DatasetPreview({ dataset }: { dataset: Dataset }) {
   const [currentResource, setCurrentResource] = useState(
-    dataset.resources[1]?.id ?? ""
+    dataset.resources[0]?.id ?? ""
   );
   return (
     <div className="min-h-[500px] bg-gray-50">
