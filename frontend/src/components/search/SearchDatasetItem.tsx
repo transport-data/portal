@@ -7,6 +7,7 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
 import { DatabaseIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function SearchDatasetItem({
   state,
@@ -26,27 +27,29 @@ export default function SearchDatasetItem({
   region?: string;
 }) {
   return (
-    <CommandItem className="flex gap-[12px] py-2">
-      <DatasetBadge state={state} />
-      <div>
-        <h5 className="text-sm font-normal text-gray-700">{title}</h5>
-        <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
-          <div className="flex gap-[4px]">
-            <BuildingLibraryIcon width={14} />
-            {organization}
-          </div>
-          <span className="hidden sm:block">•</span>
-          <div className="flex gap-[4px]">
-            <ClipboardIcon width={14} />
-            Updated on 23 March, 2023
-          </div>
-          <span className="hidden sm:block">•</span>
-          <div className="flex gap-[4px]">
-            <GlobeAltIcon width={14} />
-            {region}
+    <CommandItem asChild className="flex gap-[12px] py-2">
+      <Link href="/@sample-org/sample-dataset">
+        <DatasetBadge state={state} />
+        <div>
+          <h5 className="text-sm font-normal text-gray-700">{title}</h5>
+          <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
+            <div className="flex gap-[4px]">
+              <BuildingLibraryIcon width={14} />
+              {organization}
+            </div>
+            <span className="hidden sm:block">•</span>
+            <div className="flex gap-[4px]">
+              <ClipboardIcon width={14} />
+              Updated on 23 March, 2023
+            </div>
+            <span className="hidden sm:block">•</span>
+            <div className="flex gap-[4px]">
+              <GlobeAltIcon width={14} />
+              {region}
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     </CommandItem>
   );
 }
