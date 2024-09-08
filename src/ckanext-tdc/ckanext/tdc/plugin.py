@@ -3,7 +3,7 @@ import ckan.plugins.toolkit as toolkit
 
 class TdcPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
-    plugins.implements(plugins.IActions)
+    # plugins.implements(plugins.IActions)
 
     # IConfigurer
 
