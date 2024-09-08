@@ -1,0 +1,231 @@
+scheming_version: 2
+dataset_type: dataset
+about_url: http://github.com/ckan/ckanext-dcat
+
+dataset_fields:
+
+- field_name: title
+  label: Title
+  preset: title
+  required: true
+  help_text: A descriptive title for the dataset.
+
+- field_name: name
+  label: URL
+  preset: dataset_slug
+  form_placeholder: eg. my-dataset
+
+- field_name: notes
+  label: Description
+  required: true
+  form_snippet: markdown.html
+  help_text: A free-text account of the dataset.
+
+- field_name: tag_string
+  label: Keywords
+  preset: tag_string_autocomplete
+  form_placeholder: eg. economy, mental health, government
+  help_text: Keywords or tags describing the dataset. Use commas to separate multiple values.
+
+- field_name: license_id
+  label: License
+  form_snippet: license.html
+  help_text: License definitions and additional information can be found at http://opendefinition.org/.
+
+- field_name: owner_org
+  label: Organisation
+  preset: dataset_organization
+  help_text: The CKAN organisation the dataset belongs to.
+
+# Temporal coverage should be calculated based on
+# the resource's temporal coverage
+# - field_name: temporal_coverage
+#   label: Reference period
+#   repeating_subfields:
+#
+#     - field_name: start
+#       label: Start
+#       preset: dcat_date
+#
+#     - field_name: end
+#       label: End
+#       preset: dcat_date
+#   help_text: The temporal period or periods the dataset covers.
+
+  # This field is kept only for DCAT compatibility
+  # Spatial coverage is determined by the geographies groups
+- field_name: spatial_coverage
+  label: Spatial coverage
+  form_snippet: null
+  display_snippet: null
+
+  # Note: this will fall back to metadata_created if not present
+- field_name: issued
+  label: Release date
+  preset: dcat_date
+  help_text: Date of publication of the dataset.
+
+  # Note: this will fall back to metadata_modified if not present
+- field_name: modified
+  label: Modification date
+  preset: dcat_date
+  help_text: Most recent date on which the dataset was changed, updated or modified.
+
+- field_name: tdc_category
+  label: Category
+  preset: select
+  choices:
+  - value: public
+    label: Public Data
+  - value: community
+    label: Community Data
+  - value: tdc_formatted
+    label: TDC Formatted
+  - value: tdc_harmonized
+    label: TDC Harmonized
+
+- field_name: sources
+  label: Sources
+  repeating_subfields:
+  - field_name: title
+    label: Title
+    required: true
+  - field_name: url
+    label: Link
+
+- field_name: overview_text
+  label: Overview Text
+  preset: markdown
+
+# As options, use https://id.loc.gov/vocabulary/iso639-1.html
+# or https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+# See https://www.w3.org/TR/vocab-dcat-3/#Property:resource_language
+- field_name: language
+  label: Language
+
+- field_name: is_archived
+  label: Is archived
+  preset: select
+  choices:
+    - value: false
+      label: No
+    - value: true
+      label: Yes
+
+- field_name: sector
+  label: Sector
+  preset: multiple_select
+  choices:
+    - value: road
+      label: Road
+    - value: rail
+      label: Rail
+    - value: water_transportation
+      label: Water Transportation
+    - value: aviation
+      label: Aviation
+
+  # NOTE: these options should be limited by Sector
+- field_name: mode
+  label: Mode
+  preset: multiple_select
+  choices:
+    - value: car
+      label: Car
+    - value: motorised_2w
+      label: Motorised 2W
+    - value: motorised_3w
+      label: Motorised 3W
+    - value: bus
+      label: Bus
+    - value: good_vehicles
+      label: Good Vehicles
+    - value: other
+      label: Other
+
+- field_name: service
+  label: Service
+  preset: multiple_select
+  choices:
+    - value: passenger
+      label: Passenger
+    - value: freight
+      label: Freight
+        
+  # See http://publications.europa.eu/resource/authority/frequency
+- field_name: frequency
+  label: Update frequency
+  preset: select
+  choices:
+  - value: annually
+    label: Annually
+  - value: biannually
+    label: Biannually
+  - value: quarterly
+    label: Quarterly
+  - value: monthly
+    label: Monthly
+  - value: weekly
+    label: Weekly
+  - value: daily
+    label: Daily
+  - value: hourly
+    label: Hourly
+  - value: as_needed
+    label: As Needed
+  - value: not_planned
+    label: Not Planned
+
+# Indicator should be a custom tag vocabulary
+
+- field_name: related_datasets
+  label: Related datasets
+  preset: multiple_text
+
+resource_fields:
+
+- field_name: url
+  label: URL
+  preset: resource_url_upload
+
+- field_name: name
+  label: Name
+  form_placeholder:
+  help_text: A descriptive title for the resource.
+
+- field_name: description
+  label: Description
+  form_snippet: markdown.html
+  help_text: A free-text account of the resource.
+
+- field_name: format
+  label: Format
+  preset: resource_format_autocomplete
+  help_text: File format. If not provided it will be guessed.
+
+- field_name: type
+  label: Type
+  preset: select
+  choices:
+    - value: data
+      label: Data
+    - value: documentation
+      label: Documentation
+
+- field_name: unit
+  label: Unit
+
+- field_name: dimensioning
+  label: Dimensioning
+
+- field_name: temporal_coverage
+  label: Reference period
+  repeating_subfields:
+    - field_name: start
+      label: Start
+      preset: dcat_date
+
+    - field_name: end
+      label: End
+      preset: dcat_date
+  
