@@ -16,7 +16,7 @@ The following entities are used in the TDC CKAN extension:
 
 The way the entities relate to each other is the following:
 
-![relationships](relationships.svg)
+![relationships](./relationships.svg)
 
 Note that:
 
