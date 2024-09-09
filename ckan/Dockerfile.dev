@@ -31,6 +31,10 @@ RUN  pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@master#eg
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=ckanext-dcat && \
     pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/v2.0.0/requirements.txt
 
+### Hierarchy ###
+RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy && \
+    pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/master/requirements.txt
+
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
 RUN pip install -r https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt && \
