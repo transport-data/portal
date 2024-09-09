@@ -19,6 +19,7 @@ export const organizationRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
+      console.log('INPUT', input)
       const organization = await createOrganization({ apiKey, input });
       return organization;
     }),

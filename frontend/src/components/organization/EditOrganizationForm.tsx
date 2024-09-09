@@ -5,7 +5,7 @@ import {
   OrganizationSchema,
 } from "@schema/organization.schema";
 import { OrganizationForm } from "./OrganizationForm";
-import { Button } from "@components/ui/button";
+import { Button, LoaderButton } from "@components/ui/button";
 import { useState } from "react";
 import NotificationSuccess from "@components/_shared/Notifications";
 import { api } from "@utils/api";
@@ -15,6 +15,7 @@ import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import { useRouter } from "next/router";
 import notify from "@utils/notify";
+import { Form } from "@components/ui/form";
 
 export const EditOrganizationForm: React.FC<{
   initialValues: Organization;
@@ -39,7 +40,7 @@ export const EditOrganizationForm: React.FC<{
   });
 
   return (
-    <>
+    <Form {...formObj}>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
@@ -49,26 +50,14 @@ export const EditOrganizationForm: React.FC<{
       >
         <OrganizationForm formObj={formObj} />
         <div className="col-span-full">
-          {match(editOrganization.isLoading)
-            .with(false, () => (
-              <Button
-                type="submit"
-                variant="secondary"
-                className="mt-8 w-full py-4"
-              >
-                Edit Organization
-              </Button>
-            ))
-            .otherwise(() => (
-              <Button
-                type="submit"
-                variant="secondary"
-                className="mt-8 flex w-full py-4"
-              >
-                <Spinner className="hover:text-slate-900" />
-                Edit Organization
-              </Button>
-            ))}
+          <LoaderButton
+            loading={editOrganization.isLoading}
+            type="submit"
+            variant="secondary"
+            className="mt-8 w-full py-4"
+          >
+            Edit Organization
+          </LoaderButton>
         </div>
         {errorMessage && (
           <div className="py-4">
@@ -76,6 +65,6 @@ export const EditOrganizationForm: React.FC<{
           </div>
         )}
       </form>
-    </>
+    </Form>
   );
 };

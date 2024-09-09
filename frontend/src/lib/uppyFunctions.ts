@@ -2,7 +2,7 @@ import type { AwsS3UploadParameters } from "@uppy/aws-s3";
 import type { UppyFile } from "@uppy/core";
 import { sha256 } from "crypto-hash";
 
-export async function getUploadParameters(file: UppyFile) {
+export async function getUploadParameters(file: UppyFile, filePath?: string) {
   const arrayBuffer = await new Response(file.data).arrayBuffer();
   const response = await fetch("/api/sign-s3", {
     method: "POST",
@@ -11,6 +11,7 @@ export async function getUploadParameters(file: UppyFile) {
     },
     body: JSON.stringify({
       filename: file.name,
+      filePath: filePath ?? null,
       fileHash: await sha256(arrayBuffer),
       contentType: file.type,
     }),

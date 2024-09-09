@@ -77,6 +77,15 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function Downloads({ dataset }: { dataset: Dataset }) {
+  function trackDownload(resourceId: string) {
+    //@ts-ignore
+    if (typeof window !== "undefined" && window._paq) {
+      //@ts-ignore
+      window._paq.push(['trackEvent', 'DownloadResource', resourceId]);
+      //@ts-ignore
+      window._paq.push(['trackEvent', 'DownloadDataset', dataset.id]);
+    }
+  }
   return (
     <div className="min-h-[500px] bg-gray-50">
       <div className="container grid py-8 lg:grid-cols-2">
@@ -120,6 +129,7 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                 <div className="ml-4 flex-shrink-0">
                   <a
                     href={r.url}
+                    onClick={() => trackDownload(r.id)}
                     className="font-medium text-gray-500 hover:text-accent"
                   >
                     <ArrowDownToLineIcon className="h-5 w-5" />

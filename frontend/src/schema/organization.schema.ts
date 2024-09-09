@@ -20,7 +20,10 @@ export const OrganizationSchema = z.object({
       "The name cant have spaces nor the dot(.) character, it needs to be URL Compatible"
     ),
   title: z.string(),
-  description: z.string().optional().nullable(),
+  description: z.string().default(""),
+  image_display_url: z.string().default(""),
+  parent: z.string().optional(),
+  image_url: z.string().default(""),
 });
 
 export type OrganizationFormType = z.infer<typeof OrganizationSchema>;

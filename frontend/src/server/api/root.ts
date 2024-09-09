@@ -5,6 +5,7 @@ import { organizationRouter } from "./routers/organization";
 import { resourceRouter } from "./routers/resource";
 import { userRouter } from "./routers/user";
 import { datapackageRouter } from "./routers/datapackage";
+import { uploadsRouter } from "./routers/uploads";
 
 /**
  * This is the primary router for your server.
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   resource: resourceRouter,
   user: userRouter,
   organization: organizationRouter,
+  uploads: uploadsRouter,
   datapackage: datapackageRouter,
 });
 

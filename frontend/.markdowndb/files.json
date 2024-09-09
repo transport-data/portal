@@ -63,11 +63,11 @@
     "links": [
       {
         "from": "faq/intro.md",
-        "to": "https://google.com",
-        "toRaw": "https://google.com",
+        "to": "partners",
+        "toRaw": "/partners",
         "text": "The full list of participating groups includes",
         "embed": false,
-        "internal": false
+        "internal": true
       },
       {
         "from": "faq/intro.md",
