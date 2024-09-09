@@ -185,6 +185,9 @@ dataset_fields:
 - field_name: units
   label: Units
   preset: multiple_text
+  validators: ignore_missing scheming_valid_json_object
+  output_validators: scheming_load_json
+
 
 - field_name: dimensioning
   label: Dimensioning
@@ -192,12 +195,8 @@ dataset_fields:
 - field_name: related_datasets
   label: Related datasets
   preset: multiple_text
-  validators: ignore_missing
-
-- field_name: related_datasets
-  label: Related datasets
-  preset: multiple_text
-  validators: ignore_missing
+  validators: ignore_missing scheming_multiple_text
+  output_validators: scheming_load_json
 
 resource_fields:
 
