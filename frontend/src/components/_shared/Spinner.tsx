@@ -1,7 +1,7 @@
 import classNames from "@utils/classnames";
 
 export default function Spinner({
-  className = "text-slate-800",
+  className = "text-accent",
 }: {
   className?: string;
 }) {

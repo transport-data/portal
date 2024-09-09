@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OrganizationForm } from "./OrganizationForm";
 import { Button } from "@components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NotificationSuccess from "@components/_shared/Notifications";
 import { api } from "@utils/api";
 import { ErrorAlert } from "@components/_shared/Alerts";
@@ -14,6 +14,8 @@ import { useRouter } from "next/router";
 import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import notify from "@utils/notify";
+import { Form } from "@components/ui/form";
+import { slugify } from "@lib/utils";
 
 export const CreateOrganizationForm: React.FC = () => {
   const router = useRouter();
@@ -21,6 +23,11 @@ export const CreateOrganizationForm: React.FC = () => {
   const [organizationCreated, setOrganizationCreated] = useState("");
   const formObj = useForm<OrganizationFormType>({
     resolver: zodResolver(OrganizationSchema),
+    defaultValues: {
+      description: "",
+      name: "",
+      title: "",
+    },
   });
 
   const utils = api.useContext();
@@ -36,8 +43,18 @@ export const CreateOrganizationForm: React.FC = () => {
     onError: (error) => setErrorMessage(error.message),
   });
 
+  const {
+    setValue,
+    watch,
+    formState: { dirtyFields },
+  } = formObj;
+
+  useEffect(() => {
+    if (!dirtyFields["name"]) setValue("name", slugify(watch("title")));
+  }, [watch("title")]);
+
   return (
-    <>
+    <Form {...formObj}>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
@@ -71,6 +88,6 @@ export const CreateOrganizationForm: React.FC = () => {
           </div>
         )}
       </form>
-    </>
+    </Form>
   );
 };

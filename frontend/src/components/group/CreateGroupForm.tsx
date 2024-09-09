@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GroupForm } from "./GroupForm";
 import { Button } from "@components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NotificationSuccess from "@components/_shared/Notifications";
 import { api } from "@utils/api";
 import { ErrorAlert } from "@components/_shared/Alerts";
@@ -11,6 +11,8 @@ import { GroupFormType, GroupSchema } from "@schema/group.schema";
 import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import notify from "@utils/notify";
+import { Form } from "@components/ui/form";
+import { slugify } from "@lib/utils";
 
 export const CreateGroupForm: React.FC = () => {
   const router = useRouter();
@@ -18,6 +20,11 @@ export const CreateGroupForm: React.FC = () => {
   const [groupCreated, setGroupCreated] = useState("");
   const formObj = useForm<GroupFormType>({
     resolver: zodResolver(GroupSchema),
+    defaultValues: {
+      description: "",
+      name: "",
+      title: "",
+    },
   });
 
   const utils = api.useContext();
@@ -32,8 +39,18 @@ export const CreateGroupForm: React.FC = () => {
     onError: (error) => setErrorMessage(error.message),
   });
 
+  const {
+    setValue,
+    watch,
+    formState: { dirtyFields },
+  } = formObj;
+
+  useEffect(() => {
+    if (!dirtyFields["name"]) setValue("name", slugify(watch("title")));
+  }, [watch("title")]);
+
   return (
-    <>
+    <Form {...formObj}>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
@@ -67,6 +84,6 @@ export const CreateGroupForm: React.FC = () => {
           </div>
         )}
       </form>
-    </>
+    </Form>
   );
 };

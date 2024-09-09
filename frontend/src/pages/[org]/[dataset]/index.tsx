@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
+import useMatomoTracker from "@lib/useMatomoTracker";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -73,6 +74,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export default function DatasetPage({
   dataset,
 }: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
+  useMatomoTracker()
   const tabs = [
     {
       id: "overview",
