@@ -198,6 +198,13 @@ dataset_fields:
   validators: ignore_missing scheming_multiple_text
   output_validators: scheming_load_json
 
+- field_name: contributors
+  label: Contributors
+  preset: multiple_text
+  form_snippet: null
+  validators: ignore_missing scheming_multiple_text
+  output_validators: scheming_load_json
+
 resource_fields:
 
 - field_name: url

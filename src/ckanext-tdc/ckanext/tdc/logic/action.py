@@ -74,10 +74,43 @@ def _fix_geographies_field(data_dict):
         data_dict["regions"] = regions
 
 
+def _update_contributors(data_dict, is_update=False):
+    """
+    Whenever an update happens, contributors list
+    is updated based on which user did the update
+    """
+    current_user = tk.current_user
+    current_user_id = current_user.id
+
+    if is_update:
+        dataset_id = data_dict.get("id")
+        dataset_name = data_dict.get("name")
+        name_or_id = dataset_id or dataset_name
+
+        priviliged_context = {
+                "ignore_auth": True
+                }
+
+        package_show_action = tk.get_action("package_show")
+        package_show_data_dict = {
+                "id": name_or_id
+                }
+        old_data_dict = package_show_action(priviliged_context, package_show_data_dict)
+        old_contributors = old_data_dict.get("contributors")
+        new_contributors = list(set(old_contributors + [current_user_id]))
+
+        data_dict["contributors"] = new_contributors
+
+        return new_contributors
+
+    data_dict["contributors"] = [current_user_id]
+
+
 @tk.chained_action
 def package_create(up_func, context, data_dict):
     _fix_geographies_field(data_dict)
     _fix_topics_field(data_dict)
+    _update_contributors(data_dict)
     result = up_func(context, data_dict)
     return result
 
@@ -86,6 +119,7 @@ def package_create(up_func, context, data_dict):
 def package_update(up_func, context, data_dict):
     _fix_geographies_field(data_dict)
     _fix_topics_field(data_dict)
+    _update_contributors(data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 
@@ -94,6 +128,7 @@ def package_update(up_func, context, data_dict):
 def package_patch(up_func, context, data_dict):
     _fix_geographies_field(data_dict)
     _fix_topics_field(data_dict)
+    _update_contributors(data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 
