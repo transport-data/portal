@@ -14,17 +14,10 @@ fields:
   validators: not_empty unicode_safe name_validator group_name_validator
   form_snippet: slug.html
 
-- field_name: notes
-  label: Description
-  form_snippet: markdown.html
-
-- field_name: url
-  label: Image URL
-  form_placeholder: http://example.com/my-image.jpg
-
 - field_name: geography_type
   label: Type
   preset: select
+  required: true
   choices:
     - value: country
       name: Country

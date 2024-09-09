@@ -16,7 +16,6 @@ fields:
   label: URL
   validators: not_empty unicode_safe name_validator group_name_validator
   form_snippet: slug.html
-  form_placeholder: my-theme
   
 - field_name: notes
   label: Description
@@ -28,5 +27,5 @@ fields:
   display_snippet: email.html
   
 - field_name: url
-  label: URL
+  label: Website URL
   display_snippet: link.html
