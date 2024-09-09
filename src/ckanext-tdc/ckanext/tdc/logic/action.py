@@ -5,17 +5,29 @@ log = logging.getLogger(__name__)
 
 
 def _fix_topics_field(data_dict):
-    groups = data_dict.get("groups", None)
-    if groups is not None and len(groups) > 0:
-        def is_topic(group):
-            group_type = group.get("type", None)
-            return group_type is None or group_type == "topic" or group_type == "group"
+    """
+    When "topics" field is provided, add dataset to the
+    topic
+    """
+    topics_names = data_dict.get("topics", None)
 
-        topics = list(filter(lambda x: is_topic(x), groups))
-        topic_names = [x.get("name") for x in topics]
-        data_dict["topics"] = topic_names
-    else:
-        data_dict["topics"] = []
+    if topics_names is not None and len(topics_names) > 0:
+        priviliged_context = {"ignore_auth": True}
+
+        group_list_action = tk.get_action("group_list")
+        group_list_data_dict = {
+                "type": "topic",
+                "groups": topics_names,
+                "include_extras": True,
+                "all_fields": True
+                }
+        group_list = group_list_action(priviliged_context, group_list_data_dict)
+
+        topic_groups = [{"name": x.get("name"), "type": "topic"} for x in group_list]
+        groups = data_dict.get("groups", [])
+        groups += topic_groups
+        data_dict["groups"] = groups
+        data_dict["topics"] = [x.get("name") for x in group_list]
 
 
 def _fix_geographies_field(data_dict):
