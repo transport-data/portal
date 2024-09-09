@@ -1,5 +1,5 @@
 scheming_version: 2
-group_type: topic
+group_type: geography
 
 fields:
 - field_name: title
@@ -22,7 +22,7 @@ fields:
   label: Image URL
   form_placeholder: http://example.com/my-image.jpg
 
-- field_name: type
+- field_name: geography_type
   label: Type
   preset: select
   choices:
@@ -30,3 +30,9 @@ fields:
       name: Country
     - value: region
       name: Region
+
+- field_name: not_used
+  label: Parent organization
+  display_snippet: null
+  form_snippet: org_hierarchy.html
+  validators: ignore_missing

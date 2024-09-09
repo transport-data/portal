@@ -8,72 +8,73 @@ dataset_fields:
   label: Title
   preset: title
   required: true
-  help_text: A descriptive title for the dataset.
+  help_text: Title of the dataset as shown to users.
 
 - field_name: name
   label: URL
   preset: dataset_slug
   form_placeholder: eg. my-dataset
+  required: true
+  help_text: Usually it's the sluggified version of the dataset's title. Used in URLs.
 
 - field_name: notes
   label: Description
-  required: true
   form_snippet: markdown.html
   help_text: A free-text account of the dataset.
+  required: true
+  help_text: Description of the dataset. It supports markdown formatting.
 
 - field_name: tag_string
   label: Keywords
   preset: tag_string_autocomplete
   form_placeholder: eg. economy, mental health, government
-  help_text: Keywords or tags describing the dataset. Use commas to separate multiple values.
+  help_text: Keywords that help to describe the dataset.
 
 - field_name: license_id
   label: License
   form_snippet: license.html
-  help_text: License definitions and additional information can be found at http://opendefinition.org/.
+  help_text: License attached to the dataset.
 
 - field_name: owner_org
   label: Organisation
   preset: dataset_organization
-  help_text: The CKAN organisation the dataset belongs to.
+  help_text: Organization the dataset belongs to.
 
-# Temporal coverage should be calculated based on
-# the resource's temporal coverage
-# - field_name: temporal_coverage
-#   label: Reference period
-#   repeating_subfields:
-#
-#     - field_name: start
-#       label: Start
-#       preset: dcat_date
-#
-#     - field_name: end
-#       label: End
-#       preset: dcat_date
-#   help_text: The temporal period or periods the dataset covers.
+- field_name: temporal_coverage_start
+  label: Reference period start
+  help_text: What time window the data in the dataset covers.
+  preset: dcat_date
 
-  # This field is kept only for DCAT compatibility
-  # Spatial coverage is determined by the geographies groups
-- field_name: spatial_coverage
-  label: Spatial coverage
+- field_name: temporal_coverage_end
+  label: Reference period end
+  help_text: What time window the data in the dataset covers.
+  preset: dcat_date
+
+- field_name: geographies
+  label: Geographies
+  preset: multiple_text
+  validators: ignore_missing scheming_multiple_text
+  output_validators: scheming_load_json
+
+# Only for indexing purposes
+- field_name: regions
+  label: Regions
   form_snippet: null
-  display_snippet: null
+  validators: ignore_missing scheming_multiple_text
+  output_validators: scheming_load_json
 
-  # Note: this will fall back to metadata_created if not present
-- field_name: issued
-  label: Release date
-  preset: dcat_date
-  help_text: Date of publication of the dataset.
-
-  # Note: this will fall back to metadata_modified if not present
-- field_name: modified
-  label: Modification date
-  preset: dcat_date
-  help_text: Most recent date on which the dataset was changed, updated or modified.
+# Only for indexing purposes
+- field_name: topics
+  label: Topics
+  form_snippet: null
+  validators: ignore_missing scheming_multiple_text
+  output_validators: scheming_load_json
 
 - field_name: tdc_category
   label: Category
   preset: select
+  required: true
+  default: public
   choices:
   - value: public
     label: Public Data
@@ -106,14 +107,16 @@ dataset_fields:
 - field_name: is_archived
   label: Is archived
   preset: select
+  validators: boolean_validator
+  output_validators: boolean_validator
   choices:
     - value: false
       label: No
     - value: true
       label: Yes
 
-- field_name: sector
-  label: Sector
+- field_name: sectors
+  label: Sectors
   preset: multiple_select
   choices:
     - value: road
@@ -126,8 +129,8 @@ dataset_fields:
       label: Aviation
 
   # NOTE: these options should be limited by Sector
-- field_name: mode
-  label: Mode
+- field_name: modes
+  label: Modes
   preset: multiple_select
   choices:
     - value: car
@@ -143,8 +146,8 @@ dataset_fields:
     - value: other
       label: Other
 
-- field_name: service
-  label: Service
+- field_name: services
+  label: Services
   preset: multiple_select
   choices:
     - value: passenger
@@ -176,56 +179,51 @@ dataset_fields:
   - value: not_planned
     label: Not Planned
 
-# Indicator should be a custom tag vocabulary
+- field_name: indicator
+  label: Indicator
+
+- field_name: units
+  label: Units
+  preset: multiple_text
+
+- field_name: dimensioning
+  label: Dimensioning
 
 - field_name: related_datasets
   label: Related datasets
   preset: multiple_text
+  validators: ignore_missing
+
+- field_name: related_datasets
+  label: Related datasets
+  preset: multiple_text
+  validators: ignore_missing
 
 resource_fields:
 
 - field_name: url
   label: URL
   preset: resource_url_upload
+  required: true
 
 - field_name: name
   label: Name
+  required: true
   form_placeholder:
   help_text: A descriptive title for the resource.
 
-- field_name: description
-  label: Description
-  form_snippet: markdown.html
-  help_text: A free-text account of the resource.
-
 - field_name: format
+  required: true
   label: Format
   preset: resource_format_autocomplete
   help_text: File format. If not provided it will be guessed.
 
-- field_name: type
+- field_name: resource_type
   label: Type
   preset: select
+  required: true
   choices:
     - value: data
       label: Data
     - value: documentation
       label: Documentation
-
-- field_name: unit
-  label: Unit
-
-- field_name: dimensioning
-  label: Dimensioning
-
-- field_name: temporal_coverage
-  label: Reference period
-  repeating_subfields:
-    - field_name: start
-      label: Start
-      preset: dcat_date
-
-    - field_name: end
-      label: End
-      preset: dcat_date
-  
