@@ -1,0 +1,34 @@
+scheming_version: 2
+group_type: geography
+
+fields:
+- field_name: title
+  label: Name
+  validators: ignore_missing unicode_safe
+  form_snippet: large_text.html
+  form_attrs:
+    data-module: slug-preview-target
+
+- field_name: name
+  label: URL
+  validators: not_empty unicode_safe name_validator group_name_validator
+  form_snippet: slug.html
+
+- field_name: geography_type
+  label: Type
+  preset: select
+  required: true
+  choices:
+    - value: country
+      name: Country
+    - value: region
+      name: Region
+
+- field_name: geography_shape
+  label: Geography Shape
+
+- field_name: not_used
+  label: Parent organization
+  display_snippet: null
+  form_snippet: org_hierarchy.html
+  validators: ignore_missing
