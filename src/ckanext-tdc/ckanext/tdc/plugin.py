@@ -41,7 +41,8 @@ class TdcPlugin(plugins.SingletonPlugin):
                 "regions",
                 "sectors",
                 "modes",
-                "services"]
+                "services",
+                "contributors"]
         for field in multi_value_extra_fields:
             value = data_dict.get(field, None)
             if value is not None and isinstance(value, str):
