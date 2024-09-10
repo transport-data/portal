@@ -164,7 +164,7 @@ export default () => {
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="mb-1 mt-[12px]">
+            <div className="mb-2 mt-[12px]">
               <div className="sm:hidden">
                 <label htmlFor="tabs" className="sr-only">
                   Select a tab
@@ -250,7 +250,7 @@ export default () => {
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-3 mt-[12px] flex items-center gap-2">
               <input
                 className="remove-input-number-arrows block w-[137px] rounded-md
           border-0 px-4 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-black  focus:ring-1 focus:ring-inset focus:ring-[#111928] sm:text-sm sm:leading-6
