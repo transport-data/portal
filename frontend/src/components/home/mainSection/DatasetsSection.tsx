@@ -32,6 +32,7 @@ export default function DatasetsSection({
 
       <div className="grid-3-separated mt-16 grid grid-cols-1 gap-[32px] md:grid-cols-2 lg:grid-cols-3 lg:gap-x-[64px]">
         {_datasets.map((dataset, i) => {
+          const [firstTag, secondTag, ...restTags] = dataset.tags;
           return (
             <div key={`recent-${i}`} className="">
               <div className="dataset-card flex flex-col gap-4">
@@ -58,12 +59,14 @@ export default function DatasetsSection({
                   {dataset.title}
                 </h4>
                 {/*Tags*/}
-                <div className="flex gap-2">
-                  {dataset.tags.map((tag, x) => (
-                    <Badge key={`dataset-${tag}${x}`} variant="info">
-                      {tag}
+                <div className="flex flex-wrap gap-2">
+                  {firstTag && <Badge variant="info">{firstTag}</Badge>}
+                  {secondTag && <Badge variant="info">{secondTag}</Badge>}
+                  {restTags.length > 0 && (
+                    <Badge variant="info-outline">
+                      +{restTags.length} more
                     </Badge>
-                  ))}
+                  )}
                 </div>
                 {/*Description*/}
                 <p className=" line-clamp-4 overflow-hidden text-ellipsis text-gray-500">
