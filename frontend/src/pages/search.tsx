@@ -113,7 +113,7 @@ export default function DatasetSearch({
               </Button>
             </div>
           </div>
-          <div className="mt-5">
+          <div className="mt-8">
             <div className="flex flex-col gap-4 lg:flex-row lg:gap-[64px]">
               <div className="w-full">
                 <div className="flex flex-col items-center gap-4 md:flex-row">
