@@ -24,6 +24,9 @@ fields:
     - value: region
       name: Region
 
+- field_name: geography_shape
+  label: Geography Shape
+
 - field_name: not_used
   label: Parent organization
   display_snippet: null
