@@ -29,7 +29,7 @@ const GroupsDashboard: NextPage = () => {
             </div>
             <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
               <Button asChild variant="secondary">
-                <Link href="/dashboard/groups/create">Add group</Link>
+                <Link href="/dashboard/topics/create">Add Topic</Link>
               </Button>
             </div>
           </div>
