@@ -139,7 +139,7 @@ export default function DatasetsPage({
         popup.remove();
       });
     });
-  });
+  }, []);
 
   return (
     <>
