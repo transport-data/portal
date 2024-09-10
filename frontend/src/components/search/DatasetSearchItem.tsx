@@ -10,7 +10,7 @@ import {
 } from "@heroicons/react/20/solid";
 
 export default function DatasetSearchItem(props: any) {
-  const [firstTag, ...restTags] = props.tags;
+  const [firstTag, secondTag, ...restTags] = props.tags;
 
   return (
     <div className="flex w-full gap-5">
@@ -38,7 +38,8 @@ export default function DatasetSearchItem(props: any) {
         <div className="order-last flex flex-col gap-2 lg:order-first">
           <h4 className="text-lg font-bold leading-tight">{props.title}</h4>
           <div className="flex items-center gap-2">
-            <Badge variant="info">{firstTag}</Badge>
+            {firstTag && <Badge variant="info">{firstTag}</Badge>}
+            {secondTag && <Badge variant="info">{secondTag}</Badge>}
             {restTags.length > 0 && (
               <Badge variant="info-outline">+{restTags.length} more</Badge>
             )}
