@@ -43,22 +43,22 @@ export default function DatasetSearchItem(props: any) {
               <Badge variant="info-outline">+{restTags.length} more</Badge>
             )}
           </div>
-          <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
+          <div className="flex flex-col flex-wrap gap-[8px] text-xs font-medium text-gray-500 sm:flex-row sm:items-center">
             <div className="flex gap-[4px]">
               <BuildingLibraryIcon width={14} />
               JRC
             </div>
-            <span className="hidden sm:block">•</span>
+            <div className="hidden sm:block">•</div>
             <div className="flex gap-[4px]">
               <ClipboardIcon width={14} />
               Updated on 23 March, 2023
             </div>
-            <span className="hidden sm:block">•</span>
+            <div className="hidden sm:block">•</div>
             <div className="flex gap-[4px]">
               <ArrowUpTrayIcon width={14} />
               Updated anually
             </div>
-            <span className="hidden sm:block">•</span>
+            <div className="hidden sm:block">•</div>
             <div className="flex gap-[4px]">
               <GlobeAltIcon width={14} />
               Europe
