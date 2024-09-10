@@ -9,7 +9,7 @@ import styles from "@/styles/DatasetInfo.module.scss";
 import DatasetList from "../../components/_shared/DatasetList";
 import getConfig from "next/config";
 import { env } from "@env.mjs";
-const backend_url = env.NEXT_PUBLIC_CKAN_URL
+const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
 export async function getStaticPaths() {
   const ckan = new CKAN(backend_url);
@@ -32,10 +32,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
   orgName = orgName.includes("@") ? orgName.split("@")[1] : orgName;
   const ckan = new CKAN(backend_url);
-  let org = await ckan.getOrgDetails(orgName ?? '');
-  if (org.packages) {
+  let org = await ckan.getOrgDetails(orgName ?? "");
+  if (org?.packages) {
     const packagesWithResources = await Promise.all(
-      org.packages.map(async (dataset) => ckan.getDatasetDetails(dataset.name)),
+      org.packages.map(async (dataset) => ckan.getDatasetDetails(dataset.name))
     );
     org = { ...org, packages: packagesWithResources };
   }
@@ -75,10 +75,10 @@ export default function OrgPage({
       </Head>
       {org && (
         <Layout>
-          <div className="grid grid-rows-datasetpage-hero">
-            <section className="row-start-1 row-end-3 col-span-full">
+          <div className="grid-rows-datasetpage-hero grid">
+            <section className="col-span-full row-start-1 row-end-3">
               <div
-                className="bg-cover h-full bg-center bg-no-repeat bg-black flex flex-col"
+                className="flex h-full flex-col bg-black bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage: "url('/images/backgrounds/SearchHero.avif')",
                 }}
@@ -90,7 +90,7 @@ export default function OrgPage({
                   }}
                 />
                 <div
-                  className="grid mx-auto items-center custom-container grow"
+                  className="custom-container mx-auto grid grow items-center"
                   style={{ marginBlock: "8rem" }}
                 >
                   <div className="col-span-1">
@@ -101,7 +101,7 @@ export default function OrgPage({
                 </div>
               </div>
             </section>
-            <section className="grid row-start-2 row-span-2 col-span-full">
+            <section className="col-span-full row-span-2 row-start-2 grid">
               <div className="custom-container">
                 {org && (
                   <main className={styles.main}>
