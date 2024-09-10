@@ -7,7 +7,7 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4/test-requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/shubham-mahajan/ckanext-s3filestore/feature/r2support-ckan-2.11/requirements.txt' && \
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
-    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@80598beda6e7121d247b0a0893ff48d7e6af3632#egg=ckanext-tdc&subdirectory=src/ckanext-tdc" \
+    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@e4a7dc0d03f79d376d580a1331b07cd33d45e147#egg=ckanext-tdc&subdirectory=src/ckanext-tdc" \
 
 ## Auth
 RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
@@ -27,7 +27,7 @@ RUN apk --no-cache add patch
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
-ENV CKAN__PLUGINS envvars datatables_view image_view text_view auth s3filestore datastore datapusher
+ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher auth
 USER ckan
 
 COPY licenses.json /ext/licenses.json
