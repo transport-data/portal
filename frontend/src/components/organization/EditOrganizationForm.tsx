@@ -15,6 +15,7 @@ import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import { useRouter } from "next/router";
 import notify from "@utils/notify";
+import { toast } from "@/components/ui/use-toast";
 import { Form } from "@components/ui/form";
 
 export const EditOrganizationForm: React.FC<{
@@ -31,7 +32,9 @@ export const EditOrganizationForm: React.FC<{
   const utils = api.useContext();
   const editOrganization = api.organization.patch.useMutation({
     onSuccess: async () => {
-      notify(`Successfully edited the ${organizationEdited} organization`);
+      toast({
+        description: `Successfully edited the ${organizationEdited} organization`,
+      });
       setErrorMessage(null);
       await utils.organization.list.invalidate();
       await utils.organization.listForUser.invalidate();
