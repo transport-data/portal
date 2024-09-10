@@ -38,7 +38,6 @@ RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d39
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
 RUN pip install -r https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt && \
-    pip install -e 'git+https://github.com/datopian/ckanext-auth.git@109ac1672cf458919e2736d95c516f43c6768021#egg=ckanext-auth' && \
     pip install -e git+https://github.com/datopian/ckanext-s3filestore.git@ckan-2.10#egg=ckanext-s3filestore
 
 RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth

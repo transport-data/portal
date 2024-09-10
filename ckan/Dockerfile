@@ -7,10 +7,10 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4d5b3722c2bc64d39b6c2b1d76c9883636/test-requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/shubham-mahajan/ckanext-s3filestore/feature/r2support-ckan-2.11/requirements.txt' && \
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
-    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@e4a7dc0d03f79d376d580a1331b07cd33d45e147#egg=ckanext-tdc&subdirectory=src/ckanext-tdc" \
+    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@e4a7dc0d03f79d376d580a1331b07cd33d45e147#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
 
 ## Auth
-RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
 
 ## DCAT
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=ckanext-dcat && \
