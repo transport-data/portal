@@ -23,7 +23,7 @@ const buttonVariants = cva(
         ghost: "text-gray-900 hover:text-black",
         link: "text-primary underline-offset-4 hover:underline",
         input:
-          "shadow-sm w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0",
+          "shadow-sm w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300  disabled:bg-gray-100 ",
       },
       size: {
         default: "px-[20px] py-[10px]",

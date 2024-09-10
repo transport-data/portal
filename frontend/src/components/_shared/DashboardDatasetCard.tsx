@@ -32,7 +32,7 @@ export default ({
   return (
     <div
       onClick={() => router.push(href)}
-      className="flex cursor-pointer gap-6"
+      className="flex w-full cursor-pointer gap-6"
     >
       {variant === "success" ? (
         <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
