@@ -1,0 +1,18 @@
+[
+  {
+    "text": "Road",
+    "value": "road"
+  },
+  {
+    "text": "Rail",
+    "value": "rail"
+  },
+  {
+    "text": "Water Transportation",
+    "value": "water_transport"
+  },
+  {
+    "text": "Aviation",
+    "value": "aviation"
+  }
+]
