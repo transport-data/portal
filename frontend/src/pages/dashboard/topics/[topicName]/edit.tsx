@@ -3,29 +3,28 @@ import { useSession } from "next-auth/react";
 
 import Loading from "@components/_shared/Loading";
 import { Dashboard } from "@components/_shared/Dashboard";
-import { EditOrganizationForm } from "@components/organization/EditOrganizationForm";
+import { EditGroupForm } from "@components/group/EditGroupForm";
 import { getServerAuthSession } from "@server/auth";
-import { getOrganization } from "@utils/organization";
-import type { Organization } from "@portaljs/ckan";
-import OrganizationTabs from "@components/organization/OrganizationTabs";
+import type { Group } from "@portaljs/ckan";
 import { NextSeo } from "next-seo";
 import Layout from "@components/_shared/Layout";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
+import { getGroup } from "@utils/group";
 
-interface EditOrganizationPageProps {
-  organization: Organization;
+interface EditGroupPageProps {
+  topic: Group;
 }
 
-const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
-  organization,
-}: EditOrganizationPageProps) => {
+const EditGroupPage: NextPage<EditGroupPageProps> = ({
+  topic,
+}: EditGroupPageProps) => {
   const { data: sessionData } = useSession();
   if (!sessionData) return <Loading />;
 
   return (
     <>
-      <NextSeo title={`Edit - ${organization.title}`} />
+      <NextSeo title={`Edit - ${topic.title}`} />
       <Layout>
         <div className="container w-full">
           <div className="pt-8">
@@ -48,12 +47,12 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
                     { label: "Home", href: "/" },
                     { label: "Dashboard", href: "/dashboard" },
                     {
-                      label: "Organizations",
-                      href: "/dashboard/organizations",
+                      label: "Topics",
+                      href: "/dashboard/topics",
                     },
                     {
-                      label: "Edit Organization",
-                      href: `/dashboard/organization/${organization.name}/edit`,
+                      label: "Edit Topic",
+                      href: `/dashboard/topic/${topic.name}/edit`,
                     },
                   ]}
                 />
@@ -64,7 +63,7 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
                     <div className="mt-6 md:flex md:items-center md:justify-between">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
-                          Edit Organization
+                          Edit Topic
                         </h2>
                       </div>
                     </div>
@@ -76,8 +75,7 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
         </div>
         <div className="container pb-8">
           <div className="max-w-4xl">
-            <OrganizationTabs current="edit" />
-            <EditOrganizationForm initialValues={organization} />
+            <EditGroupForm initialValues={topic} />
           </div>
         </div>
       </Layout>
@@ -88,20 +86,20 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerAuthSession(context);
   const apiKey = session?.user.apikey;
-  const orgName = context?.params?.orgName as string;
+  const topicName = context?.params?.topicName as string;
 
-  if (!session || !apiKey || !orgName) {
+  if (!session || !apiKey || !topicName) {
     return { notFound: true };
   }
   try {
-    const organization = await getOrganization({
-      input: { id: orgName },
+    const topic = await getGroup({
+      id: topicName,
       apiKey,
     });
-    return { props: { organization } };
+    return { props: { topic } };
   } catch (e) {
     return { notFound: true };
   }
 };
 
-export default EditOrganizationPage;
+export default EditGroupPage;

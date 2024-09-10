@@ -146,7 +146,7 @@ export const GroupForm: React.FC<{
           name="image_url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Group Image</FormLabel>
+              <FormLabel>Topic Image</FormLabel>
               <FormControl>
                 <ImageUploader
                   clearImage={() => setValue("image_url", "")}

@@ -22,19 +22,22 @@ FROM ckan/ckan-dev:2.11.0
 # will also require gather_consumer and fetch_consumer processes running (please see https://github.com/ckan/ckanext-harvest)
 
 ### Scheming ###
-#RUN  pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming'
+RUN  pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming'
 
 ### Pages ###
 #RUN  pip3 install -e git+https://github.com/ckan/ckanext-pages.git#egg=ckanext-pages
 
 ### DCAT ###
-#RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v0.0.6#egg=ckanext-dcat && \
-#     pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/v0.0.6/requirements.txt
+RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=ckanext-dcat && \
+    pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/v2.0.0/requirements.txt
+
+### Hierarchy ###
+RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d3961a88c2622e4b4bdec1d711b677dc7c#egg=ckanext-hierarchy && \
+    pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/abb4e2d3961a88c2622e4b4bdec1d711b677dc7c/requirements.txt
 
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
 RUN pip install -r https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt && \
-    pip install -e 'git+https://github.com/datopian/ckanext-auth.git@109ac1672cf458919e2736d95c516f43c6768021#egg=ckanext-auth' && \
     pip install -e git+https://github.com/datopian/ckanext-s3filestore.git@ckan-2.10#egg=ckanext-s3filestore
 
 RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth

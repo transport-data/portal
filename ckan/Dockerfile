@@ -3,14 +3,22 @@ FROM viderum/ckan:v2.11.0
 ENV CKAN_INI /srv/app/production.ini
 
 # Install any extensions needed by your CKAN instance
-RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
+RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4d5b3722c2bc64d39b6c2b1d76c9883636/test-requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/shubham-mahajan/ckanext-s3filestore/feature/r2support-ckan-2.11/requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@109ac1672cf458919e2736d95c516f43c6768021#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
-    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@80598beda6e7121d247b0a0893ff48d7e6af3632#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
+    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@e4a7dc0d03f79d376d580a1331b07cd33d45e147#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
 
-RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+## Auth
+RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+
+## DCAT
+RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=ckanext-dcat && \
+    pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/v2.0.0/requirements.txt
+
+## Hierarchy
+RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d3961a88c2622e4b4bdec1d711b677dc7c#egg=ckanext-hierarchy && \
+    pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/abb4e2d3961a88c2622e4b4bdec1d711b677dc7c/requirements.txt
     
 ## Install the 'patch' command
 USER root
@@ -19,7 +27,7 @@ RUN apk --no-cache add patch
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
-ENV CKAN__PLUGINS envvars datatables_view image_view text_view auth s3filestore datastore datapusher
+ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher auth
 USER ckan
 
 COPY licenses.json /ext/licenses.json

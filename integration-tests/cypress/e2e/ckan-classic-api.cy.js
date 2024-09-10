@@ -102,7 +102,9 @@ describe('CKAN Classic API Are Working', () => {
       headers: headers,
       body: {
         name: packageName,
-        owner_org: orgName
+        owner_org: orgName,
+        tdc_category: "public",
+        notes: "Description"
       }
     }).then((resp) => {
       cy.log(resp.body)
