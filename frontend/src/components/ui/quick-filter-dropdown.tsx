@@ -11,20 +11,26 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function QuickFilterDropdown({
   text,
   items,
+  defaultValue,
   children,
 }: {
   text: string;
   items: Array<{ text: string; value: string }>;
+  defaultValue?: string;
   children?: React.ReactNode;
 }) {
-  const [selected, setSelected] = useState<string>("*");
+  const [selected, setSelected] = useState<string>(defaultValue || "*");
   const selectedText =
     selected === "*" ? "All" : items.find((i) => i.value === selected)?.text;
+
+  useEffect(() => {
+    if (defaultValue) setSelected(defaultValue);
+  }, [defaultValue]);
 
   return (
     <DropdownMenu modal={false}>

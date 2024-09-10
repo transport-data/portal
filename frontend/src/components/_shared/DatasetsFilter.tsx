@@ -119,7 +119,7 @@ export default () => {
 
       <Accordion type="single" collapsible className="w-full text-[#6B7280]">
         <AccordionItem value="keyword">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Keyword</span>
             <span className="mr-2">
               {keywordItems.every((x) => x.selected) ||
@@ -128,7 +128,7 @@ export default () => {
                 : keywordItems.filter((x) => x.selected).length}
             </span>
           </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-3.5">
+          <AccordionContent className="mt-5 flex flex-col gap-3.5">
             {keywordItems.map((x, index) =>
               index <= 9 ? (
                 <div className="flex items-center gap-2">
@@ -154,7 +154,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="location">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>
             <span className="hide mr-2">
               {regions.every((x) => x.selected) ||
@@ -164,7 +164,7 @@ export default () => {
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="mb-1">
+            <div className="mb-1 mt-[12px]">
               <div className="sm:hidden">
                 <label htmlFor="tabs" className="sr-only">
                   Select a tab
@@ -241,7 +241,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="yearsCovered">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
             <span className="hide mr-2">
               {years.every((x) => x.selected) || years.every((x) => !x.selected)
@@ -306,7 +306,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="format">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Format</span>
             <span className="hide mr-2">
               {formats.every((x) => x.selected) ||
@@ -315,7 +315,7 @@ export default () => {
                 : formats.filter((x) => x.selected).length}
             </span>
           </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-3.5">
+          <AccordionContent className="mt-5 flex flex-col gap-3.5">
             {formats.map((x, index) =>
               index <= 9 ? (
                 <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="org">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Organisation</span>
             <span className="hide mr-2">
               {orgs.every((x) => x.selected) || orgs.every((x) => !x.selected)
@@ -349,7 +349,7 @@ export default () => {
                 : orgs.filter((x) => x.selected).length}
             </span>
           </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-3.5">
+          <AccordionContent className="mt-5 flex flex-col gap-3.5">
             {orgs.map((x, index) =>
               index <= 7 ? (
                 <div className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="publicationDate">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Publication date</span>
             <span className="hide mr-2">
               {publicationDates.every((x) => x.selected) ||
@@ -384,7 +384,7 @@ export default () => {
                 : publicationDates.filter((x) => x.selected).length}
             </span>
           </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-3.5">
+          <AccordionContent className="mt-5 flex flex-col gap-3.5">
             {publicationDates.map((x, index) =>
               index <= 7 ? (
                 <div className="flex items-center gap-2">
@@ -410,13 +410,13 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="archived">
-          <AccordionTrigger className="group mb-3 justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.full]:w-full [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.full]:w-full [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="full flex">Archived</span>
             <span className="hide mx-2 flex w-full justify-end">
               Without archived
             </span>
           </AccordionTrigger>
-          <AccordionContent>
+          <AccordionContent className="mt-[12px]">
             <p className="mb-6">
               Select whether to include the archive in the search if you are
               looking for older data.

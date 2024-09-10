@@ -72,7 +72,7 @@ export default function DatasetSearch({
   orgs,
 }: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
   const router = useRouter();
-  const { q } = router.query;
+  const { q, sector, mode, service, region } = router.query;
   const [options, setOptions] = useState<PackageSearchOptions>({
     offset: 0,
     limit: 5,
@@ -94,7 +94,7 @@ export default function DatasetSearch({
           <div className="pt-5">
             <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] ">
               <input
-                className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[20px] focus:ring-1 focus:ring-[#006064] "
+                className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:ring-1 focus:ring-[#006064] "
                 placeholder="Find statistics, forecasts & studies"
               />
               <span
@@ -114,17 +114,21 @@ export default function DatasetSearch({
             </div>
           </div>
           <div className="mt-5">
-            <div className="flex flex-col gap-[64px] lg:flex-row">
+            <div className="flex flex-col gap-4 lg:flex-row lg:gap-[64px]">
               <div className="w-full">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col items-center gap-4 md:flex-row">
                   <span className="text-base font-medium text-gray-900">
                     Quick filters:
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-row sm:flex-nowrap">
                     <QuickFilterDropdown text="Sector" items={sectors} />
                     <QuickFilterDropdown text="Mode" items={example} />
                     <QuickFilterDropdown text="Service" items={example} />
-                    <QuickFilterDropdown text="Region" items={example} />
+                    <QuickFilterDropdown
+                      text="Region"
+                      defaultValue={region as string}
+                      items={example}
+                    />
                   </div>
                 </div>
                 <section className="mt-8 ">
@@ -147,7 +151,6 @@ export default function DatasetSearch({
                       <PaginationItem>
                         <PaginationLink href="#">2</PaginationLink>
                       </PaginationItem>
-
                       <PaginationItem>
                         <PaginationNext href="#" />
                       </PaginationItem>
@@ -161,40 +164,6 @@ export default function DatasetSearch({
             </div>
           </div>
         </div>
-        {/*
-        <div className="">
-          <section className="">
-            <DatasetSearchForm
-              options={options}
-              groups={groups}
-              orgs={orgs}
-              setOptions={setOptions}
-              filtersName={{ group: "Group" }}
-            />
-          </section>
-        </div>
-        <main className="custom-container">
-          <article
-            className="grid grid-cols-1 lg:grid-cols-9 lg:gap-x-2 xl:gap-x-12"
-            style={{ paddingBlock: "min(8vh, 10rem)" }}
-          >
-            <div className="lg:col-span-3">
-              <DatasetSearchFilters
-                groups={groups}
-                tags={tags}
-                orgs={orgs}
-                options={options}
-                setOptions={setOptions}
-                filtersName={{ group: "Group" }}
-              />
-            </div>
-            <div className="lg:col-span-6">
-              <SWRConfig value={{ fallback }}>
-                <ListOfDatasets options={options} setOptions={setOptions} />
-              </SWRConfig>
-            </div>
-          </article>
-        </main>*/}
       </Layout>
     </>
   );

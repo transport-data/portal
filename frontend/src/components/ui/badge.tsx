@@ -38,7 +38,14 @@ export interface BadgeProps
 
 function Badge({ className, variant, icon, children, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props}>
+    <div
+      className={cn(
+        badgeVariants({ variant }),
+        "min-w-fit text-center",
+        className
+      )}
+      {...props}
+    >
       {icon}
       {children}
     </div>
