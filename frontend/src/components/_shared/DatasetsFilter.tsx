@@ -103,12 +103,14 @@ export default () => {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-6 text-sm">
+      <div className="mb-[12px] flex items-center justify-between gap-6 text-sm">
         <div>
-          <h3 className="text-base text-[#111928]">Filters</h3>
+          <h3 className="text-base font-medium text-[#111928]">Filters</h3>
           <p className="text-sm text-[#6B7280]">Showing all 156 results</p>
         </div>
-        <span className="cursor-pointer text-cyan-900">Clear all</span>
+        <span className="cursor-pointer text-sm font-medium text-cyan-900">
+          Clear all
+        </span>
       </div>
       <SimpleSearchInput
         onTextInput={(x) => console.log(x)}

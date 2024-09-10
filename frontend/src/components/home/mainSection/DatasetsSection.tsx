@@ -13,7 +13,7 @@ import {
 import { chunkArray } from "@lib/utils";
 import { Dataset } from "@portaljs/ckan";
 
-import { datasets as _datasets } from "@static-db/datasets";
+import _datasets from "@data/datasets.json";
 
 export default function DatasetsSection({
   datasets,

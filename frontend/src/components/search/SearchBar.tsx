@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
 
-import { datasets } from "@static-db/datasets";
+import datasets from "@data/datasets.json";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
 import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
