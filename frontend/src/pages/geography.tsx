@@ -1,6 +1,5 @@
 import { Badge } from "@components/ui/badge";
 import listOfCountries from "@lib/listOfCountries";
-import "leaflet/dist/leaflet.css";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Head from "next/head";
