@@ -19,11 +19,7 @@ export default function GroupCard({
     <div className="bg-white p-8 col-span-3 rounded-lg h-full shadow-lg">
       <Image
         src={
-          image_display_url &&
-          url &&
-          getConfig().publicRuntimeConfig.DOMAINS.includes(url.hostname)
-            ? image_display_url
-            : "/images/logos/DefaultOrgLogo.svg"
+          image_display_url
         }
         alt={`${name}-collection`}
         width="43"

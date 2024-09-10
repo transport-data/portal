@@ -13,11 +13,8 @@ export default function GroupInfo({ group }: { group: Group }) {
         width={120}
         height={120}
         src={
-          group.image_display_url &&
-          url &&
-          getConfig().publicRuntimeConfig.DOMAINS.includes(url.hostname)
-            ? group.image_display_url
-            : "/images/logos/DefaultGroupLogo.svg"
+          group.image_display_url
+            ?? "/images/logos/DefaultGroupLogo.svg"
         }
         alt={`${group.name}-collection`}
       />
