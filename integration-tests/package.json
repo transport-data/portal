@@ -23,6 +23,6 @@
     "devDependencies": {
         "@4tw/cypress-drag-drop": "^2.2.5",
         "ckan-integration-tests": "github:datopian/ckan-integration-tests",
-        "cypress": "^13.9.0"
+        "cypress": "13.6.2"
     }
 }
