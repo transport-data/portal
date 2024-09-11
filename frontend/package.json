@@ -86,6 +86,7 @@
     "ky": "^0.33.3",
     "libsodium-wrappers": "^0.7.11",
     "lucide-react": "^0.436.0",
+    "maplibre-gl": "^4.7.0",
     "mddb": "^0.9.5",
     "minisearch": "^5.0.0",
     "next": "13.4.2",
