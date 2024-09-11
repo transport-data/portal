@@ -37,7 +37,8 @@ export default function DatasetsPage({
       container: "map",
       interactive: window.innerWidth < 787,
       renderWorldCopies: false,
-      maxZoom: 0.6,
+      scrollZoom: false,
+      maxZoom: window.innerWidth < 787 ? 0.6 : null
     });
 
     map.on("load", () => {
@@ -111,7 +112,7 @@ export default function DatasetsPage({
             .setHTML(
               `        
               <div>
-              <img style="width: 40px; height: 40px; border-radius: 9999px" src="https://flagsapi.com/${
+              <img style="object-fit: none; width: 40px; height: 40px; border-radius: 9999px" src="https://flagsapi.com/${
                 (e.features || [])[0]?.properties.ISO_A2
               }/flat/64.png"></img>
                 
@@ -151,11 +152,15 @@ export default function DatasetsPage({
       <Layout backgroundEffect effectSize="40%">
         <div className="container">
           <div>
-            <div className="border-b-[1px] pb-5 mb-8 border-[#E5E7EB]">
-              <h1 className="font-bold text-[#111928] text-[30px]">All Geographies</h1>
-              <h5 className="text-[#6B7280] text-base">Datasets by country & geography</h5>
+            <div className="mb-8 border-b-[1px] border-[#E5E7EB] pb-5">
+              <h1 className="text-[30px] font-bold text-[#111928]">
+                All Geographies
+              </h1>
+              <h5 className="text-base text-[#6B7280]">
+                Datasets by country & geography
+              </h5>
             </div>
-            <div className="flex max-h-[523px] min-h-[523px]" id="map"></div>
+            <div className="flex min-h-[523px] max-h-[523px] sm:min-h-[823px] sm:max-h-[823px]" id="map"></div>
           </div>
           <div className="flex flex-wrap items-center justify-center">
             <div className="mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 pt-20 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2473px]">
@@ -174,7 +179,7 @@ export default function DatasetsPage({
 }
 
 const LetterCard = ({ words, letter }: { letter: string; words: string[] }) => (
-  <div className="flex h-fit max-h-fit max-w-[200px] grid-rows-1 flex-col gap-5 rounded-lg bg-white p-6 shadow-md xl:w-[200px]">
+  <div className="flex h-fit max-h-fit max-w-full grid-rows-1 flex-col gap-5 rounded-lg bg-white p-6 shadow-md sm:max-w-[200px] xl:w-[200px]">
     <Badge
       className="h-12 w-12 items-center justify-center px-3"
       variant={"success"}
@@ -226,7 +231,7 @@ const style: any = {
       },
       source: "maplibre",
       maxzoom: 24,
-      minzoom: 0,
+      minzoom: 24,
       "source-layer": "countries",
     },
     {
@@ -289,7 +294,7 @@ const style: any = {
       },
       source: "maplibre",
       maxzoom: 24,
-      minzoom: 1,
+      minzoom: 24,
       "source-layer": "geolines",
     },
     {
@@ -338,7 +343,7 @@ const style: any = {
       },
       source: "maplibre",
       maxzoom: 24,
-      minzoom: 2,
+      minzoom: 24,
       "source-layer": "centroids",
     },
     {

@@ -119,6 +119,14 @@ input.remove-input-number-arrows[type="number"] {
   -moz-appearance: textfield;
 }
 
+
+@media (max-width: 787px) {
+  #map div:first-child.maplibregl-canvas-container.maplibregl-interactive.maplibregl-touch-drag-pan.maplibregl-touch-zoom-rotate {
+    position: absolute;
+    right: 123123213123px;
+  }
+}
+
 .customized-tooltip {
   div {
     background-color: #1f2a37;
