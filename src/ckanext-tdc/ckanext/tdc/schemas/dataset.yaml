@@ -185,8 +185,7 @@ dataset_fields:
 - field_name: units
   label: Units
   preset: multiple_text
-  validators: ignore_missing scheming_valid_json_object
-  output_validators: scheming_load_json
+  validators: ignore_missing scheming_multiple_text
 
 
 - field_name: dimensioning
