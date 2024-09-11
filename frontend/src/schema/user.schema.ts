@@ -24,11 +24,9 @@ export const UserSchema = z.object({
   lastName: z
     .string()
     .regex(/^[a-zA-ZÀ-ÿ'-]+(?: [a-zA-ZÀ-ÿ'-]+)*$/, "Invalid last name"),
-  hasAcceptedTerms: z
-    .boolean()
-    .refine((value) => value, {
-      message: "You must accept the terms to proceed",
-    }),
+  hasAcceptedTerms: z.boolean().refine((value) => value, {
+    message: "You must accept the terms to proceed",
+  }),
   hasConsentedToReceiveEmails: z.boolean().optional(),
   organizationTitle: z
     .string()
@@ -60,16 +58,20 @@ export type UserResetFormType = z.infer<typeof UserResetSchema>;
 
 export const UserInviteSchema = z
   .object({
-    email: z.string().email().or(z.literal("")),
-    name: z.string(),
+    existingUser: z.boolean(),
+    user: z.string(),
     role: z.enum(["admin", "editor", "member"]),
     group_id: z.string(), //  ... or orgId,
   })
-  .partial({ email: true, name: true })
-  .refine(
-    (data) => !!data.email || !!data.name,
-    "You must either choose the name of a preexisting user OR the email of a new user."
-  );
+  .refine((data) => data.existingUser ? true : checkIfStringIsEmail(data.user), {
+    message:
+      "If you wish to invite a new user, please provide a valid email address",
+    path: ["user"],
+  });
+
+function checkIfStringIsEmail(value: string) {
+  return value.includes("@");
+}
 
 export type UserInviteFormType = z.infer<typeof UserInviteSchema>;
 

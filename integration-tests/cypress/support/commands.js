@@ -602,6 +602,47 @@ Cypress.Commands.add("datasetMetadata", (dataset) => {
     });
 });
 
+Cypress.Commands.add("deleteUserApi", (name) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("user_delete"),
+    headers: headers,
+    body: {
+      id: name,
+    },
+  });
+});
+
+Cypress.Commands.add("createUserApi", (name, email, password) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("user_create"),
+    headers: headers,
+    body: {
+      name: name,
+      email: email,
+      password: password,
+    },
+  });
+});
+
+// Command for frontend test sepecific
+Cypress.Commands.add(
+  "createOrganizationMemberAPI",
+  (org, member, role = "editor") => {
+    cy.request({
+      method: "POST",
+      url: apiUrl("organization_member_create"),
+      headers: headers,
+      body: {
+        id: org,
+        username: member,
+        role,
+      },
+    });
+  },
+);
+
 Cypress.Commands.add("iframe", { prevSubject: "element" }, ($iframe) => {
   const $iframeDoc = $iframe.contents();
   const findBody = () => $iframeDoc.find("body");

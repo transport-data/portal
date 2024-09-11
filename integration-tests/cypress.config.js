@@ -10,12 +10,13 @@ export default defineConfig({
       "CKAN_API_TOKEN",
     CKAN_USERNAME: "ckan_admin",
     CKAN_PASSWORD: "test1234",
-    ORG_NAME_SUFFIX: "_organization_test",
-    GROUP_NAME_SUFFIX: "_group_test",
-    DATASET_NAME_SUFFIX: "_dataset_test",
-    REPORT_NAME_SUFFIX: "_report_test",
+    ORG_NAME_SUFFIX: "-organization-test",
+    GROUP_NAME_SUFFIX: "-group-test",
+    DATASET_NAME_SUFFIX: "-dataset-test",
+    REPORT_NAME_SUFFIX: "-report-test",
   },
   e2e: {
-    baseUrl: "http://ckan-dev:5000",
+    baseUrl: "http://localhost:3000",
+    apiUrl: "http://ckan-dev:5000",
   },
 });

@@ -61,13 +61,15 @@ export const userRouter = createTRPCRouter({
       const user = ctx.session.user;
       const apiKey = user.apikey;
 
-      if (input.email) {
+      if (!input.existingUser) {
         const newUser = await CkanRequest.post<CkanResponse<User>>(
           `user_invite`,
           {
             apiKey: user.apikey,
             json: {
-              ...input,
+              groupd_id: input.group_id,
+              role: input.role,
+              email: input.user,
             },
           }
         );
@@ -93,12 +95,12 @@ export const userRouter = createTRPCRouter({
           throw new Error("Could not generate api token for user");
 
         return newUser.result;
-      } else if (input.name) {
+      } else if (input.existingUser) {
         const newUser = await addOrganizationMember({
           input: {
             id: input.group_id,
             role: input.role,
-            username: input.name,
+            username: input.user,
           },
           apiKey,
         });
