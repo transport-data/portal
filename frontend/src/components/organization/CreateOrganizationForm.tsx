@@ -16,6 +16,7 @@ import Spinner from "@components/_shared/Spinner";
 import notify from "@utils/notify";
 import { Form } from "@components/ui/form";
 import { slugify } from "@lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export const CreateOrganizationForm: React.FC = () => {
   const router = useRouter();
@@ -33,7 +34,9 @@ export const CreateOrganizationForm: React.FC = () => {
   const utils = api.useContext();
   const createOrganization = api.organization.create.useMutation({
     onSuccess: async () => {
-      notify(`Successfully created the ${organizationCreated} organization`);
+      toast({
+        description: `Successfully created the ${organizationCreated} organization`,
+      });
       formObj.reset();
       setErrorMessage(null);
       await utils.organization.list.invalidate();

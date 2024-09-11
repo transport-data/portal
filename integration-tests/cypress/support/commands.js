@@ -42,7 +42,7 @@ const getRandomGroupName = () =>
   Math.random().toString(36).slice(2) + Cypress.env("GROUP_NAME_SUFFIX");
 
 const apiUrl = (path) => {
-  return `${Cypress.config("baseUrl")}/api/3/action/${path}`;
+  return `${Cypress.config("apiUrl")}/api/3/action/${path}`;
 };
 
 function printAccessibilityViolations(violations) {
@@ -52,7 +52,7 @@ function printAccessibilityViolations(violations) {
       impact,
       description: `${description} (${id})`,
       nodes: nodes.map((el) => el.target).join(" / "),
-    }))
+    })),
   );
 }
 
@@ -92,20 +92,19 @@ Cypress.Commands.add(
         },
       },
       printAccessibilityViolations,
-      skipFailures
+      skipFailures,
     );
-  }
+  },
 );
 
 Cypress.Commands.add("login", (email, password) => {
   cy.session([email, password], () => {
-    cy.visit({ url: "/user/_logout" }).then(() => {
-      cy.visit({ url: "/user/login" }).then((resp) => {
-        cy.get("#field-login").type(email);
-        cy.get("#field-password").type(password);
-        cy.get("#field-remember").check();
-        cy.get(".form-actions > .btn").click({ force: true });
-      });
+    cy.visit({ url: "/auth/old_signin" }).then((resp) => {
+      cy.get("#username").type(email);
+      cy.get("#password").type(password);
+      //get button of type submit
+      cy.get("button[type=submit]").click({ force: true });
+      cy.wait(5000)
     });
   });
 });
@@ -115,11 +114,11 @@ Cypress.Commands.add("consentCookies", (name) => {
   window.localStorage.setItem("uc_ui_version", "3.31.0");
   window.localStorage.setItem(
     "uc_settings",
-    '{"controllerId":"be35644e53624f168a34831b6b8f43fd0f00c7a7046149f4a71ae4dd4fe7c086","id":"-Ng55cVGIeHhNq","language":"en","services":[{"history":[{"action":"onInitialPageLoad","language":"en","status":true,"timestamp":1697590963232,"type":"implicit","versions":{"application":"SDK-4.28.2","service":"40.17.42","settings":"2.0.0"}},{"action":"onAcceptAllServices","language":"en","status":true,"timestamp":1697590987880,"type":"explicit","versions":{"application":"SDK-4.28.2","service":"40.17.42","settings":"2.0.0"}}],"id":"H1Vl5NidjWX","processorId":"714588f7c59602d69ea5b0377f9daf339519d550a31e9ca46d5218d838da87b9","status":true},{"history":[{"action":"onInitialPageLoad","language":"en","status":true,"timestamp":1697590963232,"type":"implicit","versions":{"application":"SDK-4.28.2","service":"25.7.28","settings":"2.0.0"}},{"action":"onAcceptAllServices","language":"en","status":true,"timestamp":1697590987880,"type":"explicit","versions":{"application":"SDK-4.28.2","service":"25.7.28","settings":"2.0.0"}}],"id":"BJ59EidsWQ","processorId":"5291d30c403cf10e79a3195537dfda599da1125698410838ad7a451697b7b740","status":true}],"version":"2.0.0"}'
+    '{"controllerId":"be35644e53624f168a34831b6b8f43fd0f00c7a7046149f4a71ae4dd4fe7c086","id":"-Ng55cVGIeHhNq","language":"en","services":[{"history":[{"action":"onInitialPageLoad","language":"en","status":true,"timestamp":1697590963232,"type":"implicit","versions":{"application":"SDK-4.28.2","service":"40.17.42","settings":"2.0.0"}},{"action":"onAcceptAllServices","language":"en","status":true,"timestamp":1697590987880,"type":"explicit","versions":{"application":"SDK-4.28.2","service":"40.17.42","settings":"2.0.0"}}],"id":"H1Vl5NidjWX","processorId":"714588f7c59602d69ea5b0377f9daf339519d550a31e9ca46d5218d838da87b9","status":true},{"history":[{"action":"onInitialPageLoad","language":"en","status":true,"timestamp":1697590963232,"type":"implicit","versions":{"application":"SDK-4.28.2","service":"25.7.28","settings":"2.0.0"}},{"action":"onAcceptAllServices","language":"en","status":true,"timestamp":1697590987880,"type":"explicit","versions":{"application":"SDK-4.28.2","service":"25.7.28","settings":"2.0.0"}}],"id":"BJ59EidsWQ","processorId":"5291d30c403cf10e79a3195537dfda599da1125698410838ad7a451697b7b740","status":true}],"version":"2.0.0"}',
   );
   window.sessionStorage.setItem(
     "uc_user_country",
-    '{"countryCode":"BR","countryName":"BR","regionCode":"RN"}'
+    '{"countryCode":"BR","countryName":"BR","regionCode":"RN"}',
   );
 });
 
@@ -177,12 +176,12 @@ Cypress.Commands.add("createLinkedDataset", () => {
     cy.get("#field-name").clear().type(datasetName);
     cy.get("button.btn-primary[type=submit]").click({ force: true });
     cy.get(
-      '[title="Link to a URL on the internet (you can also link to an API)"]'
+      '[title="Link to a URL on the internet (you can also link to an API)"]',
     ).click();
     cy.get("#field-image-url")
       .clear()
       .type(
-        "https://raw.githubusercontent.com/datapackage-examples/sample-csv/master/sample.csv"
+        "https://raw.githubusercontent.com/datapackage-examples/sample-csv/master/sample.csv",
       );
     cy.get(".btn-primary").click();
     cy.get(".content_action > .btn");
@@ -223,18 +222,25 @@ Cypress.Commands.add("deleteDataset", (datasetName) => {
 
 Cypress.Commands.add("deleteReport", (reportName) => {
   cy.visit({ url: "/report" }).then(() => {
-    cy.contains(reportName).parents(".content-box").within(() => {
-      cy.get(".btn").contains("Delete").click({ force: true });
-    });
-    cy.get('body').then($body => {
-      if ($body.find('.modal-footer > .btn-primary:contains("Confirm")').length > 0) {
-        cy.get('.modal-footer > .btn-primary').contains("Confirm").click();
+    cy.contains(reportName)
+      .parents(".content-box")
+      .within(() => {
+        cy.get(".btn").contains("Delete").click({ force: true });
+      });
+    cy.get("body").then(($body) => {
+      if (
+        $body.find('.modal-footer > .btn-primary:contains("Confirm")').length >
+        0
+      ) {
+        cy.get(".modal-footer > .btn-primary").contains("Confirm").click();
       } else {
-        cy.log('No modal present, proceeding without confirmation.');
+        cy.log("No modal present, proceeding without confirmation.");
       }
     });
 
-    cy.contains("Report and visualizations were removed successfully.").should('be.visible');
+    cy.contains("Report and visualizations were removed successfully.").should(
+      "be.visible",
+    );
   });
 });
 
@@ -272,7 +278,7 @@ Cypress.Commands.add(
     cy.get("#field-name").type(groupName);
     cy.get("#field-description").type(`Description for ${groupName}`);
     cy.get("#field-additional_description").type(
-      `Additional description for ${groupName}`
+      `Additional description for ${groupName}`,
     );
 
     if (relationshipType) {
@@ -282,9 +288,9 @@ Cypress.Commands.add(
         if (relationshipType === "parent") {
           for (let i = 0; i < relationships.length; i++) {
             cy.get("#s2id_field-children").within(() => {
-                cy.get(".select2-input").type(relationships[i], { force: true });
-                cy.wait(1000);
-                cy.get(".select2-input").type("{enter}", { force: true });
+              cy.get(".select2-input").type(relationships[i], { force: true });
+              cy.wait(1000);
+              cy.get(".select2-input").type("{enter}", { force: true });
             });
           }
         } else if (relationshipType === "child") {
@@ -294,7 +300,7 @@ Cypress.Commands.add(
     }
 
     cy.get(".btn-primary").contains("Save Group").click({ force: true });
-  }
+  },
 );
 
 Cypress.Commands.add("deleteGroup", (groupName) => {
@@ -362,33 +368,36 @@ Cypress.Commands.add("deleteOrganizationAPI", (name) => {
   });
 });
 
-Cypress.Commands.add("createGroupAPI", (name, relationshipType, relationships) => {
-  const body = {
-    name: name,
-    description: "Some group description",
-    additional_description: "Some additional group description",
-    group_relationship_type: "",
-    parent: "",
-    children: ""
-  };
+Cypress.Commands.add(
+  "createGroupAPI",
+  (name, relationshipType, relationships) => {
+    const body = {
+      name: name,
+      description: "Some group description",
+      additional_description: "Some additional group description",
+      group_relationship_type: "",
+      parent: "",
+      children: "",
+    };
 
-  if (relationshipType) {
-    body.group_relationship_type = relationshipType;
-  }
-  if (relationships) {
-    if (relationshipType === "parent") {
-      body.children = relationships.join(",");
-    } else if (relationshipType === "child") {
-      body.parent = relationships;
+    if (relationshipType) {
+      body.group_relationship_type = relationshipType;
     }
-  }
-  cy.request({
-    method: "POST",
-    url: apiUrl("group_create"),
-    headers: headers,
-    body: body,
-  });
-});
+    if (relationships) {
+      if (relationshipType === "parent") {
+        body.children = relationships.join(",");
+      } else if (relationshipType === "child") {
+        body.parent = relationships;
+      }
+    }
+    cy.request({
+      method: "POST",
+      url: apiUrl("group_create"),
+      headers: headers,
+      body: body,
+    });
+  },
+);
 
 Cypress.Commands.add("deleteGroupAPI", (name) => {
   cy.request({
@@ -430,23 +439,25 @@ Cypress.Commands.add("datapusherSubmitAPI", (resourceId) => {
 });
 
 Cypress.Commands.add("datastoreSearchAPI", (resourceId) => {
-  const request = cy.request({
-    method: "POST",
-    url: apiUrl("datastore_search"),
-    headers: headers,
-    body: {
-      resource_id: resourceId,
-    },
-    failOnStatusCode: false
-  }).then((res) => {
-    if (res.status === 200) {
-      return true;
-    } else if (res.status === 404) {
-      return false;
-    } else {
-      throw new Error("Unexpected status code: " + res.status);
-    }
-  });
+  const request = cy
+    .request({
+      method: "POST",
+      url: apiUrl("datastore_search"),
+      headers: headers,
+      body: {
+        resource_id: resourceId,
+      },
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        return true;
+      } else if (res.status === 404) {
+        return false;
+      } else {
+        throw new Error("Unexpected status code: " + res.status);
+      }
+    });
 });
 
 Cypress.Commands.add("createResourceAPI", (dataset, resource) => {
@@ -543,28 +554,38 @@ Cypress.Commands.add("facetFilter", (facetType, facetValue) => {
     });
 });
 
-Cypress.Commands.add("prepareFile", (dataset, file, format, resourceId = null, resourceName = file, resourceDescription = "Lorem Ipsum is simply dummy text of the printing and type") => {
-  cy.fixture(`${file}`, "binary")
-    .then(Cypress.Blob.binaryStringToBlob)
-    .then((blob) => {
-      var data = new FormData();
-      data.append("package_id", dataset);
-      data.append("name", resourceName);
-      data.append("format", format);
-      data.append("description", resourceDescription);
-      data.append("upload", blob, file);
+Cypress.Commands.add(
+  "prepareFile",
+  (
+    dataset,
+    file,
+    format,
+    resourceId = null,
+    resourceName = file,
+    resourceDescription = "Lorem Ipsum is simply dummy text of the printing and type",
+  ) => {
+    cy.fixture(`${file}`, "binary")
+      .then(Cypress.Blob.binaryStringToBlob)
+      .then((blob) => {
+        var data = new FormData();
+        data.append("package_id", dataset);
+        data.append("name", resourceName);
+        data.append("format", format);
+        data.append("description", resourceDescription);
+        data.append("upload", blob, file);
 
-      if (resourceId) {
-        data.append("id", resourceId);
-      }
+        if (resourceId) {
+          data.append("id", resourceId);
+        }
 
-      var xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open("POST", apiUrl("resource_create"));
-      xhr.setRequestHeader("Authorization", headers.Authorization);
-      xhr.send(data);
-    });
-});
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open("POST", apiUrl("resource_create"));
+        xhr.setRequestHeader("Authorization", headers.Authorization);
+        xhr.send(data);
+      });
+  },
+);
 
 Cypress.Commands.add("datasetMetadata", (dataset) => {
   return cy
@@ -586,6 +607,6 @@ Cypress.Commands.add("iframe", { prevSubject: "element" }, ($iframe) => {
   const findBody = () => $iframeDoc.find("body");
   if ($iframeDoc.prop("readyState") === "complete") return findBody();
   return Cypress.Promise((resolve) =>
-    $iframe.on("load", () => resolve(findBody()))
+    $iframe.on("load", () => resolve(findBody())),
   );
 });
