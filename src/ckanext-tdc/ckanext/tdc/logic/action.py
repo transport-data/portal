@@ -35,9 +35,13 @@ def _fix_geographies_field(data_dict):
     When "geographies" field is provided, add dataset
     to geographies and regions groups
     """
-    geography_names = data_dict.get("geographies", None)
+    geography_names = data_dict.get("geographies", [])
+    region_names = data_dict.get("regions", [])
 
-    if geography_names is not None and len(geography_names) > 0:
+    has_geographies = isinstance(geography_names, list) and len(geography_names) > 0
+    has_regions = isinstance(region_names, list) and len(region_names) > 0
+
+    if has_geographies or has_regions:
         countries = []
         regions = []
 
@@ -46,7 +50,7 @@ def _fix_geographies_field(data_dict):
         group_list_action = tk.get_action("group_list")
         group_list_data_dict = {
                 "type": "geography",
-                "groups": geography_names,
+                "groups": geography_names + region_names,
                 "include_extras": True,
                 "all_fields": True,
                 "include_groups": True
@@ -55,13 +59,15 @@ def _fix_geographies_field(data_dict):
 
         for group in group_list:
             geography_type = group.get("geography_type")
+            group_name = group.get("name")
             if geography_type == "country":
-                group_name = group.get("name")
                 parent_groups = group.get("groups")
                 region_names = list([x.get("name") for x in parent_groups])
 
                 countries.append(group_name)
                 regions.extend(region_names)
+            elif geography_type == "region":
+                regions.append(group_name)
 
         countries = list(set(countries))
         regions = list(set(regions))
@@ -69,6 +75,7 @@ def _fix_geographies_field(data_dict):
         geography_groups = [{"name": x, "type": "geography"} for x in countries + regions]
         groups = data_dict.get("groups", [])
         groups += geography_groups
+
         data_dict["groups"] = groups
         data_dict["geographies"] = countries
         data_dict["regions"] = regions
