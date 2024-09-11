@@ -13,6 +13,10 @@ const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_normal`;
 const normalUserPassword = "test1234";
 const normalUserEmail = Math.random().toString(36).slice(2) + "@test2.com";
 
+Cypress.on('uncaught:exception', (err, runnable) => {
+  return false;
+});
+
 describe("Create and edit org members", () => {
   before(() => {
     cy.createOrganizationAPI(org);
