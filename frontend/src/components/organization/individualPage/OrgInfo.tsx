@@ -14,25 +14,19 @@ export default function OrgInfo({ org }: { org: Organization }) {
         <Image
           width={120}
           height={120}
-          src={
-            org.image_display_url &&
-            url &&
-            getConfig().publicRuntimeConfig.DOMAINS.includes(url.hostname)
-              ? org.image_display_url
-              : "/images/logos/DefaultOrgLogo.svg"
-          }
+          src={org.image_display_url ?? "/images/logos/DefaultOrgLogo.svg"}
           alt={`${org.name}-collection`}
         />
       </div>
-      <div className="flex flex-col gap-y-3 mt-8">
-        <span className="font-medium text-gray-500 inline">
+      <div className="mt-8 flex flex-col gap-y-3">
+        <span className="inline font-medium text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-5 h-5 text-accent inline mr-1"
+            className="mr-1 inline h-5 w-5 text-accent"
           >
             <path
               strokeLinecap="round"
@@ -42,14 +36,14 @@ export default function OrgInfo({ org }: { org: Organization }) {
           </svg>
           Packages: {org.packages ? org.packages.length : 0}
         </span>
-        <span className="font-medium text-gray-500 inline">
+        <span className="inline font-medium text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-5 h-5 text-accent inline mr-1"
+            className="mr-1 inline h-5 w-5 text-accent"
           >
             <path
               strokeLinecap="round"
@@ -60,15 +54,15 @@ export default function OrgInfo({ org }: { org: Organization }) {
           Created: {org.created && format(org.created)}
         </span>
       </div>
-      <div className="py-4 my-4 border-y">
-        <p className="text-sm font-normal text-stone-500 line-clamp-4">
+      <div className="my-4 border-y py-4">
+        <p className="line-clamp-4 text-sm font-normal text-stone-500">
           {org.description?.replace(/<\/?[^>]+(>|$)/g, "") || "No description"}
         </p>
       </div>
       <div className="flex flex-wrap gap-1">
         {org.tags?.map((tag: Tag) => (
           <span
-            className="bg-accent px-4 py-1 rounded-full text-white"
+            className="rounded-full bg-accent px-4 py-1 text-white"
             key={tag.id}
           >
             {tag.display_name}

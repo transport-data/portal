@@ -13,6 +13,7 @@ import Spinner from "@components/_shared/Spinner";
 import notify from "@utils/notify";
 import { Form } from "@components/ui/form";
 import { slugify } from "@lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export const CreateGroupForm: React.FC = () => {
   const router = useRouter();
@@ -30,7 +31,9 @@ export const CreateGroupForm: React.FC = () => {
   const utils = api.useContext();
   const createGroup = api.group.create.useMutation({
     onSuccess: async () => {
-      notify(`Successfully created the ${groupCreated} topic`);
+      toast({
+        description: `Successfully created the ${groupCreated} topic`,
+      });
       formObj.reset();
       setErrorMessage(null);
       await utils.group.list.invalidate();
