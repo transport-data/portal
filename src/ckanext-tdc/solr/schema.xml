@@ -179,13 +179,13 @@ attribute with the form `ckan-X.Y` -->
     <dynamicField name="*" type="string" indexed="true"  stored="false"/>
 
     <!-- Custom metadata schema -->
-    <field name="topics" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="geographies" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="regions" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="sectors" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="modes" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="services" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="contributors" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="topics" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="geographies" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="regions" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="sectors" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="modes" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="services" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="contributors" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="is_archived" type="boolean" indexed="true" stored="true" />
 
     
