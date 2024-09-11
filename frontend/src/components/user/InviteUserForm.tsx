@@ -118,7 +118,6 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
     return <Spinner className="dark:text-primary-dark mx-auto my-2" />;
   }
 
-  console.log(formObj.watch())
   return (
     <Form {...formObj}>
       <form

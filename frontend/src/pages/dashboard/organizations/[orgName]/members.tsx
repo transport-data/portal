@@ -102,7 +102,7 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
         setShow={setIsInvitingUser}
         title="Invite member"
       >
-        <InviteUserForm groupId={organization.id} />
+        <InviteUserForm groupId={organization.id} orgUsers={organization.users ?? []} />
       </Modal>
     </>
   );
