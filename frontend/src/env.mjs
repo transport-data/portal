@@ -24,6 +24,9 @@ export const env = createEnv({
     R2_ACCESS_KEY_ID: z.string(),
     R2_SECRET_KEY_ID: z.string(),
     SYS_ADMIN_API_KEY: z.string(),
+    MATOMO_AUTH_KEY: z.string(),
+    MATOMO_URL: z.string(),
+    MATOMO_SITE_ID: z.string(),
   },
 
   /**
@@ -53,6 +56,9 @@ export const env = createEnv({
     NEXT_PUBLIC_R2_PUBLIC_URL: process.env.NEXT_PUBLIC_R2_PUBLIC_URL,
     NEXT_PUBLIC_CKAN_URL: process.env.NEXT_PUBLIC_CKAN_URL,
     NEXT_PUBLIC_PUBLIC_PORTAL_URL: process.env.NEXT_PUBLIC_PUBLIC_PORTAL_URL,
+    MATOMO_AUTH_KEY: process.env.MATOMO_AUTH_KEY,
+    MATOMO_URL: process.env.MATOMO_URL,
+    MATOMO_SITE_ID: process.env.MATOMO_SITE_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

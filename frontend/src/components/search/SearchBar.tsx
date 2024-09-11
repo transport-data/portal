@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
 
-import { datasets } from "@static-db/datasets";
+import datasets from "@data/datasets.json";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
 import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
@@ -26,7 +26,7 @@ const facets: any = {
   in: {
     field: "region",
     description: "a region, country or a city",
-    suggestions: [
+    options: [
       "Africa",
       "Asia",
       "Australia and Oceania",
@@ -44,19 +44,19 @@ const facets: any = {
   },*/
   sector: {
     description: "road, rail, aviation, water transportation",
-    suggestions: ["road", "rail", "aviation", "water transportation"],
+    options: ["road", "rail", "aviation", "water transportation"],
   },
   mode: {
     description: "car, 2W, 3W, multi-modal etc.",
-    suggestions: ["car", "2W", "3W", "multi-modal"],
+    options: ["car", "2W", "3W", "multi-modal"],
   },
   service: {
     description: "passenger or freight",
-    suggestions: ["passenger", "freight"],
+    options: ["passenger", "freight"],
   },
   fuel: {
     description: "battery electric, petrol, diesel etc.",
-    suggestions: ["battery electric", "petrol", "diesel"],
+    options: ["battery electric", "petrol", "diesel"],
   },
 };
 
@@ -104,7 +104,6 @@ export default function SearchBar() {
   };
 
   const handleTyping = (value: string) => {
-    console.log(value);
     setValue("query", value);
     setIsTyping(value.length > 0);
   };
@@ -147,7 +146,7 @@ export default function SearchBar() {
             </Badge>
           )}
           <CommandInput
-            className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[20px] focus:border-0 focus:ring-0 "
+            className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
             onFocus={() => setShowCommandList(true)}
             placeholder="Find statistics, forecasts & studies"
             onInput={(e) => handleTyping((e.target as HTMLInputElement).value)}
@@ -176,23 +175,21 @@ export default function SearchBar() {
             showCommandList ? "block" : "hidden"
           }`}
         >
-          {facets[facetName]?.suggestions?.length && !facetValue ? (
+          {facets[facetName]?.options?.length && !facetValue ? (
             <CommandGroup
               heading={<CommandListHeader title="Narrow your search" />}
             >
-              {facets[facetName]?.suggestions?.map(
-                (item: string, i: number) => (
-                  <SearchFacetItem
-                    key={`${item}-${i}`}
-                    badge={`${facetName}: ${item}`}
-                    text={""}
-                    onSelect={() => {
-                      setValue("facetValue", item);
-                      setFocus("query");
-                    }}
-                  />
-                )
-              )}
+              {facets[facetName]?.options?.map((item: string, i: number) => (
+                <SearchFacetItem
+                  key={`${item}-${i}`}
+                  badge={`${facetName}: ${item}`}
+                  text={""}
+                  onSelect={() => {
+                    setValue("facetValue", item);
+                    setFocus("query");
+                  }}
+                />
+              ))}
             </CommandGroup>
           ) : (
             <>

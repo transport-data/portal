@@ -6,6 +6,7 @@ import { resourceRouter } from "./routers/resource";
 import { userRouter } from "./routers/user";
 import { datapackageRouter } from "./routers/datapackage";
 import { uploadsRouter } from "./routers/uploads";
+import { matomoRouter } from "./routers/matomo";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   organization: organizationRouter,
   uploads: uploadsRouter,
   datapackage: datapackageRouter,
+  matomo: matomoRouter 
 });
 
 // export type definition of API

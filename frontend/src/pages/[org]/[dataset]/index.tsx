@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@components/ui/select";
 import useMatomoTracker from "@lib/useMatomoTracker";
+import { api } from "@utils/api";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -107,6 +108,8 @@ export default function DatasetPage({
       label: `${dataset.organization?.title || dataset.organizatio?.name}`,
     },
   ];
+  const matomo = api.matomo.getVisitorStats.useQuery()
+  console.log(matomo.data)
   return (
     <>
       <Head>

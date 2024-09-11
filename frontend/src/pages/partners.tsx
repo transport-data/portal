@@ -5,7 +5,7 @@ import {
   ArrowLongRightIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/20/solid";
-import { partnersList } from "@static-db/partners";
+import partnersList from "@data/partners.json";
 import Head from "next/head";
 import Link from "next/link";
 import NewsLetterSignUpSection from "@components/_shared/NewsletterSection";

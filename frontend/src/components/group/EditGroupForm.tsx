@@ -11,11 +11,15 @@ import { GroupFormType, GroupSchema } from "@schema/group.schema";
 import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import notify from "@utils/notify";
+import { Form } from "@components/ui/form";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/router";
 
 export const EditGroupForm: React.FC<{
   initialValues: Group;
 }> = ({ initialValues }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
   const [groupEdited, setGroupEdited] = useState("");
   const formObj = useForm<GroupFormType>({
     resolver: zodResolver(GroupSchema),
@@ -25,15 +29,18 @@ export const EditGroupForm: React.FC<{
   const utils = api.useContext();
   const editGroup = api.group.patch.useMutation({
     onSuccess: async () => {
-      notify(`Successfully edited the ${groupEdited} group`);
+      toast({
+        description: `Successfully edited the ${groupEdited} topic`,
+      });
       setErrorMessage(null);
       await utils.group.list.invalidate();
+      await router.push("/dashboard/topics");
     },
     onError: (error) => setErrorMessage(error.message),
   });
 
   return (
-    <>
+    <Form {...formObj}>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
@@ -45,22 +52,14 @@ export const EditGroupForm: React.FC<{
         <div className="col-span-full">
           {match(editGroup.isLoading)
             .with(false, () => (
-              <Button
-                type="submit"
-                variant="secondary"
-                className="mt-8 w-full py-4"
-              >
-                Edit group
+              <Button type="submit" className="mt-8 w-full py-4">
+                Edit Topic
               </Button>
             ))
             .otherwise(() => (
-              <Button
-                type="submit"
-                variant="secondary"
-                className="mt-8 flex w-full py-4"
-              >
+              <Button type="submit" className="mt-8 flex w-full py-4">
                 <Spinner className="hover:text-slate-900" />
-                Edit group
+                Edit Topic
               </Button>
             ))}
         </div>
@@ -70,6 +69,6 @@ export const EditGroupForm: React.FC<{
           </div>
         )}
       </form>
-    </>
+    </Form>
   );
 };

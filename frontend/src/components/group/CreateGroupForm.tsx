@@ -13,6 +13,7 @@ import Spinner from "@components/_shared/Spinner";
 import notify from "@utils/notify";
 import { Form } from "@components/ui/form";
 import { slugify } from "@lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export const CreateGroupForm: React.FC = () => {
   const router = useRouter();
@@ -30,11 +31,13 @@ export const CreateGroupForm: React.FC = () => {
   const utils = api.useContext();
   const createGroup = api.group.create.useMutation({
     onSuccess: async () => {
-      notify(`Successfully created the ${groupCreated} group`);
+      toast({
+        description: `Successfully created the ${groupCreated} topic`,
+      });
       formObj.reset();
       setErrorMessage(null);
       await utils.group.list.invalidate();
-      await router.push("/dashboard/groups");
+      await router.push("/dashboard/topics");
     },
     onError: (error) => setErrorMessage(error.message),
   });
@@ -63,7 +66,7 @@ export const CreateGroupForm: React.FC = () => {
           {match(createGroup.isLoading)
             .with(false, () => (
               <Button type="submit" color="stone" className="mt-8 w-full py-4">
-                Create group
+                Create Topic
               </Button>
             ))
             .otherwise(() => (
@@ -74,7 +77,7 @@ export const CreateGroupForm: React.FC = () => {
                 className="mt-8 flex w-full py-4"
               >
                 <Spinner className="text-slate-900" />
-                Create group
+                Create Topic
               </Button>
             ))}
         </div>

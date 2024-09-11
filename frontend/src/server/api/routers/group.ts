@@ -5,7 +5,7 @@ import {
   deleteGroups,
   listGroups,
   patchGroup,
-  getGroup
+  getGroup,
 } from "@utils/group";
 import { z } from "zod";
 
@@ -29,7 +29,8 @@ export const groupRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const group = await createGroup({ apiKey, input });
+      const _group = { ...input, type: "topic" };
+      const group = await createGroup({ apiKey, input: _group });
       return group;
     }),
   patch: protectedProcedure

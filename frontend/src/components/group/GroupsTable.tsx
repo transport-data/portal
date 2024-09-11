@@ -4,6 +4,7 @@ import type { Group } from "@portaljs/ckan";
 import Modal from "@components/_shared/Modal";
 import { EditGroupForm } from "./EditGroupForm";
 import Link from "next/link";
+import { Dialog } from "@components/ui/dialog";
 
 export const GroupsTable: React.FC<{ publicUrl: string }> = ({ publicUrl }) => {
   const checkbox = useRef<HTMLInputElement>(null);
@@ -152,13 +153,13 @@ export const GroupsTable: React.FC<{ publicUrl: string }> = ({ publicUrl }) => {
                             </Link>
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm font-medium">
-                            <button
-                              onClick={() => setEditingGroup(group)}
-                              className="opacity-75 hover:opacity-100"
-                            >
+                              <Link
+                                href={`/dashboard/topics/${group.name}/edit`}
+                                className="opacity-75 hover:opacity-100"
+                              >
                               Edit
                               <span className="sr-only">, {group.name}</span>
-                            </button>
+                            </Link>
                           </td>
                         </tr>
                       ))}
