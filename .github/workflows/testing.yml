@@ -42,6 +42,12 @@ jobs:
           while ! docker exec ckan-tdc-db pg_isready -U ckandbuser -d ckandb; do
             sleep 1
           done
+      - name: Install and build frontend
+        run: npm ci && cp .env.example .env && npm run build
+        working-directory: ./frontend
+      - name: Run frontend
+        run: npm run start
+        working-directory: ./frontend
       - name: Run Integration tests 🧪
         uses: cypress-io/github-action@v6
         with:
