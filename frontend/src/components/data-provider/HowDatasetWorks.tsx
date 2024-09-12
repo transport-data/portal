@@ -3,7 +3,7 @@ import { CheckCircleIcon, CheckIcon } from "@heroicons/react/20/solid";
 
 export default () => {
   return (
-    <div className="container min-w-full bg-white py-6 text-gray-500 lg:px-20 lg:py-[96px]">
+    <div className="py-6 text-gray-500 lg:py-[96px]">
       <div>
         <h1 className="text-4xl font-extrabold text-gray-900">
           How TDC datasets work
@@ -15,7 +15,7 @@ export default () => {
         </p>
       </div>
 
-      <div className="mt-16 flex w-full flex-col flex-wrap gap-32 lg:flex-row lg:gap-8 xl:justify-center">
+      <div className="mt-16 flex w-full flex-col md:flex-wrap xl:flex-nowrap gap-32 lg:flex-row lg:gap-8">
         <div className="flex flex-col-reverse gap-8 lg:w-[296px] lg:min-w-[296px] lg:flex-col">
           <div className="flex min-h-fit flex-col items-center gap-32 lg:flex-row lg:gap-8">
             <div className="flex h-16 w-16 items-center justify-center rounded-md bg-[#E1EFFE]">
