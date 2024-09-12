@@ -8,6 +8,8 @@ import {
   GlobeAltIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
+import { Tooltip } from "flowbite-react";
+import Link from "next/link";
 
 export default function DatasetSearchItem(props: any) {
   const [firstTag, secondTag, ...restTags] = props.tags;
@@ -35,7 +37,7 @@ export default function DatasetSearchItem(props: any) {
       )}
 
       <div className="flex w-full flex-col justify-start gap-2 lg:flex-row">
-        <div className="order-last flex flex-col gap-2 lg:order-first">
+        <div className="order-last lg:mr-auto flex flex-col gap-2 lg:order-first">
           <h4 className="text-lg font-bold leading-tight">{props.title}</h4>
           <div className="flex items-center gap-2">
             {firstTag && <Badge variant="info">{firstTag}</Badge>}
@@ -66,16 +68,43 @@ export default function DatasetSearchItem(props: any) {
             </div>
           </div>
         </div>
-        {props.state === "TDC Formatted" && (
-          <Badge className="h-fit lg:ml-auto" variant="success">
-            TDC Formatted
-          </Badge>
-        )}
-        {props.state === "TDC Harmonised" && (
-          <Badge className="h-fit lg:ml-auto" variant="warning">
-            TDC Harmonised
-          </Badge>
-        )}
+        <Tooltip
+          className="max-w-[192px] bg-[#1F2A37] "
+          content={
+            <div className="flex flex-col gap-1.5">
+              <h4 className="text-sm">{props.state}</h4>
+              <p className="text-xs text-[#9CA3AF]">
+                {props.state === "TDC Harmonised" ? (
+                  <>
+                    Data have been validated, and derived from multiple sources
+                    by TDC. For more information,{" "}
+                    <Link className="underline" href={"https://google.com"}>
+                      click here
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    Data is SDMX-compliant. For more information,{" "}
+                    <Link className="underline" href={"https://google.com"}>
+                      click here
+                    </Link>
+                  </>
+                )}
+              </p>
+            </div>
+          }
+        >
+          {props.state === "TDC Formatted" && (
+            <Badge className="h-fit lg:ml-auto" variant="success">
+              TDC Formatted
+            </Badge>
+          )}
+          {props.state === "TDC Harmonised" && (
+            <Badge className="h-fit lg:ml-auto" variant="warning">
+              TDC Harmonised
+            </Badge>
+          )}
+        </Tooltip>
       </div>
     </div>
   );

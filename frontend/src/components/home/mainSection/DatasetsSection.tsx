@@ -14,6 +14,8 @@ import { chunkArray } from "@lib/utils";
 import { Dataset } from "@portaljs/ckan";
 
 import _datasets from "@data/datasets.json";
+import { Tooltip } from "flowbite-react";
+import Link from "next/link";
 
 export default function DatasetsSection({
   datasets,
@@ -36,23 +38,55 @@ export default function DatasetsSection({
           return (
             <div key={`recent-${i}`} className="">
               <div className="dataset-card flex flex-col gap-4">
-                {/*Badge*/}
-                {dataset.state === "TDC Harmonised" && (
-                  <Badge
-                    icon={<ShieldCheckIcon width={14} />}
-                    variant="warning"
-                  >
-                    {dataset.state}
-                  </Badge>
-                )}
-                {dataset.state === "TDC Formatted" && (
-                  <Badge
-                    icon={<CheckCircleIcon width={14} />}
-                    variant="success"
-                  >
-                    {dataset.state}
-                  </Badge>
-                )}
+                <Tooltip
+                  className="max-w-[192px] bg-[#1F2A37] "
+                  content={
+                    <div className="flex flex-col gap-1.5">
+                      <h4 className="text-sm">{dataset.state}</h4>
+                      <p className="text-xs text-[#9CA3AF]">
+                        {dataset.state === "TDC Harmonised" ? (
+                          <>
+                            Data have been validated, and derived from multiple
+                            sources by TDC. For more information,{" "}
+                            <Link
+                              className="underline"
+                              href={"https://google.com"}
+                            >
+                              click here
+                            </Link>
+                          </>
+                        ) : (
+                          <>
+                            Data is SDMX-compliant. For more information,{" "}
+                            <Link
+                              className="underline"
+                              href={"https://google.com"}
+                            >
+                              click here
+                            </Link>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  }
+                >
+                  {dataset.state === "TDC Harmonised" && (
+                    <Badge
+                      icon={<ShieldCheckIcon width={14} />}
+                      variant="warning"
+                    >
+                      {dataset.state}
+                    </Badge>
+                  )}
+                  {dataset.state === "TDC Formatted" && (
+                    <Badge
+                      icon={<CheckCircleIcon width={14} />}
+                      variant="success"
+                    >
+                      {dataset.state}
+                    </Badge>
+                  )}
+                </Tooltip>
 
                 {/*Title*/}
                 <h4 className="text-2xl font-bold leading-tight">
