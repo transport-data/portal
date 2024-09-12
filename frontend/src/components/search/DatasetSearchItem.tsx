@@ -69,6 +69,7 @@ export default function DatasetSearchItem(props: any) {
           </div>
         </div>
         <Tooltip
+          placement="bottom"
           className="max-w-[192px] bg-[#1F2A37] "
           content={
             <div className="flex flex-col gap-1.5">

@@ -39,6 +39,7 @@ export default function DatasetsSection({
             <div key={`recent-${i}`} className="">
               <div className="dataset-card flex flex-col gap-4">
                 <Tooltip
+                  placement="bottom"
                   className="max-w-[192px] bg-[#1F2A37] "
                   content={
                     <div className="flex flex-col gap-1.5">
