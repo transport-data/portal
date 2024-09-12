@@ -160,44 +160,40 @@ def package_search(up_func, context, data_dict):
     return result
 
 
-def validate_github_token(access_token, client_secret):
+generic_error_message = {
+    'errors': {'auth': [_('Unable to authenticate user')]},
+    'error_summary': {_('auth'): _('Unable to authenticate user')},
+}
 
+def validate_github_token(access_token, client_secret):
     try:
-    
         github_secret =  os.getenv("CKANEXT__TDC__CLIENT_AUTH_SECRET")
         # GitHub OAuth API to check if the token is valid
         url = "https://api.github.com/user"
         headers = {
             "Authorization": f"Bearer {access_token}"
         }
-        
-        # Send request to GitHub API
+
         response = requests.get(url, headers=headers)
 
-        # Check if the token is valid (status 200 means valid)
         if(github_secret == client_secret):
             if response.status_code == 200:
-                return response.json()  # Token is valid, return user details
+                return response.json() 
             else:
-                return response.json()  # Token is invalid, return error details
+                return generic_error_message
         else:
-            return dict()
+            return generic_error_message
     except Exception as e:
         log.error(e)
-        return dict()
+        return generic_error_message
 
 def user_login(context, data_dict):
     try:
         session = context['session']
 
-        generic_error_message = {
-            'errors': {'auth': [_('Username or password entered was incorrect')]},
-            'error_summary': {_('auth'): _('Incorrect username or password')},
-        }
-
         from_github = data_dict.get('from_github', False)
         
-        if from_github:
+        if from_github: 
             token = data_dict['token']
             email = data_dict['email']
             client_secret = data_dict['client_secret']
@@ -206,7 +202,7 @@ def user_login(context, data_dict):
 
             validated_token = validate_github_token(token, client_secret)
 
-            id = validated_token["id"]
+            id = validated_token.get("id")
 
             if not id or not validated_token:
                 return generic_error_message
@@ -220,24 +216,23 @@ def user_login(context, data_dict):
                     for _ in range(password_length)
                 )
 
-                try:
-                    user_name = ''.join(
-                        c.lower() if c.isalnum() else '_' for c in email.split('@')[0]
-                    )
-                    user = tk.get_action('user_create')(
-                        context,
-                        {
-                            'name': user_name,
-                            'display_name': data_dict['name'],
-                            'fullname': data_dict['name'],
-                            'email': email,
-                            'password': password,
-                            'state': 'active',
-                        },
-                    )
-                except Exception as e:
-                    log.error(f'Error creating user: \n{e}')
-                    return generic_error_message
+                user_name = ''.join(
+                    c.lower() if c.isalnum() else '_' for c in email.split('@')[0]
+                )
+
+                user = tk.get_action('user_create')(
+                    context,
+                    {
+                        'name': user_name,
+                        'display_name': data_dict['name'],
+                        'fullname': data_dict['name'],
+                        'email': email,
+                        'password': password,
+                        'state': 'active',
+                    },
+                )
+                log.info(user)
+
             else:
                 user = user.as_dict()
 
