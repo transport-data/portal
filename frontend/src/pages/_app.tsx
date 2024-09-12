@@ -10,6 +10,7 @@ import NotificationContainer from "@components/_shared/NotificationContainer";
 import { DefaultSeo } from "next-seo";
 
 import { Inter } from "next/font/google";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -45,9 +46,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
       />
       <NotificationContainer />
       <SessionProvider session={session}>
-        <div className={inter.className}>
-          <Component {...pageProps} />
-        </div>
+        <TooltipProvider>
+          <div className={inter.className}>
+            <Component {...pageProps} />
+          </div>
+        </TooltipProvider>
       </SessionProvider>
     </ThemeProvider>
   );
