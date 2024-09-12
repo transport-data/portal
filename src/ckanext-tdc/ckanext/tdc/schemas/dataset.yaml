@@ -119,12 +119,16 @@ dataset_fields:
   label: Sectors
   preset: multiple_select
   choices:
+    - value: all
+      label: All
+    - value: active-mobility
+      label: Active Mobility
     - value: road
       label: Road
     - value: rail
       label: Rail
-    - value: water_transportation
-      label: Water Transportation
+    - value: water 
+      label: Water
     - value: aviation
       label: Aviation
 
@@ -133,18 +137,40 @@ dataset_fields:
   label: Modes
   preset: multiple_select
   choices:
-    - value: car
-      label: Car
-    - value: motorised_2w
-      label: Motorised 2W
-    - value: motorised_3w
-      label: Motorised 3W
+    - value: all
+      label: All
+    - value: walking
+      label: Walking
+    - value: cycling
+      label: Cycling
+    - value: two-three-wheelers
+      label: Two-/Three-wheelers
+    - value: cars
+      label: Cars
+    - value: private-cars
+      label: Private cars
+    - value: taxis
+      label: Taxis
+    - value: truck
+      label: Truck
     - value: bus
       label: Bus
-    - value: good_vehicles
-      label: Good Vehicles
-    - value: other
-      label: Other
+    - value: heavy-rail
+      label: Heavy rail
+    - value: high-speed-rail
+      label: High-speed rail
+    - value: transit-rail
+      label: Transit rail
+    - value: coastal-shipping
+      label: Coastal shipping
+    - value: inland-shipping
+      label: Inland shipping
+    - value: international-maritime
+      label: International maritime
+    - value: domestic-aviation
+      label: Domestic aviation
+    - value: international-aviation
+      label: International aviation
 
 - field_name: services
   label: Services
