@@ -9,6 +9,6 @@ The user sign in using his GitHub account, and we receive the GitHub token with 
 
 In CKAN we receive the data sent by the front and validate first the secret to check if the stored secret in CKAN matches the received one, after that we verify the token to check if it's a token generated from GitHub.
 
-If the user's email isn't registered we create an account using his email, and username after that we generate an API token for this user and return it to the frontend use.
+If the user's email isn't registered we create an account using his email and username, generate an API token for this created user, and return it to the frontend use.
 
 If the user email is already registered we generate an API token for this user and return it to the frontend use.
