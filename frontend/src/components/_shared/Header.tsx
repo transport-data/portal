@@ -36,7 +36,7 @@ export default function Header({
   backgroundColor?: string;
 }) {
   const { data: session } = useSession();
-  console.log(session);
+
   return (
     <Disclosure
       as="nav"

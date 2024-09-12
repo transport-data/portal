@@ -10,7 +10,7 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f
     pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@eb98218bcf1529a13c20a4f95aa1d5b9dcfc3408#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
 
 ## Auth
-RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+# RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
 
 ## DCAT
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=ckanext-dcat && \

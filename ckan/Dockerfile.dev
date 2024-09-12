@@ -40,7 +40,7 @@ RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d39
 RUN pip install -r https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt && \
     pip install -e git+https://github.com/datopian/ckanext-s3filestore.git@ckan-2.10#egg=ckanext-s3filestore
 
-#RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+# RUN pip install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
 
 
 # Copy custom initialization scripts
