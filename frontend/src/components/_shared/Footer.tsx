@@ -11,11 +11,11 @@ const Footer: React.FC = () => {
     resources: [
       {
         name: "Datasets",
-        href: "#",
+        href: "/datasets",
       },
       {
         name: "Geography",
-        href: "#",
+        href: "/geography",
       },
       {
         name: "FAQ",
@@ -23,9 +23,9 @@ const Footer: React.FC = () => {
       },
     ],
     organisation: [
-      { name: "About Us", href: "#" },
+      { name: "About Us", href: "/about-us" },
       { name: "Partners", href: "/partners" },
-      { name: "Events", href: "#" },
+      { name: "Events", href: "/events" },
       { name: "Contact", href: "#" },
     ],
     legal: [

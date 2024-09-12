@@ -12,6 +12,25 @@ import { inputStyle, selectStyle } from "@styles/formStyles";
 import { ErrorMessage } from "@hookform/error-message";
 import { Organization, User } from "@portaljs/ckan";
 import notify from "@utils/notify";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/router";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 interface EditMemberFormProps {
   user: User & { capacity: "admin" | "editor" | "member" };
@@ -52,7 +71,7 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
   });
 
   return (
-    <>
+    <Form {...formObj}>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
@@ -61,44 +80,48 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
         })}
       >
         <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="name"
-              className="block w-fit text-sm font-medium opacity-75"
-            >
-              Name
-            </label>
-            <div className="mt-1 w-full">
-              <input
-                type="text"
-                className={inputStyle}
-                {...formObj.register("username")}
-                disabled
-              />
-              <ErrorMessage
-                errors={formObj.formState.errors}
-                name="username"
-                render={({ message }) => (
-                  <p className="text-justify text-xs text-red-600">{message}</p>
-                )}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="title"
-              className="block w-fit text-sm font-medium opacity-75"
-            >
-              Role
-            </label>
-            <select {...formObj.register("role")} className={selectStyle}>
-              {roleOptions.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FormField
+            control={formObj.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input disabled={true} placeholder="Username..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />{" "}
+          <FormField
+            control={formObj.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Parent</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select parent for org" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {roleOptions.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <div className="col-span-full">
           {match(editMember.isLoading)
@@ -125,6 +148,6 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
           </div>
         )}
       </form>
-    </>
+    </Form>
   );
 };

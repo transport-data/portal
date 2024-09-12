@@ -74,7 +74,7 @@ export const UsersTable: React.FC = () => {
                     <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
                       <input
                         type="checkbox"
-                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900"
+                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
                         ref={checkbox}
                         checked={checked}
                         onChange={toggleAll}
@@ -118,7 +118,7 @@ export const UsersTable: React.FC = () => {
                             )}
                             <input
                               type="checkbox"
-                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 focus:ring-stone-900"
+                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 focus:ring-accent"
                               value={user.name}
                               checked={selectedUsers.includes(user)}
                               onChange={(e) =>

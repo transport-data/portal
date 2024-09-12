@@ -4,6 +4,17 @@ import type { Organization, User } from "@portaljs/ckan";
 import Modal from "@components/_shared/Modal";
 import { EditMemberForm } from "@components/organization/EditMemberForm";
 import notify from "@utils/notify";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@components/ui/button";
+import { Badge } from "@components/ui/badge";
 
 interface OrganizationsUsersTableProps {
   name: string;
@@ -71,7 +82,7 @@ export const OrganizationUsersTable: React.FC<OrganizationsUsersTableProps> = ({
                         id: organization!.id,
                       });
                     }}
-                    className="inline-flex items-center rounded bg-background px-2 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white dark:bg-background-dark dark:ring-slate-600"
+                    className="inline-flex items-center rounded z-10 bg-background px-2 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white dark:bg-background-dark dark:ring-slate-600"
                   >
                     Remove from organization
                   </button>
@@ -81,49 +92,49 @@ export const OrganizationUsersTable: React.FC<OrganizationsUsersTableProps> = ({
               </div>
             )}
             <div className="ring-1 ring-gray-300 dark:ring-slate-600 sm:mx-0 sm:rounded-lg">
-              <table className="min-w-full table-fixed divide-y divide-gray-300 dark:divide-gray-600">
-                <thead>
-                  <tr>
-                    <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead scope="col" className="relative px-7 sm:w-12 sm:px-6">
                       <input
                         type="checkbox"
-                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900"
+                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
                         ref={checkbox}
                         checked={checked}
                         onChange={toggleAll}
                       />
-                    </th>
-                    <th
+                    </TableHead>
+                    <TableHead
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold"
                     >
                       Name
-                    </th>
-                    <th
+                    </TableHead>
+                    <TableHead
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold"
                     >
                       Capacity
-                    </th>
-                    <th
+                    </TableHead>
+                    <TableHead
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold"
                     >
                       State
-                    </th>
-                    <th
+                    </TableHead>
+                    <TableHead
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold"
                     >
                       Edit
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {organization && (
                     <>
                       {users.map((user) => (
-                        <tr
+                        <TableRow
                           key={user.name}
                           className={
                             selectedUsers.includes(user)
@@ -131,13 +142,13 @@ export const OrganizationUsersTable: React.FC<OrganizationsUsersTableProps> = ({
                               : undefined
                           }
                         >
-                          <td className="relative px-7 sm:w-12 sm:px-6">
+                          <TableCell className="relative px-7 sm:w-12 sm:px-6">
                             {selectedUsers.includes(user) && (
                               <div className="absolute inset-y-0 left-0 w-0.5 bg-stone-900" />
                             )}
                             <input
                               type="checkbox"
-                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 focus:ring-stone-900"
+                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 focus:ring-accent text-accent"
                               value={user.name}
                               checked={selectedUsers.includes(user)}
                               onChange={(e) =>
@@ -148,31 +159,32 @@ export const OrganizationUsersTable: React.FC<OrganizationsUsersTableProps> = ({
                                 )
                               }
                             />
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm opacity-75">
+                          </TableCell>
+                          <TableCell>
                             {user.name}
-                          </td>
-                          <td className="px-3 py-4 text-sm opacity-75">
-                            {user.capacity}
-                          </td>
-                          <td className="px-3 py-4 text-sm opacity-75">
-                            {user.state}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm font-medium">
-                            <button
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="success" className="text-sm capitalize">{user.capacity}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className="text-sm capitalize">{user.state}</Badge>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap px-3 py-4 text-sm font-medium">
+                            <Button
                               onClick={() => setEditingMember(user)}
+                              variant="secondary"
                               className="opacity-75 hover:opacity-100"
                             >
                               Edit
                               <span className="sr-only">, {user.name}</span>
-                            </button>
-                          </td>
-                        </tr>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
                       ))}
                     </>
                   )}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           </div>
         </div>
