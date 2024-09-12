@@ -75,7 +75,7 @@ export default function ContributeSection() {
               <ArrowRightIcon width={20} />
             </Button>
             <Button className="border border-gray-200" variant="ghost">
-              Add data
+                Learn more
             </Button>
           </div>
         </div>
