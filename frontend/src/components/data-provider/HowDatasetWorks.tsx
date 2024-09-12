@@ -6,7 +6,7 @@ export default () => {
     <div className="container min-w-full bg-white py-6 text-gray-500 lg:px-20 lg:py-[96px]">
       <div>
         <h1 className="text-4xl font-extrabold text-gray-900">
-          How TDC datasets work?
+          How TDC datasets work
         </h1>
         <p className="mt-4 text-xl font-normal text-gray-500">
           TDC hosts a diverse range of dataset types with differing variety of
