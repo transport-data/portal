@@ -1,4 +1,12 @@
+import os
+import logging
+import requests
+import random
+import string
+from sqlalchemy import func
+from ckan.common import _, config
 from ckan.plugins import toolkit as tk
+import json
 
 import logging
 log = logging.getLogger(__name__)
@@ -150,3 +158,117 @@ def package_search(up_func, context, data_dict):
 
     result = up_func(context, data_dict)
     return result
+
+
+def validate_github_token(access_token, client_secret):
+
+    try:
+    
+        github_secret =  os.getenv("CKANEXT__TDC__CLIENT_AUTH_SECRET")
+        # GitHub OAuth API to check if the token is valid
+        url = "https://api.github.com/user"
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+        
+        # Send request to GitHub API
+        response = requests.get(url, headers=headers)
+
+        # Check if the token is valid (status 200 means valid)
+        if(github_secret == client_secret):
+            if response.status_code == 200:
+                return response.json()  # Token is valid, return user details
+            else:
+                return response.json()  # Token is invalid, return error details
+        else:
+            return dict()
+    except Exception as e:
+        log.error(e)
+        return dict()
+
+def user_login(context, data_dict):
+    try:
+        session = context['session']
+
+        generic_error_message = {
+            'errors': {'auth': [_('Username or password entered was incorrect')]},
+            'error_summary': {_('auth'): _('Incorrect username or password')},
+        }
+
+        from_github = data_dict.get('from_github', False)
+        
+        if from_github:
+            token = data_dict['token']
+            email = data_dict['email']
+            client_secret = data_dict['client_secret']
+            model = context['model']
+            context['ignore_auth'] = True
+
+            validated_token = validate_github_token(token, client_secret)
+
+            id = validated_token["id"]
+
+            if not id or not validated_token:
+                return generic_error_message
+
+            user = session.query(model.User).filter(func.lower(model.User.email) == func.lower(email)).first()
+
+            if not user:
+                password_length = 10
+                password = ''.join(
+                    random.choice(string.ascii_letters + string.digits)
+                    for _ in range(password_length)
+                )
+
+                try:
+                    user_name = ''.join(
+                        c.lower() if c.isalnum() else '_' for c in email.split('@')[0]
+                    )
+                    user = tk.get_action('user_create')(
+                        context,
+                        {
+                            'name': user_name,
+                            'display_name': data_dict['name'],
+                            'fullname': data_dict['name'],
+                            'email': email,
+                            'password': password,
+                            'state': 'active',
+                        },
+                    )
+                except Exception as e:
+                    log.error(f'Error creating user: \n{e}')
+                    return generic_error_message
+            else:
+                user = user.as_dict()
+
+            if config.get('ckanext.auth.include_frontend_login_token', False):
+                user = generate_token(context, user)
+
+            return json.dumps(user)
+    except Exception as e:
+        log.error(e)
+        return json.dumps({"error":True})
+
+def generate_token(context, user):
+    context['ignore_auth'] = True
+    user['frontend_token'] = None
+
+    try:
+        api_tokens = tk.get_action('api_token_list')(
+            context, {'user_id': user['name']}
+        )
+
+        for token in api_tokens:
+            if token['name'] == 'frontend_token':
+                tk.get_action('api_token_revoke')(context, {'jti': token['id']})
+
+        frontend_token = tk.get_action('api_token_create')(
+            context, {'user': user['name'], 'name': 'frontend_token'}
+        )
+
+        user['frontend_token'] = frontend_token.get('token')
+
+    except Exception as e:
+        log.error(e)
+
+    return user
