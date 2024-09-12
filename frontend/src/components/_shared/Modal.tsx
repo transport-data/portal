@@ -19,7 +19,7 @@ export default function Modal({
     <Transition.Root show={show} as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-10"
+        className="relative z-30"
         initialFocus={cancelButtonRef}
         onClose={setShow}
       >

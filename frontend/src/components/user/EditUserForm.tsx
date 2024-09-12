@@ -21,6 +21,8 @@ import {
 } from "@schema/user.schema";
 import notify from "@utils/notify";
 import { User } from "@interfaces/ckan/user.interface";
+import { Form } from "@components/ui/form";
+import { toast } from "@/components/ui/use-toast";
 
 export const EditUserForm: React.FC<{
   initialValues: User;
@@ -43,7 +45,7 @@ export const EditUserForm: React.FC<{
   });
 
   return (
-    <>
+    <Form {...formObj}>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
@@ -80,6 +82,6 @@ export const EditUserForm: React.FC<{
           </div>
         )}
       </form>
-    </>
+    </Form>
   );
 };
