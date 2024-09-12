@@ -58,6 +58,10 @@
   }
 }
 
+div[role=tooltip] div.absolute.z-10.h-2.w-2.bg-gray-900 {
+  background-color: #1F2A37;
+}
+
 a {
   color: inherit;
   text-decoration: none;
