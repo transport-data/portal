@@ -4,7 +4,13 @@ import Layout from "@/components/_shared/Layout";
 import { Dataset as DatasetType } from "@portaljs/ckan";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
-import { Building2Icon, ChevronLeftIcon, DownloadIcon, ArrowDownToLineIcon, Landmark } from "lucide-react";
+import {
+  Building2Icon,
+  ChevronLeftIcon,
+  DownloadIcon,
+  ArrowDownToLineIcon,
+  Landmark,
+} from "lucide-react";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,6 +30,8 @@ import {
 } from "@components/ui/select";
 import useMatomoTracker from "@lib/useMatomoTracker";
 import { api } from "@utils/api";
+import { DefaultTooltip } from "@components/ui/tooltip";
+import Link from "next/link";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -75,7 +83,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export default function DatasetPage({
   dataset,
 }: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
-  useMatomoTracker()
+  useMatomoTracker();
   const tabs = [
     {
       id: "overview",
@@ -108,8 +116,8 @@ export default function DatasetPage({
       label: `${dataset.organization?.title || dataset.organizatio?.name}`,
     },
   ];
-  const matomo = api.matomo.getVisitorStats.useQuery()
-  console.log(matomo.data)
+  const matomo = api.matomo.getVisitorStats.useQuery();
+  console.log(matomo.data);
   return (
     <>
       <Head>
@@ -149,9 +157,25 @@ export default function DatasetPage({
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                   {dataset.title || dataset.name}
                 </h2>
-                <Badge className="my-2" variant="warning">
-                  TDC Harmonized
-                </Badge>
+                <DefaultTooltip
+                  contentClassName="max-w-[180px]"
+                  content={
+                    <div className="flex flex-col">
+                      <span className="text-semibold text-sm">TDC Harmonized</span>
+                      <div className="text-xs">
+                      Data have been validated, and derived from multiple
+                      sources by TDC. For more information,{" "}
+                      <Link className="underline" href={"https://google.com"}>
+                        click here
+                      </Link></div>
+                    </div>
+                  }
+                >
+                  <button className="mt-4 flex w-fit gap-1 rounded-[6px] px-[10px] py-[2px] text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 
+                    text-yellow-800 bg-yellow-100">
+                      TDC Harmonized
+                  </button>
+                </DefaultTooltip>
                 <div className="mt-4 text-justify text-base font-normal leading-normal text-gray-500">
                   {dataset.notes ?? "-"}
                 </div>
@@ -191,10 +215,10 @@ export default function DatasetPage({
         <Tabs defaultValue="overview">
           <div className="border-b border-gray-200 shadow-sm">
             <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
-              <TabsList className="bg-transparent overflow-x-auto max-w-[95vw] h-14 justify-start">
-                  {tabs.map((tab) => (
-                    <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
-                  ))}
+              <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
+                {tabs.map((tab) => (
+                  <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
+                ))}
               </TabsList>
               <div className="flex w-full items-center justify-end space-x-4 lg:w-auto">
                 <Button variant="secondary">
