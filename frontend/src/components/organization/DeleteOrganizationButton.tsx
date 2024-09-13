@@ -10,7 +10,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@components/ui/button";
+import { Button, LoaderButton } from "@components/ui/button";
+import { useState } from "react";
+import { toast } from "@components/ui/use-toast";
 
 export function DeleteOrganizationButton({
   groupId,
@@ -22,14 +24,24 @@ export function DeleteOrganizationButton({
   children?: React.ReactNode;
 }) {
   const utils = api.useContext();
+  const [open, setOpen] = useState(false);
   const deleteOrganizations = api.organization.delete.useMutation({
     onSuccess: async () => {
       onSuccess();
       await utils.organization.list.invalidate();
+      setOpen(false)
     },
+    onError: (e) => {
+      setOpen(false)
+      toast({
+        title: "Failed to delete organization",
+        description: e.message,
+        variant: "danger",
+      })
+    }
   });
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         {children || <Button variant="danger">Delete Organization</Button>}
       </AlertDialogTrigger>
@@ -43,14 +55,15 @@ export function DeleteOrganizationButton({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button
+            <LoaderButton
+              loading={deleteOrganizations.isLoading}
               onClick={() => deleteOrganizations.mutate({ ids: [groupId] })}
               className="bg-red-600 hover:bg-red-400 text-white"
               id="confirmDelete"
               variant="danger"
             >
               Delete
-            </Button>
+            </LoaderButton>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

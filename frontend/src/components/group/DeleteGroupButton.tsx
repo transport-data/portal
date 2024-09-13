@@ -10,7 +10,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@components/ui/button";
+import { Button, LoaderButton } from "@components/ui/button";
+import { useState } from "react";
+import { toast } from "@components/ui/use-toast";
 
 export function DeleteGroupButton({
   groupId,
@@ -22,14 +24,24 @@ export function DeleteGroupButton({
   children?: React.ReactNode;
 }) {
   const utils = api.useContext();
+  const [open, setOpen] = useState(false);
   const deleteGroups = api.group.delete.useMutation({
     onSuccess: async () => {
       onSuccess();
       await utils.group.list.invalidate();
+      setOpen(false)
     },
+    onError: (e) => {
+      setOpen(false)
+      toast({
+        title: "Failed to delete topic",
+        description: e.message,
+        variant: "danger",
+      })
+    }
   });
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         {children || <Button variant="danger">Delete Topic</Button>}
       </AlertDialogTrigger>
@@ -43,14 +55,15 @@ export function DeleteGroupButton({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button
+            <LoaderButton
+              loading={deleteGroups.isLoading}
               onClick={() => deleteGroups.mutate({ ids: [groupId] })}
               className="bg-red-600 hover:bg-red-400 text-white"
               variant="danger"
               id="confirmDelete"
             >
               Delete
-            </Button>
+            </LoaderButton>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
