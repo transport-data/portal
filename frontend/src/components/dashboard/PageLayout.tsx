@@ -1,44 +1,50 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@components/_shared/Layout";
-import DatasetsTabContent from "@components/dashboard/MyDatasetsTabContent";
-import MyDiscussionsTabContent from "@components/dashboard/MyDiscussionsTabContent";
-import MyOrganizationTabContent from "@components/dashboard/MyOrganizationTabContent";
-import NewsFeedTabContent from "@components/dashboard/NewsFeedTabContent";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Button } from "@components/ui/button";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 
-import type { NextPage } from "next";
 import { NextSeo } from "next-seo";
+import { useRouter } from "next/router";
+import { ReactNode } from "react";
 
-const HomeDashboard: NextPage = () => {
+const PageLayout = ({
+  currentPage,
+  children,
+}: {
+  currentPage: string;
+  children: ReactNode;
+}) => {
   // const { data: sessionData } = useSession();
   // if (!sessionData) return <Loading />;
   const tabs = [
     {
       title: "Newsfeed",
-      id: "newsfeed",
-      content: <NewsFeedTabContent />,
+      id: "",
+      content: children,
     },
     {
       title: "My Datasets",
       id: "my-datasets",
-      content: <DatasetsTabContent />,
+      content: children,
     },
     {
       title: "My Organisation",
       id: "my-organization",
-      content: <MyOrganizationTabContent />,
+      content: children,
     },
     {
       title: "My Discussions",
-      id: "my-discussion",
-      content: <MyDiscussionsTabContent />,
+      id: "my-discussions",
+      content: children,
     },
   ];
+
+  const router = useRouter();
+  const selectedTab = tabs.find((x) => x.id === currentPage)!;
   return (
     <>
-      <NextSeo title="Dashboard" />
+      <NextSeo title={selectedTab.title} />
       <Layout>
         <div className="w-full px-6 sm:px-20">
           <div className="py-8">
@@ -59,7 +65,12 @@ const HomeDashboard: NextPage = () => {
                 <DefaultBreadCrumb
                   links={[
                     { label: "Home", href: "/" },
-                    { label: "Dashboard", href: "/dashboard" },
+                    {
+                      label: "Dashboard",
+                      href: `/dashboard${
+                        selectedTab.id ? "/" + selectedTab.id : selectedTab.id
+                      }`,
+                    },
                   ]}
                 />
               </nav>
@@ -80,15 +91,20 @@ const HomeDashboard: NextPage = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="newsfeed">
+        <Tabs defaultValue={currentPage}>
           <div className="border-b border-gray-200 shadow-sm">
-            <div className="flex gap-1 flex-col-reverse items-center justify-between px-6 pb-4 sm:px-20 md:flex-row">
+            <div className="flex flex-col-reverse items-center justify-between gap-1 px-6 pb-4 sm:px-20 md:flex-row">
               <TabsList className="customized-scroll inline-flex h-14 max-w-[95vw] items-center justify-start overflow-x-auto overflow-y-hidden rounded-md bg-transparent p-1 text-muted-foreground">
                 {tabs.map((tab) => (
-                  <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
+                  <TabsTrigger
+                    value={tab.id}
+                    onClick={() => router.push("/dashboard/" + tab.id)}
+                  >
+                    {tab.title}
+                  </TabsTrigger>
                 ))}
               </TabsList>
-              <div className="md:min-w-fit min-w-full">
+              <div className="min-w-full md:min-w-fit">
                 <Button className="justify-between gap-2">
                   <svg
                     width="16"
@@ -123,4 +139,4 @@ const HomeDashboard: NextPage = () => {
   );
 };
 
-export default HomeDashboard;
+export default PageLayout;
