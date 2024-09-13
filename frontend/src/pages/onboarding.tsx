@@ -197,7 +197,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   ]);
 
   const nextStep = () => {
-    if (stepNumber === steps.length - 1) return router.push("/dashboard");
+    if (stepNumber === steps.length - 1) return router.push("/dashboard/newsfeed");
     setStep(stepNumber + 1);
   };
 

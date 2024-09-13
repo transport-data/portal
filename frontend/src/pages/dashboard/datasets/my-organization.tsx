@@ -10,6 +10,7 @@ import { env } from "@env.mjs";
 import Link from "next/link";
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import MyDatasetsTabContent from "@components/dashboard/MyDatasetsTabContent";
+import MyOrganizationTabContent from "@components/dashboard/MyOrganizationTabContent";
 
 const DatasetsDashboard: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -17,12 +18,13 @@ const DatasetsDashboard: NextPage = () => {
 
   return (
     <>
-      <NextSeo title="Datasets" />
-      <DashboardLayout active="my-datasets">
-        <MyDatasetsTabContent />
+      <NextSeo title="My Organization" />
+      <DashboardLayout active="my-organization">
+        <MyOrganizationTabContent />
       </DashboardLayout>
     </>
   );
 };
 
 export default DatasetsDashboard;
+
