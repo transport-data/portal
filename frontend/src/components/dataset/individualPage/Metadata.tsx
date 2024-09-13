@@ -17,12 +17,15 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
       <div className="container grid py-8 lg:grid-cols-2">
         <div>
           <h3 className="text-3xl font-semibold leading-loose text-primary">
-            Introduction and key takeawyas
+            Overview
           </h3>
           <p className="max-w-lg text-gray-500">
-            The dataset is maintained and updated by TDC and comprises of data
-            from multiple sources that were validated and harmonised to build a
-            single repository.
+            For information on the ATO please contact{" "}
+            <span className="underline">
+              Jamie Leather, Chief Transport Sector Group ADB
+            </span>{" "}
+            or{" "}
+            <span className="underline">asiantransportoutlook@gmail.com</span>
           </p>
         </div>
         <div className="flex flex-col gap-y-4 py-4">
@@ -126,22 +129,30 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             <TableBody>
               <TableRow>
                 <TableCell className="text-gray-500">23/03/2023</TableCell>
-                <TableCell><Badge variant="success">Latest</Badge></TableCell>
+                <TableCell>
+                  <Badge variant="success">Latest</Badge>
+                </TableCell>
                 <TableCell>March 2023</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-gray-500">11/07/2022</TableCell>
-                <TableCell><Badge variant="muted">Past</Badge></TableCell>
+                <TableCell>
+                  <Badge variant="muted">Past</Badge>
+                </TableCell>
                 <TableCell>March 2022 - Revisited</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-gray-500">17/03/2022</TableCell>
-                <TableCell><Badge variant="muted">Past</Badge></TableCell>
+                <TableCell>
+                  <Badge variant="muted">Past</Badge>
+                </TableCell>
                 <TableCell>March 2022</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-gray-500">17/06/2022</TableCell>
-                <TableCell><Badge variant="muted">Past</Badge></TableCell>
+                <TableCell>
+                  <Badge variant="muted">Past</Badge>
+                </TableCell>
                 <TableCell>March 2021</TableCell>
               </TableRow>
             </TableBody>
@@ -162,27 +173,27 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             dataset={dataset}
             options={[
               {
-                type: 'quotation',
+                type: "quotation",
                 label: "APA",
                 content: <p>teste</p>,
               },
               {
-                type: 'quotation',
+                type: "quotation",
                 label: "Chicago",
                 content: <p>teste 2</p>,
               },
               {
-                type: 'quotation',
+                type: "quotation",
                 label: "Harvard",
                 content: <></>,
               },
               {
-                type: 'quotation',
+                type: "quotation",
                 label: "MLA",
                 content: <></>,
               },
               {
-                type: 'quotation',
+                type: "quotation",
                 label: "Bluebook",
                 content: <></>,
               },
@@ -192,62 +203,62 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             dataset={dataset}
             options={[
               {
-                type: 'code',
+                type: "code",
                 label: "APA",
                 content: <p>teste</p>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "Chicago",
                 content: <p>teste 2</p>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "Harvard",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "MLA",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "Bluebook",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "BibTex",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "APA 2",
                 content: <p>teste</p>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "MLA 2",
                 content: <p>teste 2</p>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "Chicago 2",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "Harvard 2",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "Vancouver 2",
                 content: <></>,
               },
               {
-                type: 'code',
+                type: "code",
                 label: "BibTex 2",
                 content: <></>,
               },

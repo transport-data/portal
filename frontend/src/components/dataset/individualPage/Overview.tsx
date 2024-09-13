@@ -6,7 +6,7 @@ export function Overview({ dataset }: { dataset: Dataset }) {
       <div className="container grid grid-cols-1 gap-6 lg:grid-cols-2 lg:py-16">
         <div>
           <h3 className="text-3xl font-semibold leading-loose text-primary">
-            Introduction and key takeawyas
+            Introduction and key takeaways
           </h3>
           <div className="text-xs font-semibold leading-3 text-gray-500">
             EDITED BY
