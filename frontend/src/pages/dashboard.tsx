@@ -3,6 +3,7 @@ import Layout from "@components/_shared/Layout";
 import DatasetsTabContent from "@components/dashboard/MyDatasetsTabContent";
 import MyDiscussionsTabContent from "@components/dashboard/MyDiscussionsTabContent";
 import MyOrganizationTabContent from "@components/dashboard/MyOrganizationTabContent";
+import MyTopicsTabContent from "@components/dashboard/MyTopicsTabContent";
 import NewsFeedTabContent from "@components/dashboard/NewsFeedTabContent";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Button } from "@components/ui/button";
@@ -34,6 +35,11 @@ const HomeDashboard: NextPage = () => {
       title: "My Discussions",
       id: "my-discussion",
       content: <MyDiscussionsTabContent />,
+    },
+    {
+      title: "My Topics",
+      id: "my-topics",
+      content: <MyTopicsTabContent />,
     },
   ];
   return (
