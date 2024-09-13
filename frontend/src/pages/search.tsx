@@ -1,66 +1,133 @@
-import { useEffect } from "react";
+import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
+import { Button } from "@components/ui/button";
+import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
+import { env } from "@env.mjs";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { CKAN, PackageSearchOptions } from "@portaljs/ckan";
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { SWRConfig, unstable_serialize } from "swr";
-import ListOfDatasets from "../components/search/ListOfDatasets";
+import { unstable_serialize } from "swr";
 import Layout from "../components/_shared/Layout";
-import TopBar from "../components/_shared/TopBar";
-import { PackageSearchOptions } from "@portaljs/ckan";
-import getConfig from "next/config";
-import { CKAN } from "@portaljs/ckan";
-import DatasetSearchForm from "@/components/search/DatasetSearchForm";
-import DatasetSearchFilters from "@/components/search/DatasetSearchFilters";
-import { env } from "@env.mjs";
-import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { Button } from "@components/ui/button";
-import { SearchIcon } from "lucide-react";
-import DatasetsFilter from "@components/_shared/DatasetsFilter";
-import DashboardDatasetCard, {
-  DashboardDatasetCardProps,
-} from "@components/_shared/DashboardDatasetCard";
-import { usersMock } from "@components/dashboard/MyOrganizationTabContent";
-import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 
-import example from "@data/example.json";
-import datasets from "@data/datasets.json";
-import sectors from "@data/sectors.json";
 import DatasetSearchItem from "@components/search/DatasetSearchItem";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@components/ui/pagination";
+import datasets from "@data/datasets.json";
+import example from "@data/example.json";
+import sectors from "@data/sectors.json";
+import CkanRequest from "@datopian/ckan-api-client-js";
 
-export async function getStaticProps() {
+type Option = {
+  label: string;
+  value: string;
+};
+
+export async function getServerSideProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
   const ckan = new CKAN(backend_url);
-  const search_result = await ckan.packageSearch({
-    offset: 0,
-    limit: 5,
-    tags: [],
-    groups: [],
-    orgs: [],
+  let modes: Option[] = [];
+  let services: Option[] = [];
+
+  const schemingFields = (
+    await CkanRequest.get<any>("scheming_dataset_schema_show?type=dataset")
+  ).result;
+
+  schemingFields.dataset_fields.forEach((x: any) => {
+    if (x.field_name === "modes") {
+      modes = x.choices;
+    } else if (x.field_name === "services") {
+      services = x.choices;
+    }
   });
-  const groups = await ckan.getGroupsWithDetails();
-  const tags = await ckan.getAllTags();
-  const orgs = await ckan.getOrgsWithDetails(true);
+
+  let tags: Facet[] = [];
+  let orgs: Facet[] = [];
+  let resourcesFormats: Facet[] = [];
+  let topics: Facet[] = [];
+  let groups: Facet[] = [];
+  let regions: Facet[] = [];
+  let metadataCreated: Facet[] = [];
+  let yearsCoverage: Facet[] = [];
+
+  const datasetSearchResult = (
+    await CkanRequest.get<any>(
+      `package_search?rows=9&start=0&facet.field=
+      ["tags", "groups", "regions", "topics", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end"]`
+    )
+  ).result;
+
+  const facets = datasetSearchResult.search_facets;
+
+  for (const key in facets) {
+    switch (key) {
+      case "organization": {
+        orgs = facets[key].items;
+        break;
+      }
+      case "tags": {
+        tags = facets[key].items;
+        break;
+      }
+      case "groups": {
+        groups = facets[key].items;
+        break;
+      }
+      case "regions": {
+        regions = facets[key].items;
+        break;
+      }
+      case "topics": {
+        topics = facets[key].items;
+        break;
+      }
+      case "res_format": {
+        resourcesFormats = facets[key].items;
+        break;
+      }
+      case "metadata_created": {
+        metadataCreated = facets[key].items;
+        break;
+      }
+      case "temporal_coverage_end":
+      case "temporal_coverage_start": {
+        yearsCoverage.push(...facets[key].items);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  const search_result = datasetSearchResult.results;
+
   return {
     props: {
+      ...facets,
       fallback: {
         [unstable_serialize([
           "package_search",
           { offset: 0, limit: 5, tags: [], groups: [], orgs: [] },
         ])]: search_result,
       },
-      groups,
       tags,
       orgs,
+      resourcesFormats,
+      topics,
+      groups,
+      regions,
+      metadataCreated,
+      yearsCoverage,
+      modes,
+      services,
     },
   };
 }
@@ -70,7 +137,14 @@ export default function DatasetSearch({
   groups,
   tags,
   orgs,
-}: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
+  resourcesFormats,
+  topics,
+  regions,
+  metadataCreated,
+  yearsCoverage,
+  modes,
+  services,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const router = useRouter();
   const { q, sector, mode, service, region } = router.query;
   const [options, setOptions] = useState<PackageSearchOptions>({
@@ -122,8 +196,8 @@ export default function DatasetSearch({
                   </span>
                   <div className="flex flex-wrap items-center gap-2 sm:flex-row sm:flex-nowrap">
                     <QuickFilterDropdown text="Sector" items={sectors} />
-                    <QuickFilterDropdown text="Mode" items={example} />
-                    <QuickFilterDropdown text="Service" items={example} />
+                    <QuickFilterDropdown text="Mode" items={modes} />
+                    <QuickFilterDropdown text="Service" items={services} />
                     <QuickFilterDropdown
                       text="Region"
                       defaultValue={region as string}
@@ -160,7 +234,19 @@ export default function DatasetSearch({
               </div>
 
               <div className="order-first w-full border-l pl-5 pt-[12px] lg:order-last lg:max-w-[340px]">
-                <DatasetsFilter></DatasetsFilter>
+                <DatasetsFilter
+                  {...{
+                    tags,
+                    orgs,
+                    resourcesFormats,
+                    groups,
+                    regions,
+                    metadataCreated,
+                    yearsCoverage,
+                    modes,
+                    services,
+                  }}
+                />
               </div>
             </div>
           </div>

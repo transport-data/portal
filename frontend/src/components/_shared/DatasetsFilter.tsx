@@ -8,98 +8,74 @@ import { Label } from "@components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import SimpleSearchInput from "@components/ui/simple-search-input";
 import classNames from "@utils/classnames";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
-export default () => {
+export type Facet = { name: string; display_name: string; count: number };
+
+export default ({
+  tags,
+  orgs,
+  resourcesFormats,
+  groups,
+  regions,
+  metadataCreated,
+  yearsCoverage,
+}: {
+  tags: Facet[];
+  orgs: Facet[];
+  resourcesFormats: Facet[];
+  groups: Facet[];
+  regions: Facet[];
+  metadataCreated: Facet[];
+  yearsCoverage: Facet[];
+}) => {
+  const mapFacetsToFilterItems = (facets: Facet[]) => {
+    return facets.map((x) => ({
+      value: x.name,
+      amountOfDatasets: x.count,
+      selected: false,
+      label: x.display_name,
+    }));
+  };
+
   const tabs = [
     { name: "All", current: false },
     { name: "Regions", current: true },
     { name: "Countries", current: false },
     { name: "Cities", current: false },
   ];
-  const [keywordItems, setKeywordItems] = useState([
-    { value: "Transport data (56)", selected: false },
-    { value: "Urban Mobility (97)", selected: false },
-    { value: "Public Transit (234)", selected: false },
-    { value: "Traffic (45)", selected: false },
-    { value: "Emissions (176)", selected: false },
-    { value: "Infrastructure (49)", selected: false },
-    { value: "Forecast (16)", selected: false },
-    { value: "Accessibility (87)", selected: false },
-    { value: "Mobility Analytics (23)", selected: false },
-    { value: "Transportation Demand (35)", selected: false },
-    { value: "Transportation Demand (35)", selected: false },
-  ]);
+  const [keywordItems, setKeywordItems] = useState(
+    mapFacetsToFilterItems(tags)
+  );
 
   const [publicationDates, setPublicationDates] = useState([
-    { value: "All (1,156)", selected: false },
-    { value: "Last Month (97)", selected: false },
-    { value: "2023 (97)", selected: false },
-    { value: "2022 (234)", selected: false },
-    { value: "2021 (45)", selected: false },
-    { value: "2020 (176)", selected: false },
-    { value: "2019 (34)", selected: false },
-    { value: "2018 (49)", selected: false },
+    { value: "All (1,156)", label: "All (1,156)", selected: false },
+    { value: "Last Month (97)", label: "Last Month (97)", selected: false },
+    { value: "2023 (97)", label: "2023 (97)", selected: false },
+    { value: "2022 (234)", label: "2022 (234)", selected: false },
+    { value: "2021 (45)", label: "2021 (45)", selected: false },
+    { value: "2020 (176)", label: "2020 (176)", selected: false },
+    { value: "2019 (34)", label: "2019 (34)", selected: false },
+    { value: "2018 (49)", label: "2018 (49)", selected: false },
   ]);
 
-  const [orgs, setOrgs] = useState([
-    { value: "World Bank Group (1,156)", selected: false },
-    { value: "Eurostat (97)", selected: false },
-    { value: "UN (97)", selected: false },
-    { value: "OECD (234)", selected: false },
-    { value: "Federal Transit Administration (45)", selected: false },
+  const [internalOrgs, setInternalOrgs] = useState<
     {
-      value: "International Association of Public Transport (176)",
-      selected: false,
-    },
-    { value: "European Environment Agency (34)", selected: false },
-    { value: "Environmental Protection Agency (49)", selected: false },
-    { value: "Environmental Protection Agency (49)", selected: false },
-  ]);
+      value: string;
+      label: string;
+      selected: boolean;
+    }[]
+  >(mapFacetsToFilterItems(orgs));
 
-  const [formats, setFormats] = useState([
-    { value: "CSV (1,156)", selected: false },
-    { value: "GarminIMG (97)", selected: false },
-    { value: "GeoJSON (97)", selected: false },
-    { value: "GeoTIFF (234)", selected: false },
-    { value: "KML (45)", selected: false },
-    { value: "PDF (176)", selected: false },
-    { value: "SHP (34)", selected: false },
-    { value: "XLSX (49)", selected: false },
-  ]);
+  const [formats, setFormats] = useState(
+    mapFacetsToFilterItems(resourcesFormats)
+  );
 
-  const [years, setYears] = useState([
-    { value: 1994, selected: false },
-    { value: 1995, selected: false },
-    { value: 1996, selected: false },
-    { value: 1997, selected: false },
-    { value: 1998, selected: false },
-    { value: 1999, selected: false },
-    { value: 2000, selected: false },
-    { value: 2001, selected: false },
-    { value: 2002, selected: false },
-    { value: 2003, selected: false },
-    { value: 2004, selected: false },
-    { value: 2005, selected: false },
-  ]);
+  const [years, setYears] = useState(mapFacetsToFilterItems(yearsCoverage));
 
-  const [regions, setRegions] = useState([
-    { value: "APAC", selected: false, amountOfDatasets: 54 },
-    { value: "Asia", selected: false, amountOfDatasets: 49 },
-    { value: "Australia and Oceania", selected: false, amountOfDatasets: 14 },
-    { value: "MENA", selected: false, amountOfDatasets: 19 },
-    { value: "OECD", selected: false, amountOfDatasets: 2 },
-    // {
-    //   value: "Central and South America",
-    //   selected: false,
-    //   amountOfDatasets: 54,
-    // },
-    // { value: "Europe", selected: false, amountOfDatasets: 2 },
-    // { value: "North America", selected: false, amountOfDatasets: 54 },
-    // { value: "EU", selected: false, amountOfDatasets: 54 },
-    // { value: "CEE", selected: false, amountOfDatasets: 54 },
-    // { value: "LAC", selected: false, amountOfDatasets: 54 },
-  ]);
+  const [internalRegions, setInternalRegions] = useState(
+    mapFacetsToFilterItems(regions)
+  );
 
   return (
     <>
@@ -121,7 +97,7 @@ export default () => {
         <AccordionItem value="keyword">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Keyword</span>
-            <span className="mr-2">
+            <span className="hide mr-2 text-sm">
               {keywordItems.every((x) => x.selected) ||
               keywordItems.every((x) => !x.selected)
                 ? "All"
@@ -129,38 +105,21 @@ export default () => {
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
-            {keywordItems.map((x, index) =>
-              index <= 9 ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    onChange={() => {
-                      x.selected = !x.selected;
-                      setKeywordItems([...keywordItems]);
-                    }}
-                    checked={x.selected}
-                    className="remove-input-ring rounded text-[#006064]"
-                    type="checkbox"
-                  />
-                  <label htmlFor="">{x.value}</label>
-                </div>
-              ) : index === 10 ? (
-                <span className="mt-[1px] cursor-pointer text-[#006064]">
-                  View all
-                </span>
-              ) : (
-                <></>
-              )
-            )}
+            <Checkboxes
+              setItems={setKeywordItems}
+              items={keywordItems}
+              limitToPresentViewAll={9}
+            />
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="location">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>
-            <span className="hide mr-2">
-              {regions.every((x) => x.selected) ||
-              regions.every((x) => !x.selected)
+            <span className="hide mr-2 text-sm">
+              {internalRegions.every((x) => x.selected) ||
+              internalRegions.every((x) => !x.selected)
                 ? "All"
-                : regions.filter((x) => x.selected).length}
+                : internalRegions.filter((x) => x.selected).length}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -203,8 +162,8 @@ export default () => {
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  regions.forEach((x) => (x.selected = true));
-                  setRegions([...regions]);
+                  internalRegions.forEach((x) => (x.selected = true));
+                  setInternalRegions([...internalRegions]);
                 }}
               >
                 Check all
@@ -212,38 +171,26 @@ export default () => {
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  regions.forEach((x) => (x.selected = false));
-                  setRegions([...regions]);
+                  internalRegions.forEach((x) => (x.selected = false));
+                  setInternalRegions([...internalRegions]);
                 }}
               >
                 Uncheck all
               </span>
             </div>
             <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
-              {regions.map((x) => (
-                <div className="flex items-center gap-2 pr-4">
-                  <input
-                    onChange={() => {
-                      x.selected = !x.selected;
-                      setRegions([...regions]);
-                    }}
-                    checked={x.selected}
-                    className="remove-input-ring rounded text-[#006064]"
-                    type="checkbox"
-                  />
-                  <label htmlFor="" className="flex flex-grow justify-between">
-                    <span>{x.value}</span>
-                    <span>{x.amountOfDatasets}</span>
-                  </label>
-                </div>
-              ))}
+              <Checkboxes
+                spaceCount
+                items={internalRegions}
+                setItems={setInternalRegions}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="yearsCovered">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
-            <span className="hide mr-2">
+            <span className="hide mr-2 text-sm">
               {years.every((x) => x.selected) || years.every((x) => !x.selected)
                 ? "All"
                 : years.filter((x) => x.selected).length}
@@ -288,27 +235,14 @@ export default () => {
               </span>
             </div>
             <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
-              {years.map((x) => (
-                <div className="flex items-center gap-2">
-                  <input
-                    onChange={() => {
-                      x.selected = !x.selected;
-                      setYears([...years]);
-                    }}
-                    checked={x.selected}
-                    className="remove-input-ring rounded text-[#006064]"
-                    type="checkbox"
-                  />
-                  <label htmlFor="">{x.value}</label>
-                </div>
-              ))}
+              <Checkboxes items={years} setItems={setYears} />
             </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="format">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Format</span>
-            <span className="hide mr-2">
+            <span className="hide mr-2 text-sm">
               {formats.every((x) => x.selected) ||
               formats.every((x) => !x.selected)
                 ? "All"
@@ -316,68 +250,35 @@ export default () => {
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
-            {formats.map((x, index) =>
-              index <= 9 ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    onChange={() => {
-                      x.selected = !x.selected;
-                      setFormats([...formats]);
-                    }}
-                    checked={x.selected}
-                    className="remove-input-ring rounded text-[#006064]"
-                    type="checkbox"
-                  />
-                  <label htmlFor="">{x.value}</label>
-                </div>
-              ) : index === 10 ? (
-                <span className="mt-[1px] cursor-pointer text-[#006064]">
-                  View all
-                </span>
-              ) : (
-                <></>
-              )
-            )}
+            <Checkboxes
+              setItems={setFormats}
+              items={formats}
+              limitToPresentViewAll={9}
+            />
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="org">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Organisation</span>
-            <span className="hide mr-2">
-              {orgs.every((x) => x.selected) || orgs.every((x) => !x.selected)
+            <span className="hide mr-2 text-sm">
+              {internalOrgs.every((x) => x.selected) ||
+              internalOrgs.every((x) => !x.selected)
                 ? "All"
-                : orgs.filter((x) => x.selected).length}
+                : internalOrgs.filter((x) => x.selected).length}
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
-            {orgs.map((x, index) =>
-              index <= 7 ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    onChange={() => {
-                      x.selected = !x.selected;
-                      setOrgs([...orgs]);
-                    }}
-                    checked={x.selected}
-                    className="remove-input-ring rounded text-[#006064]"
-                    type="checkbox"
-                  />
-                  <label htmlFor="">{x.value}</label>
-                </div>
-              ) : index === 8 ? (
-                <span className="mt-[1px] cursor-pointer text-[#006064]">
-                  View all
-                </span>
-              ) : (
-                <></>
-              )
-            )}
+            <Checkboxes
+              setItems={setInternalOrgs}
+              items={internalOrgs}
+              limitToPresentViewAll={7}
+            />
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="publicationDate">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Publication date</span>
-            <span className="hide mr-2">
+            <span className="hide mr-2 text-sm">
               {publicationDates.every((x) => x.selected) ||
               publicationDates.every((x) => !x.selected)
                 ? "All"
@@ -385,34 +286,17 @@ export default () => {
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
-            {publicationDates.map((x, index) =>
-              index <= 7 ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    onChange={() => {
-                      x.selected = !x.selected;
-                      setPublicationDates([...publicationDates]);
-                    }}
-                    checked={x.selected}
-                    className="remove-input-ring rounded text-[#006064]"
-                    type="checkbox"
-                  />
-                  <label htmlFor="">{x.value}</label>
-                </div>
-              ) : index === 8 ? (
-                <span className="mt-[1px] cursor-pointer text-[#006064]">
-                  View all
-                </span>
-              ) : (
-                <></>
-              )
-            )}
+            <Checkboxes
+              setItems={setPublicationDates}
+              items={publicationDates}
+              limitToPresentViewAll={7}
+            />
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="archived">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.full]:w-full [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="full flex">Archived</span>
-            <span className="hide mx-2 flex w-full justify-end">
+            <span className="hide mx-2 flex w-full justify-end text-sm">
               Without archived
             </span>
           </AccordionTrigger>
@@ -442,6 +326,69 @@ export default () => {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+    </>
+  );
+};
+
+const Checkboxes = ({
+  setItems,
+  spaceCount,
+  items,
+  limitToPresentViewAll,
+}: {
+  setItems: Dispatch<
+    SetStateAction<
+      {
+        value: string;
+        amountOfDatasets: number;
+        selected: boolean;
+        label: string;
+      }[]
+    >
+  >;
+  items: {
+    value: string;
+    amountOfDatasets: number;
+    selected: boolean;
+    label: string;
+  }[];
+  limitToPresentViewAll?: number;
+  spaceCount?: boolean;
+}) => {
+  return (
+    <>
+      {items.map((x, index) =>
+        index <= (limitToPresentViewAll ?? 999999 * 999999) ? (
+          <div className="flex items-center gap-2">
+            <input
+              onChange={() => {
+                x.selected = !x.selected;
+                setItems([...items]);
+              }}
+              checked={x.selected}
+              className="remove-input-ring rounded text-[#006064]"
+              type="checkbox"
+            />
+            <label
+              className={spaceCount ? "flex w-full justify-between" : ""}
+              htmlFor=""
+            >
+              {x.label}{" "}
+              {spaceCount ? (
+                <span>{`(${x.amountOfDatasets})`}</span>
+              ) : (
+                `(${x.amountOfDatasets})`
+              )}
+            </label>
+          </div>
+        ) : index === 8 ? (
+          <span className="mt-[1px] cursor-pointer text-[#006064]">
+            View all
+          </span>
+        ) : (
+          <></>
+        )
+      )}
     </>
   );
 };

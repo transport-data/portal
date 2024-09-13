@@ -1,13 +1,12 @@
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { Button } from "./button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { Button } from "./button";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -20,13 +19,13 @@ export default function QuickFilterDropdown({
   children,
 }: {
   text: string;
-  items: Array<{ text: string; value: string }>;
+  items: Array<{ label: string; value: string }>;
   defaultValue?: string;
   children?: React.ReactNode;
 }) {
-  const [selected, setSelected] = useState<string>(defaultValue || "*");
+  const [selected, setSelected] = useState<string>(defaultValue || "all");
   const selectedText =
-    selected === "*" ? "All" : items.find((i) => i.value === selected)?.text;
+    selected === "all" ? "All" : items.find((i) => i.value === selected)?.label;
 
   useEffect(() => {
     if (defaultValue) setSelected(defaultValue);
@@ -56,37 +55,41 @@ export default function QuickFilterDropdown({
             className="flex flex-col gap-[12px]"
             onValueChange={(v) => setSelected(v)}
           >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                value="*"
-                id="option-one"
-                className="border-gray-300 text-accent data-[state=checked]:border-accent"
-                onSelect={(e) => {
-                  console.log(e);
-                }}
-              />
-              <Label
-                htmlFor="option-one"
-                className="text-sm font-medium leading-none text-gray-500"
-              >
-                All
-              </Label>
-            </div>
+            {(items[0] || {}).value !== "all" ? (
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem
+                  value="all"
+                  id="option-one"
+                  className="border-gray-300 text-accent data-[state=checked]:border-accent"
+                  onSelect={(e) => {
+                    console.log(e);
+                  }}
+                />
+                <Label
+                  htmlFor="option-one"
+                  className="text-sm font-medium leading-none text-gray-500"
+                >
+                  All
+                </Label>
+              </div>
+            ) : (
+              <></>
+            )}
             {items.map((item, i) => (
               <div
                 className="flex items-center space-x-2"
-                key={`${item.text}-${i}`}
+                key={`${item.label}-${i}`}
               >
                 <RadioGroupItem
                   className="border-gray-300 text-accent data-[state=checked]:border-accent"
                   value={item.value}
-                  id={`${item.text}-${i}`}
+                  id={`${item.label}-${i}`}
                 />
                 <Label
-                  htmlFor={`${item.text}-${i}`}
+                  htmlFor={`${item.label}-${i}`}
                   className="text-sm font-medium leading-none text-gray-500"
                 >
-                  {item.text}
+                  {item.label}
                 </Label>
               </div>
             ))}
