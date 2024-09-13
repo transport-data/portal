@@ -23,6 +23,7 @@ export const listGroups = async ({ apiKey }: { apiKey: string }) => {
   let action = "group_list?";
   action += "&all_fields=True";
   action += "&include_extras=True";
+  action += "&type=topic";
   const groups = await CkanRequest.get<CkanResponse<Group[]>>(action, {
     apiKey,
   });
