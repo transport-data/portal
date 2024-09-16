@@ -107,9 +107,10 @@ export default function Faq({
           <div className="shrink grow basis-0 pb-4 text-2xl font-bold leading-9 text-primary">
             About Transport Data Commons
           </div>
-          <div className="prose text-justify prose-p:mt-2 prose-li:text-gray-500 prose-p:text-base prose-li:text-base prose-p:text-gray-500 prose-a:no-underline prose-a:text-accent prose-ul:mt-2 prose-li:m-0">
+          <div className="prose prose-p:mt-2 prose-p:text-base prose-p:text-gray-500 prose-a:text-accent prose-a:no-underline prose-ul:mt-2 prose-li:m-0 prose-li:text-base prose-li:text-gray-500">
             <Markdown remarkPlugins={[remarkFrontmatter]}>
-              {// @ts-ignore
+              {
+                // @ts-ignore
                 faqFiles["intro"][0]["source"]
               }
             </Markdown>
@@ -132,7 +133,7 @@ export default function Faq({
                         {_faq.title}
                       </AccordionTrigger>
                       <AccordionContent className="py-4">
-          <div className="prose text-justify marker:text-accent prose-p:mt-2 prose-p:text-gray-500 prose-a:text-accent prose-ul:mt-2 prose-li:m-0">
+                        <div className="prose text-justify marker:text-accent prose-p:mt-2 prose-p:text-gray-500 prose-a:text-accent prose-ul:mt-2 prose-li:m-0">
                           <Markdown remarkPlugins={[remarkFrontmatter]}>
                             {_faq.source}
                           </Markdown>
@@ -146,13 +147,14 @@ export default function Faq({
           })}
         </div>
       </div>
-      <div className="flex justify-center">
-        <h2 className="text-4xl font-extrabold leading-10 text-primary">
-          Still need help?
-        </h2>
-      </div>
-      <div className="container grid grid-cols-1 gap-x-4 py-6 lg:grid-cols-4 xl:gap-x-16">
-        <div className="flex flex-col gap-y-4 py-4">
+      <div className="container grid grid-cols-1 py-6 lg:grid-cols-7 xl:gap-x-12">
+        <div className="lg:col-span-2"></div>
+          <div className="flex lg:col-span-5 pb-12">
+            <h2 className="text-4xl font-extrabold leading-10 text-primary">
+              Still need help?
+            </h2>
+          </div>
+        <div className="flex flex-col gap-y-4 py-4 lg:col-span-2">
           <div className="text-lg font-semibold leading-relaxed text-primary">
             Points of contact
           </div>
@@ -222,7 +224,7 @@ export default function Faq({
             </dd>
           </div>
         </div>
-        <div className="col-span-3 flex w-full max-w-3xl flex-col gap-y-4 py-4 xl:px-16 xl:pb-16">
+        <div className="flex w-full max-w-3xl flex-col gap-y-4 py-4 lg:col-span-5 xl:pb-16">
           <ContactForm />
         </div>
       </div>

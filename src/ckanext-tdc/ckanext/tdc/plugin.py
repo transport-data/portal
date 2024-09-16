@@ -50,4 +50,10 @@ class TdcPlugin(plugins.SingletonPlugin):
                 new_value = json.loads(value)
                 if isinstance(new_value, list):
                     data_dict[field] = new_value
+
+        metadata_created = data_dict.get("metadata_created", None)
+        if metadata_created:
+            year = metadata_created[0:4]
+            data_dict["metadata_created_year"] = year
+
         return data_dict

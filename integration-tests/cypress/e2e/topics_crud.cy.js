@@ -30,6 +30,13 @@ describe("Create and edit topics", () => {
       cy.get("button[type=submit]").click();
       cy.visit(`/dashboard/topics/${topic}/edit`).then(() => {
         cy.get("input[name=title]").should("have.value", topic + " edited");
+        cy.contains('Delete Topic').click()
+        cy.wait(2000)
+        cy.get('#confirmDelete').click()
+        //check if value is no longer preset
+        cy.visit('/dashboard/topics').then(() => {
+          cy.get("table").should("not.contain", topic + " edited");
+        })
       });
     });
   });

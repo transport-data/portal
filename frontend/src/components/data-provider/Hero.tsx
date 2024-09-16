@@ -2,7 +2,7 @@ import { Button } from "@components/ui/button";
 
 export default function Hero() {
   return (
-    <section className="bg-gradient-to-b from-[#E3F9ED] to-white to-40% pb-6 md:pb-[96px] pt-[64px]">
+    <section className="pb-6 md:pb-[96px] pt-[64px]">
       <div className="container">
         <div className="flex items-center gap-x-16 xl:items-start">
           <div className="flex w-full flex-col items-center">

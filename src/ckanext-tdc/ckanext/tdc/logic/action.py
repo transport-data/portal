@@ -7,6 +7,7 @@ from sqlalchemy import func
 from ckan.common import _, config
 from ckan.plugins import toolkit as tk
 import json
+from ckanext.scheming import helpers as scheming_helpers
 
 import logging
 log = logging.getLogger(__name__)
@@ -213,12 +214,38 @@ def _add_display_name_to_custom_group_facets(search_response):
                             item["display_name"] = group_display_name or group_title or item_name
 
 
+def _add_display_name_to_multi_select_facets(search_response):
+    dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
+    search_facets = search_response.get("search_facets", [])
+
+    if len(search_facets) > 0:
+        dataset_fields = dataset_schema["dataset_fields"]
+
+        for facet_name in search_facets:
+            facet_field = list(filter(lambda x: x.get("field_name") == facet_name, dataset_fields))
+            if len(facet_field) > 0:
+                facet_field = facet_field[0]
+                preset = facet_field.get("preset")
+                if preset == "multiple_select":
+                    choices = facet_field.get("choices")
+                    search_facet = search_facets[facet_name]
+                    items = search_facet["items"]
+                    for item in items:
+                        value = item["name"]
+                        value_choice = list(filter(lambda x: x.get("value") == value, choices))
+                        if len(value_choice) > 0:
+                            value_choice = value_choice[0]
+                            value_label = value_choice["label"]
+                            item["display_name"] = value_label
+
+
 @tk.chained_action
 @tk.side_effect_free
 def package_search(up_func, context, data_dict):
     _control_archived_datasets_visibility(data_dict)
     result = up_func(context, data_dict)
     _add_display_name_to_custom_group_facets(result)
+    _add_display_name_to_multi_select_facets(result)
     return result
 
 
