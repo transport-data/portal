@@ -35,7 +35,7 @@ describe("Create and edit topics", () => {
         cy.get('#confirmDelete').click()
         //check if value is no longer preset
         cy.visit('/dashboard/topics').then(() => {
-          cy.get("table").should("not.contain", topic + " edited");
+          cy.get("section").should("not.contain", topic + " edited");
         })
       });
     });

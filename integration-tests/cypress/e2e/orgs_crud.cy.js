@@ -31,7 +31,7 @@ describe("Create and edit orgs", () => {
         cy.get('#confirmDelete').click()
         //check if value is no longer preset
         cy.visit('/dashboard/organizations').then(() => {
-          cy.get("table").should("not.contain", org + " edited");
+          cy.get("section").should("not.contain", org + " edited");
         })
       });
     });
