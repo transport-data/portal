@@ -2,6 +2,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
 import ckanext.tdc.logic.action as action
+import ckanext.tdc.cli as cli
 
 import json
 import logging
@@ -12,6 +13,7 @@ class TdcPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IClick, inherit=True)
 
     # IConfigurer
 
@@ -50,3 +52,8 @@ class TdcPlugin(plugins.SingletonPlugin):
                 if isinstance(new_value, list):
                     data_dict[field] = new_value
         return data_dict
+
+    # IClick
+    def get_commands(self):
+        return cli.get_commands()
+
