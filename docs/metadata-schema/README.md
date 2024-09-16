@@ -43,7 +43,7 @@ This taxonomy is mostly what comes built-in into CKAN, except for the following 
 
 ### Dataset
 
-**JSON schema:** (dataset.yaml)[https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml]
+**JSON schema:** [dataset.yaml](https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml)
 
 Example of a request body to create a dataset:
 
@@ -447,7 +447,7 @@ This field is used to support TDC Formatted datasets. The value should be a list
 
 ### Resource
 
-**JSON schema:** (dataset.yaml)[https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml]
+**JSON schema:** [dataset.yaml](https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml)
 
 Example of a request body to create a resource:
 
@@ -527,7 +527,7 @@ Description
 
 ### Organization
 
-**JSON schema:** (organization.yaml)[https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml]
+**JSON schema:** [organization.yaml](https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml)
 
 Example of a request body to create a organization:
 
@@ -623,7 +623,7 @@ URL pointing to the website of the organization.
 
 ### Topic
 
-**JSON schema:** (topic.yaml)[https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml]
+**JSON schema:** [topic.yaml](https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml)
 
 Example of a request body to create a topic:
 
@@ -703,7 +703,7 @@ URL pointing to the image file for the topic.
 
 ### Geography
 
-**JSON schema:** (geography.yaml)[https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml]
+**JSON schema:** [geography.yaml](https://github.com/transport-data/tdc-data-portal/tree/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml)
 
 Example of a request body to create a geography:
 
