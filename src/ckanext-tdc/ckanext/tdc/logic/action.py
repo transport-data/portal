@@ -202,3 +202,20 @@ def package_search(up_func, context, data_dict):
     result = up_func(context, data_dict)
     _add_display_name_to_custom_group_facets(result)
     return result
+
+
+@tk.chained_action
+@tk.side_effect_free
+def group_list(up_func, context, data_dict):
+    group_type = data_dict.get("type")
+
+    result = up_func(context, data_dict)
+
+    if group_type == "geography":
+        include_shapes = tk.asbool(data_dict.get("include_shapes", "False"))
+        if not include_shapes:
+            for item in result:
+                if "geography_shape" in item:
+                    del item["geography_shape"]
+
+    return result

@@ -77,13 +77,15 @@ def create_country(data_dict, region_m49):
     log.info("creating country {}".format(iso3))
     title = properties["nam_en"]
     region_name = TDC_REGIONS[region_m49]["name"]
+    geography_shape = data_dict["geometry"]
 
     data_dict = {
             "name": iso3.lower(),
             "title": title,
             "geography_type": "country",
             "m49_code": m49_code,
-            "groups": [{"name": region_name}]
+            "groups": [{"name": region_name}],
+            "geography_shape": geography_shape
             }
     create_geography(data_dict)
     return title

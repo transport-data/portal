@@ -29,7 +29,8 @@ class TdcPlugin(plugins.SingletonPlugin):
                 "package_create": action.package_create,
                 "package_update": action.package_update,
                 "package_patch": action.package_patch,
-                "package_search": action.package_search
+                "package_search": action.package_search,
+                "group_list": action.group_list
                 }
 
     # IPackageController
@@ -56,4 +57,3 @@ class TdcPlugin(plugins.SingletonPlugin):
     # IClick
     def get_commands(self):
         return cli.get_commands()
-
