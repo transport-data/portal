@@ -1,9 +1,8 @@
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import { Button } from "@components/ui/button";
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
-import { env } from "@env.mjs";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { CKAN, PackageSearchOptions } from "@portaljs/ckan";
+import { PackageSearchOptions } from "@portaljs/ckan";
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -31,8 +30,6 @@ type Option = {
 };
 
 export async function getServerSideProps() {
-  const backend_url = env.NEXT_PUBLIC_CKAN_URL;
-  const ckan = new CKAN(backend_url);
   let modes: Option[] = [];
   let services: Option[] = [];
 
@@ -54,13 +51,13 @@ export async function getServerSideProps() {
   let topics: Facet[] = [];
   let groups: Facet[] = [];
   let regions: Facet[] = [];
-  let metadataCreated: Facet[] = [];
+  let metadataCreatedYear: Facet[] = [];
   let yearsCoverage: Facet[] = [];
 
   const datasetSearchResult = (
     await CkanRequest.get<any>(
       `package_search?rows=9&start=0&facet.field=
-      ["tags", "groups", "regions", "topics", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end"]`
+      ["tags", "groups", "regions", "topics", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end", "metadata_created_year"]`
     )
   ).result;
 
@@ -92,8 +89,8 @@ export async function getServerSideProps() {
         resourcesFormats = facets[key].items;
         break;
       }
-      case "metadata_created": {
-        metadataCreated = facets[key].items;
+      case "metadata_created_year": {
+        metadataCreatedYear = facets[key].items;
         break;
       }
       case "temporal_coverage_end":
@@ -124,7 +121,7 @@ export async function getServerSideProps() {
       topics,
       groups,
       regions,
-      metadataCreated,
+      metadataCreated: metadataCreatedYear,
       yearsCoverage,
       modes,
       services,
@@ -154,6 +151,16 @@ export default function DatasetSearch({
     groups: [],
     orgs: [],
     query: q as string,
+  });
+
+  const [searchFilter, setSearchFilter] = useState({
+    tags: [],
+    startYear: undefined,
+    endYear: undefined,
+    orgs: [],
+    publicationDate: [],
+    showArchived: false,
+    locations: [],
   });
 
   return (
