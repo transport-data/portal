@@ -29,6 +29,29 @@ jobs:
         run: bash ./scripts/cypress_setup.sh
       - name: Print Logs
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
+        continue-on-error: true
+      - name: Wait for ckan-tdc-dev to be healthy
+        run: |
+          echo "Waiting for ckan-tdc-dev to become healthy"
+          for i in {1..60}; do
+            health_status=$(docker inspect --format='{{.State.Health.Status}}' ckan-tdc-dev)
+            if [ "$health_status" == "healthy" ]; then
+              echo "ckan-tdc-dev is healthy"
+              break
+            elif [ "$health_status" == "unhealthy" ]; then
+              echo "ckan-tdc-dev is unhealthy, printing logs"
+              docker compose -f docker-compose.dev.yml logs ckan-tdc-dev
+              exit 1
+            else
+              echo "Current health status: $health_status"
+            fi
+            sleep 5
+          done
+          if [ "$health_status" != "healthy" ]; then
+            echo "ckan-tdc-dev did not become healthy in time"
+            docker compose -f docker-compose.dev.yml logs ckan-tdc-dev
+            exit 1
+          fi
       - name: Wait for ckan-tdc-db to be healthy
         run: |
           while ! docker exec ckan-tdc-db pg_isready -U ckandbuser -d ckandb; do

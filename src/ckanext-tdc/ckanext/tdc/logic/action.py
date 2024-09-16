@@ -1,4 +1,12 @@
+import os
+import logging
+import requests
+import random
+import string
+from sqlalchemy import func
+from ckan.common import _, config
 from ckan.plugins import toolkit as tk
+import json
 from ckanext.scheming import helpers as scheming_helpers
 
 import logging
@@ -17,14 +25,16 @@ def _fix_topics_field(data_dict):
 
         group_list_action = tk.get_action("group_list")
         group_list_data_dict = {
-                "type": "topic",
-                "groups": topics_names,
-                "include_extras": True,
-                "all_fields": True
-                }
-        group_list = group_list_action(priviliged_context, group_list_data_dict)
+            "type": "topic",
+            "groups": topics_names,
+            "include_extras": True,
+            "all_fields": True
+        }
+        group_list = group_list_action(
+            priviliged_context, group_list_data_dict)
 
-        topic_groups = [{"name": x.get("name"), "type": "topic"} for x in group_list]
+        topic_groups = [{"name": x.get("name"), "type": "topic"}
+                        for x in group_list]
         groups = data_dict.get("groups", [])
         groups += topic_groups
         data_dict["groups"] = groups
@@ -39,7 +49,8 @@ def _fix_geographies_field(data_dict):
     geography_names = data_dict.get("geographies", [])
     region_names = data_dict.get("regions", [])
 
-    has_geographies = isinstance(geography_names, list) and len(geography_names) > 0
+    has_geographies = isinstance(
+        geography_names, list) and len(geography_names) > 0
     has_regions = isinstance(region_names, list) and len(region_names) > 0
 
     if has_geographies or has_regions:
@@ -50,13 +61,14 @@ def _fix_geographies_field(data_dict):
 
         group_list_action = tk.get_action("group_list")
         group_list_data_dict = {
-                "type": "geography",
-                "groups": geography_names + region_names,
-                "include_extras": True,
-                "all_fields": True,
-                "include_groups": True
-                }
-        group_list = group_list_action(priviliged_context, group_list_data_dict)
+            "type": "geography",
+            "groups": geography_names + region_names,
+            "include_extras": True,
+            "all_fields": True,
+            "include_groups": True
+        }
+        group_list = group_list_action(
+            priviliged_context, group_list_data_dict)
 
         for group in group_list:
             geography_type = group.get("geography_type")
@@ -73,7 +85,8 @@ def _fix_geographies_field(data_dict):
         countries = list(set(countries))
         regions = list(set(regions))
 
-        geography_groups = [{"name": x, "type": "geography"} for x in countries + regions]
+        geography_groups = [{"name": x, "type": "geography"}
+                            for x in countries + regions]
         groups = data_dict.get("groups", [])
         groups += geography_groups
 
@@ -96,14 +109,15 @@ def _update_contributors(data_dict, is_update=False):
         name_or_id = dataset_id or dataset_name
 
         priviliged_context = {
-                "ignore_auth": True
-                }
+            "ignore_auth": True
+        }
 
         package_show_action = tk.get_action("package_show")
         package_show_data_dict = {
-                "id": name_or_id
-                }
-        old_data_dict = package_show_action(priviliged_context, package_show_data_dict)
+            "id": name_or_id
+        }
+        old_data_dict = package_show_action(
+            priviliged_context, package_show_data_dict)
         old_contributors = old_data_dict.get("contributors")
         new_contributors = list(set(old_contributors + [current_user_id]))
 
@@ -165,8 +179,10 @@ def _add_display_name_to_custom_group_facets(search_response):
 
     if "search_facets" in search_response:
         search_facets = search_response["search_facets"]
-        custom_group_types_in_facets = list(filter(lambda x: x in custom_group_types, search_facets))
-        custom_group_facets = [search_facets[x] for x in custom_group_types_in_facets]
+        custom_group_types_in_facets = list(
+            filter(lambda x: x in custom_group_types, search_facets))
+        custom_group_facets = [search_facets[x]
+                               for x in custom_group_types_in_facets]
 
         if len(custom_group_facets) > 0:
             all_facet_items = [x.get("items", []) for x in custom_group_facets]
@@ -179,16 +195,18 @@ def _add_display_name_to_custom_group_facets(search_response):
                 priviliged_context = {"ignore_auth": True}
                 group_list_action = tk.get_action("group_list")
                 group_list_data_dict = {
-                        "groups": all_facet_item_names,
-                        "all_fields": True,
-                        "type": "geography"
-                        }
-                group_list = group_list_action(priviliged_context, group_list_data_dict)
+                    "groups": all_facet_item_names,
+                    "all_fields": True,
+                    "type": "geography"
+                }
+                group_list = group_list_action(
+                    priviliged_context, group_list_data_dict)
 
                 for facet in custom_group_facets:
                     for item in facet["items"]:
                         item_name = item.get("name")
-                        group = list(filter(lambda x: x.get("name") == item_name, group_list))
+                        group = list(filter(lambda x: x.get(
+                            "name") == item_name, group_list))
                         if len(group) > 0:
                             group = group[0]
                             group_display_name = group.get("display_name")
@@ -229,3 +247,125 @@ def package_search(up_func, context, data_dict):
     _add_display_name_to_custom_group_facets(result)
     _add_display_name_to_multi_select_facets(result)
     return result
+
+
+generic_error_message = {
+    'errors': {'auth': [_('Unable to authenticate user')]},
+    'error_summary': {_('auth'): _('Unable to authenticate user')},
+}
+
+
+def validate_github_token(access_token):
+    try:
+        # GitHub OAuth API to check if the token is valid
+        url = "https://api.github.com/user"
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return generic_error_message
+
+    except Exception as e:
+        log.error(e)
+        return generic_error_message
+
+
+def user_login(context, data_dict):
+    try:
+
+        frontend_secret = os.getenv("CKANEXT__TDC__CLIENT_AUTH_SECRET")
+        client_secret = data_dict['client_secret']
+
+        if frontend_secret != client_secret:
+            return {
+                'errors': {'auth': [_('Unable to authenticate user')]},
+                'error_summary': {_('auth'): _('Client not authorized to authenticate')},
+            }
+
+        session = context['session']
+
+        from_github = data_dict.get('from_github', False)
+
+        if from_github:
+            token = data_dict['token']
+            email = data_dict['email']
+            model = context['model']
+            context['ignore_auth'] = True
+
+            validated_token = validate_github_token(token)
+
+            user_id = validated_token.get("id")
+
+            if not user_id or not validated_token:
+                return generic_error_message
+
+            user = session.query(model.User).filter(func.lower(
+                model.User.email) == func.lower(email)).first()
+
+            if not user:
+                password_length = 10
+                password = ''.join(
+                    random.choice(string.ascii_letters + string.digits)
+                    for _ in range(password_length)
+                )
+
+                user_name = ''.join(
+                    c.lower() if c.isalnum() else '_' for c in email.split('@')[0]
+                )
+
+                user = tk.get_action('user_create')(
+                    context,
+                    {
+                        'name': user_name,
+                        'display_name': data_dict['name'],
+                        'fullname': data_dict['name'],
+                        'email': email,
+                        'password': password,
+                        'state': 'active',
+                    },
+                )
+                log.info(user)
+
+            else:
+                user = user.as_dict()
+
+            if config.get('ckanext.auth.include_frontend_login_token', False):
+                user = generate_token(context, user)
+
+            return json.dumps(user)
+        else:
+            return generic_error_message
+    except Exception as e:
+        log.error(e)
+        return json.dumps({"error": True})
+
+
+def generate_token(context, user):
+    context['ignore_auth'] = True
+    user['frontend_token'] = None
+
+    try:
+        api_tokens = tk.get_action('api_token_list')(
+            context, {'user_id': user['name']}
+        )
+
+        for token in api_tokens:
+            if token['name'] == 'frontend_token':
+                tk.get_action('api_token_revoke')(
+                    context, {'jti': token['id']})
+
+        frontend_token = tk.get_action('api_token_create')(
+            context, {'user': user['name'], 'name': 'frontend_token'}
+        )
+
+        user['frontend_token'] = frontend_token.get('token')
+
+    except Exception as e:
+        log.error(e)
+
+    return user

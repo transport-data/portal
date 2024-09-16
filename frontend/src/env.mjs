@@ -27,6 +27,12 @@ export const env = createEnv({
     MATOMO_AUTH_KEY: z.string(),
     MATOMO_URL: z.string(),
     MATOMO_SITE_ID: z.string(),
+
+    GITHUB_CLIENT_ID:z.string(),
+    GITHUB_CLIENT_SECRET:z.string(),
+
+    FRONTEND_AUTH_SECRET: z.string()
+
   },
 
   /**
@@ -59,6 +65,9 @@ export const env = createEnv({
     MATOMO_AUTH_KEY: process.env.MATOMO_AUTH_KEY,
     MATOMO_URL: process.env.MATOMO_URL,
     MATOMO_SITE_ID: process.env.MATOMO_SITE_ID,
+    GITHUB_CLIENT_ID:process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET:process.env.GITHUB_CLIENT_SECRET,
+    FRONTEND_AUTH_SECRET:process.env.FRONTEND_AUTH_SECRET
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

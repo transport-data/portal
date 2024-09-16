@@ -1,6 +1,9 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { Disclosure } from "@headlessui/react";
+import { ArrowRightOnRectangleIcon, BellIcon } from "@heroicons/react/20/solid";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -32,6 +35,8 @@ export default function Header({
 }: {
   backgroundColor?: string;
 }) {
+  const { data: session } = useSession();
+
   return (
     <Disclosure
       as="nav"
@@ -93,14 +98,47 @@ export default function Header({
               ))}
             </div>
           </div>
+
           <div className="hidden sm:ml-6 sm:items-center lg:flex">
-            <Button variant="ghost" className="relative" asChild>
-              <Link href="/auth/signin">Log In</Link>
-            </Button>
-            <Button>
-              <Link href="/auth/signup">Sign up</Link>
-            </Button>
+            {session?.user ? (
+              <div className="flex items-center gap-4">
+                <BellIcon width={24} className="text-gray-500" />
+                <Avatar className="h-[32px] w-[32px]">
+                  <AvatarImage
+                    src={session.user.image || ""}
+                    alt={session.user.name || ""}
+                  />
+                  <AvatarFallback className="bg-gray-300">
+                    {session.user.name
+                      ?.trim()
+                      .split(" ")
+                      .map((word) => word[0])
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  variant="ghost"
+                  className="relative px-0 text-gray-500"
+                  onClick={() => signOut()}
+                >
+                  <ArrowRightOnRectangleIcon width={16} />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" className="relative" asChild>
+                  <Link href="/auth/signin">Log In</Link>
+                </Button>
+                <Button>
+                  <Link href="/auth/signup">Sign up</Link>
+                </Button>
+              </>
+            )}
           </div>
+
           <div className="-mr-2 flex items-center lg:hidden">
             {/* Mobile menu button */}
             <Disclosure.Button className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
