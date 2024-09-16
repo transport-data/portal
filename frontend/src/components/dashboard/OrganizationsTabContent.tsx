@@ -1,59 +1,89 @@
-import { useState, useEffect } from "react";
-import DatasetsFilter from "@components/_shared/DatasetsFilter";
-import DashboardOrganizationCard, {
-  DashboardOrganizationCardProps
-} from "@components/_shared/DashboardOrganizationCard";
+import { useState } from "react";
+import DashboardOrganizationCard from "@components/_shared/DashboardOrganizationCard";
 import { api } from "@utils/api";
 import SimpleSearchInput from "@components/ui/simple-search-input";
+import { Button } from "@components/ui/button";
+import MiniSearch from "minisearch";
+import Link from "next/link";
+import { Plus } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 export default () => {
-  const { data: organizations } = api.organization.listForUser.useQuery();
-  
   const [searchText, setSearchText] = useState("");
-  const [filteredOrgs, setFilteredOrgs] = useState<DashboardOrganizationCardProps[]>([]);
-
-  useEffect(() => {
-    if (organizations) {
-      setFilteredOrgs(
-        organizations.filter((group) =>
-          group.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          group.title.toLowerCase().includes(searchText.toLowerCase()) ||
-          group.display_name.toLowerCase().includes(searchText.toLowerCase())
-        )
-      );
-    }
-  }, [searchText, organizations]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const { data: organizations } = api.organization.listForUser.useQuery();
+  const miniSearch = new MiniSearch({
+    fields: ["description", "display_name", "name"], // fields to index for full-text search
+    storeFields: ["description", "display_name", "image_display_url", "name"], // fields to return with search results
+  });
+  miniSearch.addAll(organizations || []);
+  const paginatedData = organizations?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) || [];
+  const totalPages = Math.ceil((organizations?.length || 0) / itemsPerPage);
+  
   return (
-    <div className="mt-6 flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
-      <div className="order-1 space-y-12">
-      <div className="lg:hidden">
-            <SimpleSearchInput
-                onTextInput={(text) => setSearchText(text)}
-                placeholder="Search"
-            />
-        </div>
-      </div>
-      <div className="order-3 w-fit">
-        <section className="flex flex-col gap-4">
-          {filteredOrgs && filteredOrgs.length > 0 ? (
-              <div>
-                  {filteredOrgs.map((x) => (
-                      <DashboardOrganizationCard {...x} />
-                  ))}
-              </div>
-          ):(
-              <p>No Organizations found</p>
-          )}
-        </section>
-      </div>
-      <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
-        <SimpleSearchInput
+    <div>
+      <div className="grid grid-cols-12 gap-2 xl:max-h-[36px]">
+        <div className="col-span-8">
+          <SimpleSearchInput
             onTextInput={(text) => setSearchText(text)}
             placeholder="Search"
-        />
+          />
+        </div>
+        <div className="col-span-2">
+          <Link href="/dashboard/organizations/create">
+            <Button className="gap-2 px-3 py-2">
+              <Plus size={16}/>
+              New Organization
+            </Button>
+          </Link>
+        </div>
       </div>
+      <div className="mt-2 grid grid-cols-12 gap-2 sm:flex-row sm:gap-8">
+        <div className="col-span-9">
+          <section className="flex flex-col gap-4">
+          {paginatedData && paginatedData.length > 0 ? (
+            paginatedData.map((org) => (
+              <div key={org.id} className={
+                searchText !== "" &&
+                !miniSearch
+                  .search(searchText, { prefix: true })
+                  .find((result) => result.id === org.id)
+                  ? "hidden"
+                  : "block"}>
+                <DashboardOrganizationCard {...org} />
+                </div>
+              ))
+          ):(
+              <p>No Organizations found</p>
+            )}
+          </section>
+        </div>
+      </div>
+      <Pagination className="mt-2">
+        <PaginationContent>
+          <PaginationPrevious
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+          />
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                isActive={index + 1 === currentPage}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationNext
+            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          />
+        </PaginationContent>
+      </Pagination>
     </div>
+    
   );
 };
 
