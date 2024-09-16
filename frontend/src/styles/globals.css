@@ -397,3 +397,7 @@ snap-tabs {
     margin-right: -5px;
   }
 }
+
+div.w-fit[data-testid="flowbite-tooltip-target"] {
+  height: fit-content;
+}
