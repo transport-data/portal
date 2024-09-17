@@ -33,9 +33,14 @@ location: JRC ISPRA, Italy
 ISTDM2023 is open to: researchers and academics; transport infrastructure managers and owners; traffic operation managers, road transport operators; industry, vehicle manufacturers and suppliers; public authorities; NGOs and other stakeholders.
 ```
 
-As you can see we have a title, which is going to be the title of the event, an image, which can either be a full fledged URL or a relative link, altough please note that if you do the relative link you need to store the image in the `/frontend/public` folder,
-besides that we have a from and to items that is going to define the date of the event, and needs to be set in machine readable format, so YYYY-MM-DD, besides that we have the organization and the location, and in the end the markdown content, that can contain any number of items
-such as headings, links, lists etc
+As you can see we have:
+
+- A title, which is going to be the title of the event. 
+- An image, which can either be a full fledged URL or a relative link, altough please note that if you do the relative link you need to store the image in the `/frontend/public` folder
+- A from and to items that are going to define the date of the event, and need to be set in machine readable format, so YYYY-MM-17/09/2024
+- The organization and the location, which are just some extra metadata that is added as badges
+
+And in the end the markdown content, that can contain any number of item such as headings, links, lists etc
 
 So with the following information we can see that the example gave above is going to end up like this in the page
 
