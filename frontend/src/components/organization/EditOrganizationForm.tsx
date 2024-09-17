@@ -19,14 +19,14 @@ import { toast } from "@/components/ui/use-toast";
 import { Form } from "@components/ui/form";
 
 export const EditOrganizationForm: React.FC<{
-  initialValues: Organization;
+  initialValues: Organization & { groups: Array<{name: string }>};
 }> = ({ initialValues }) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [organizationEdited, setOrganizationEdited] = useState("");
   const formObj = useForm<OrganizationFormType>({
     resolver: zodResolver(OrganizationSchema),
-    defaultValues: initialValues,
+    defaultValues: { ...initialValues, parent: initialValues.groups[0]?.name ?? '' },
   });
 
   const utils = api.useContext();

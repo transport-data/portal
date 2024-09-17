@@ -16,14 +16,14 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 
 export const EditGroupForm: React.FC<{
-  initialValues: Group;
+  initialValues: Group & { groups: Array<{ name: string }>};
 }> = ({ initialValues }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const [groupEdited, setGroupEdited] = useState("");
   const formObj = useForm<GroupFormType>({
     resolver: zodResolver(GroupSchema),
-    defaultValues: initialValues,
+    defaultValues: { ...initialValues, parent: initialValues.groups[0]?.name ?? '' },
   });
 
   const utils = api.useContext();
