@@ -4,7 +4,7 @@ If you want to change the content in the Events Page
 
 ![Events](./page.png)
 
-All you need to do is add or edit the files in the `frontend/md/faq` folder
+All you need to do is add or edit the files in the `frontend/md/events` folder
 
 We currently have the following structure
 
