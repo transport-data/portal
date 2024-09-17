@@ -7,10 +7,10 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4d5b3722c2bc64d39b6c2b1d76c9883636/test-requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/shubham-mahajan/ckanext-s3filestore/feature/r2support-ckan-2.11/requirements.txt' && \
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
-    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@524d59e30fe185298628e355de4c041c62276198#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
+    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@099410ee745984a7029d4e192bd6dbbde653c1f1#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
 
 ## Auth
-RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
+# RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
 
 ## DCAT
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=ckanext-dcat && \
@@ -27,7 +27,7 @@ RUN apk --no-cache add patch
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
-ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher auth
+ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher
 USER ckan
 
 COPY licenses.json /ext/licenses.json

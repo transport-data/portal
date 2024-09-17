@@ -5,12 +5,14 @@ import Loading from "@components/_shared/Loading";
 import { Dashboard } from "@components/_shared/Dashboard";
 import { EditGroupForm } from "@components/group/EditGroupForm";
 import { getServerAuthSession } from "@server/auth";
-import type { Group } from "@portaljs/ckan";
+import type { Group } from "@schema/group.schema";
 import { NextSeo } from "next-seo";
 import Layout from "@components/_shared/Layout";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { getGroup } from "@utils/group";
+import { DeleteGroupButton } from "@components/group/DeleteGroupButton";
+import { useRouter } from "next/router";
 
 interface EditGroupPageProps {
   topic: Group;
@@ -20,6 +22,7 @@ const EditGroupPage: NextPage<EditGroupPageProps> = ({
   topic,
 }: EditGroupPageProps) => {
   const { data: sessionData } = useSession();
+  const router = useRouter();
   if (!sessionData) return <Loading />;
 
   return (
@@ -61,10 +64,14 @@ const EditGroupPage: NextPage<EditGroupPageProps> = ({
                 <div className="min-w-0 flex-1">
                   <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                     <div className="mt-6 md:flex md:items-center md:justify-between">
-                      <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 max-w-4xl flex-1 justify-between">
                         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                           Edit Topic
                         </h2>
+                        <DeleteGroupButton
+                          groupId={topic.name}
+                          onSuccess={() => router.push("/dashboard/topics")}
+                        />
                       </div>
                     </div>
                   </h2>

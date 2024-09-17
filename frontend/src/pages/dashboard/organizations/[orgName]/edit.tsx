@@ -6,12 +6,14 @@ import { Dashboard } from "@components/_shared/Dashboard";
 import { EditOrganizationForm } from "@components/organization/EditOrganizationForm";
 import { getServerAuthSession } from "@server/auth";
 import { getOrganization } from "@utils/organization";
-import type { Organization } from "@portaljs/ckan";
+import type { Organization } from "@schema/organization.schema";
 import OrganizationTabs from "@components/organization/OrganizationTabs";
 import { NextSeo } from "next-seo";
 import Layout from "@components/_shared/Layout";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
+import { useRouter } from "next/router";
+import { DeleteOrganizationButton } from "@components/organization/DeleteOrganizationButton";
 
 interface EditOrganizationPageProps {
   organization: Organization;
@@ -20,6 +22,7 @@ interface EditOrganizationPageProps {
 const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
   organization,
 }: EditOrganizationPageProps) => {
+  const router = useRouter();
   const { data: sessionData } = useSession();
   if (!sessionData) return <Loading />;
 
@@ -62,10 +65,16 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
                 <div className="min-w-0 flex-1">
                   <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                     <div className="mt-6 md:flex md:items-center md:justify-between">
-                      <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 max-w-4xl flex-1 justify-between">
                         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                           Edit Organization
                         </h2>
+                        <DeleteOrganizationButton
+                          groupId={organization.id}
+                          onSuccess={() =>
+                            router.push("/dashboard/organizations")
+                          }
+                        />
                       </div>
                     </div>
                   </h2>

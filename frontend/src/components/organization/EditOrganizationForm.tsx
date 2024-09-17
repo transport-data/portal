@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type OrganizationFormType,
   OrganizationSchema,
+  type Organization,
 } from "@schema/organization.schema";
 import { OrganizationForm } from "./OrganizationForm";
 import { Button, LoaderButton } from "@components/ui/button";
@@ -10,7 +11,6 @@ import { useState } from "react";
 import NotificationSuccess from "@components/_shared/Notifications";
 import { api } from "@utils/api";
 import { ErrorAlert } from "@components/_shared/Alerts";
-import type { Organization } from "@portaljs/ckan";
 import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import { useRouter } from "next/router";
@@ -19,14 +19,14 @@ import { toast } from "@/components/ui/use-toast";
 import { Form } from "@components/ui/form";
 
 export const EditOrganizationForm: React.FC<{
-  initialValues: Organization;
+  initialValues: Organization & { groups: Array<{name: string }>};
 }> = ({ initialValues }) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [organizationEdited, setOrganizationEdited] = useState("");
   const formObj = useForm<OrganizationFormType>({
     resolver: zodResolver(OrganizationSchema),
-    defaultValues: initialValues,
+    defaultValues: { ...initialValues, parent: initialValues.groups[0]?.name ?? '' },
   });
 
   const utils = api.useContext();

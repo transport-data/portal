@@ -25,6 +25,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   const [errorMessage] = useState<string | null>(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [loggingIn] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
@@ -39,6 +40,10 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
     { id: 5, name: "Fabrique des Mobilités" },
     { id: 6, name: "FIA Foundation" },
   ];
+
+  useEffect(() => {
+    setIsSmallScreen(window.innerWidth < 1457);
+  }, []);
 
   const [locations, setLocations] = useState([
     { selected: false, name: "Africa" },
@@ -161,7 +166,12 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
             Not a member of an organisation, but still want to contribute your
             data?
           </p>
-          <Button className="flex h-[41px] w-[144px] justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"></Button>
+          <Button
+            className="flex h-[41px] w-[144px] justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+            onClick={() => router.push("/contact")}
+          >
+            Reach out
+          </Button>
         </>
       );
       setDisableButton(
@@ -209,10 +219,10 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
             defaultValue={csrfToken ? csrfToken : ""}
           />
           <div className="pb-8">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4 md:flex-col md:items-start lg:flex-row lg:items-center">
               {steps.map((step, stepIdx) => (
-                <div className="w-full">
-                  <div className="flex items-center gap-4">
+                <>
+                  <div className="w-fit">
                     <div className="flex items-center gap-2">
                       {stepNumber === stepIdx ? (
                         <svg
@@ -251,24 +261,29 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                         <></>
                       )}
 
-                      <span
+                      <div
+                        style={
+                          isSmallScreen
+                            ? ({} as any)
+                            : { "text-wrap": "nowrap" }
+                        }
                         className={
-                          "text-sm " +
+                          "whitespace-normal break-keep	text-sm " +
                           (stepNumber >= stepIdx
                             ? "pl-6 text-[#006064]"
                             : "text-gray-500")
                         }
                       >
                         {step.name}
-                      </span>
+                      </div>
                     </div>
-                    {stepIdx === steps.length - 1 ? (
-                      <></>
-                    ) : (
-                      <div className="w-[69px] border-t border-gray-300" />
-                    )}
                   </div>
-                </div>
+                  {stepIdx === steps.length - 1 ? (
+                    <></>
+                  ) : (
+                    <div className="min-w-[15%] border-t border-gray-300 md:min-w-full lg:min-w-[15%]" />
+                  )}
+                </>
               ))}
             </div>
           </div>

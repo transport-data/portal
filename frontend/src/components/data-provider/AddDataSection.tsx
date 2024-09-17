@@ -2,7 +2,7 @@ import { Button } from "@components/ui/button";
 
 export default () => {
   return (
-    <div className="container min-w-full md:px-20 flex flex-col gap-16 bg-white py-6 text-gray-500 md:flex-row md:py-[96px]">
+    <div className="flex flex-col gap-16 py-6 text-gray-500 md:flex-row md:py-[96px]">
       <div className="flex flex-col justify-center md:w-[380px] md:min-w-[380px]">
         <h1 className="text-4xl font-extrabold text-gray-900">
           Designed with your data in mind

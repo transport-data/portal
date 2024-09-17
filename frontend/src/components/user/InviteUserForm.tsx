@@ -1,7 +1,6 @@
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
-import { DefaultTooltip } from "@components/ui/tooltip";
 import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";

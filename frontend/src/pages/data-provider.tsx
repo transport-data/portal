@@ -15,13 +15,15 @@ export default function Home(): JSX.Element {
         <meta name="description" content="Transport Data Commons" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Layout backgroundEffect>
-        <Hero />
-        <HowDatasetWorks />
-        <AddDataSection />
-        <HowToAddData />
-        <FaqsSection />
-        <NewsLetterSignUpSection />
+      <Layout backgroundEffect effectSize="10%">
+        <div className="container [&>*]:bg-transparent">
+          <Hero />
+          <HowDatasetWorks />
+          <AddDataSection />
+          <HowToAddData />
+          <FaqsSection />
+          <NewsLetterSignUpSection />
+        </div>
       </Layout>
     </>
   );

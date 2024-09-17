@@ -3,7 +3,7 @@ import { Button } from "@components/ui/button";
 
 export default () => {
   return (
-    <div className="container space-y-8 bg-white py-6 text-gray-500 md:py-[96px]">
+    <div className="space-y-8 py-6 text-gray-500 md:py-[96px]">
       <div>
         <h1 className="text-center text-4xl font-extrabold text-gray-900">
           How to add data to TDC?

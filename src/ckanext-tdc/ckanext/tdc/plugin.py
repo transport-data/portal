@@ -30,7 +30,8 @@ class TdcPlugin(plugins.SingletonPlugin):
                 "package_update": action.package_update,
                 "package_patch": action.package_patch,
                 "package_search": action.package_search,
-                "group_list": action.group_list
+                "group_list": action.group_list,
+                "user_login" : action.user_login
                 }
 
     # IPackageController
@@ -52,6 +53,12 @@ class TdcPlugin(plugins.SingletonPlugin):
                 new_value = json.loads(value)
                 if isinstance(new_value, list):
                     data_dict[field] = new_value
+
+        metadata_created = data_dict.get("metadata_created", None)
+        if metadata_created:
+            year = metadata_created[0:4]
+            data_dict["metadata_created_year"] = year
+
         return data_dict
 
     # IClick
