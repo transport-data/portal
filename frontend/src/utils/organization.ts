@@ -1,7 +1,7 @@
-import { type Organization, type User } from "@portaljs/ckan";
+import { type User } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { OrganizationFormType } from "@schema/organization.schema";
+import { OrganizationFormType, type Organization } from "@schema/organization.schema";
 
 export const createOrganization = async ({
   apiKey,

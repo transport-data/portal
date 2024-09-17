@@ -45,7 +45,7 @@ export function ImageUploader({
         }).use(AwsS3, {
             id: 'AwsS3',
             getUploadParameters: (file: UppyFile) =>
-                getUploadParameters(file, 'ckan/storage/uploads/group'),
+                getUploadParameters(file, 'storage/uploads/group'),
         })
         return uppy
     }, [])

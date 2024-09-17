@@ -19,8 +19,8 @@ export const organizationRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      console.log('INPUT', input)
-      const organization = await createOrganization({ apiKey, input });
+      const _organization = { ...input, groups: [{name: input.parent}] };
+      const organization = await createOrganization({ apiKey, input: _organization });
       return organization;
     }),
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -62,7 +62,8 @@ export const organizationRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const organization = await patchOrganization({ apiKey, input });
+      const _organization = { ...input, groups: [{name: input.parent}] };
+      const organization = await patchOrganization({ apiKey, input: _organization });
       return organization;
     }),
   delete: protectedProcedure

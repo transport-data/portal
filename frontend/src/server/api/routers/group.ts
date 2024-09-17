@@ -29,7 +29,7 @@ export const groupRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const _group = { ...input, type: "topic" };
+      const _group = { ...input, type: "topic", groups: [{name: input.parent}] };
       const group = await createGroup({ apiKey, input: _group });
       return group;
     }),
@@ -38,7 +38,8 @@ export const groupRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const group = await patchGroup({ apiKey, input });
+      const _group = { ...input, groups: [{name: input.parent}] };
+      const group = await patchGroup({ apiKey, input: _group });
       return group;
     }),
   delete: protectedProcedure

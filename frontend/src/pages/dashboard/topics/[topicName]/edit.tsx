@@ -5,7 +5,7 @@ import Loading from "@components/_shared/Loading";
 import { Dashboard } from "@components/_shared/Dashboard";
 import { EditGroupForm } from "@components/group/EditGroupForm";
 import { getServerAuthSession } from "@server/auth";
-import type { Group } from "@portaljs/ckan";
+import type { Group } from "@schema/group.schema";
 import { NextSeo } from "next-seo";
 import Layout from "@components/_shared/Layout";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";

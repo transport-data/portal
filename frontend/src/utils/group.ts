@@ -1,7 +1,6 @@
-import { type Group } from "@portaljs/ckan";
-import { type CkanResponse } from "@schema/ckan.schema";
+import { type CkanResponse, } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { GroupFormType } from "@schema/group.schema";
+import { GroupFormType, type Group } from "@schema/group.schema";
 
 export const getGroup = async ({
   apiKey,
