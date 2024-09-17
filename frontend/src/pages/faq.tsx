@@ -117,7 +117,8 @@ export default function Faq({
           </div>
           {R.entries(categories).map((category, index) => {
             const [_category, categoryMetadata] = category;
-            const _faqs = faqFiles[_category as keyof typeof categories] || [];
+            let _faqs = faqFiles[_category as keyof typeof categories] || [];
+            _faqs = R.sortBy(_faqs, R.prop('filePath'));
             return (
               <div className="py-4">
                 <div
@@ -243,6 +244,7 @@ export const getStaticProps = async () => {
     faqFiles.map((file) => {
       let source = fs.readFileSync(file.file_path, { encoding: "utf-8" });
       return {
+        filePath: file.file_path,
         title: file.metadata?.title || "No title",
         category: file.metadata?.category || "other",
         source,
