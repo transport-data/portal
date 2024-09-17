@@ -1,6 +1,6 @@
 import { api } from "@utils/api";
 import { useLayoutEffect, useRef, useState } from "react";
-import type { Organization } from "@portaljs/ckan";
+import type { Organization } from "@schema/organization.schema";
 import Modal from "@components/_shared/Modal";
 import { EditOrganizationForm } from "./EditOrganizationForm";
 import Link from "next/link";

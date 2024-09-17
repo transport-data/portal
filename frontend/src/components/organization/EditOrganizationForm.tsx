@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type OrganizationFormType,
   OrganizationSchema,
+  type Organization,
 } from "@schema/organization.schema";
 import { OrganizationForm } from "./OrganizationForm";
 import { Button, LoaderButton } from "@components/ui/button";
@@ -10,7 +11,6 @@ import { useState } from "react";
 import NotificationSuccess from "@components/_shared/Notifications";
 import { api } from "@utils/api";
 import { ErrorAlert } from "@components/_shared/Alerts";
-import type { Organization } from "@portaljs/ckan";
 import { match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import { useRouter } from "next/router";

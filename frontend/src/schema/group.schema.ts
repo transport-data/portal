@@ -1,4 +1,5 @@
 import z from "zod";
+import type { Group as GroupDefault } from "@portaljs/ckan";
 
 // TODO: implement the search schema
 /*export const SearchOrganizationSchema = z.object({
@@ -27,3 +28,4 @@ export const GroupSchema = z.object({
 });
 
 export type GroupFormType = z.infer<typeof GroupSchema>;
+export type Group = GroupDefault & { groups: Array<{ id: string; name: string }> };

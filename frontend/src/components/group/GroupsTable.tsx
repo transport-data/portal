@@ -1,6 +1,6 @@
 import { api } from "@utils/api";
 import { useLayoutEffect, useRef, useState } from "react";
-import type { Group } from "@portaljs/ckan";
+import type { Group } from "@schema/group.schema";
 import Modal from "@components/_shared/Modal";
 import { EditGroupForm } from "./EditGroupForm";
 import Link from "next/link";

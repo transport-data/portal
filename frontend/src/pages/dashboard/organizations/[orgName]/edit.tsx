@@ -6,7 +6,7 @@ import { Dashboard } from "@components/_shared/Dashboard";
 import { EditOrganizationForm } from "@components/organization/EditOrganizationForm";
 import { getServerAuthSession } from "@server/auth";
 import { getOrganization } from "@utils/organization";
-import type { Organization } from "@portaljs/ckan";
+import type { Organization } from "@schema/organization.schema";
 import OrganizationTabs from "@components/organization/OrganizationTabs";
 import { NextSeo } from "next-seo";
 import Layout from "@components/_shared/Layout";
