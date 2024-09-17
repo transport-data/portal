@@ -56,4 +56,7 @@ class TdcPlugin(plugins.SingletonPlugin):
             year = metadata_created[0:4]
             data_dict["metadata_created_year"] = year
 
+            date = metadata_created[0:10]
+            data_dict["metadata_created_date"] = date
+
         return data_dict
