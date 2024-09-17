@@ -226,7 +226,7 @@ def _add_display_name_to_multi_select_facets(search_response):
             if len(facet_field) > 0:
                 facet_field = facet_field[0]
                 preset = facet_field.get("preset")
-                if preset == "multiple_select":
+                if preset in ["multiple_select", "select"]:
                     choices = facet_field.get("choices")
                     search_facet = search_facets[facet_name]
                     items = search_facet["items"]
