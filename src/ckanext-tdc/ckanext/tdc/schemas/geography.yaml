@@ -24,8 +24,13 @@ fields:
     - value: region
       name: Region
 
+- field_name: m49_code
+  label: UN M.49 code
+
 - field_name: geography_shape
   label: Geography Shape
+  preset: json_object
+  validators: scheming_valid_json_object
 
 - field_name: not_used
   label: Parent organization
