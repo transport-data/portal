@@ -112,6 +112,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                 <div className="customized-scroll inline-flex h-14 max-w-[95vw] items-center justify-start overflow-x-auto overflow-y-hidden rounded-md bg-transparent p-1 text-muted-foreground">
                   {tabs.map((tab) => (
                     <Link
+                      key={tab.id}
                       className={cn(
                         "inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-medium text-[#1f2a37] ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ",
                         active === tab.id

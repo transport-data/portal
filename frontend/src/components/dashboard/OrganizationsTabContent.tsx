@@ -1,5 +1,7 @@
-import { useState } from "react";
-import DashboardOrganizationCard from "@components/_shared/DashboardOrganizationCard";
+import { useState, useMemo } from "react";
+import DashboardOrganizationCard, {
+  DashboardOrganizationCardProps
+} from "@components/_shared/DashboardOrganizationCard";
 import { api } from "@utils/api";
 import SimpleSearchInput from "@components/ui/simple-search-input";
 import { Button } from "@components/ui/button";
@@ -13,13 +15,37 @@ export default () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { data: organizations } = api.organization.listForUser.useQuery();
-  const miniSearch = new MiniSearch({
-    fields: ["description", "display_name", "name"], // fields to index for full-text search
-    storeFields: ["description", "display_name", "image_display_url", "name"], // fields to return with search results
-  });
-  miniSearch.addAll(organizations || []);
-  const paginatedData = organizations?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) || [];
-  const totalPages = Math.ceil((organizations?.length || 0) / itemsPerPage);
+
+  const miniSearch = useMemo(() => {
+    const search = new MiniSearch({
+      fields: ["description", "display_name", "name"], // fields to index for full-text search
+      storeFields: ["id", "name"]
+    });
+    search.addAll(organizations || []);
+    return search;
+  }, [organizations]);
+
+  const searchResults = useMemo(() => {
+    if (!searchText) {
+      return organizations || [];
+    }
+    return miniSearch.search(searchText, { prefix: true }).map(result => {
+      const group = organizations?.find(g => g.id === result.id);
+      // Ensure all required fields are present
+      return group || {} as DashboardOrganizationCardProps;
+    });
+  }, [searchText, organizations, miniSearch]);
+
+  const paginatedData = useMemo(() => {
+    if(searchText) {
+      setCurrentPage(1);
+    }
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return searchResults.slice(startIndex, endIndex);
+  }, [searchResults, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(searchResults.length / itemsPerPage);
   
   return (
     <div>
@@ -42,20 +68,16 @@ export default () => {
       <div className="mt-2 grid grid-cols-12 gap-2 sm:flex-row sm:gap-8">
         <div className="col-span-9">
           <section className="flex flex-col gap-4">
-          {paginatedData && paginatedData.length > 0 ? (
-            paginatedData.map((org) => (
-              <div key={org.id} className={
-                searchText !== "" &&
-                !miniSearch
-                  .search(searchText, { prefix: true })
-                  .find((result) => result.id === org.id)
-                  ? "hidden"
-                  : "block"}>
-                <DashboardOrganizationCard {...org} />
+            {paginatedData.length > 0 ? (
+              paginatedData.map((org) => (
+                <div key={org?.id}>
+                  <DashboardOrganizationCard {...org} />
                 </div>
               ))
-          ):(
-              <p>No Organizations found</p>
+            ) : (
+              <div className="flex items-center justify-center h-[80px]">
+                <p className="text-center">No Organizations found</p>
+              </div>
             )}
           </section>
         </div>

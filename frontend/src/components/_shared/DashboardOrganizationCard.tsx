@@ -5,20 +5,15 @@ import { api } from "@utils/api";
 import { User, Calendar, Database } from 'lucide-react';
 
 
+export interface DashboardOrganizationCardProps {
+  id: string,
+  name: string
+}
+
 export default ({
-  title,
-  display_name,
-  image_url,
-  image_display_url,
-  is_organization,
   id,
   name,
-  description,
-  created,
-  approval_status,
-  type,
-  state,
-}: Organization) => {
+}: DashboardOrganizationCardProps) => {
   const {data: organization} = api.organization.get.useQuery({
     name: name,
     includeUsers: true
@@ -31,17 +26,17 @@ export default ({
     >
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-bold">{title}</h2>
+          <h2 className="text-lg font-bold">{organization?.title}</h2>
         </div>
         <div className="min-w-[400px] max-w-[600px] py-4">
-          {description ? (
-            <p className="truncate">{description}</p>
+          {organization?.description ? (
+            <p className="truncate">{organization?.description}</p>
           ):(
             <p>No description provided.</p>
           )}
         </div>
         <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center">
-          {state === "active" && (
+          {organization?.state === "active" && (
             <>
             <span className="flex items-center gap-1">
               <Badge variant={"success"} className="text-[#03543F]">
@@ -51,10 +46,10 @@ export default ({
             <span className="hidden xl:block">•</span>
             </>
           )}
-          {created && (
+          {organization?.created && (
             <span className="flex items-center gap-1">
               <Calendar size={14}/>
-              Created On {new Date(created).toLocaleDateString("en-GB").replace(/\//g, '.')}
+              Created On {new Date(organization?.created).toLocaleDateString("en-GB").replace(/\//g, '.')}
             </span>
           )}
           <span className="hidden xl:block">•</span>

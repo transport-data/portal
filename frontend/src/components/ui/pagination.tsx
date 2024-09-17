@@ -52,6 +52,9 @@ const PaginationLink = ({
     className={cn(
       `flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500
        ${disabled ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700"}`,
+       buttonVariants({
+        variant: isActive ? "outline" : "ghost",
+      }),
       className
     )}
     /*className={cn(
