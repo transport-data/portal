@@ -50,7 +50,7 @@ export default () => {
   return (
     <div>
       <div className="grid grid-cols-12 gap-2 xl:max-h-[36px]">
-        <div className="col-span-8">
+        <div className="col-span-10">
           <SimpleSearchInput
             onTextInput={(text) => setSearchText(text)}
             placeholder="Search"
@@ -58,15 +58,15 @@ export default () => {
         </div>
         <div className="col-span-2">
           <Link href="/dashboard/topics/create">
-            <Button className="gap-2 px-3 py-2">
+            <Button className="gap-2 px-3 py-2 text-sm sm:text-base">
                 <Plus size={16}/>
-              New Topic
+              Add New
             </Button>
           </Link>
         </div>
       </div>
       <div className="mt-2 grid grid-cols-12 gap-2 sm:flex-row sm:gap-8">
-        <div className="col-span-9">
+        <div className="col-span-10">
           <section className="flex flex-col gap-4">
             {paginatedData.length > 0 ? (
               paginatedData.map((group) => (
