@@ -29,6 +29,7 @@ export default NextAuth({
           },
         });
 
+        console.log('USER', user)
         if (user.result.id) {
           return {
             ...user.result,
@@ -57,10 +58,23 @@ export default NextAuth({
     async redirect({ url, baseUrl }) {
       return baseUrl; // Redirect to the homepage after sign-in
     },
-    async session({ session, token, user }) {
-      return session; // Pass session information to the client
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          apikey: token.apikey ? token.apikey : "",
+          id: token.sub,
+          sysadmin: token.sysadmin
+        },
+      };
     },
     async jwt({ token, user, account }) {
+      if (user) {
+          token.apikey = user.apikey
+          // token.teams = user.teams
+          token.sysadmin = user.sysadmin
+      }
       if (account?.provider === "github" && account.access_token) {
         const access_token = account.access_token;
 
