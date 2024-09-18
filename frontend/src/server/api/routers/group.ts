@@ -18,18 +18,33 @@ export const groupRouter = createTRPCRouter({
       const groups = await getGroup({ apiKey, id: input.id });
       return groups;
     }),
-  list: protectedProcedure.query(async ({ ctx, input }) => {
-    const user = ctx.session.user;
-    const apiKey = user.apikey;
-    const groups = await listGroups({ apiKey });
-    return groups;
-  }),
+  list: protectedProcedure
+    .input(
+      z.object({
+        showGeographyShapes: z.boolean().optional(),
+        type: z.enum(["topic", "geography"]).optional().default("topic"),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const groups = await listGroups({
+        apiKey,
+        type: input.type,
+        showCoordinates: input.showGeographyShapes,
+      });
+      return groups;
+    }),
   create: protectedProcedure
     .input(GroupSchema)
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const _group = { ...input, type: "topic", groups: [{name: input.parent}] };
+      const _group = {
+        ...input,
+        type: "topic",
+        groups: [{ name: input.parent }],
+      };
       const group = await createGroup({ apiKey, input: _group });
       return group;
     }),
@@ -38,7 +53,7 @@ export const groupRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const _group = { ...input, groups: [{name: input.parent}] };
+      const _group = { ...input, groups: [{ name: input.parent }] };
       const group = await patchGroup({ apiKey, input: _group });
       return group;
     }),
