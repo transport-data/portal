@@ -68,6 +68,8 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
+          wait-on: 'http://localhost:5000'
+          wait-on-timeout: 600
           command: npm run test
           working-directory: ./integration-tests
       - uses: actions/upload-artifact@v3
