@@ -2,7 +2,7 @@
 
 ## Create Organization
 
-You can create a organization in the `/dashboard/organizations/create` route where you can define
+You can create a organization in the `/dashboard/organizations/create` route where you can define. Only sysadmin user can create an organization.
 
 - Title for the organization
 - URL for the organization, which is going to act as an ID for the organization, and act as URL in the public pages such `/organizations/{organization url}`
@@ -33,3 +33,17 @@ You can edit an organization members in the `/dashboard/organizations/{organizat
 To add a new member, simply click on "Add another member", select the user and their capacity, and then click "Save" (you can also edit any existing members, or remove them by clicking on the small red `-` button on the right)
 
 ![Members management addition](./members-add.png)
+
+## List and Search Organizations
+To view the Organizations list, you can go to `/dashboard/organizations`.
+Sysadmin users can view all organizations.
+Other users can view organizations in which they are `admin' level role.
+
+![List Organization](list.png)
+
+You can search for Organizations based on their name, title and description.
+
+![Search Organizationss](search.png)
+
+Clicking on an organization will redirect you to Edit Organization Page.
+
