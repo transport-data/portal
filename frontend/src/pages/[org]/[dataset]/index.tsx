@@ -117,7 +117,6 @@ export default function DatasetPage({
     },
   ];
   const matomo = api.matomo.getVisitorStats.useQuery();
-  console.log(matomo.data);
   return (
     <>
       <Head>

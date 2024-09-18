@@ -85,10 +85,10 @@ export const authOptions: NextAuthOptions = {
           json: {
             id: credentials.username,
             password: credentials.password,
+            client_secret: env.FRONTEND_AUTH_SECRET
           },
         });
 
-        console.log('USER', user)
         if (user.result.id) {
           return {
             ...user.result,

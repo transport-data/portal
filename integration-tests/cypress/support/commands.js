@@ -99,7 +99,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("login", (email, password) => {
   cy.session([email, password], () => {
-    cy.visit({ url: "/auth/old_signin" }).then((resp) => {
+    cy.visit({ url: "/auth/signin?old_signin=true" }).then((resp) => {
       cy.get("#username").type(email);
       cy.get("#password").type(password);
       //get button of type submit
