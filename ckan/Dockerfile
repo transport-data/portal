@@ -39,7 +39,7 @@ RUN ckan config-tool ${CKAN_INI} "ckan.auth.allow_dataset_collaborators = true"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.allow_admin_collaborators = true"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_dataset_if_not_in_organization = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.public_user_details = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.group_and_organization_list_max = 350"
+RUN ckan config-tool ${CKAN_INI} "ckan.group_and_organization_list_all_fields_max = 350"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
