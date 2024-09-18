@@ -28,6 +28,16 @@ COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
 ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher
+
+COPY patches/ckan/* ${APP_DIR}/patches/ckan/
+
+RUN for d in $APP_DIR/patches/*; do \
+        for f in `ls $d/*.patch | sort -g`; do \
+			cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; cd ${APP_DIR}/src && git apply --ignore-space-change --ignore-whitespace "$f" ; \
+        done ; \
+    done
+
+
 USER ckan
 
 COPY licenses.json /ext/licenses.json
@@ -39,6 +49,7 @@ RUN ckan config-tool ${CKAN_INI} "ckan.auth.allow_dataset_collaborators = true"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.allow_admin_collaborators = true"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_dataset_if_not_in_organization = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.public_user_details = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.group_and_organization_list_all_fields_max = 350"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
