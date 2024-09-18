@@ -7,7 +7,7 @@ export default defineConfig({
   env: {
     FRONTEND_URL: "",
     API_KEY:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5ZTI5MkpfcjFKVnBUcmtWUXNWNld4dTE4d2tvRG9zclFuZ1FNSFZlNXdZIiwiaWF0IjoxNzI2NjcwMjY5fQ.jlz_FDtZMTlBe2lDjKek33YckgZZgAKpPhv6poZ1jmw",
+      "CKAN_API_TOKEN",
     CKAN_USERNAME: "ckan_admin",
     CKAN_PASSWORD: "test1234",
     ORG_NAME_SUFFIX: "-organization-test",
@@ -16,7 +16,7 @@ export default defineConfig({
     REPORT_NAME_SUFFIX: "-report-test",
   },
   e2e: {
-    baseUrl: "http://localhost:3000",
+    baseUrl: "http://127.0.0.1:3000",
     apiUrl: "http://ckan-dev:5000",
   },
 });

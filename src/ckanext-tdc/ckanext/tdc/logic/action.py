@@ -294,7 +294,6 @@ def validate_github_token(access_token):
 
 
 def user_login(context, data_dict):
-    print(data_dict, flush=True)
     try:
 
         frontend_secret = os.getenv("CKANEXT__TDC__CLIENT_AUTH_SECRET")
