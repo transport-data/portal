@@ -8,9 +8,14 @@ import { Button } from "@components/ui/button";
 import MiniSearch from "minisearch";
 import Link from "next/link";
 import { Plus } from 'lucide-react';
+import { useSession } from "next-auth/react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 export default () => {
+  const { data: sessionData } = useSession();
+  console.log(sessionData)
+  const isSysAdmin = sessionData?.user?.sysadmin == true;    
+
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -26,11 +31,13 @@ export default () => {
   }, [organizations]);
 
   const searchResults = useMemo(() => {
+
+    const filtered_orgs = organizations ? organizations.filter((org) => (org.capacity == "admin")) : []
     if (!searchText) {
-      return organizations || [];
+      return filtered_orgs;
     }
     return miniSearch.search(searchText, { prefix: true }).map(result => {
-      const group = organizations?.find(g => g.id === result.id);
+      const group = filtered_orgs?.find(g => g.id === result.id);
       // Ensure all required fields are present
       return group || {} as DashboardOrganizationCardProps;
     });
@@ -56,14 +63,16 @@ export default () => {
             placeholder="Search"
           />
         </div>
-        <div className="col-span-2">
-          <Link href="/dashboard/organizations/create">
-            <Button className="gap-2 px-3 py-2">
-              <Plus size={16}/>
-              New Organization
-            </Button>
-          </Link>
-        </div>
+        {isSysAdmin && 
+          <div className="col-span-2">
+            <Link href="/dashboard/organizations/create">
+              <Button className="gap-2 px-3 py-2">
+                <Plus size={16}/>
+                New Organization
+              </Button>
+            </Link>
+          </div>
+        }
       </div>
       <div className="mt-2 grid grid-cols-12 gap-2 sm:flex-row sm:gap-8">
         <div className="col-span-9">

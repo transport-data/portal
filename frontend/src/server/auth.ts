@@ -25,6 +25,7 @@ declare module "next-auth" {
       email: string;
       username: string;
       apikey: string;
+      sysadmin: boolean;
     };
   }
 
@@ -33,6 +34,7 @@ declare module "next-auth" {
     username: string;
     apikey: string;
     frontend_token: string;
+    sysadmin: boolean;
   }
 }
 
@@ -46,6 +48,7 @@ export const authOptions: NextAuthOptions = {
     jwt({ token, user }) {
       if (user) {
         token.apikey = user.apikey;
+        token.sysadmin = user.sysadmin
       }
       return token;
     },
@@ -56,6 +59,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           apikey: token.apikey ? token.apikey : "",
           id: token.sub,
+          sysadmin: token.sysadmin
         },
       };
     },
@@ -90,6 +94,7 @@ export const authOptions: NextAuthOptions = {
             ...user.result,
             image: "",
             apikey: user.result.frontend_token,
+            sysadmin: user.result.sysadmin
           };
         } else {
           return Promise.reject(
