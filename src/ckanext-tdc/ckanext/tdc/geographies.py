@@ -57,8 +57,18 @@ def create_geography(data_dict):
     create_group_action(priviliged_context, data_dict)
 
 
+def delete_geography(data_dict):
+    site_user = tk.get_action("get_site_user")({"ignore_auth": True}, {})
+    priviliged_context = {"ignore_auth": True, "user": site_user["name"]}
+    delete_group_action = tk.get_action("group_delete")
+    purge_group_action = tk.get_action("group_purge")
+    data_dict["type"] = "geography"
+    data_dict["id"] = data_dict["name"]
+    delete_group_action(priviliged_context, data_dict)
+    purge_group_action(priviliged_context, data_dict)
+
+
 def create_region(m49_code):
-    log.info("creating region {}".format(m49_code))
     tdc_region = TDC_REGIONS[m49_code]
     data_dict = {
             "name": tdc_region["name"],
@@ -66,15 +76,13 @@ def create_region(m49_code):
             "geography_type": "region",
             "m49_code": m49_code
             }
-    create_geography(data_dict)
-    return tdc_region["title"]
+    return data_dict
 
 
 def create_country(data_dict, region_m49):
     properties = data_dict["properties"]
     m49_code = properties["m49_cd"]
     iso3 = properties["iso3cd"]
-    log.info("creating country {}".format(iso3))
     title = properties["nam_en"]
     region_name = TDC_REGIONS[region_m49]["name"]
     geography_shape = data_dict["geometry"]
@@ -87,24 +95,23 @@ def create_country(data_dict, region_m49):
             "groups": [{"name": region_name}],
             "geography_shape": geography_shape
             }
-    create_geography(data_dict)
-    return title
+    return data_dict
 
 
-def create_default_tdc_geographies():
+def get_default_tdc_geographies():
     regions = get_un_regions()
 
     south_america_m49 = 5
     north_america_m49 = 3
 
-    _countries = {}
+    geographies = []
     for region_code in regions:
         # Americas must be split into South and North America
         if region_code == 19:
-            create_region(south_america_m49)
-            create_region(north_america_m49)
+            geographies.append(create_region(south_america_m49))
+            geographies.append(create_region(north_america_m49))
         else:
-            create_region(region_code)
+            geographies.append(create_region(region_code))
 
         countries = regions[region_code]
         for country_code in countries:
@@ -121,9 +128,27 @@ def create_default_tdc_geographies():
                     _country_region_code = north_america_m49
 
             new_country = create_country(country, _country_region_code)
+            geographies.append(new_country)
+    return geographies
 
-            if _country_region_code not in _countries:
-                _countries[_country_region_code] = []
-            _countries[_country_region_code].append(new_country)
 
-    log.info(_countries)
+def create_default_tdc_geographies():
+    geographies = get_default_tdc_geographies()
+    for geography in geographies:
+        create_geography(geography)
+
+
+def delete_default_tdc_geographies():
+    geographies = get_default_tdc_geographies()
+    for geography in geographies:
+        delete_geography(geography)
+
+
+def list_default_tdc_geographies():
+    geographies = get_default_tdc_geographies()
+    for geography in geographies:
+        if "geography_shape" in geography:
+            del geography["geography_shape"]
+
+    log.info(json.dumps(geographies))
+
