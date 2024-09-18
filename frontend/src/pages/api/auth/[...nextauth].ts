@@ -29,7 +29,6 @@ export default NextAuth({
           },
         });
 
-        console.log('USER', user)
         if (user.result.id) {
           return {
             ...user.result,
