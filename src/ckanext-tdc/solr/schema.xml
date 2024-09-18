@@ -187,6 +187,8 @@ attribute with the form `ckan-X.Y` -->
     <field name="services" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="contributors" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="is_archived" type="boolean" indexed="true" stored="true" />
+    <field name="metadata_created_year" type="date" indexed="true" stored="true" multiValued="false" docValues="true"/>
+    <field name="metadata_created_date" type="date" indexed="true" stored="true" multiValued="false" docValues="true"/>
 
     
 </fields>

@@ -226,7 +226,7 @@ def _add_display_name_to_multi_select_facets(search_response):
             if len(facet_field) > 0:
                 facet_field = facet_field[0]
                 preset = facet_field.get("preset")
-                if preset == "multiple_select":
+                if preset in ["multiple_select", "select"]:
                     choices = facet_field.get("choices")
                     search_facet = search_facets[facet_name]
                     items = search_facet["items"]
@@ -248,7 +248,24 @@ def package_search(up_func, context, data_dict):
     _add_display_name_to_multi_select_facets(result)
     return result
 
+  
+@tk.chained_action
+@tk.side_effect_free
+def group_list(up_func, context, data_dict):
+    group_type = data_dict.get("type")
 
+    result = up_func(context, data_dict)
+
+    if group_type == "geography":
+        include_shapes = tk.asbool(data_dict.get("include_shapes", "False"))
+        if not include_shapes:
+            for item in result:
+                if "geography_shape" in item:
+                    del item["geography_shape"]
+
+    return result
+
+  
 generic_error_message = {
     'errors': {'auth': [_('Unable to authenticate user')]},
     'error_summary': {_('auth'): _('Unable to authenticate user')},
