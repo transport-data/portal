@@ -3,33 +3,44 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "./button";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useEffect, useState } from "react";
+import { SearchDatasetsType } from "@schema/dataset.schema";
+import { Dispatch, SetStateAction } from "react";
 
 export default function QuickFilterDropdown({
   text,
-  items,
-  defaultValue,
-  children,
+  items = [],
+  filterFieldName,
+  defaultValue = "*",
+  hideAllOption,
+  setSearchFilter,
+  resetPagination,
 }: {
   text: string;
-  items: Array<{ label: string; value: string }>;
+  hideAllOption?: boolean;
+  filterFieldName: string;
+  resetPagination?: () => void;
+  items: Array<{ display_name: string; name: string }>;
   defaultValue?: string;
-  children?: React.ReactNode;
+  setSearchFilter: Dispatch<SetStateAction<SearchDatasetsType>>;
 }) {
-  const [selected, setSelected] = useState<string>(defaultValue || "all");
-  const selectedText =
-    selected === "all" ? "All" : items.find((i) => i.value === selected)?.label;
+  if (items.findIndex((x) => x.name === "all") > -1) {
+    items.splice(
+      items.findIndex((x) => x.name === "all"),
+      1
+    );
+  }
 
-  useEffect(() => {
-    if (defaultValue) setSelected(defaultValue);
-  }, [defaultValue]);
+  const selectedText =
+    defaultValue === "*"
+      ? "All"
+      : items.find((i) => i.name === defaultValue)?.display_name;
 
   return (
     <DropdownMenu modal={false}>
@@ -51,14 +62,21 @@ export default function QuickFilterDropdown({
         <DropdownMenuSeparator />
         <div className="p-4">
           <RadioGroup
-            defaultValue={selected}
+            defaultValue={defaultValue}
             className="flex flex-col gap-[12px]"
-            onValueChange={(v) => setSelected(v)}
+            onValueChange={(v) => {
+              setSearchFilter((oldValue) => {
+                const newValue: any = { ...oldValue, offset: 0 };
+                newValue[filterFieldName] = v;
+                return newValue;
+              });
+              if (resetPagination) resetPagination();
+            }}
           >
-            {(items[0] || {}).value !== "all" ? (
+            {!hideAllOption && (
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
-                  value="all"
+                  value="*"
                   id="option-one"
                   className="border-gray-300 text-accent data-[state=checked]:border-accent"
                   onSelect={(e) => {
@@ -72,31 +90,27 @@ export default function QuickFilterDropdown({
                   All
                 </Label>
               </div>
-            ) : (
-              <></>
             )}
+
             {items.map((item, i) => (
               <div
                 className="flex items-center space-x-2"
-                key={`${item.label}-${i}`}
+                key={`${item.display_name}-${i}`}
               >
                 <RadioGroupItem
                   className="border-gray-300 text-accent data-[state=checked]:border-accent"
-                  value={item.value}
-                  id={`${item.label}-${i}`}
+                  value={item.name}
+                  id={`${item.display_name}-${i}`}
                 />
                 <Label
-                  htmlFor={`${item.label}-${i}`}
+                  htmlFor={`${item.display_name}-${i}`}
                   className="text-sm font-medium leading-none text-gray-500"
                 >
-                  {item.label}
+                  {item.display_name}
                 </Label>
               </div>
             ))}
           </RadioGroup>
-          {/*items.map((item, i) => (
-            <DropdownMenuItem key={`item-${i}`}>loj</DropdownMenuItem>
-          ))*/}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

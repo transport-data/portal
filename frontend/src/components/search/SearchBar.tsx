@@ -1,26 +1,23 @@
-import { Button } from "@components/ui/button";
-import { SearchIcon } from "lucide-react";
 import {
   Command,
-  CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Button } from "@components/ui/button";
+import { SearchIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
 
+import { Badge } from "@components/ui/badge";
 import datasets from "@data/datasets.json";
+import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { SearchbarFormType } from "@schema/searchbar.schema";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
-import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { SearchbarFormType, SearchbarSchema } from "@schema/searchbar.schema";
-import { useForm } from "react-hook-form";
-import { Badge } from "@components/ui/badge";
-import { useRouter } from "next/router";
 
 const facets: any = {
   in: {
@@ -60,14 +57,64 @@ const facets: any = {
   },
 };
 
-export default function SearchBar() {
+export default function SearchBar({
+  sector,
+  service,
+  fuel,
+  before,
+  after,
+  region,
+  mode,
+  hideDatasetSuggestion,
+}: {
+  sector?: string;
+  fuel?: string;
+  hideDatasetSuggestion?: boolean;
+  before?: string;
+  after?: string;
+  service?: string;
+  region?: string;
+  mode?: string;
+}) {
   const commandRef = useRef<HTMLDivElement>(null);
   const [showCommandList, setShowCommandList] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showAllFacets, setShowAllFacets] = useState<boolean>(false);
   const router = useRouter();
 
-  const form = useForm<SearchbarFormType>();
+  let defaultFacetName;
+  let defaultFacetValue;
+
+  if (sector) {
+    defaultFacetName = "sector";
+    defaultFacetValue = sector;
+  } else if (mode) {
+    defaultFacetName = "mode";
+    defaultFacetValue = mode;
+  } else if (region) {
+    defaultFacetName = "region";
+    defaultFacetValue = region;
+  } else if (after) {
+    defaultFacetName = "after";
+    defaultFacetValue = after;
+  } else if (before) {
+    defaultFacetName = "before";
+    defaultFacetValue = before;
+  } else if (fuel) {
+    defaultFacetName = "fuel";
+    defaultFacetValue = fuel;
+  } else if (service) {
+    defaultFacetName = "service";
+    defaultFacetValue = service;
+  }
+
+  const form = useForm<SearchbarFormType>({
+    defaultValues: {
+      facetName: defaultFacetName,
+      facetValue: defaultFacetValue,
+    },
+  });
+
   const {
     handleSubmit,
     setValue,
@@ -80,13 +127,12 @@ export default function SearchBar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isInput = event.target instanceof HTMLInputElement;
       if (
         commandRef.current &&
         !commandRef.current.contains(event.target as Node)
       ) {
         reset();
-        setShowCommandList(false);
+        if (!hideDatasetSuggestion) setShowCommandList(false);
       }
     };
 
@@ -147,7 +193,9 @@ export default function SearchBar() {
           )}
           <CommandInput
             className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
-            onFocus={() => setShowCommandList(true)}
+            onFocus={() => {
+              if (!hideDatasetSuggestion) setShowCommandList(true);
+            }}
             placeholder="Find statistics, forecasts & studies"
             onInput={(e) => handleTyping((e.target as HTMLInputElement).value)}
             value={query}

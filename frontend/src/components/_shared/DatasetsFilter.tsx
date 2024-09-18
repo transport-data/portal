@@ -7,8 +7,9 @@ import {
 import { Label } from "@components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import SimpleSearchInput from "@components/ui/simple-search-input";
+import { SearchDatasetsType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export type Facet = { name: string; display_name: string; count: number };
 
@@ -16,24 +17,37 @@ export default ({
   tags,
   orgs,
   resourcesFormats,
+  datasetCount,
   groups,
+  setSearchFilter,
+  resetPagination,
+  searchFilter,
+  resetFilter,
   regions,
-  metadataCreated,
   yearsCoverage,
+  metadataCreatedDates,
 }: {
   tags: Facet[];
+  setSearchFilter: Dispatch<SetStateAction<SearchDatasetsType>>;
+  resetPagination: () => void;
+  resetFilter: () => void;
+  searchFilter: SearchDatasetsType;
   orgs: Facet[];
+  metadataCreatedDates: Facet[];
+  datasetCount: number;
   resourcesFormats: Facet[];
   groups: Facet[];
   regions: Facet[];
-  metadataCreated: Facet[];
   yearsCoverage: Facet[];
 }) => {
-  const mapFacetsToFilterItems = (facets: Facet[]) => {
+  const mapFacetsToFilterItems = (
+    facets: Facet[],
+    isSelectedFn: (v: string) => boolean
+  ) => {
     return facets.map((x) => ({
       value: x.name,
       amountOfDatasets: x.count,
-      selected: false,
+      selected: isSelectedFn(x.name),
       label: x.display_name,
     }));
   };
@@ -44,47 +58,107 @@ export default ({
     { name: "Countries", current: false },
     { name: "Cities", current: false },
   ];
-  const [keywordItems, setKeywordItems] = useState(
-    mapFacetsToFilterItems(tags)
-  );
 
-  const [publicationDates, setPublicationDates] = useState([
-    { value: "All (1,156)", label: "All (1,156)", selected: false },
-    { value: "Last Month (97)", label: "Last Month (97)", selected: false },
-    { value: "2023 (97)", label: "2023 (97)", selected: false },
-    { value: "2022 (234)", label: "2022 (234)", selected: false },
-    { value: "2021 (45)", label: "2021 (45)", selected: false },
-    { value: "2020 (176)", label: "2020 (176)", selected: false },
-    { value: "2019 (34)", label: "2019 (34)", selected: false },
-    { value: "2018 (49)", label: "2018 (49)", selected: false },
-  ]);
+  const [keywordItems, setKeywordItems] = useState<
+    ReturnType<typeof mapFacetsToFilterItems> | never[]
+  >([]);
 
+  const [publicationDates, setPublicationDates] = useState<
+    ReturnType<typeof mapFacetsToFilterItems> | never[]
+  >([]);
   const [internalOrgs, setInternalOrgs] = useState<
-    {
-      value: string;
-      label: string;
-      selected: boolean;
-    }[]
-  >(mapFacetsToFilterItems(orgs));
+    ReturnType<typeof mapFacetsToFilterItems> | never[]
+  >([]);
 
-  const [formats, setFormats] = useState(
-    mapFacetsToFilterItems(resourcesFormats)
-  );
+  const [formats, setFormats] = useState<
+    ReturnType<typeof mapFacetsToFilterItems> | never[]
+  >([]);
 
-  const [years, setYears] = useState(mapFacetsToFilterItems(yearsCoverage));
+  const [years, setYears] = useState<
+    ReturnType<typeof mapFacetsToFilterItems> | never[]
+  >([]);
 
-  const [internalRegions, setInternalRegions] = useState(
-    mapFacetsToFilterItems(regions)
-  );
+  const [internalRegions, setInternalRegions] = useState<
+    ReturnType<typeof mapFacetsToFilterItems> | never[]
+  >([]);
+
+  const [totalOfFiltersApplied, setTotalOfFiltersApplied] = useState(0);
+
+  useEffect(() => {
+    setKeywordItems(
+      mapFacetsToFilterItems(tags, (v) => {
+        return !!searchFilter.tags?.includes(v);
+      })
+    );
+
+    setFormats(
+      mapFacetsToFilterItems(resourcesFormats, (v) => {
+        return !!searchFilter.resFormat?.includes(v);
+      })
+    );
+
+    setInternalOrgs(
+      mapFacetsToFilterItems(orgs, (v) => {
+        return !!searchFilter.orgs?.includes(v);
+      })
+    );
+
+    setYears(
+      mapFacetsToFilterItems(yearsCoverage, (v) => {
+        return false;
+      })
+    );
+
+    setPublicationDates(
+      mapFacetsToFilterItems(metadataCreatedDates, (v) => {
+        return !!searchFilter.publicationDate?.includes(v);
+      })
+    );
+
+    setTotalOfFiltersApplied(
+      (searchFilter.tags?.length || 0) +
+        (searchFilter.locations?.length || 0) +
+        (searchFilter.orgs?.length || 0) +
+        (searchFilter.resFormat?.length || 0) +
+        (searchFilter.publicationDate?.length || 0) +
+        (searchFilter.locations?.length || 0) +
+        (searchFilter.sector ? 1 : 0) +
+        (searchFilter.service ? 1 : 0) +
+        (searchFilter.mode ? 1 : 0) +
+        (searchFilter.region ? 1 : 0)
+    );
+  }, [
+    tags,
+    orgs,
+    resourcesFormats,
+    metadataCreatedDates,
+    groups,
+    regions,
+    yearsCoverage,
+  ]);
 
   return (
     <>
       <div className="mb-[12px] flex items-center justify-between gap-6 text-sm">
         <div>
           <h3 className="text-base font-medium text-[#111928]">Filters</h3>
-          <p className="text-sm text-[#6B7280]">Showing all 156 results</p>
+          <p className="text-sm text-[#6B7280]">
+            {totalOfFiltersApplied > 0 && (
+              <span>
+                {totalOfFiltersApplied}{" "}
+                {totalOfFiltersApplied > 1 ? "Filters" : "Filter"} •{" "}
+              </span>
+            )}
+            Showing{" "}
+            {datasetCount > 1
+              ? `all ${datasetCount} results`
+              : `${datasetCount} result`}
+          </p>
         </div>
-        <span className="cursor-pointer text-sm font-medium text-cyan-900">
+        <span
+          onClick={resetFilter}
+          className="cursor-pointer text-sm font-medium text-cyan-900"
+        >
           Clear all
         </span>
       </div>
@@ -106,7 +180,15 @@ export default ({
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              setItems={setKeywordItems}
+              onChange={(items) => {
+                setKeywordItems(items);
+                setSearchFilter((oldValue) => ({
+                  ...oldValue,
+                  offset: 0,
+                  tags: items.filter((x) => x.selected).map((x) => x.value),
+                }));
+                resetPagination();
+              }}
               items={keywordItems}
               limitToPresentViewAll={9}
             />
@@ -182,7 +264,7 @@ export default ({
               <Checkboxes
                 spaceCount
                 items={internalRegions}
-                setItems={setInternalRegions}
+                onChange={(items) => {}}
               />
             </div>
           </AccordionContent>
@@ -235,7 +317,7 @@ export default ({
               </span>
             </div>
             <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
-              <Checkboxes items={years} setItems={setYears} />
+              <Checkboxes items={years} onChange={(items) => {}} />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -251,7 +333,17 @@ export default ({
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              setItems={setFormats}
+              onChange={(items) => {
+                setFormats(items);
+                setSearchFilter((oldValue) => ({
+                  ...oldValue,
+                  offset: 0,
+                  resFormat: items
+                    .filter((x) => x.selected)
+                    .map((x) => x.value),
+                }));
+                resetPagination();
+              }}
               items={formats}
               limitToPresentViewAll={9}
             />
@@ -269,7 +361,15 @@ export default ({
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              setItems={setInternalOrgs}
+              onChange={(items) => {
+                setInternalOrgs(items);
+                setSearchFilter((oldValue) => ({
+                  ...oldValue,
+                  offset: 0,
+                  orgs: items.filter((x) => x.selected).map((x) => x.value),
+                }));
+                resetPagination();
+              }}
               items={internalOrgs}
               limitToPresentViewAll={7}
             />
@@ -287,7 +387,17 @@ export default ({
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              setItems={setPublicationDates}
+              onChange={(items) => {
+                setPublicationDates(items);
+                setSearchFilter((oldValue) => ({
+                  ...oldValue,
+                  offset: 0,
+                  publicationDate: items
+                    .filter((x) => x.selected)
+                    .map((x) => x.value),
+                }));
+                resetPagination();
+              }}
               items={publicationDates}
               limitToPresentViewAll={7}
             />
@@ -297,7 +407,7 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.full]:w-full [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="full flex">Archived</span>
             <span className="hide mx-2 flex w-full justify-end text-sm">
-              Without archived
+              {searchFilter.showArchived ? "All" : "Without archived"}
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-[12px]">
@@ -305,10 +415,21 @@ export default ({
               Select whether to include the archive in the search if you are
               looking for older data.
             </p>
-            <RadioGroup defaultValue="withoutArchived" className="flex gap-3.5">
+            <RadioGroup
+              defaultValue={`${!!searchFilter.showArchived}`}
+              onValueChange={(v) => {
+                setSearchFilter((oldValue) => ({
+                  ...oldValue,
+                  offset: 0,
+                  showArchived: v === "true",
+                }));
+                resetPagination();
+              }}
+              className="flex gap-3.5"
+            >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
-                  value="withoutArchived"
+                  value="false"
                   id="withoutArchived"
                   className="border-none bg-[#006064] text-white"
                 />
@@ -316,7 +437,7 @@ export default ({
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
-                  value="all"
+                  value="true"
                   id="all"
                   className="border-none bg-[#006064] text-white"
                 />
@@ -331,21 +452,11 @@ export default ({
 };
 
 const Checkboxes = ({
-  setItems,
   spaceCount,
+  onChange,
   items,
   limitToPresentViewAll,
 }: {
-  setItems: Dispatch<
-    SetStateAction<
-      {
-        value: string;
-        amountOfDatasets: number;
-        selected: boolean;
-        label: string;
-      }[]
-    >
-  >;
   items: {
     value: string;
     amountOfDatasets: number;
@@ -354,6 +465,14 @@ const Checkboxes = ({
   }[];
   limitToPresentViewAll?: number;
   spaceCount?: boolean;
+  onChange: (
+    v: {
+      value: string;
+      amountOfDatasets: number;
+      selected: boolean;
+      label: string;
+    }[]
+  ) => void;
 }) => {
   return (
     <>
@@ -363,7 +482,7 @@ const Checkboxes = ({
             <input
               onChange={() => {
                 x.selected = !x.selected;
-                setItems([...items]);
+                onChange([...items]);
               }}
               checked={x.selected}
               className="remove-input-ring rounded text-[#006064]"

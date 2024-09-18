@@ -1,67 +1,72 @@
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
-import { Button } from "@components/ui/button";
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
-import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { PackageSearchOptions } from "@portaljs/ckan";
-import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { unstable_serialize } from "swr";
 import Layout from "../components/_shared/Layout";
 
 import DatasetSearchItem from "@components/search/DatasetSearchItem";
+import SearchBar from "@components/search/SearchBar";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@components/ui/pagination";
-import datasets from "@data/datasets.json";
-import example from "@data/example.json";
-import sectors from "@data/sectors.json";
-import CkanRequest from "@datopian/ckan-api-client-js";
+import { cn } from "@lib/utils";
+import { SearchDatasetsType } from "@schema/dataset.schema";
+import { api } from "@utils/api";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-type Option = {
-  label: string;
-  value: string;
-};
+export default function DatasetSearch() {
+  const router = useRouter();
 
-export async function getServerSideProps() {
-  let modes: Option[] = [];
-  let services: Option[] = [];
-
-  const schemingFields = (
-    await CkanRequest.get<any>("scheming_dataset_schema_show?type=dataset")
-  ).result;
-
-  schemingFields.dataset_fields.forEach((x: any) => {
-    if (x.field_name === "modes") {
-      modes = x.choices;
-    } else if (x.field_name === "services") {
-      services = x.choices;
-    }
-  });
-
+  let modes: Facet[] = [];
+  let services: Facet[] = [];
+  let updateFrequencies: Facet[] = [];
   let tags: Facet[] = [];
+  let sectors: Facet[] = [];
   let orgs: Facet[] = [];
   let resourcesFormats: Facet[] = [];
   let topics: Facet[] = [];
   let groups: Facet[] = [];
   let regions: Facet[] = [];
   let metadataCreatedYear: Facet[] = [];
+  let metadataCreatedDates: Facet[] = [];
   let yearsCoverage: Facet[] = [];
+  const { q, sector, mode, service, region, fuel, before, after } =
+    router.query;
 
-  const datasetSearchResult = (
-    await CkanRequest.get<any>(
-      `package_search?rows=9&start=0&facet.field=
-      ["tags", "groups", "regions", "topics", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end", "metadata_created_year"]`
-    )
-  ).result;
+  const startFilter: SearchDatasetsType = {
+    tags: [],
+    offset: 0,
+    limit: 9,
+    startYear: undefined,
+    endYear: undefined,
+    orgs: [],
+    sort: "score desc, metadata_modified desc",
+    mode: mode as string | undefined,
+    service: service as string | undefined,
+    sector: sector as string | undefined,
+    fuel: fuel as string | undefined,
+    before: before as string | undefined,
+    after: after as string | undefined,
+    region: region as string | undefined,
+    publicationDate: [],
+    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "topics", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end", "metadata_created", "metadata_created_year"]`,
+    showArchived: false,
+    locations: [],
+    query: q as string,
+  };
+  const [searchFilter, setSearchFilter] =
+    useState<SearchDatasetsType>(startFilter);
 
-  const facets = datasetSearchResult.search_facets;
+  const [currentPage, setCurrentPage] = useState(0);
+  const {
+    data: { datasets, count: datasetCount, facets } = {
+      datasets: [],
+      facets: {} as any,
+    },
+  } = api.dataset.search.useQuery(searchFilter);
 
   for (const key in facets) {
     switch (key) {
@@ -93,6 +98,61 @@ export async function getServerSideProps() {
         metadataCreatedYear = facets[key].items;
         break;
       }
+      case "metadata_created": {
+        const a = new Map<string, number>();
+        let totalCount = 0;
+        for (let i = 0; i < facets[key].items.length; i++) {
+          const x = facets[key].items[i];
+          const dateConverted = new Date(x.name);
+          const today = new Date();
+          const _key =
+            dateConverted.getFullYear() === today.getFullYear() &&
+            dateConverted.getMonth() === today.getMonth() - 1
+              ? "Last month"
+              : dateConverted.getFullYear().toString();
+          let count = a.get(_key);
+          if (!count) {
+            a.set(_key, x.count);
+          } else {
+            count += x.count;
+            a.set(_key, count!);
+          }
+
+          totalCount += x.count;
+        }
+
+        metadataCreatedDates = Array.from(a.keys()).map(
+          (k) =>
+            ({
+              name: k,
+              display_name: k,
+              count: a.get(k),
+            } as Facet)
+        );
+        metadataCreatedDates.unshift({
+          name: "*",
+          display_name: "All",
+          count: totalCount,
+        });
+
+        break;
+      }
+      case "modes": {
+        modes = facets[key].items;
+        break;
+      }
+      case "services": {
+        services = facets[key].items;
+        break;
+      }
+      case "frequency": {
+        updateFrequencies = facets[key].items;
+        break;
+      }
+      case "sectors": {
+        sectors = facets[key].items;
+        break;
+      }
       case "temporal_coverage_end":
       case "temporal_coverage_start": {
         yearsCoverage.push(...facets[key].items);
@@ -104,64 +164,7 @@ export async function getServerSideProps() {
     }
   }
 
-  const search_result = datasetSearchResult.results;
-
-  return {
-    props: {
-      ...facets,
-      fallback: {
-        [unstable_serialize([
-          "package_search",
-          { offset: 0, limit: 5, tags: [], groups: [], orgs: [] },
-        ])]: search_result,
-      },
-      tags,
-      orgs,
-      resourcesFormats,
-      topics,
-      groups,
-      regions,
-      metadataCreated: metadataCreatedYear,
-      yearsCoverage,
-      modes,
-      services,
-    },
-  };
-}
-
-export default function DatasetSearch({
-  fallback,
-  groups,
-  tags,
-  orgs,
-  resourcesFormats,
-  topics,
-  regions,
-  metadataCreated,
-  yearsCoverage,
-  modes,
-  services,
-}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
-  const router = useRouter();
-  const { q, sector, mode, service, region } = router.query;
-  const [options, setOptions] = useState<PackageSearchOptions>({
-    offset: 0,
-    limit: 5,
-    tags: [],
-    groups: [],
-    orgs: [],
-    query: q as string,
-  });
-
-  const [searchFilter, setSearchFilter] = useState({
-    tags: [],
-    startYear: undefined,
-    endYear: undefined,
-    orgs: [],
-    publicationDate: [],
-    showArchived: false,
-    locations: [],
-  });
+  const pages = new Array(Math.ceil((datasetCount || 0) / 9)).fill(0);
 
   return (
     <>
@@ -173,82 +176,214 @@ export default function DatasetSearch({
       <Layout backgroundEffect effectSize="100px">
         <div className="container">
           <div className="pt-5">
-            <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] ">
-              <input
-                className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:ring-1 focus:ring-[#006064] "
-                placeholder="Find statistics, forecasts & studies"
-              />
-              <span
-                className="absolute right-[125px] z-[10] cursor-pointer p-2 text-gray-500"
-                role="button"
-              >
-                <XMarkIcon width={20} />
-              </span>
-
-              <Button
-                type="submit"
-                className="absolute right-[10px] top-[10px] flex gap-[8px]"
-              >
-                <MagnifyingGlassIcon width={20} />
-                Search
-              </Button>
-            </div>
+            <SearchBar
+              hideDatasetSuggestion
+              sector={sector as string | undefined}
+              region={region as string | undefined}
+              mode={mode as string | undefined}
+              service={service as string | undefined}
+              before={before as string | undefined}
+              after={after as string | undefined}
+              fuel={fuel as string | undefined}
+            />
           </div>
           <div className="mt-8">
             <div className="flex flex-col gap-4 lg:flex-row lg:gap-[64px]">
-              <div className="w-full">
-                <div className="flex flex-col items-center gap-4 md:flex-row">
-                  <span className="text-base font-medium text-gray-900">
-                    Quick filters:
-                  </span>
-                  <div className="flex flex-wrap items-center gap-2 sm:flex-row sm:flex-nowrap">
-                    <QuickFilterDropdown text="Sector" items={sectors} />
-                    <QuickFilterDropdown text="Mode" items={modes} />
-                    <QuickFilterDropdown text="Service" items={services} />
-                    <QuickFilterDropdown
-                      text="Region"
-                      defaultValue={region as string}
-                      items={example}
-                    />
-                  </div>
-                </div>
-                <section className="mt-8 ">
-                  <div className="flex flex-col gap-8">
-                    {datasets.map((item, i) => (
-                      <DatasetSearchItem
-                        key={`dataset-result-${i}`}
-                        {...item}
+              <div className="mb-8 flex w-full flex-col justify-between">
+                <div>
+                  <div className="flex flex-col flex-wrap items-center justify-between gap-2 md:flex-row xl:flex-nowrap">
+                    <div className="flex flex-col items-center gap-4 md:flex-row">
+                      <span className="text-base font-medium text-gray-900">
+                        Quick filters:
+                      </span>
+                      <div className="flex flex-wrap items-center gap-2 sm:flex-row sm:flex-nowrap">
+                        <QuickFilterDropdown
+                          setSearchFilter={setSearchFilter}
+                          defaultValue={searchFilter.sector}
+                          text="Sector"
+                          resetPagination={() => setCurrentPage(0)}
+                          filterFieldName="sector"
+                          items={sectors}
+                        />
+                        <QuickFilterDropdown
+                          setSearchFilter={setSearchFilter}
+                          text="Mode"
+                          resetPagination={() => setCurrentPage(0)}
+                          filterFieldName="mode"
+                          defaultValue={searchFilter.mode}
+                          items={modes}
+                        />
+                        <QuickFilterDropdown
+                          setSearchFilter={setSearchFilter}
+                          text="Service"
+                          filterFieldName="service"
+                          resetPagination={() => setCurrentPage(0)}
+                          defaultValue={searchFilter.service}
+                          items={services}
+                        />
+                        <QuickFilterDropdown
+                          setSearchFilter={setSearchFilter}
+                          resetPagination={() => setCurrentPage(0)}
+                          defaultValue={searchFilter.region}
+                          text="Region"
+                          filterFieldName="region"
+                          items={regions}
+                        />
+                        <div className="w-full sm:hidden">
+                          <QuickFilterDropdown
+                            setSearchFilter={setSearchFilter}
+                            hideAllOption
+                            defaultValue={searchFilter.sort}
+                            text="Sort by"
+                            filterFieldName="sort"
+                            items={[
+                              {
+                                display_name: "Relevance",
+                                name: "score desc, metadata_modified desc",
+                              },
+                              {
+                                display_name: "Name Ascending",
+                                name: "name asc",
+                              },
+                              {
+                                display_name: "Name Descending",
+                                name: "name desc",
+                              },
+                              {
+                                display_name: "Last Modified",
+                                name: "metadata_modified desc",
+                              },
+                            ]}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="hidden sm:block">
+                      <QuickFilterDropdown
+                        setSearchFilter={setSearchFilter}
+                        hideAllOption
+                        defaultValue={searchFilter.sort}
+                        text="Sort by"
+                        filterFieldName="sort"
+                        items={[
+                          {
+                            display_name: "Relevance",
+                            name: "score desc, metadata_modified desc",
+                          },
+                          {
+                            display_name: "Name Ascending",
+                            name: "name asc",
+                          },
+                          {
+                            display_name: "Name Descending",
+                            name: "name desc",
+                          },
+                          {
+                            display_name: "Last Modified",
+                            name: "metadata_modified desc",
+                          },
+                        ]}
                       />
-                    ))}
+                    </div>
                   </div>
-                  <Pagination className="mx-0 mt-8 justify-start">
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious href="#" />
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">1</PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">2</PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationNext href="#" />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </section>
+                  <section className="mt-8">
+                    <div className="flex flex-col gap-8">
+                      {datasets.map((item, i) => (
+                        <DatasetSearchItem
+                          frequencies={updateFrequencies}
+                          key={`dataset-result-${i}`}
+                          {...item}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                </div>
+                <Pagination className="mx-0 mt-8 justify-start">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <button
+                        disabled={currentPage === 0}
+                        aria-label="Go to next page"
+                        className={cn(
+                          "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                          "rounded-s-lg px-2",
+                          currentPage === 0 ? "cursor-not-allowed" : ""
+                        )}
+                        onClick={() => {
+                          setSearchFilter((oldV) => ({
+                            ...oldV,
+                            offset: (currentPage - 1) * 9,
+                          }));
+                          setCurrentPage((oldV) => oldV - 1);
+                        }}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                    </PaginationItem>
+                    {pages.map((x, i) =>
+                      i > currentPage + 2 || i < currentPage - 2 ? (
+                        <></>
+                      ) : (
+                        <PaginationItem>
+                          <button
+                            disabled={currentPage === i}
+                            onClick={() => {
+                              setSearchFilter((oldV) => ({
+                                ...oldV,
+                                offset: i * 9,
+                              }));
+                              setCurrentPage(i);
+                            }}
+                            className={cn(
+                              `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
+                              currentPage === i ? "cursor-auto bg-gray-100" : ""
+                            )}
+                          >
+                            {i + 1}
+                          </button>
+                        </PaginationItem>
+                      )
+                    )}
+                    <PaginationItem>
+                      <button
+                        disabled={currentPage === pages.length - 1}
+                        aria-label="Go to next page"
+                        onClick={() => {
+                          setSearchFilter((oldV) => ({
+                            ...oldV,
+                            offset: (currentPage + 1) * 9,
+                          }));
+                          setCurrentPage((oldV) => oldV + 1);
+                        }}
+                        className={cn(
+                          "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                          "rounded-e-lg px-2",
+                          currentPage === pages.length - 1
+                            ? "cursor-not-allowed"
+                            : ""
+                        )}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
 
               <div className="order-first w-full border-l pl-5 pt-[12px] lg:order-last lg:max-w-[340px]">
                 <DatasetsFilter
+                  setSearchFilter={setSearchFilter}
+                  resetPagination={() => setCurrentPage(0)}
+                  resetFilter={() => setSearchFilter(startFilter)}
+                  datasetCount={datasetCount || 0}
+                  searchFilter={searchFilter}
+                  metadataCreatedDates={metadataCreatedDates}
                   {...{
                     tags,
                     orgs,
                     resourcesFormats,
                     groups,
                     regions,
-                    metadataCreated,
                     yearsCoverage,
                     modes,
                     services,

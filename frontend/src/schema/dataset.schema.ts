@@ -33,10 +33,12 @@ export const DatasetSchema = z.object({
   notes: z.string().optional().nullable(),
   tags: z.array(z.string()),
   userRepresents: z.boolean().default(false),
-  sources: z.array(z.object({
-    name: z.string(),
-    url: z.string().url().optional(),
-  })),
+  sources: z.array(
+    z.object({
+      name: z.string(),
+      url: z.string().url().optional(),
+    })
+  ),
   language: z.string().optional(),
   referencePeriodStart: z.date(),
   referencePeriodEnd: z.date(),
@@ -46,7 +48,34 @@ export const DatasetSchema = z.object({
   private: z.boolean().default(true),
   resources: z.array(ResourceSchema),
 });
+export const SearchDatasetsSchema = z.object({
+  query: z.string().nullable().optional(),
+  mode: z.string().optional(),
+  service: z.string().optional(),
+  sector: z.string().optional(),
+  region: z.string().optional(),
+  fuel: z.string().optional(),
+  before: z.string().optional(),
+  after: z.string().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+  groups: z.array(z.string()).optional(),
+  orgs: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  sort: z.string().optional(),
+  facetsFields: z.string().nullable().optional(),
+  includePrivate: z.boolean().optional(),
+  showArchived: z.boolean().optional(),
+  startYear: z.number().optional(),
+  endYear: z.number().optional(),
+  publicationDate: z.array(z.string()).optional(),
+  locations: z.array(z.string()).optional(),
+  resFormat: z.array(z.string()).optional(),
+  type: z.array(z.string()).optional(),
+  private: z.boolean().optional(),
+});
 
 export type SearchDatasetType = z.infer<typeof SearchDatasetSchema>;
+export type SearchDatasetsType = z.infer<typeof SearchDatasetsSchema>;
 export type DatasetFormType = z.infer<typeof DatasetSchema>;
 export type ResourceFormType = z.infer<typeof ResourceSchema>;

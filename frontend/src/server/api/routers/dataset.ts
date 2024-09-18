@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { DatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
+import { DatasetSchema, SearchDatasetsSchema } from "@schema/dataset.schema";
 import {
   createDataset,
   deleteDatasets,
@@ -11,11 +11,11 @@ import { z } from "zod";
 
 export const datasetRouter = createTRPCRouter({
   search: protectedProcedure
-    .input(SearchDatasetSchema)
+    .input(SearchDatasetsSchema)
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const searchResults = await searchDatasets({ apiKey, input });
+      const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
   get: protectedProcedure
