@@ -28,6 +28,16 @@ COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
 ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher
+
+COPY patches ${APP_DIR}/patches
+
+RUN for d in $APP_DIR/patches/*; do \
+        for f in `ls $d/*.patch | sort -g`; do \
+			cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; cd ${APP_DIR}/src && git apply --ignore-space-change --ignore-whitespace "$f" ; \
+        done ; \
+    done
+
+
 USER ckan
 
 COPY licenses.json /ext/licenses.json
