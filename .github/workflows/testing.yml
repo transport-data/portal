@@ -57,21 +57,18 @@ jobs:
           while ! docker exec ckan-tdc-db pg_isready -U ckandbuser -d ckandb; do
             sleep 1
           done
-      - name: Install and build frontend
-        run: npm ci && cp .env.example .env && npm run build
+      - name: Copy .env
+        run: cp .env.example .env
         working-directory: ./frontend
-      - name: Run frontend
-        run: npm run start &
-        working-directory: ./frontend
-      - name: Wait for server
-        run: sleep 5
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://localhost:5000'
+          build: npm run build
+          start: npm run start
+          wait-on: 'http://127.0.0.1:3000'
           wait-on-timeout: 600
           command: npm run test
-          working-directory: ./integration-tests
+          working-directory: ./frontend
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
