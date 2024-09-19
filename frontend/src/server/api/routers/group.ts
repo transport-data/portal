@@ -50,7 +50,7 @@ export const groupRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      if (input.parent === '' || !input.parent) return await createGroup({ apiKey, input });
+      if (input.parent === '' || !input.parent) return await patchGroup({ apiKey, input });
       const _group = { ...input, groups: [{name: input.parent}] };
       const group = await patchGroup({ apiKey, input: _group });
       return group;
