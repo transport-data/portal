@@ -33,7 +33,6 @@ export const groupRouter = createTRPCRouter({
         type: input.type,
         showCoordinates: input.showGeographyShapes,
       });
-    console.log('GROUPS', groups)
       return groups;
     }),
   create: protectedProcedure

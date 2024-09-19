@@ -22,7 +22,7 @@ export const listGroups = async ({
   type,
   showCoordinates,
 }: {
-  apiKey: string;
+  apiKey?: string;
   type: "topic" | "geography";
   showCoordinates?: boolean;
 }) => {
@@ -41,7 +41,7 @@ export const listGroups = async ({
       Group[] & { geography_shape?: { type: string; coordinates: [] } }
     >
   >(action, {
-    apiKey,
+    apiKey: apiKey ?? '',
   });
   return groups.result;
 };

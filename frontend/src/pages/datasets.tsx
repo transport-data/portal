@@ -11,6 +11,7 @@ import Heading from "@components/_shared/Heading";
 import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
+import { listGroups } from "@utils/group";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -22,7 +23,10 @@ export async function getStaticProps() {
     groups: [],
     orgs: [],
   });
-  const groups = await ckan.getGroupsWithDetails();
+  const groups = await listGroups({
+    type: 'topic',
+    showCoordinates: false,
+  });
   const tags = await ckan.getAllTags();
   const orgs = await ckan.getOrgsWithDetails(true);
   return {
