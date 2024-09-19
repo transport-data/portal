@@ -110,6 +110,7 @@ export default NextAuth({
             ...userResult,
             image: user?.image ?? userResult?.image ?? "",
             apikey: userResult.frontend_token,
+            sysadmin: userResult.sysadmin,
           };
 
           return { ...token, ...user, sub: userResult.id };
