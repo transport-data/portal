@@ -8,6 +8,7 @@ from ckan.common import _, config
 from ckan.plugins import toolkit as tk
 import json
 from ckanext.scheming import helpers as scheming_helpers
+import ckan.lib.authenticator as authenticator
 
 import logging
 log = logging.getLogger(__name__)
@@ -355,8 +356,40 @@ def user_login(context, data_dict):
                 user = generate_token(context, user)
 
             return json.dumps(user)
-        else:
+        if not data_dict.get('id') or not data_dict.get('password'):
             return generic_error_message
+
+        model = context['model']
+        if "@" in data_dict.get("id", ""):
+            user = session.query(model.User).filter(model.User.email == data_dict.get("id", "")).first()
+        else:
+            user = model.User.get(data_dict['id'])
+
+        if not user:
+            return generic_error_message
+
+        user = user.as_dict()
+
+        if config.get('ckanext.auth.include_frontend_login_token', False):
+            user = generate_token(context, user)
+
+        if data_dict['password']:
+            identity = {'login': user['name'], 'password': data_dict['password']}
+
+            auth = authenticator
+
+            try:
+                authUser = auth.default_authenticate(identity)
+                authUser_name = model.User.get(authUser.id).name
+
+                if authUser_name != user['name']:
+                    return generic_error_message
+                else:
+                    return user
+            except Exception as e:
+                log.error(e)
+                return generic_error_message
+
     except Exception as e:
         log.error(e)
         return json.dumps({"error": True})

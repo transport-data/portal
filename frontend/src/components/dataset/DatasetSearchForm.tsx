@@ -17,7 +17,10 @@ export const SearchDatasetForm: React.FC<{
     resolver: zodResolver(SearchDatasetSchema),
   });
 
-  const { data: groups } = api.group.list.useQuery();
+  const { data: groups } = api.group.list.useQuery({
+    showGeographyShapes: false,
+    type: "topic",
+  });
 
   const groupOptions = groups
     ? groups.map((group) => ({
@@ -26,8 +29,7 @@ export const SearchDatasetForm: React.FC<{
       }))
     : [];
 
-  const { data: organizations } =
-    api.organization.list.useQuery();
+  const { data: organizations } = api.organization.list.useQuery();
 
   const organizationOptions = organizations
     ? organizations.map((organization) => ({

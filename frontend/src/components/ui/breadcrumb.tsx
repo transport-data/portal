@@ -118,7 +118,7 @@ const DefaultBreadCrumb = ({ links }: { links: Link[] }) => {
     <Breadcrumb>
       <BreadcrumbList>
         {links.map((link, index) => (
-          <>
+          <React.Fragment key={link.href}>
             <BreadcrumbItem key={index} className={index < links.length - 1 ? 'text-primary' : ''}>
               <BreadcrumbLink href={link.href} className="flex items-center gap-x-3">
                 {link.href === '/' ? 
@@ -127,7 +127,7 @@ const DefaultBreadCrumb = ({ links }: { links: Link[] }) => {
                 {link.label}</BreadcrumbLink>
             </BreadcrumbItem>
             {index < links.length - 1 && <BreadcrumbSeparator />}
-          </>
+          </React.Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
