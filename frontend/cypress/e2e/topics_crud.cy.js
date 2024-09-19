@@ -7,7 +7,7 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const parentTopic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const topic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const sample_topic = `${uuid()}-2-${Cypress.env("ORG_NAME_SUFFIX")}`;
+const sample_topic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}b`;
 
 describe("Create and edit topics", () => {
   before(() => {
