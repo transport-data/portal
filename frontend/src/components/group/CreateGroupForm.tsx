@@ -36,7 +36,10 @@ export const CreateGroupForm: React.FC = () => {
       });
       formObj.reset();
       setErrorMessage(null);
-      await utils.group.list.invalidate();
+      await utils.group.list.invalidate({
+        showGeographyShapes: false,
+        type: 'topic'
+      });
       await router.push("/dashboard/topics");
     },
     onError: (error) => setErrorMessage(error.message),

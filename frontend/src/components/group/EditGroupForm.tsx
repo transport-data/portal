@@ -15,14 +15,17 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 
 export const EditGroupForm: React.FC<{
-  initialValues: Group & { groups: Array<{ name: string }>};
+  initialValues: Group & { groups: Array<{ name: string }> };
 }> = ({ initialValues }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const [groupEdited, setGroupEdited] = useState("");
   const formObj = useForm<GroupFormType>({
     resolver: zodResolver(GroupSchema),
-    defaultValues: { ...initialValues, parent: initialValues.groups[0]?.name ?? '' },
+    defaultValues: {
+      ...initialValues,
+      parent: initialValues.groups[0]?.name ?? "",
+    },
   });
 
   const utils = api.useContext();
@@ -32,7 +35,10 @@ export const EditGroupForm: React.FC<{
         description: `Successfully edited the ${groupEdited} topic`,
       });
       setErrorMessage(null);
-      await utils.group.list.invalidate();
+      await utils.group.list.invalidate({
+        showGeographyShapes: false,
+        type: "topic",
+      });
       await router.push("/dashboard/topics");
     },
     onError: (error) => setErrorMessage(error.message),

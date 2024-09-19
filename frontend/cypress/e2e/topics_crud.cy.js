@@ -62,6 +62,7 @@ describe("List and Search Topic", () => {
     cy.get("button[type=submit]").click();
     
     cy.visit("/dashboard/topics/");
+    cy.get("section").should("contain", sample_topic);
     cy.get("input[name=search]").type(sample_topic);
     cy.get("section").should("not.contain", "No Topics found");
     cy.get("section").should("contain", sample_topic);
