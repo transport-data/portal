@@ -12,6 +12,7 @@ import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
 import { listGroups } from "@utils/group";
+import { listOrganizations } from "@utils/organization";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -28,7 +29,12 @@ export async function getStaticProps() {
     showCoordinates: false,
   });
   const tags = await ckan.getAllTags();
-  const orgs = await ckan.getOrgsWithDetails(true);
+  const orgs = await listOrganizations({
+    input: {
+      includeUsers: false,
+      detailed: true
+    }
+  })
   return {
     props: {
       fallback: {
