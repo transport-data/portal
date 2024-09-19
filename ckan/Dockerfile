@@ -52,4 +52,9 @@ RUN ckan config-tool ${CKAN_INI} "ckan.auth.public_user_details = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.group_and_organization_list_all_fields_max = 350"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_create_groups = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_create_organizations = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_groups = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_organizations = false"
+
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
