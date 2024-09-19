@@ -55,7 +55,7 @@ export default NextAuth({
       return true; // Allows the sign-in
     },
     async redirect({ url, baseUrl }) {
-      return baseUrl; // Redirect to the homepage after sign-in
+      return `${baseUrl}/dashboard/newsfeed`; // Redirect to the homepage after sign-in
     },
     session: ({ session, token }) => {
       return {
