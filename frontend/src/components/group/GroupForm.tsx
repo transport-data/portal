@@ -40,7 +40,10 @@ export const GroupForm: React.FC<{
     setValue,
   } = formObj;
 
-  const possibleParents = api.group.list.useQuery();
+  const possibleParents = api.group.list.useQuery({
+  showGeographyShapes: false,
+    type: 'topic'}
+  );
 
   return (
     <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-2">

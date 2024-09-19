@@ -12,7 +12,10 @@ export const GroupsTable: React.FC<{ publicUrl: string }> = ({ publicUrl }) => {
   const [indeterminate, setIndeterminate] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
-  const { data: groups } = api.group.list.useQuery();
+  const { data: groups } = api.group.list.useQuery({
+    showGeographyShapes: false,
+    type: 'topic',}
+  );
 
   const utils = api.useContext();
   const deleteGroups = api.group.delete.useMutation({
