@@ -18,12 +18,23 @@ export const groupRouter = createTRPCRouter({
       const groups = await getGroup({ apiKey, id: input.id });
       return groups;
     }),
-  list: protectedProcedure.query(async ({ ctx, input }) => {
-    const user = ctx.session.user;
-    const apiKey = user.apikey;
-    const groups = await listGroups({ apiKey });
-    return groups;
-  }),
+  list: protectedProcedure
+    .input(
+      z.object({
+        showGeographyShapes: z.boolean().optional(),
+        type: z.enum(["topic", "geography"]).optional().default("topic"),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const groups = await listGroups({
+        apiKey,
+        type: input.type,
+        showCoordinates: input.showGeographyShapes,
+      });
+      return groups;
+    }),
   create: protectedProcedure
     .input(GroupSchema)
     .mutation(async ({ input, ctx }) => {
