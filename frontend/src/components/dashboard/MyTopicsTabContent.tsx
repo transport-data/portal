@@ -14,7 +14,7 @@ export default () => {
   const [searchText, setSearchText] = useState("");
   const itemsPerPage = 10;
   const { data: groupsData } = api.group.list.useQuery({
-    showGeographyShapes:false,
+    showGeographyShapes: false,
     type:"topic",
   });
 

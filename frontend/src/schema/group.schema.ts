@@ -25,6 +25,7 @@ export const GroupSchema = z.object({
   image_display_url: z.string().default(""),
   parent: z.string().optional(),
   image_url: z.string().default(""),
+  type: z.string().default("topic"),
 });
 
 export type GroupFormType = z.infer<typeof GroupSchema>;
