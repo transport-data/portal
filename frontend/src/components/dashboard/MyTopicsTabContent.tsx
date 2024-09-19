@@ -13,7 +13,10 @@ export default () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const itemsPerPage = 10;
-  const { data: groupsData } = api.group.list.useQuery();
+  const { data: groupsData } = api.group.list.useQuery({
+    showGeographyShapes:false,
+    type:"topic",
+  });
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
