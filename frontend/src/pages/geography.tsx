@@ -1,15 +1,15 @@
 import { Badge } from "@components/ui/badge";
-import listOfCountries from "@lib/listOfCountries";
 import { listGroups } from "@utils/group";
+import * as getCountryISO2 from "country-iso-3-to-2";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import * as getCountryISO2 from "country-iso-3-to-2";
 
 import Layout from "../components/_shared/Layout";
+import Link from "next/link";
 
 export async function getServerSideProps(ctx) {
   return {
@@ -29,15 +29,15 @@ export async function getServerSideProps(ctx) {
 export default function DatasetsPage({
   groups,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
-  const letterMap = new Map<string, string[]>();
-  listOfCountries.forEach((country) => {
-    let letter = country.name[0]!.toLowerCase();
+  const letterMap = new Map<string, { name: string; title: string }[]>();
+  groups.forEach((country) => {
+    let letter = country.title[0]!.toLowerCase();
     if (letter === "Å".toLowerCase()) letter = "a";
     const array = letterMap.get(letter);
     if (!array) {
-      letterMap.set(letter, [country.name]);
+      letterMap.set(letter, [{ name: country.name, title: country.title }]);
     } else {
-      array.push(country.name);
+      array.push({ name: country.name, title: country.title });
     }
   });
 
@@ -276,7 +276,7 @@ export default function DatasetsPage({
               {Array.from(letterMap.keys()).map((letter) => (
                 <LetterCard
                   letter={letter}
-                  words={letterMap.get(letter) || []}
+                  countries={letterMap.get(letter) || []}
                 />
               ))}
             </div>
@@ -287,7 +287,13 @@ export default function DatasetsPage({
   );
 }
 
-const LetterCard = ({ words, letter }: { letter: string; words: string[] }) => (
+const LetterCard = ({
+  countries,
+  letter,
+}: {
+  letter: string;
+  countries: { name: string; title: string }[];
+}) => (
   <div className="flex h-fit max-h-fit max-w-full grid-rows-1 flex-col gap-5 rounded-lg bg-white p-6 shadow-md sm:max-w-[200px] xl:w-[200px]">
     <Badge
       className="h-12 w-12 items-center justify-center px-3"
@@ -296,8 +302,13 @@ const LetterCard = ({ words, letter }: { letter: string; words: string[] }) => (
       <span className="text-[30px] font-extrabold uppercase">{letter}</span>
     </Badge>
     <div className="flex flex-col gap-3">
-      {words.map((word) => (
-        <span className="break-words text-[#6B7280]">{word}</span>
+      {countries.map((word) => (
+        <Link
+          href={`/search?region=${word.name}`}
+          className="cursor-pointer break-words text-[#6B7280] hover:underline"
+        >
+          {word.title}
+        </Link>
       ))}
     </div>
   </div>
