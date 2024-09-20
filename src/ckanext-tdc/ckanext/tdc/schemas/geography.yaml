@@ -27,10 +27,16 @@ fields:
 - field_name: m49_code
   label: UN M.49 code
 
+- field_name: iso2
+  label: ISO 3166-1 alpha-2
+
 - field_name: geography_shape
   label: Geography Shape
   preset: json_object
   validators: scheming_valid_json_object
+
+- field_name: image_url
+  label: Image URL
 
 - field_name: not_used
   label: Parent organization

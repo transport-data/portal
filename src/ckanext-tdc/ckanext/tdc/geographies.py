@@ -1,8 +1,13 @@
+from ckanext.s3filestore.uploader import S3Uploader
+from ckan.common import config
+
 from ckan.plugins import toolkit as tk
+import ckan.logic as logic
 
 import json
 import os.path as path
 import logging
+import requests
 log = logging.getLogger(__name__)
 
 
@@ -51,10 +56,22 @@ def create_geography(data_dict):
     site_user = tk.get_action("get_site_user")({"ignore_auth": True}, {})
     priviliged_context = {"ignore_auth": True, "user": site_user["name"]}
     create_group_action = tk.get_action("group_create")
-    # create_group_action = tk.get_action("group_delete")
+    update_group_action = tk.get_action("group_update")
+    show_group_action = tk.get_action("group_show")
     data_dict["type"] = "geography"
-    # data_dict["id"] = data_dict["name"]
-    create_group_action(priviliged_context, data_dict)
+
+    group_exists = True
+    try:
+        show_group_action(priviliged_context, {"id": data_dict["name"]})
+    except logic.NotFound:
+        group_exists = False
+
+    if not group_exists:
+        create_group_action(priviliged_context, data_dict)
+    else:
+        log.info("{} already exists. Updating it.".format(data_dict["name"]))
+        data_dict["id"] = data_dict["name"]
+        update_group_action(priviliged_context, data_dict)
 
 
 def delete_geography(data_dict):
@@ -79,13 +96,38 @@ def create_region(m49_code):
     return data_dict
 
 
+def upload_country_flag(iso2):
+    r = requests.get("https://flagsapi.com/{}/flat/64.png".format(iso2), stream=True)
+    r.raise_for_status()
+
+    upload_to = "group"
+    filestore = S3Uploader(upload_to)
+    bucket_name = filestore.bucket_name
+    bucket = filestore.get_s3_bucket(bucket_name)
+    storage_path = filestore.storage_path
+    filename = "{}.png".format(iso2)
+    key = "{}/{}".format(storage_path, filename)
+    site_url = config.get("ckan.site_url")
+
+    try:
+        bucket.upload_fileobj(r.raw, key, ExtraArgs={"ACL": "public-read", "ContentType": "image/png"})
+        log.info("Successfully uploaded {0} to S3!".format(key))
+        return "{}/uploads/{}/{}".format(site_url, upload_to, filename)
+    except Exception as e:
+        log.error('Something went very very wrong for {0}'.format(str(e)))
+        raise e
+
+
 def create_country(data_dict, region_m49):
     properties = data_dict["properties"]
     m49_code = properties["m49_cd"]
     iso3 = properties["iso3cd"]
+    iso2 = properties["iso2cd"]
     title = properties["nam_en"]
     region_name = TDC_REGIONS[region_m49]["name"]
     geography_shape = data_dict["geometry"]
+
+    image_url = upload_country_flag(iso2)
 
     data_dict = {
             "name": iso3.lower(),
@@ -93,8 +135,11 @@ def create_country(data_dict, region_m49):
             "geography_type": "country",
             "m49_code": m49_code,
             "groups": [{"name": region_name}],
-            "geography_shape": geography_shape
+            "geography_shape": geography_shape,
+            "iso2": iso2,
+            "image_url": image_url
             }
+
     return data_dict
 
 
@@ -151,4 +196,3 @@ def list_default_tdc_geographies():
             del geography["geography_shape"]
 
     log.info(json.dumps(geographies))
-
