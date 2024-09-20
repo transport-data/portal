@@ -32,7 +32,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
   const createUser = api.user.createUser.useMutation({
     onSuccess: async () => {
       await signIn("credentials", {
-        callbackUrl: "/dashboard",
+        callbackUrl: "/dashboard/newsfeed",
         username: watch("name"),
         password: watch("password"),
       });

@@ -48,9 +48,8 @@ const EditGroupPage: NextPage<EditGroupPageProps> = ({
                 <DefaultBreadCrumb
                   links={[
                     { label: "Home", href: "/" },
-                    { label: "Dashboard", href: "/dashboard" },
                     {
-                      label: "Topics",
+                      label: "Dashboard",
                       href: "/dashboard/topics",
                     },
                     {

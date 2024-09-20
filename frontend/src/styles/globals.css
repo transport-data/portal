@@ -58,8 +58,8 @@
   }
 }
 
-div[role=tooltip] div.absolute.z-10.h-2.w-2.bg-gray-900 {
-  background-color: #1F2A37;
+div[role="tooltip"] div.absolute.z-10.h-2.w-2.bg-gray-900 {
+  background-color: #1f2a37;
 }
 
 a {
@@ -95,6 +95,10 @@ body {
     center;
 }
 
+div[data-testid="carousel"] div:nth-child(2) {
+  bottom: -26px;
+}
+
 .icon-at-left {
   background: url("../../public/assets/organization-icon.svg") no-repeat left
     16px center;
@@ -123,9 +127,9 @@ input.remove-input-number-arrows[type="number"] {
   -moz-appearance: textfield;
 }
 
-
 @media (max-width: 787px) {
-  #map div:first-child.maplibregl-canvas-container.maplibregl-interactive.maplibregl-touch-drag-pan.maplibregl-touch-zoom-rotate {
+  #map
+    div:first-child.maplibregl-canvas-container.maplibregl-interactive.maplibregl-touch-drag-pan.maplibregl-touch-zoom-rotate {
     position: absolute;
     right: 123123213123px;
   }
@@ -140,7 +144,7 @@ input.remove-input-number-arrows[type="number"] {
     display: flex;
     flex-direction: column;
     padding: 12px;
-    gap: 10px
+    gap: 10px;
   }
 
   .maplibregl-popup-tip {

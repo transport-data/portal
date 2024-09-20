@@ -36,7 +36,10 @@ export const CreateGroupForm: React.FC = () => {
       });
       formObj.reset();
       setErrorMessage(null);
-      await utils.group.list.invalidate();
+      await utils.group.list.invalidate({
+        showGeographyShapes: false,
+        type: 'topic'
+      });
       await router.push("/dashboard/topics");
     },
     onError: (error) => setErrorMessage(error.message),
@@ -57,7 +60,7 @@ export const CreateGroupForm: React.FC = () => {
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
-          setGroupCreated(data.name);
+          setGroupCreated(data.title ?? data.name);
           createGroup.mutate(data);
         })}
       >

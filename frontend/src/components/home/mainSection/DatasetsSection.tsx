@@ -51,6 +51,7 @@ export default function DatasetsSection({
                             sources by TDC. For more information,{" "}
                             <Link
                               className="underline"
+                              target="_blank"
                               href={"https://google.com"}
                             >
                               click here
@@ -60,6 +61,7 @@ export default function DatasetsSection({
                           <>
                             Data is SDMX-compliant. For more information,{" "}
                             <Link
+                              target="_blank"
                               className="underline"
                               href={"https://google.com"}
                             >

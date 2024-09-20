@@ -58,7 +58,7 @@ export const listGroups = async ({
       >
     >
   >(action, {
-    apiKey,
+    apiKey: apiKey ?? '',
   });
   return groups.result;
 };

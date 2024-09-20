@@ -79,7 +79,7 @@ export const listOrganizations = async ({
   apiKey,
   input,
 }: {
-  apiKey: string;
+  apiKey?: string;
   input: {
     detailed?: boolean;
     includeUsers?: boolean;
@@ -91,7 +91,7 @@ export const listOrganizations = async ({
   action += `&include_users=${!!input.includeUsers}`;
   const organizations = await CkanRequest.get<CkanResponse<Organization[]>>(
     action,
-    { apiKey }
+    { apiKey: apiKey ?? '' }
   );
   return organizations.result;
 };

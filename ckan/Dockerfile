@@ -2,12 +2,14 @@ FROM viderum/ckan:v2.11.0
 
 ENV CKAN_INI /srv/app/production.ini
 
+ENV CKANEXT_TDC_HASH 03e69ece9a58b3f19976af94e931e8aa4462a6a0
+
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4d5b3722c2bc64d39b6c2b1d76c9883636/test-requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/shubham-mahajan/ckanext-s3filestore/feature/r2support-ckan-2.11/requirements.txt' && \
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
-    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@d348651fb56666771d9ac9b345343ba1ac8db853#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
+    pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@${CKANEXT_TDC_HASH}#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
 
 ## Auth
 # RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
@@ -51,5 +53,10 @@ RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_dataset_if_not_in_organizatio
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.public_user_details = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.group_and_organization_list_all_fields_max = 350"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
+
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_create_groups = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_create_organizations = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_groups = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_organizations = false"
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
