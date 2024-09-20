@@ -3,6 +3,7 @@ import ckan.plugins.toolkit as toolkit
 
 import ckanext.tdc.logic.action as action
 import ckanext.tdc.cli as cli
+import ckanext.tdc.logic.auth as auth
 
 import json
 import logging
@@ -14,6 +15,7 @@ class TdcPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IClick, inherit=True)
+    plugins.implements(plugins.IAuthFunctions, inherit=True)
 
     # IConfigurer
 
@@ -31,7 +33,7 @@ class TdcPlugin(plugins.SingletonPlugin):
                 "package_patch": action.package_patch,
                 "package_search": action.package_search,
                 "group_list": action.group_list,
-                "user_login" : action.user_login
+                "user_login": action.user_login
                 }
 
     # IPackageController
@@ -65,5 +67,11 @@ class TdcPlugin(plugins.SingletonPlugin):
         return data_dict
 
     # IClick
+
     def get_commands(self):
         return cli.get_commands()
+
+    # IAuthFunctions:
+
+    def get_auth_functions(self):
+        return auth.get_auth_functions()
