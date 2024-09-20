@@ -60,7 +60,7 @@ export const CreateGroupForm: React.FC = () => {
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
-          setGroupCreated(data.name);
+          setGroupCreated(data.title ?? data.name);
           createGroup.mutate(data);
         })}
       >

@@ -49,7 +49,7 @@ export const EditGroupForm: React.FC<{
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
-          setGroupEdited(data.name);
+          setGroupEdited(data.title ?? data.name);
           editGroup.mutate(data);
         })}
       >

@@ -27,6 +27,9 @@ export function DeleteOrganizationButton({
   const [open, setOpen] = useState(false);
   const deleteOrganizations = api.organization.delete.useMutation({
     onSuccess: async () => {
+      toast({
+        description: "Succesfully deleted organization",
+      })
       onSuccess();
       await utils.organization.list.invalidate();
       setOpen(false)

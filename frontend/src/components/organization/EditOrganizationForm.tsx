@@ -38,6 +38,7 @@ export const EditOrganizationForm: React.FC<{
       setErrorMessage(null);
       await utils.organization.list.invalidate();
       await utils.organization.listForUser.invalidate();
+      await router.push("/dashboard/organizations");
     },
     onError: (error) => setErrorMessage(error.message),
   });
@@ -47,7 +48,7 @@ export const EditOrganizationForm: React.FC<{
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
-          setOrganizationEdited(data.name);
+          setOrganizationEdited(data.title ?? data.name);
           editOrganization.mutate(data);
         })}
       >

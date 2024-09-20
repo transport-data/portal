@@ -27,6 +27,9 @@ export function DeleteGroupButton({
   const [open, setOpen] = useState(false);
   const deleteGroups = api.group.delete.useMutation({
     onSuccess: async () => {
+      toast({
+        description: "Succesfully deleted topic",
+      })
       onSuccess();
       await utils.group.list.invalidate();
       setOpen(false)

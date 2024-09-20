@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@lib/utils";
 import { Check } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface InviteUserFormProps {
   groupId: string;
@@ -55,6 +56,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
 }: InviteUserFormProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchedUser, setSearchedUser] = useState("");
+  const [userAdded, setUserAdded] = useState("");
   const { data: users, isLoading: isAllUsersLoading } =
     api.user.list.useQuery();
 
@@ -97,13 +99,15 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
   const utils = api.useContext();
   const inviteUser = api.user.inviteUser.useMutation({
     onSuccess: async (response) => {
-      notify(
-        `Successfully ${
+      toast({
+        description: `Successfully ${
           typeof response === "string" ? "added" : "invited"
         } the ${
-          typeof response === "string" ? response : response?.display_name
-        } user`
-      );
+          typeof response === "string"
+            ? response
+            : response?.display_name ?? response?.name ?? response?.id
+        } user`,
+      });
       formObj.reset();
       setErrorMessage(null);
       await utils.organization.get.invalidate();
@@ -122,7 +126,10 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit(
-          (data) => inviteUser.mutate(data),
+          (data) => {
+            setUserAdded(data.user);
+            inviteUser.mutate(data);
+          },
           (e) => {
             console.log(e);
           }
@@ -151,7 +158,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                           ? usersOptions.find((u) => u.value === field.value)
                               ?.label
                           : field.value && field.value.length > 0
-                          ? `Invite "${field.value}"`
+                          ? `Add "${field.value}"`
                           : "Select user"}
                       </Button>
                     </FormControl>
@@ -169,22 +176,23 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                       <CommandList>
                         <CommandEmpty></CommandEmpty>
                         <CommandGroup>
-                          {(searchedUser.length > 2 && !userAlreadyExists(searchedUser)) && 
-                          <CommandItem
-                            value={searchedUser}
-                            className={cn(
-                              field.value === searchedUser
-                                ? "bg-accent text-accent-foreground"
-                                : ""
+                          {searchedUser.length > 2 &&
+                            !userAlreadyExists(searchedUser) && (
+                              <CommandItem
+                                value={searchedUser}
+                                className={cn(
+                                  field.value === searchedUser
+                                    ? "bg-accent text-accent-foreground"
+                                    : ""
+                                )}
+                                onSelect={() => {
+                                  formObj.setValue("user", searchedUser ?? "");
+                                  formObj.setValue("existingUser", false);
+                                }}
+                              >
+                                Add {searchedUser}
+                              </CommandItem>
                             )}
-                            onSelect={() => {
-                              formObj.setValue("user", searchedUser ?? "");
-                              formObj.setValue("existingUser", false);
-                            }}
-                          >
-                            Invite {searchedUser}
-                          </CommandItem>
-                          }
                           {usersOptions.map((u) => (
                             <CommandItem
                               value={u.value}
@@ -247,7 +255,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
           {match(inviteUser.isLoading)
             .with(false, () => (
               <Button type="submit" color="stone" className="mt-8 w-full py-4">
-                Invite user
+                Add user
               </Button>
             ))
             .otherwise(() => (
@@ -258,7 +266,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                 className="mt-8 flex w-full py-4"
               >
                 <Spinner className="text-slate-900" />
-                Invite user
+                Add user
               </Button>
             ))}
         </div>
