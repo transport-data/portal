@@ -61,7 +61,7 @@ export const CreateOrganizationForm: React.FC = () => {
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
-          setOrganizationCreated(data.name);
+          setOrganizationCreated(data.title ?? data.name);
           createOrganization.mutate(data);
         })}
       >

@@ -159,14 +159,18 @@ export default function DatasetSearchItem({
                   <>
                     Data have been validated, and derived from multiple sources
                     by TDC. For more information,{" "}
-                    <Link className="underline" href={"https://google.com"}>
+                    <Link className="underline" 
+                      target="_blank"
+                      href={"https://google.com"}>
                       click here
                     </Link>
                   </>
                 ) : tdc_category === "tdc_formatted" ? (
                   <>
                     Data is SDMX-compliant. For more information,{" "}
-                    <Link className="underline" href={"https://google.com"}>
+                    <Link className="underline" 
+                      target="_blank"
+                      href={"https://google.com"}>
                       click here
                     </Link>
                   </>

@@ -75,7 +75,7 @@ export default function ResetUserPage({
   const resetUser = api.user.resetUser.useMutation({
     onSuccess: async () => {
       await signIn("credentials", {
-        callbackUrl: "/dashboard",
+        callbackUrl: "/dashboard/newsfeed",
         username: watch("name"),
         password: watch("password"),
       });

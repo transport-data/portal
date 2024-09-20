@@ -16,7 +16,7 @@ export default defineConfig({
     REPORT_NAME_SUFFIX: "-report-test",
   },
   e2e: {
-    baseUrl: "http://localhost:3000",
+    baseUrl: "http://127.0.0.1:3000",
     apiUrl: "http://ckan-dev:5000",
   },
 });

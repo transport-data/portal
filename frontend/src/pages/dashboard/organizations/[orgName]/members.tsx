@@ -59,11 +59,11 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
                     },
                     {
                       label: "Edit Organization",
-                      href: `/dashboard/organization/${organization.name}/edit`,
+                      href: `/dashboard/organizations/${organization.name}/edit`,
                     },
                     {
                       label: "Edit Organization Members",
-                      href: `/dashboard/organization/${organization.name}/members`,
+                      href: `/dashboard/organizations/${organization.name}/members`,
                     },
                   ]}
                 />
@@ -92,7 +92,7 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
                 onClick={() => setIsInvitingUser(true)}
                 className="mb-10 ml-auto !inline w-auto"
               >
-                Invite member
+                Add member
               </Button></div>
             </div>
             <OrganizationUsersTable name={organization.name} />
@@ -101,7 +101,7 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
       <Modal
         show={isInvitingUser}
         setShow={setIsInvitingUser}
-        title="Invite member"
+        title="Add member"
       >
         <InviteUserForm groupId={organization.id} orgUsers={organization.users ?? []} />
       </Modal>

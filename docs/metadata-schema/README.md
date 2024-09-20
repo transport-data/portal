@@ -16,7 +16,7 @@ The following entities are used in the TDC CKAN extension:
 
 The way the entities relate to each other is the following:
 
-![relationships](./relationships.svg)
+![relationships](./relationships.png)
 
 Note that:
 
@@ -202,11 +202,13 @@ What time window the data in the dataset covers.
 
 List of countries the dataset is associated with. Regions are calculated automatically based on the chosen countries.
 
+[Codes for valid geographies](../geographies)
+
 **Example:**
 
 ```json
 {
-    "geographies": ["br"]
+    "geographies": ["bra"]
 }
 ```
 

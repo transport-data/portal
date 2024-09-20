@@ -17,7 +17,11 @@ export const DatasetForm: React.FC<{
     control,
   } = formObj;
 
-  const { data: groups } = api.group.list.useQuery();
+  const { data: groups } = api.group.list.useQuery(
+    {
+      showGeographyShapes: false,
+      type: 'topic'
+    });
 
   const groupOptions = groups
     ? groups.map((group) => ({

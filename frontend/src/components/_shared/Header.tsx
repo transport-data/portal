@@ -122,7 +122,10 @@ export default function Header({
                 <Button
                   variant="ghost"
                   className="relative px-0 text-gray-500"
-                  onClick={() => signOut()}
+                  onClick={() => signOut({
+                    callbackUrl: '/',
+                    redirect: true,
+                  })}
                 >
                   <ArrowRightOnRectangleIcon width={16} />
                 </Button>

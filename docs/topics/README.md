@@ -23,3 +23,15 @@ You can edit a topic by going to `/dashboard/topics/{topic url}/edit`
 In this edit page, you can also delete by clicking on the "Delete Button" which should open up a modal for confirmation
 
 ![Delete topic modal](./delete.png)
+
+## List and Search Topics
+To view the Topics list, you can go to `/dashboard/topics`.
+Only Sysadmin users can view and Search topics.
+
+![List Topics](list.png)
+
+You can search for Topics based on their name, title and description.
+
+![Search Topics](search.png)
+
+Clicking on a Topics will redirect you to Edit Topic Page.

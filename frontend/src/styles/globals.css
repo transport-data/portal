@@ -95,6 +95,10 @@ body {
     center;
 }
 
+div[data-testid="carousel"] div:nth-child(2) {
+  bottom: -26px;
+}
+
 .icon-at-left {
   background: url("../../public/assets/organization-icon.svg") no-repeat left
     16px center;

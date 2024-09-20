@@ -11,7 +11,8 @@ import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 
 const CreateOrganizationPage: NextPage = () => {
   const { data: sessionData } = useSession();
-  if (!sessionData) return <Loading />;
+  const isSysAdmin = sessionData?.user?.sysadmin == true;
+  if (!isSysAdmin) return <Loading />;
 
   return (
     <>

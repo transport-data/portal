@@ -8,7 +8,16 @@
     "lint": "next lint",
     "prebuild": "npm run mddb",
     "mddb": "mddb md",
-    "start": "next start"
+    "start": "next start",
+    "cy:verify": "cypress verify",
+    "cy:info": "cypress info",
+    "test": "cypress run",
+    "open": "cypress open",
+    "tests": "node test.js",
+    "test:headless": "$(npm bin)/cypress run --headless",
+    "test:recorded": "cypress run --record --key 9b3fe9b0-b8ef-4e2d-895f-17f0a6cc5031",
+    "test:notrecorded": "cypress run",
+    "test:recorded-parallel": "cypress run --record --key 9b3fe9b0-b8ef-4e2d-895f-17f0a6cc5031 --parallel"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.398.0",
@@ -124,6 +133,12 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "axe-core": "^4.8.2",
+    "cypress-axe": "^1.5.0",
+    "cypress-file-upload": "^5.0.7",
+    "@4tw/cypress-drag-drop": "^2.2.5",
+    "ckan-integration-tests": "github:datopian/ckan-integration-tests",
+    "cypress": "13.6.2",
     "@types/eslint": "^8.37.0",
     "@types/node": "^18.16.0",
     "@types/prettier": "^2.7.2",
