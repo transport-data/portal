@@ -54,12 +54,6 @@ export default function DatasetsPage({
     });
 
     map.on("load", () => {
-      // Add a source for the countries polygons.
-      // map.addSource("countries", {
-      //   type: "geojson",
-      //   data: "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson",
-      // });
-
       const popup = new maplibregl.Popup({
         closeButton: false,
         closeOnClick: false,
@@ -67,35 +61,33 @@ export default function DatasetsPage({
       });
 
       let maxOfDatasets = 0;
-      const top: string[] = [];
-      const medium = [];
-      const lowest = [];
 
       groups.forEach((x) => {
         if (maxOfDatasets < x.package_count) maxOfDatasets = x.package_count;
       });
 
-      // const colorsByCount = new Map();
-      // const colors = [
-      //   "#B2EBF2",
-      //   "#4DD0E1",
-      //   "#26C6DA",
-      //   "#00BCD4",
-      //   "#00ACC1",
-      //   "#0097A7",
-      //   "#006064",
-      // ];
+      const getFillColor = (packageCount: number) => {
+        if (packageCount === 0) return "#D1D5DB";
 
-      // let counter = 0;
+        const colors = interpolateColors(
+          hexToRgb("#B2EBF2"),
+          hexToRgb("#006064"),
+          10
+        );
 
-      // for (let i = 0; i < maxOfDatasets; i + maxOfDatasets / colors.length) {
-      //   colorsByCount.set(counter, colors[counter]);
-      //   counter++;
-      // }
+        let index = 0;
+        const percentage = `${(packageCount / maxOfDatasets) * 100}`;
 
-      console.log(
-        interpolateColors(hexToRgb("#B2EBF2"), hexToRgb("#006064"), 9)
-      );
+        if (/\d/g.test(percentage[1]!)) {
+          index = Number(percentage[0]!);
+        }
+
+        if (/\d\d\d/g.test(percentage.slice(0, 3)!)) {
+          index = colors.length - 1;
+        }
+
+        return colors[index];
+      };
 
       groups.forEach((x) => {
         if (x.geography_shape) {
@@ -108,7 +100,7 @@ export default function DatasetsPage({
             type: "fill",
             source: x.id,
             paint: {
-              "fill-color": "blue",
+              "fill-color": getFillColor(x.package_count),
               "fill-outline-color": "white",
             },
           });
@@ -876,105 +868,38 @@ const style: any = {
   },
 };
 
-const countriesWithLargeAmountOfDatasets = [
-  "USA",
-  "ATG",
-  "AUS",
-  "BTN",
-  "COG",
-  "CZE",
-  "GHA",
-  "GIN",
-  "HTI",
-  "ISL",
-  "JOR",
-  "KHM",
-  "KOR",
-  "LVA",
-  "MLT",
-  "MNE",
-  "MOZ",
-  "PER",
-  "SAH",
-  "SGP",
-  "SLV",
-  "SOM",
-  "TJK",
-  "TUV",
-  "UKR",
-  "WSM",
-];
-
-const countriesWithMediumAmountOfDatasets = [
-  "AZE",
-  "BGD",
-  "CAN",
-  "CHL",
-  "CMR",
-  "CSI",
-  "DEU",
-  "DJI",
-  "GUY",
-  "HUN",
-  "IOA",
-  "JAM",
-  "LBN",
-  "LBY",
-  "LSO",
-  "MDG",
-  "MKD",
-  "MNG",
-  "MRT",
-  "NIU",
-  "NZL",
-  "PCN",
-  "PYF",
-  "SAU",
-  "RUS",
-  "SHN",
-  "STP",
-  "TTO",
-  "UGA",
-  "UZB",
-  "ZMB",
-];
-
-function hexToRgb(hex) {
-  var arrBuff = new ArrayBuffer(4);
-  var vw = new DataView(arrBuff);
+const hexToRgb = (hex: string) => {
+  let arrBuff = new ArrayBuffer(4);
+  let vw = new DataView(arrBuff);
   hex = hex.replace(/[^0-9A-F]/gi, "");
   vw.setUint32(0, parseInt(hex, 16), false);
-  var arrByte = new Uint8Array(arrBuff);
+  let arrByte = new Uint8Array(arrBuff);
 
   return arrByte[1] + "," + arrByte[2] + "," + arrByte[3];
-}
+};
 
-function interpolateColor(color1, color2, factor) {
-  if (arguments.length < 3) {
-    factor = 0.5;
-  }
-  var result = color1.slice();
-  for (var i = 0; i < 3; i++) {
+const interpolateColor = (color1, color2, factor: number = 0.5) => {
+  let result = color1.slice();
+  for (let i = 0; i < 3; i++) {
     result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
   }
   return result;
-}
+};
 
-// My function to interpolate between two colors completely, returning an array
-function interpolateColors(color1, color2, steps) {
-  var stepFactor = 1 / (steps - 1),
+const interpolateColors = (color1, color2, steps: number) => {
+  let stepFactor = 1 / (steps - 1),
     interpolatedColorArray = [];
 
   color1 = color1.match(/\d+/g).map(Number);
   color2 = color2.match(/\d+/g).map(Number);
 
-  for (var i = 0; i < steps; i++) {
-    var color_ = interpolateColor(color1, color2, stepFactor * i);
+  for (let i = 0; i < steps; i++) {
+    let color_ = interpolateColor(color1, color2, stepFactor * i);
 
-    var new_color_ =
+    let new_color_ =
       "rgba(" + color_[0] + "," + color_[1] + "," + color_[2] + ",1)";
     interpolatedColorArray.push(new_color_);
   }
 
   return interpolatedColorArray;
-}
+};
