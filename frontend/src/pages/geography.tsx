@@ -1,22 +1,34 @@
 import { Badge } from "@components/ui/badge";
 import listOfCountries from "@lib/listOfCountries";
+import { listGroups } from "@utils/group";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import * as getCountryISO2 from "country-iso-3-to-2";
+
 import Layout from "../components/_shared/Layout";
 
+export async function getServerSideProps(ctx) {
+  return {
+    props: {
+      groups: (
+        await listGroups({
+          apiKey: ctx.session?.apiKey || "",
+          type: "geography",
+          showCoordinates: true,
+          limit: 350,
+        })
+      ).filter((x) => x.geography_type === "country"),
+    },
+  };
+}
+
 export default function DatasetsPage({
-  countriesByAlpha2Abbreviation,
-}: {
-  countriesByAlpha2Abbreviation: Map<
-    string,
-    { imageUrl: string; totalOfdatasets: number }
-  >;
-  // Ideally receive a map would be good but we can use the example below instead
-  // countries: { imageUrl: string; countryAbbreviationInAlpha2: string, totalOfdatasets: number }[];
-}): JSX.Element {
+  groups,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const letterMap = new Map<string, string[]>();
   listOfCountries.forEach((country) => {
     let letter = country.name[0]!.toLowerCase();
@@ -38,15 +50,15 @@ export default function DatasetsPage({
       interactive: window.innerWidth < 787,
       renderWorldCopies: false,
       scrollZoom: false,
-      maxZoom: window.innerWidth < 787 ? 0.6 : null
+      maxZoom: window.innerWidth < 787 ? 0.6 : null,
     });
 
     map.on("load", () => {
       // Add a source for the countries polygons.
-      map.addSource("countries", {
-        type: "geojson",
-        data: "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson",
-      });
+      // map.addSource("countries", {
+      //   type: "geojson",
+      //   data: "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson",
+      // });
 
       const popup = new maplibregl.Popup({
         closeButton: false,
@@ -54,91 +66,193 @@ export default function DatasetsPage({
         className: "customized-tooltip",
       });
 
-      // Add a layer showing the countries polygons.
-      map.addLayer({
-        id: "countries-layer",
-        type: "fill",
-        source: "countries",
-        paint: {
-          "fill-color": [
-            "match",
-            ["get", "ISO_A3"],
-            countriesWithLargeAmountOfDatasets,
-            "#006064",
-            countriesWithMediumAmountOfDatasets,
-            "#00BCD4",
-            "#D1D5DB",
-          ],
-          "fill-outline-color": "white",
-        },
+      let maxOfDatasets = 0;
+      const top: string[] = [];
+      const medium = [];
+      const lowest = [];
+
+      groups.forEach((x) => {
+        if (maxOfDatasets < x.package_count) maxOfDatasets = x.package_count;
       });
 
-      map.on("click", "countries-layer", (e) => {
-        router.push(
-          `/dataset-search?country=${(e.features || [])[0]?.properties.ISO_A2}`
-        );
-      });
+      // const colorsByCount = new Map();
+      // const colors = [
+      //   "#B2EBF2",
+      //   "#4DD0E1",
+      //   "#26C6DA",
+      //   "#00BCD4",
+      //   "#00ACC1",
+      //   "#0097A7",
+      //   "#006064",
+      // ];
 
-      map.on("mouseenter", "countries-layer", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
+      // let counter = 0;
 
-      map.on("mousemove", "countries-layer", (e) => {
-        if (popup._container) {
-          popup._container.style.minWidth = "194px";
-          popup._container.style.cursor = "pointer";
-          popup._container.style.width = "194px";
-          popup._container.style.height = "171px";
-          popup._container.style.minHeight = "171px";
-        }
+      // for (let i = 0; i < maxOfDatasets; i + maxOfDatasets / colors.length) {
+      //   colorsByCount.set(counter, colors[counter]);
+      //   counter++;
+      // }
 
-        if (
-          (e.features || []).length > 0 &&
-          !(
-            (e.features || [])[0]?.properties.ADMIN ===
+      console.log(
+        interpolateColors(hexToRgb("#B2EBF2"), hexToRgb("#006064"), 9)
+      );
+
+      groups.forEach((x) => {
+        if (x.geography_shape) {
+          map.addSource(x.id, {
+            type: "geojson",
+            data: x.geography_shape,
+          });
+          map.addLayer({
+            id: x.id,
+            type: "fill",
+            source: x.id,
+            paint: {
+              "fill-color": "blue",
+              "fill-outline-color": "white",
+            },
+          });
+
+          map.on("click", x.id, (e) => {
+            router.push(
+              `/search?region=${(e.features || [])[0]?.properties.ISO_A2}`
+            );
+          });
+
+          map.on("mouseenter", x.id, () => {
+            map.getCanvas().style.cursor = "pointer";
+          });
+
+          map.on("mousemove", x.id, (e) => {
+            if (popup._container) {
+              popup._container.style.minWidth = "194px";
+              popup._container.style.cursor = "pointer";
+              popup._container.style.width = "194px";
+              popup._container.style.height = "171px";
+              popup._container.style.minHeight = "171px";
+            }
+
             popup
-              .getElement()
-              ?.getElementsByTagName("div")
-              ?.item(1)
-              ?.getElementsByTagName("div")
-              ?.item(0)
-              ?.getElementsByClassName("country-title")
-              ?.item(0)
-              ?.textContent?.trim()
-          )
-        ) {
-          popup
-            .setLngLat(e.lngLat)
-            .setHTML(
-              `        
+              .setLngLat(e.lngLat)
+              .setHTML(
+                `        
               <div>
-              <img style="object-fit: none; width: 40px; height: 40px; border-radius: 9999px" src="https://flagsapi.com/${
-                (e.features || [])[0]?.properties.ISO_A2
-              }/flat/64.png"></img>
+              <img style="object-fit: none; width: 40px; height: 40px; border-radius: 9999px" src="${
+                x.image_display_url || x.image_url
+              }"></img>
                 
               <div class="country-title" style="color: white'; font-size: 14px">${
-                (e.features || [])[0]?.properties.ADMIN
+                x.title
               }
               </div>
-              <div style="color: #9CA3AF">${
-                (e.features || [])[0]?.properties.ISO_A2
-              }</div>
+              <div style="color: #9CA3AF">${getCountryISO2(
+                x.name.toUpperCase()
+              )}</div>
 
 
                 </div>
                 
-                <div style="color: white; font-size: 30px">${1650}+</div>
+                <div style="color: white; font-size: 30px">${
+                  x.package_count
+                }+</div>
                 <div style="color: #9CA3AF; font-size: 16px">Datasets</div>
               `
-            )
-            .addTo(map);
+              )
+              .addTo(map);
+          });
+
+          map.on("mouseleave", x.id, () => {
+            map.getCanvas().style.cursor = "";
+            popup.remove();
+          });
         }
       });
 
-      map.on("mouseleave", "countries-layer", () => {
-        map.getCanvas().style.cursor = "";
-        popup.remove();
-      });
+      // Add a layer showing the countries polygons.
+      // TODO remove it
+      // map.addLayer({
+      //   id: "countries-layer",
+      //   type: "fill",
+      //   source: "countries",
+      //   paint: {
+      //     "fill-color": [
+      //       "match",
+      //       ["get", "ISO_A3"],
+      //       top,
+      //       "#006064",
+      //       countriesWithMediumAmountOfDatasets,
+      //       "#00BCD4",
+      //       "#D1D5DB",
+      //     ],
+      //     "fill-outline-color": "white",
+      //   },
+      // });
+
+      // map.on("click", "countries-layer", (e) => {
+      //   router.push(
+      //     `/search?region=${(e.features || [])[0]?.properties.ISO_A2}`
+      //   );
+      // });
+
+      // map.on("mouseenter", "countries-layer", () => {
+      //   map.getCanvas().style.cursor = "pointer";
+      // });
+
+      // map.on("mousemove", "countries-layer", (e) => {
+      //   if (popup._container) {
+      //     popup._container.style.minWidth = "194px";
+      //     popup._container.style.cursor = "pointer";
+      //     popup._container.style.width = "194px";
+      //     popup._container.style.height = "171px";
+      //     popup._container.style.minHeight = "171px";
+      //   }
+
+      //   if (
+      //     (e.features || []).length > 0 &&
+      //     !(
+      //       (e.features || [])[0]?.properties.ADMIN ===
+      //       popup
+      //         .getElement()
+      //         ?.getElementsByTagName("div")
+      //         ?.item(1)
+      //         ?.getElementsByTagName("div")
+      //         ?.item(0)
+      //         ?.getElementsByClassName("country-title")
+      //         ?.item(0)
+      //         ?.textContent?.trim()
+      //     )
+      //   ) {
+      //     popup
+      //       .setLngLat(e.lngLat)
+      //       .setHTML(
+      //         `
+      //         <div>
+      //         <img style="object-fit: none; width: 40px; height: 40px; border-radius: 9999px" src="https://flagsapi.com/${
+      //           (e.features || [])[0]?.properties.ISO_A2
+      //         }/flat/64.png"></img>
+
+      //         <div class="country-title" style="color: white'; font-size: 14px">${
+      //           (e.features || [])[0]?.properties.ADMIN
+      //         }
+      //         </div>
+      //         <div style="color: #9CA3AF">${
+      //           (e.features || [])[0]?.properties.ISO_A2
+      //         }</div>
+
+      //           </div>
+
+      //           <div style="color: white; font-size: 30px">${1650}+</div>
+      //           <div style="color: #9CA3AF; font-size: 16px">Datasets</div>
+      //         `
+      //       )
+      //       .addTo(map);
+      //   }
+      // });
+
+      // map.on("mouseleave", "countries-layer", () => {
+      //   map.getCanvas().style.cursor = "";
+      //   popup.remove();
+      // });
     });
   }, []);
 
@@ -160,7 +274,10 @@ export default function DatasetsPage({
                 Datasets by country & geography
               </h5>
             </div>
-            <div className="flex min-h-[523px] max-h-[523px] sm:min-h-[823px] sm:max-h-[823px]" id="map"></div>
+            <div
+              className="flex max-h-[523px] min-h-[523px] sm:max-h-[823px] sm:min-h-[823px]"
+              id="map"
+            ></div>
           </div>
           <div className="flex flex-wrap items-center justify-center">
             <div className="mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 pt-20 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2473px]">
@@ -351,7 +468,7 @@ const style: any = {
       type: "fill",
       source: "crimea",
       paint: {
-        "fill-color": "#D6C7FF",
+        "fill-color": "#D1D5DB",
       },
     },
   ],
@@ -821,3 +938,43 @@ const countriesWithMediumAmountOfDatasets = [
   "UZB",
   "ZMB",
 ];
+
+function hexToRgb(hex) {
+  var arrBuff = new ArrayBuffer(4);
+  var vw = new DataView(arrBuff);
+  hex = hex.replace(/[^0-9A-F]/gi, "");
+  vw.setUint32(0, parseInt(hex, 16), false);
+  var arrByte = new Uint8Array(arrBuff);
+
+  return arrByte[1] + "," + arrByte[2] + "," + arrByte[3];
+}
+
+function interpolateColor(color1, color2, factor) {
+  if (arguments.length < 3) {
+    factor = 0.5;
+  }
+  var result = color1.slice();
+  for (var i = 0; i < 3; i++) {
+    result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+  }
+  return result;
+}
+
+// My function to interpolate between two colors completely, returning an array
+function interpolateColors(color1, color2, steps) {
+  var stepFactor = 1 / (steps - 1),
+    interpolatedColorArray = [];
+
+  color1 = color1.match(/\d+/g).map(Number);
+  color2 = color2.match(/\d+/g).map(Number);
+
+  for (var i = 0; i < steps; i++) {
+    var color_ = interpolateColor(color1, color2, stepFactor * i);
+
+    var new_color_ =
+      "rgba(" + color_[0] + "," + color_[1] + "," + color_[2] + ",1)";
+    interpolatedColorArray.push(new_color_);
+  }
+
+  return interpolatedColorArray;
+}

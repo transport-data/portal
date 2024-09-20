@@ -1,6 +1,7 @@
 import { type CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { GroupFormType, type Group } from "@schema/group.schema";
+import { GeoJSONSource } from "maplibre-gl";
 
 export const getGroup = async ({
   apiKey,
@@ -21,9 +22,13 @@ export const listGroups = async ({
   apiKey,
   type,
   showCoordinates,
+  limit,
+  sort,
 }: {
   apiKey: string;
+  limit?: number;
   type: "topic" | "geography";
+  sort?: string;
   showCoordinates?: boolean;
 }) => {
   // TODO: implement pagination and other parameters
@@ -36,9 +41,21 @@ export const listGroups = async ({
     action += `&include_shapes=${true}`;
   }
 
+  if (sort) {
+    action += `&sort=${true}`;
+  }
+
+  if (limit) {
+    action += `&limit=${limit}`;
+  }
+
+  console.log(action)
+
   const groups = await CkanRequest.get<
     CkanResponse<
-      Group[] & { geography_shape?: { type: string; coordinates: [] } }
+      Array<
+        Group & { geography_type?: string; geography_shape?: GeoJSON.GeoJSON }
+      >
     >
   >(action, {
     apiKey,
