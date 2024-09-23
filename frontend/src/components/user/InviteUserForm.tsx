@@ -101,7 +101,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
     onSuccess: async (response) => {
       toast({
         description: `Successfully ${
-          typeof response === "string" ? "added" : "invited"
+          formObj.getValues("existingUser") ? "added" : "invited"
         } the ${
           typeof response === "string"
             ? response
