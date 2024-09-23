@@ -130,6 +130,7 @@ export const OrganizationForm: React.FC<{
                     </span>
                   ))}
               </FormControl>
+              <FormDescription>Use this if you want to say that this organization is a sub-organization of another organization</FormDescription>
               <FormMessage />
             </FormItem>
           )}

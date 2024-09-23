@@ -139,6 +139,7 @@ export const GroupForm: React.FC<{
                   </span>
                 ))}
             </FormControl>
+            <FormDescription>Use this if you want to say that this topic is a sub-group of another topic</FormDescription>
             <FormMessage />
           </FormItem>
         )}
