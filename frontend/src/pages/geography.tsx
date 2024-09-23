@@ -129,7 +129,7 @@ export default function DatasetsPage({
               .setHTML(
                 `        
               <div>
-              <img style="object-fit: none; width: 40px; height: 40px; border-radius: 9999px" src="${
+              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" src="${
                 x.image_display_url || x.image_url
               }"></img>
                 
