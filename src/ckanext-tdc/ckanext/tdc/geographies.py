@@ -31,9 +31,21 @@ def get_un_regions():
         title = properties.get("nam_en")
         object_id = properties.get("objectid")
         sts_code = properties.get("stscod")
+        iso3_code = properties.get("iso3cd")
 
         # 010 => Antarctica
-        if title and m49_code != "010" and sts_code == 1:
+        add_check = title and m49_code != "010"
+
+        if sts_code != 1 and title and iso3_code:
+            same_iso3_list = list(filter(
+                    lambda x: x["properties"].get('iso3cd') == iso3_code
+                    and x["properties"].get("stscod") == 1
+                    and x["properties"].get("nam_en"), features))
+            add_check = add_check and len(same_iso3_list) == 0
+        else:
+            add_check = add_check and sts_code == 1
+
+        if add_check:
             area_code = int(area_code)
             if area_code not in regions:
                 regions[area_code] = {}
@@ -67,6 +79,8 @@ def create_geography(data_dict):
         group_exists = False
 
     if not group_exists:
+        # NOTE: this check_access prevents an exception
+        logic.check_access("group_show", priviliged_context, {"id": data_dict["name"]})
         create_group_action(priviliged_context, data_dict)
     else:
         log.info("{} already exists. Updating it.".format(data_dict["name"]))
@@ -75,14 +89,17 @@ def create_geography(data_dict):
 
 
 def delete_geography(data_dict):
-    site_user = tk.get_action("get_site_user")({"ignore_auth": True}, {})
-    priviliged_context = {"ignore_auth": True, "user": site_user["name"]}
-    delete_group_action = tk.get_action("group_delete")
-    purge_group_action = tk.get_action("group_purge")
-    data_dict["type"] = "geography"
-    data_dict["id"] = data_dict["name"]
-    delete_group_action(priviliged_context, data_dict)
-    purge_group_action(priviliged_context, data_dict)
+    try:
+        site_user = tk.get_action("get_site_user")({"ignore_auth": True}, {})
+        priviliged_context = {"ignore_auth": True, "user": site_user["name"]}
+        delete_group_action = tk.get_action("group_delete")
+        purge_group_action = tk.get_action("group_purge")
+        data_dict["type"] = "geography"
+        data_dict["id"] = data_dict["name"]
+        delete_group_action(priviliged_context, data_dict)
+        purge_group_action(priviliged_context, data_dict)
+    except Exception as e:
+        log.error(e)
 
 
 def create_region(m49_code):
@@ -97,7 +114,7 @@ def create_region(m49_code):
 
 
 def upload_country_flag(iso2):
-    r = requests.get("https://flagsapi.com/{}/flat/64.png".format(iso2), stream=True)
+    r = requests.get("https://flagcdn.com/h60/{}.png".format(iso2.lower()), stream=True)
     r.raise_for_status()
 
     upload_to = "group"
