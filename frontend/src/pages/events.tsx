@@ -20,8 +20,14 @@ export type EventsProps = {
   source?: string;
 };
 
-export default function EventsPage({ events }: { events: Array<EventsProps> }) {
-  const [highlighted, ...rest] = events;
+export default function EventsPage({
+  upcoming,
+  past,
+}: {
+  upcoming: Array<EventsProps>;
+  past: Array<EventsProps>;
+}) {
+  const [highlighted, ...rest] = upcoming;
   const otherEvents = rest?.splice(0, 2);
   const otherEventsSize = otherEvents.length;
   return (
@@ -73,21 +79,25 @@ export default function EventsPage({ events }: { events: Array<EventsProps> }) {
             Past Events
           </Heading>
           <div className="relative grid grid-cols-1 gap-[40px] md:grid-cols-2">
-            {otherEvents.map((event, i) => {
-              return (
-                <div className="col-span-1 pt-[20px]">
-                  <EventCard
-                    key={`event-${i}`}
-                    {...event}
-                    showImage={false}
-                    className={`rounded-none `}
-                  />
-                </div>
-              );
-            })}
+            {past.length > 0 ? (
+              past.map((event, i) => {
+                return (
+                  <div className="col-span-1 pt-[20px]">
+                    <EventCard
+                      key={`event-${i}`}
+                      {...event}
+                      showImage={false}
+                      className={`rounded-none `}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="mt-8">No past events available</div>
+            )}
+
             <div className="absolute inset-y-0 left-1/2 hidden w-[1px] bg-gray-200 md:block"></div>
           </div>
-          <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2"></div>
         </div>
         <NewsLetterSection />
       </Layout>
@@ -107,11 +117,25 @@ export const getStaticProps = async () => {
       source,
     } as EventsProps;
   });
+
+  const now = new Date();
+
+  const upcomingEvents = events.filter(
+    (event) => new Date(event.from ?? "") > now
+  );
+  const pastEvents = events.filter(
+    (event) => new Date(event.from ?? "") <= now
+  );
+
   return {
     props: {
-      events: events.sort(
+      upcoming: upcomingEvents.sort(
         (a, b) =>
           new Date(a.from ?? "").getTime() - new Date(b.from ?? "").getTime()
+      ),
+      past: pastEvents.sort(
+        (a, b) =>
+          new Date(b.from ?? "").getTime() - new Date(a.from ?? "").getTime()
       ),
     },
   };

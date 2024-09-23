@@ -32,15 +32,25 @@ export const formatIcon = (format: string) => {
 }
 
 export const formatDatePeriod = (from:string,to:string)=>{
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const fromDate = new Date(from);
   const toDate = new Date(to);
-  const dayFrom = fromDate.getDate();
-  const dayTo = toDate.getDate();
-  const month = months[fromDate.getMonth()];
-  const year = fromDate.getFullYear();
 
-  return `${dayFrom} - ${dayTo} ${month} ${year}`;
+  // Formatter for day and month
+  const dayMonthFormatter = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
+
+  // Formatter for full date (with year)
+  const fullDateFormatter = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  // Check if the from and to dates are in the same month and year
+  const sameMonthYear = fromDate.getMonth() === toDate.getMonth() && fromDate.getFullYear() === toDate.getFullYear();
+
+  if (sameMonthYear) {
+    // 12 - 16 May 2023
+    return `${fromDate.getDate()} - ${dayMonthFormatter.format(toDate)} ${toDate.getFullYear()}`;
+  } else {
+    // 12 Mar 2023 - 16 Apr 2023
+    return `${fullDateFormatter.format(fromDate)} - ${fullDateFormatter.format(toDate)}`;
+  }
 }
 
 export function getFileName(url: string) {
