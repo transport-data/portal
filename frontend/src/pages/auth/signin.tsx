@@ -13,7 +13,7 @@ import { ErrorAlert } from "@components/_shared/Alerts";
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { old_signin } = context.query;
   if (old_signin && old_signin === "true") {
-    console.log('OLD SIGNIN')
+    console.log("OLD SIGNIN");
     return {
       props: {
         csrfToken: await getCsrfToken(context),
@@ -23,14 +23,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   return {
     props: {
-      empty: null
+      empty: null,
     },
   };
 }
 
-export default function LoginPage({ csrfToken, old_signin }: { csrfToken?: string, old_signin?: boolean }) {
+export default function LoginPage({
+  csrfToken,
+  old_signin,
+}: {
+  csrfToken?: string;
+  old_signin?: boolean;
+}) {
   if (old_signin && csrfToken) {
-    console.log('OLD SIGNIN', old_signin)
+    console.log("OLD SIGNIN", old_signin);
     return <OldLoginPage csrfToken={csrfToken} />;
   }
   return (
@@ -46,7 +52,11 @@ export default function LoginPage({ csrfToken, old_signin }: { csrfToken?: strin
           <div>
             <div className="mt-6 grid grid-cols-1 gap-4">
               <a
-                onClick={() => signIn("github")}
+                onClick={() =>
+                  signIn("github", {
+                    callbackUrl: "/dashboard/newsfeed",
+                  })
+                }
                 className="col-span-12 flex w-full cursor-pointer items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
               >
                 <svg
