@@ -9,6 +9,13 @@ from ckan.plugins import toolkit as tk
 import json
 from ckanext.scheming import helpers as scheming_helpers
 import ckan.lib.authenticator as authenticator
+import ckan.lib.mailer as mailer
+from ckan.logic.action.create import _get_random_username_from_email
+from ckan.lib.base import render
+import ckan.logic as logic
+
+NotAuthorized = logic.NotAuthorized
+get_action = logic.get_action
 
 import logging
 log = logging.getLogger(__name__)
@@ -419,3 +426,104 @@ def generate_token(context, user):
         log.error(e)
 
     return user
+
+def send_email(email_type, to_email, from_user, message, organization=None):
+    site_title = config.get('ckan.site_title')
+    site_url = config.get('ckan.site_url')
+
+    if email_type == "organization_participation":
+        subject_template = 'emails/user_participation_subject.txt'
+        subject_vars = {}
+        body_template = 'emails/request_organization_owner.txt'
+        body_vars = {
+            'site_title': site_title,
+            'site_url': site_url,
+            'user_name': from_user.name,
+            'user_email': from_user.email,
+            'message': message,
+            'organization': organization
+        }
+    elif email_type == "user_invite":
+        subject_template = 'emails/invite_user_subject.txt'
+        subject_vars = {
+            'site_title': site_title
+        }
+        body_template = 'emails/invite_user_body.txt'
+        body_vars = {
+            'site_title': site_title,
+            'site_url': site_url,
+            'user_name': from_user.name,
+            'user_email': from_user.email,
+            'message': message
+        }
+    else:
+        raise ValueError("Invalid Email Type.")
+
+    subject = render(subject_template, subject_vars)
+    body = render(body_template, body_vars)
+    name = _get_random_username_from_email(to_email)
+    mailer._mail_recipient(
+        name, to_email, site_title, site_url, subject, body
+    )
+
+def invite_user_to_tdc(context, data_dict):
+    if not context.get('user'):
+        return generic_error_message
+
+    model = context['model']
+
+    from_user = model.User.get(context['user'])
+    if not from_user:
+        return generic_error_message
+    
+    to_emails = data_dict.get("emails")
+    message = data_dict.get("message")
+
+    if not (to_emails and message):
+        raise ValueError("Missing Parameters.")
+    
+    for email in to_emails:
+        send_email("user_invite", email, from_user, message)
+    
+    return "Invited User Successfully"
+
+def request_organization_owner(context, data_dict):
+
+    if not context.get('user'):
+        return generic_error_message
+
+    model = context['model']
+
+    from_user = model.User.get(context['user'])
+    if not from_user:
+        return generic_error_message
+    
+    org_id = data_dict.get("id")
+    message = data_dict.get("message")
+
+    if not org_id:
+        raise ValueError("Missing Parameters.")
+    
+    data_dict = {
+        'id': org_id,
+        'include_users': True,
+    }
+    org_dict = get_action('organization_show')({}, data_dict)
+    ## find admin users of the org
+    to_emails = []
+    for user in org_dict.get("users"):
+        if user.get("capacity") == "admin":
+            user_show = get_action('user_show')({}, {
+                'id': user.get("id")
+            })
+            to_emails.append(user_show.get("email"))
+    
+    for email in to_emails:
+        send_email("organization_participation", email, from_user, message, org_dict.get("name"))
+    
+    return "Request Sent Successfully"
+
+    
+    
+
+

@@ -1,0 +1,10 @@
+{% trans %}
+{{ user_name }} ({{ user_email }}) has requested to be added as Member in {{ organization }}
+
+Message from {{ user_name }}:
+
+{{ message }}
+
+To accept the request, please visit {{ site_title }} at {{ site_url }}
+
+{% endtrans %}

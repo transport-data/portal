@@ -238,3 +238,25 @@ export const purgeOrganization = async ({
   );
   return purgedOrganization.result;
 };
+
+export const requestOrganizationOwner = async ({
+  id,
+  message,
+  apiKey,
+}: {
+  id: string;
+  message: string;
+  apiKey: string;
+}) => {
+  const response: CkanResponse<String> = await CkanRequest.post(
+    "request_organization_owner",
+    {
+      apiKey,
+      json: { 
+        id: id,
+        message: message
+      },
+    }
+  );
+  return response;
+};
