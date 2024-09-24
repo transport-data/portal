@@ -142,7 +142,7 @@ export default function LoginPage({
   ]);
 
   const submitOrganizationParticipation = async (selectedValues: any) => {
-    const org_id = selectedValues.orgInWhichItParticipates.id;
+    const org_id = selectedValues.orgInWhichItParticipates?.id;
     const message = selectedValues.messageToParticipateOfTheOrg;
   
     if (selectedValues.confirmThatItParticipatesOfTheOrg && org_id && message && apiKey) {
@@ -210,23 +210,28 @@ export default function LoginPage({
         console.error("Error submitting follow preferences:", error);
         <ErrorAlert text="An error occurred while submitting your follow preferences." />
       }
-    } else {
-      console.log("API key or Group IDs not found");
     }
     return true;
   };
   const nextStep = async () => {
-    if (stepNumber === steps.length - 1) {
-      const selectedValues = form.getValues();
+    const selectedValues = form.getValues();
+    if (stepNumber === 0) {
       await submitFollowPreferences();
+    } else if (stepNumber === 1) {
       await submitOrganizationParticipation(selectedValues);
+    } else if (stepNumber === 2) {
       await submitUserInvites(selectedValues);
-  
       router.push("/dashboard/newsfeed");
-    } else {
-      setStep(stepNumber + 1);
     }
+    setStep(stepNumber + 1);
   };
+
+  const skipStep = () => {
+    if (stepNumber === steps.length - 1) {
+      router.push("/dashboard/newsfeed");
+    }
+    setStep(stepNumber + 1);
+  }
 
   return (
     <>
@@ -361,7 +366,7 @@ export default function LoginPage({
                 ? "Don’t want to share data?"
                 : "Don’t want to invite anyone?"}{" "}
               <span
-                onClick={() => nextStep()}
+                onClick={() => skipStep() }
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"
               >
                 {stepNumber === 0 ? "Skip" : "Skip this step"}{" "}
