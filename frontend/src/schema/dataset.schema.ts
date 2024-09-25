@@ -9,6 +9,7 @@ export const SearchDatasetSchema = z.object({
   tags: z.array(z.string()).default([]),
   sort: z.string().optional(),
   include_private: z.boolean().optional(),
+  include_drafts : z.boolean().optional()
 });
 
 export const ResourceSchema = z.object({

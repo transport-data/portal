@@ -11,15 +11,38 @@ export const searchDatasets = async ({
   apiKey: string;
   input: SearchDatasetType;
 }) => {
-  const ckan = new CKAN(`${env.NEXT_PUBLIC_CKAN_URL}`);
-  const datasets = await ckan.packageSearch(input, {
-    headers: {
-      Authorization: apiKey,
-    },
-  });
 
-  const results = datasets.datasets;
-  return results;
+  const ckanUrl =env.NEXT_PUBLIC_CKAN_URL;
+    const baseAction = `package_search`
+
+    let queryParams: string[] = []
+
+    if (input?.query) {
+        queryParams.push(`q=${input.query}`)
+    }
+
+    if (input?.offset) {
+        queryParams.push(`start=${input.offset}`)
+    }
+
+    if (input?.limit || input?.limit == 0) {
+        queryParams.push(`rows=${input.limit}`)
+    }
+
+    if (input?.sort) {
+        queryParams.push(`sort=${input?.sort}`)
+    }
+
+    if (input?.include_drafts) {
+        queryParams.push(`include_drafts=${input?.include_drafts}`)
+    }
+
+
+    const action = `${baseAction}?${queryParams.join("&")}`
+    const res = await CkanRequest.get<any>(action, { ckanUrl, apiKey})
+
+    return res.result;
+
 };
 
 export const getDataset = async ({

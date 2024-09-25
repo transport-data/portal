@@ -2,13 +2,11 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession, useSession } from "next-auth/react";
 import Loading from "@components/_shared/Loading";
 import { NextSeo } from "next-seo";
-import { env } from "@env.mjs";
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import MyDatasetsTabContent from "@components/dashboard/MyDatasetsTabContent";
-import { CKAN } from "@portaljs/ckan";
 import { SWRConfig, unstable_serialize } from "swr";
-import { packageSearch } from "@lib/dataset";
-import { PackageSearch } from "@interfaces/ckan/package.interface";
+import { searchDatasets } from "@utils/dataset";
+import { SearchDatasetType } from "@schema/dataset.schema";
 
 export const getServerSideProps: GetServerSideProps<any> = async (context) => {
   const session = await getSession(context);
@@ -20,8 +18,7 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
       },
     };
   }
-
-  const options: PackageSearch = {
+  const options: SearchDatasetType = {
     offset: 0,
     limit: 20,
     tags: [],
@@ -30,9 +27,11 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
     include_private: true,
     include_drafts: true,
     query: `creator_user_id:${session.user.id}`,
-    token: session.user.apikey,
   };
-  const search_result = await packageSearch(options);
+  const search_result = await searchDatasets({
+    apiKey: session.user.apikey,
+    input: options,
+  });
   return {
     props: {
       fallback: {
