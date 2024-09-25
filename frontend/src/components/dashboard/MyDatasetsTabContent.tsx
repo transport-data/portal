@@ -62,7 +62,7 @@ export default () => {
       <div className="order-3 w-fit w-full sm:order-2">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
         <section className="flex flex-col gap-4">
-          {!isLoading ? (
+          {isLoading ? (
             Array.from({ length: 3 }).map((_, x) => (
               <div key={x} className="flex w-full cursor-pointer gap-6">
                 <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
