@@ -31,6 +31,10 @@ export const formatIcon = (format: string) => {
   return '/images/fileIcons/undefined.png'
 }
 
+export const formatDate = (dateString:string)=>{
+  return new Date(dateString).toLocaleDateString('en-GB');
+}
+
 export const formatDatePeriod = (from:string,to:string)=>{
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const fromDate = new Date(from);
@@ -84,3 +88,11 @@ export function truncateText(text: string, maxLength: number) {
   }
   return text;
 };
+
+
+function capitalize(text:string) {
+  return text
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
