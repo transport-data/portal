@@ -28,12 +28,17 @@ export async function getStaticProps(context: GetServerSidePropsContext) {
   const location_data = await listGroups({
     type: 'geography',
   });
-  const organizations_data = await listOrganizations({
-    input: {
-      detailed: true,
-      includeUsers: true
-    }
-  });
+  // const organizations_data = await listOrganizations({
+  //   input: {
+  //     detailed: true,
+  //     includeUsers: true
+  //   }
+  // });
+  const organizations_data = [
+    {id: "1", display_name: "Org1", name: "org_1"},
+    {id: "2", display_name: "Org2", name: "org_2"},
+    {id: "3", display_name: "Org3", name: "org_3"}
+  ]
   return {
     props: {
       csrfToken,

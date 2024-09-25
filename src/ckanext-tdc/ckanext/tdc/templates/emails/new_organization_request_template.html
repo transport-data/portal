@@ -20,18 +20,33 @@
         .site-link:hover {
             text-decoration: underline;
         }
+        .color {
+            color: #006064;
+        }
+        .visit_btn {
+            color: #FFFFFF;
+            background-color: #006064;
+            border-radius: 5px;
+            text-align: center;
+            padding: 10px 25px;
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
-    <p><span class="highlight">{{ user_name }} ({{ user_email }})</span> has Requested you to Create a new Organization.</p>
-    <hr>
-    <p>Review the Request and Create an Organization with the Following Information</p>
-    <p>Name: {{ org_name }}</p>
-    <hr>
-    <p>Description: {{ org_description }}</p>
-    <p>Data Description: {{ dataset_description }}</p>
+    <p><span class="highlight color">{{ user_name }} ({{ user_email }})</span> has Requested to Create a New Organization on {{ site_title }}</p>
+    <p>Please Review the Request</p>
 
-    <p>To accept this invite, please visit <a href="{{ site_url }}" class="site-link">{{ site_title }}</a>.</p>
+    <div class="org_detail">
+        <h2 style="background-color: #006064; text-align: center; color: #FFFFFF; padding: 10px 0px;">New Organization Request</h2>
+        <h4><span class="highlight color">Name:</span> {{ org_name }}</h4>
+        <h4><span class="highlight color">Description:</span> {{ org_description }}</h5>
+        <h4><span class="highlight color">Data Description:</span> {{ dataset_description }}</h5>
+    </div>
+    
+    <p>To Create the Organization, please visit {{ site_title }}</p>
+    <a href="{{ site_url }}" class="visit_btn">Visit CKAN</a>
     <p>Have a nice day.</p>
 </body>
 </html>

@@ -20,15 +20,29 @@
         .site-link:hover {
             text-decoration: underline;
         }
+        .color {
+            color: #006064;
+        }
+        .visit_btn {
+            color: #FFFFFF;
+            background-color: #006064;
+            border-radius: 5px;
+            text-align: center;
+            padding: 10px 25px;
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
-    <p>You have been invited to <span class="highlight">{{ site_title }}</span> by <span class="highlight">{{ user_name }} ({{ user_email }})</span>.</p>
+    <h2 style="background-color: #006064; text-align: center; color: #FFFFFF; padding: 10px 0px;">Invitation to TDC</h2>
+    <p>You have been invited to <span class="highlight color">TDC</span> by <span class="highlight">{{ user_name }} ({{ user_email }})</span>.</p>
     <hr>
     <p>Message from <span class="highlight">{{ user_name }}:</span></p>
     <p>{{ message }}</p>
     <hr>
-    <p>To accept this invite, please visit <a href="{{ site_url }}" class="site-link">{{ site_title }}</a>.</p>
+    <p>To accept this invite, please visit {{ site_title }}</p>
+    <a href="{{ site_url }}" class="visit_btn">Visit CKAN</a>
     <p>Have a nice day.</p>
 </body>
 </html>
