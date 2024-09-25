@@ -1,7 +1,15 @@
 import { Badge } from "@components/ui/badge";
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
-import classNames from "@utils/classnames";
+import {
+  CheckCircleIcon,
+  CircleStackIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/20/solid";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { formatDate } from "@lib/utils";
 import { useRouter } from "next/router";
+import { capitalize } from "remeda";
+import geography from "@data/geography.json";
+import UserAvatar from "./UserAvatar";
 
 export interface DashboardDatasetCardProps {
   tdcValidated?: boolean;
@@ -16,85 +24,81 @@ export interface DashboardDatasetCardProps {
   contributors: { imageUrl: string }[];
 }
 
-export default ({
-  tdcValidated,
-  title,
-  keywords,
-  visibility,
-  dateState,
-  updateFrequency,
-  region,
-  variant,
-  href,
-  contributors,
-}: DashboardDatasetCardProps) => {
+export default function DashboardDatasetCard(props: Dataset) {
   const router = useRouter();
+
+  const {
+    tdc_category,
+    title,
+    tags,
+    metadata_modified,
+    frequency,
+    state,
+    geographies,
+    contributors,
+  } = props;
+
+  const badgeVariant =
+    tdc_category === "tdc_harmonized"
+      ? "warning"
+      : tdc_category === "tdc_formatted"
+      ? "success"
+      : "purple";
+
+  const badgeIconOptions = {
+    width: 20,
+    height: 20,
+  };
+
+  const badgeIcon =
+    tdc_category === "tdc_harmonized" ? (
+      <ShieldCheckIcon {...badgeIconOptions} />
+    ) : tdc_category === "tdc_formatted" ? (
+      <CheckCircleIcon {...badgeIconOptions} />
+    ) : (
+      <CircleStackIcon {...badgeIconOptions} />
+    );
+
   return (
     <div
-      onClick={() => router.push(href)}
+      onClick={() => router.push("#")}
       className="flex w-full cursor-pointer gap-6"
     >
-      {variant === "success" ? (
-        <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
-          <Badge
-            className="flex h-8 w-8 items-center justify-center pl-1.5 pr-1.5"
-            icon={<CheckCircleIcon width={20} height={20} />}
-            variant="success"
-          />
-        </div>
-      ) : (
-        <div className="h-8 w-8">
-          <Badge
-            className="flex items-center p-1"
-            icon={
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7.2002 28.8V36C7.2002 39.9768 14.7218 43.2 24.0002 43.2C33.2786 43.2 40.8002 39.9768 40.8002 36V28.8C40.8002 32.7768 33.2786 36 24.0002 36C14.7218 36 7.2002 32.7768 7.2002 28.8Z"
-                  fill="#7E3AF2"
-                />
-                <path
-                  d="M7.2002 16.8V24C7.2002 27.9768 14.7218 31.2 24.0002 31.2C33.2786 31.2 40.8002 27.9768 40.8002 24V16.8C40.8002 20.7768 33.2786 24 24.0002 24C14.7218 24 7.2002 20.7768 7.2002 16.8Z"
-                  fill="#7E3AF2"
-                />
-                <path
-                  d="M40.8002 12C40.8002 15.9768 33.2786 19.2 24.0002 19.2C14.7218 19.2 7.2002 15.9768 7.2002 12C7.2002 8.02319 14.7218 4.79999 24.0002 4.79999C33.2786 4.79999 40.8002 8.02319 40.8002 12Z"
-                  fill="#7E3AF2"
-                />
-              </svg>
-            }
-            variant="purple"
-          />
-        </div>
-      )}
-      <div className="space-y-2 text-sm">
+      <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
+        <Badge
+          className="flex h-8 w-8 items-center justify-center pl-1.5 pr-1.5"
+          icon={badgeIcon}
+          variant={badgeVariant}
+        />
+      </div>
+
+      <div className="w-full space-y-2 text-sm">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-bold">{title}</h2>
-          {tdcValidated && (
+          {tdc_category === "tdc_formatted" && (
             <Badge variant={"success"} className="text-[#03543F]">
-              TDC Validated
+              TDC Formatted
             </Badge>
           )}
+          {tdc_category === "tdc_harmonized" && (
+            <Badge variant={"warning"}>TDC Harmonized</Badge>
+          )}
         </div>
+
         <div className="flex gap-2">
-          {(keywords || [])?.map((k) => (
+          {(tags || [])?.map((k) => (
             <Badge variant={"purple"} className="bg-[#E5EDFF] text-[#42389D]">
-              {k}
+              {capitalize(k.display_name ?? "")}
             </Badge>
           ))}
         </div>
 
         <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center">
-          <Badge
-            variant={"success"}
-            className="capitalize"
-            icon={
-              visibility === "public" ? (
+          {!props.private && (
+            <Badge
+              variant={"success"}
+              className="capitalize"
+              icon={
                 <svg
                   width="14"
                   height="15"
@@ -108,7 +112,16 @@ export default ({
                     stroke-width="1.5"
                   />
                 </svg>
-              ) : (
+              }
+            >
+              Public
+            </Badge>
+          )}
+          {state === "inactive" && (
+            <Badge
+              variant={"success"}
+              className="capitalize"
+              icon={
                 <svg
                   width="14"
                   height="14"
@@ -124,11 +137,12 @@ export default ({
                     stroke-linejoin="round"
                   />
                 </svg>
-              )
-            }
-          >
-            {visibility}
-          </Badge>
+              }
+            >
+              Draft
+            </Badge>
+          )}
+
           <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <svg
@@ -145,9 +159,10 @@ export default ({
                 fill="#6B7280"
               />
             </svg>
-            {dateState}
+            {formatDate(metadata_modified ?? "")}
           </span>
-          {updateFrequency && (
+
+          {frequency && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
@@ -165,55 +180,60 @@ export default ({
                     fill="#6B7280"
                   />
                 </svg>
-                {updateFrequency}
+                {capitalize(frequency)}
               </span>
             </>
           )}
-          <span className="hidden xl:block">•</span>
-          <span className="flex items-center gap-1">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M7.00039 12.5999C8.4856 12.5999 9.90999 12.0099 10.9602 10.9597C12.0104 9.9095 12.6004 8.48512 12.6004 6.9999C12.6004 5.51469 12.0104 4.09031 10.9602 3.0401C9.90999 1.9899 8.4856 1.3999 7.00039 1.3999C5.51518 1.3999 4.0908 1.9899 3.04059 3.0401C1.99039 4.09031 1.40039 5.51469 1.40039 6.9999C1.40039 8.48512 1.99039 9.9095 3.04059 10.9597C4.0908 12.0099 5.51518 12.5999 7.00039 12.5999ZM3.03279 5.6188C3.29269 4.8745 3.75644 4.21818 4.37119 3.7246C4.55879 4.0109 4.88219 4.1999 5.25039 4.1999C5.52887 4.1999 5.79594 4.31053 5.99285 4.50744C6.18977 4.70435 6.30039 4.97143 6.30039 5.2499V5.5999C6.30039 5.97121 6.44789 6.3273 6.71044 6.58985C6.97299 6.8524 7.32909 6.9999 7.70039 6.9999C8.07169 6.9999 8.42779 6.8524 8.69034 6.58985C8.95289 6.3273 9.10039 5.97121 9.10039 5.5999C9.10028 5.2866 9.20526 4.98231 9.39854 4.73573C9.59182 4.48915 9.86223 4.31453 10.1665 4.2398C10.8345 5.00397 11.202 5.98492 11.2004 6.9999C11.2004 7.2379 11.1808 7.4724 11.1423 7.6999H10.5004C10.1291 7.6999 9.77299 7.8474 9.51044 8.10995C9.24789 8.3725 9.10039 8.7286 9.10039 9.0999V10.6378C8.4622 11.0071 7.73771 11.201 7.00039 11.1999V9.7999C7.00039 9.4286 6.85289 9.0725 6.59034 8.80995C6.32779 8.5474 5.97169 8.3999 5.60039 8.3999C5.22909 8.3999 4.87299 8.2524 4.61044 7.98985C4.34789 7.7273 4.20039 7.37121 4.20039 6.9999C4.20051 6.6688 4.08329 6.34837 3.86952 6.09552C3.65576 5.84267 3.3593 5.67377 3.03279 5.6188Z"
-                fill="#6B7280"
-              />
-            </svg>
-            {region}
-          </span>
-          <span className="hidden xl:block">•</span>
-          <span className="flex items-center gap-1">
-            <span>Contributors</span>
-            <div className="flex -space-x-2 rtl:space-x-reverse">
-              {contributors.map((x, i) =>
-                i === 4 ? (
-                  <a
-                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-700 text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800"
-                    href="#"
-                  >
-                    {contributors.length - 4}
-                  </a>
-                ) : i < 4 ? (
-                  <img
-                    src={x.imageUrl}
-                    className={classNames(
-                      "h-6 w-6 rounded-full border-2 border-white dark:border-gray-800"
-                    )}
+
+          {geographies && geographies[0] && (
+            <>
+              <span className="hidden xl:block">•</span>
+              <span className="flex items-center gap-1">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M7.00039 12.5999C8.4856 12.5999 9.90999 12.0099 10.9602 10.9597C12.0104 9.9095 12.6004 8.48512 12.6004 6.9999C12.6004 5.51469 12.0104 4.09031 10.9602 3.0401C9.90999 1.9899 8.4856 1.3999 7.00039 1.3999C5.51518 1.3999 4.0908 1.9899 3.04059 3.0401C1.99039 4.09031 1.40039 5.51469 1.40039 6.9999C1.40039 8.48512 1.99039 9.9095 3.04059 10.9597C4.0908 12.0099 5.51518 12.5999 7.00039 12.5999ZM3.03279 5.6188C3.29269 4.8745 3.75644 4.21818 4.37119 3.7246C4.55879 4.0109 4.88219 4.1999 5.25039 4.1999C5.52887 4.1999 5.79594 4.31053 5.99285 4.50744C6.18977 4.70435 6.30039 4.97143 6.30039 5.2499V5.5999C6.30039 5.97121 6.44789 6.3273 6.71044 6.58985C6.97299 6.8524 7.32909 6.9999 7.70039 6.9999C8.07169 6.9999 8.42779 6.8524 8.69034 6.58985C8.95289 6.3273 9.10039 5.97121 9.10039 5.5999C9.10028 5.2866 9.20526 4.98231 9.39854 4.73573C9.59182 4.48915 9.86223 4.31453 10.1665 4.2398C10.8345 5.00397 11.202 5.98492 11.2004 6.9999C11.2004 7.2379 11.1808 7.4724 11.1423 7.6999H10.5004C10.1291 7.6999 9.77299 7.8474 9.51044 8.10995C9.24789 8.3725 9.10039 8.7286 9.10039 9.0999V10.6378C8.4622 11.0071 7.73771 11.201 7.00039 11.1999V9.7999C7.00039 9.4286 6.85289 9.0725 6.59034 8.80995C6.32779 8.5474 5.97169 8.3999 5.60039 8.3999C5.22909 8.3999 4.87299 8.2524 4.61044 7.98985C4.34789 7.7273 4.20039 7.37121 4.20039 6.9999C4.20051 6.6688 4.08329 6.34837 3.86952 6.09552C3.65576 5.84267 3.3593 5.67377 3.03279 5.6188Z"
+                    fill="#6B7280"
                   />
-                ) : (
-                  <></>
-                )
-              )}
-            </div>
-          </span>
+                </svg>
+                {geography.filter((g) => g.code === geographies[0])[0]?.title}
+              </span>
+            </>
+          )}
+
+          {contributors && contributors[0] && (
+            <>
+              <span className="hidden xl:block">•</span>
+              <span className="flex items-center gap-1">
+                <span>Contributors</span>
+                <div className="flex -space-x-2 rtl:space-x-reverse">
+                  {contributors.map((x, i) =>
+                    i === 4 ? (
+                      <a
+                        className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-700 text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800"
+                        href="#"
+                      >
+                        {contributors.length - 4}
+                      </a>
+                    ) : i < 4 ? (
+                      <UserAvatar id={x} />
+                    ) : (
+                      <></>
+                    )
+                  )}
+                </div>
+              </span>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
-};
+}

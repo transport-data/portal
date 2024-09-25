@@ -4,36 +4,40 @@ import DashboardDatasetCard, {
 import DatasetsFilter from "@components/_shared/DatasetsFilter";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { usersMock } from "./MyOrganizationTabContent";
+import useSWR from "swr";
+import { useSession } from "next-auth/react";
+import { CKAN, PackageSearchOptions } from "@portaljs/ckan";
+import { env } from "@env.mjs";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { useState } from "react";
+
+const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
 export default () => {
-  const datasets: DashboardDatasetCardProps[] = [
-    {
-      variant: "success",
-      keywords: ["Vehicle registration"],
-      title: "Asia Transport Outlook",
-      contributors: usersMock.map((x) => ({ imageUrl: x.icon })),
-      dateState: "Updated on 23.03.2023",
-      region: "Asia",
-      tdcValidated: true,
-      updateFrequency: "Updated annually",
-      href: "",
-      visibility: "public",
-    },
-    {
-      variant: "purple",
-      keywords: ["Urban mobility", "Mobility Analytics"],
-      title: "Transport performance indicators",
-      contributors: usersMock.map((x) => ({ imageUrl: x.icon })),
-      dateState: "Added on 28.02.2023",
-      region: "Asia",
-      href: "",
-      visibility: "draft",
-    },
-  ];
+  const { data: session } = useSession();
+
+  const [visibility, setVisibility] = useState("All");
+
+  const options: PackageSearchOptions = {
+    offset: 0,
+    limit: 20,
+    tags: [],
+    groups: [],
+    orgs: [],
+    include_private: true,
+    query: `creator_user_id:${session?.user.id}`,
+  };
+
+  const { data } = useSWR(["package_search"], async () => {
+    const ckan = new CKAN(backend_url);
+    return ckan.packageSearch(options);
+  });
+
+  const datasets = data?.datasets as Dataset[];
 
   return (
-    <div className="mt-6 flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
-      <div className="order-1 space-y-12">
+    <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
+      <div className="order-1 space-y-12 lg:min-w-[120px]">
         <SelectableItemsList
           items={[
             {
@@ -110,22 +114,23 @@ export default () => {
               value: "In Review",
             },
           ]}
-          onSelectedItem={() => ""}
+          onSelectedItem={(option) => setVisibility(option)}
+          selected={visibility}
           title="Categories"
         />
-        <div className="lg:hidden space-y-2.5">
+        <div className="space-y-2.5 lg:hidden">
           <DatasetsFilter />
         </div>
       </div>
-      <div className="order-3 w-fit sm:order-2">
+      <div className="order-3 w-fit w-full sm:order-2">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
         <section className="flex flex-col gap-4">
-          {datasets.map((x) => (
+          {datasets?.map((x) => (
             <DashboardDatasetCard {...x} />
           ))}
         </section>
       </div>
-      <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
+      <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3  sm:min-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
         <DatasetsFilter />
       </div>
     </div>
