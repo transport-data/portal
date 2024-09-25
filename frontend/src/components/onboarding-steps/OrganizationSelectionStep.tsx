@@ -1,6 +1,5 @@
 import TextDivisor from "@components/_shared/TextDivisor";
 import TextEditor from "@components/_shared/TextEditor";
-import Image from "next/image";
 
 import {
   Combobox,
@@ -13,13 +12,19 @@ import { OnboardingFormType } from "@schema/onboarding.schema";
 import Link from "next/link";
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { ChevronDown , Building } from 'lucide-react';
+import NewOrganizationRequest from "./NewOrganizationRequest";
 
 export default ({
   form,
   orgs,
+  newOrgRequest,
+  setNewOrgRequest
 }: {
   form: UseFormReturn<OnboardingFormType, any, undefined>;
   orgs: any[];
+  newOrgRequest: boolean;
+  setNewOrgRequest: any;
 }) => {
   const [query, setQuery] = useState("");
   const filteredOrgs =
@@ -30,6 +35,10 @@ export default ({
         });
   return (
     <div className="space-y-5">
+      { newOrgRequest ? (
+        <NewOrganizationRequest form={form} setRequestNewOrg={setNewOrgRequest}/>
+      ) : (
+        <>
       <div>
         <h2 className="mb-2.5 text-xl font-bold text-[#111928]">
           Find your organisation
@@ -62,21 +71,7 @@ export default ({
               displayValue={(org: any) => org?.name}
             />
             <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none data-[open]:rotate-180">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="10"
-                height="6"
-                viewBox="0 0 10 6"
-                fill="none"
-              >
-                <path
-                  d="M8.5 1.5L5 5L1.5 1.5"
-                  stroke="#6B7280"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              <ChevronDown size={14} />
             </ComboboxButton>
 
             {filteredOrgs.length > 0 && (
@@ -88,12 +83,7 @@ export default ({
                     className="group relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-500 hover:bg-[#E5E7EB]"
                   >
                     <div className="flex items-center gap-3.5">
-                      <Image
-                        alt="Small building icon"
-                        src="/assets/organization-icon.svg"
-                        width={14}
-                        height={16}
-                      />
+                      <Building size={14} />
                       <span className="block truncate group-data-[selected]:font-semibold">
                         {org.name}
                       </span>
@@ -107,7 +97,8 @@ export default ({
         <p className="text-sm text-gray-500">
           Don’t see your organisation?{" "}
           <Link
-            href={"https://google.com"}
+            href={""}
+            onClick={() => setNewOrgRequest(true)}
             className="text-[#00ACC1] hover:text-[#008E9D]"
           >
             Request a new organisation
@@ -132,6 +123,8 @@ export default ({
           </label>
         </div>
       </div>
+      </>
+)}
     </div>
   );
 };

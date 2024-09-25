@@ -9,6 +9,9 @@ export const OnboardingSchema = z.object({
   confirmThatItParticipatesOfTheOrg: z.boolean().default(false),
   messageToParticipateOfTheOrg: z.string().optional(),
   messageToInviteNewUsers: z.string().optional(),
+  newOrganizationName: z.string().optional(),
+  newOrganizationDescription: z.string().optional(),
+  newOrganizationDataDescription: z.string().optional(),
 });
 
 export type OnboardingFormType = z.infer<typeof OnboardingSchema>;

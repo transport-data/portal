@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { listGroups, followGroups } from "@utils/group";
 import { inviteUser } from "@utils/user";
-import { listOrganizations, requestOrganizationOwner } from "@utils/organization";
+import { listOrganizations, requestOrganizationOwner, requestNewOrganization } from "@utils/organization";
 
 export async function getStaticProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
@@ -59,6 +59,7 @@ export default function LoginPage({
   const [disableButton, setDisableButton] = useState(false);
   const form = useForm<OnboardingFormType>();
   const { handleSubmit, watch } = form;
+  const [newOrgRequest, setNewOrgRequest] = useState(false);
 
   useEffect(() => {
     setIsSmallScreen(window.innerWidth < 1457);
@@ -97,7 +98,13 @@ export default function LoginPage({
   );
 
   useEffect(() => {
-    if (stepNumber === 1) {
+    if (stepNumber === 0) {
+      const isAnySelected =
+        topics.some(topic => topic.selected) ||
+        locations.some(location => location.selected) ||
+        organizations.some(org => org.selected);
+      setDisableButton(!isAnySelected);
+    } else if (stepNumber === 1) {
       setSubtitleText("Prepare to share data");
       setParagraphText(
         <>
@@ -119,12 +126,23 @@ export default function LoginPage({
           </Button>
         </>
       );
-      setDisableButton(
-        !(
-          watch("orgInWhichItParticipates") &&
-          watch("messageToParticipateOfTheOrg")
-        )
-      );
+      if (newOrgRequest) {
+        setDisableButton(
+          !(
+            watch("newOrganizationName") &&
+            watch("newOrganizationDescription") &&
+            watch("confirmThatItParticipatesOfTheOrg")
+          )
+        );
+      } else {
+        setDisableButton(
+          !(
+            watch("orgInWhichItParticipates") &&
+            watch("messageToParticipateOfTheOrg") &&
+            watch("confirmThatItParticipatesOfTheOrg")
+          )
+        );
+      }
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
@@ -138,26 +156,55 @@ export default function LoginPage({
     watch("orgInWhichItParticipates"),
     watch("messageToParticipateOfTheOrg"),
     watch("newUsersEmailsToInvite"),
+    watch("confirmThatItParticipatesOfTheOrg"),
+    watch("newOrganizationName"),
+    watch("newOrganizationDescription"),
+    topics,
+    locations,
+    organizations,
     stepNumber,
   ]);
 
   const submitOrganizationParticipation = async (selectedValues: any) => {
-    const org_id = selectedValues.orgInWhichItParticipates?.id;
-    const message = selectedValues.messageToParticipateOfTheOrg;
-  
-    if (selectedValues.confirmThatItParticipatesOfTheOrg && org_id && message && apiKey) {
-      try {
-        const response = await requestOrganizationOwner({
-          id: org_id,
-          message: message,
-          apiKey: apiKey,
-        });
-        if (!response.success) {
-          <ErrorAlert text="Failed to request organization participation." />
+
+    const isSelected =  selectedValues.confirmThatItParticipatesOfTheOrg;
+    if (newOrgRequest) {
+      const org_name = selectedValues.newOrganizationName;
+      const org_description = selectedValues.newOrganizationDescription;
+      const dataset_description = selectedValues.newOrganizationDataDescription;
+      if (isSelected && org_name && org_description && apiKey) {
+        try {
+          const response = await requestNewOrganization({
+            org_name: org_name,
+            org_description: org_description,
+            dataset_description: dataset_description,
+            apiKey: apiKey
+          });
+          if (!response.success) {
+            <ErrorAlert text="Failed to request new organization participation." />
+          }
+        } catch (error) {
+          console.error("Error requesting organization participation:", error);
+          <ErrorAlert text="An error occurred while requesting organization participation." />
         }
-      } catch (error) {
-        console.error("Error requesting organization participation:", error);
-        <ErrorAlert text="An error occurred while requesting organization participation." />
+      }
+    } else {
+      const org_id = selectedValues.orgInWhichItParticipates?.id;
+      const message = selectedValues.messageToParticipateOfTheOrg;
+      if (isSelected && org_id && message && apiKey) {
+        try {
+          const response = await requestOrganizationOwner({
+            id: org_id,
+            message: message,
+            apiKey: apiKey,
+          });
+          if (!response.success) {
+            <ErrorAlert text="Failed to request organization participation." />
+          }
+        } catch (error) {
+          console.error("Error requesting organization participation:", error);
+          <ErrorAlert text="An error occurred while requesting organization participation." />
+        }
       }
     }
   };
@@ -255,7 +302,7 @@ export default function LoginPage({
               {steps.map((step, stepIdx) => (
                 <Fragment key={stepIdx}>
                   <div className="w-fit">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" onClick={ () => setStep(stepIdx) }>
                       {stepNumber === stepIdx ? (
                         <svg
                           className="absolute"
@@ -329,7 +376,7 @@ export default function LoginPage({
               setOrganizations={setOrganizations}
             />
           ) : stepNumber === 1 ? (
-            <OrganizationSelectionStep orgs={organizations_data} form={form} />
+            <OrganizationSelectionStep orgs={organizations_data} form={form} newOrgRequest={newOrgRequest} setNewOrgRequest={setNewOrgRequest} />
           ) : (
             <InviteUsersStep form={form} />
           )}

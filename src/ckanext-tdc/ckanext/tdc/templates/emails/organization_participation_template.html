@@ -1,0 +1,33 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            color: #006064;
+        }
+        .highlight {
+            font-weight: bold;
+        }
+        .site-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .site-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <p><span class="highlight">{{ user_name }} ({{ user_email }})</span> has requested to be added as a member in <span class="highlight">{{ organization }}</span>.</p>
+    <hr>
+    <p>Message from <span class="highlight">{{ user_name }}:</span></p>
+    <p>{{ message }}</p>
+    <hr>
+    <p>To accept the request, please visit <a href="{{ site_url }}" class="site-link">{{ site_title }}</a>.</p>
+</body>
+</html>

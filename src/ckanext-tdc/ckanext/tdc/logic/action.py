@@ -13,6 +13,10 @@ import ckan.lib.mailer as mailer
 from ckan.logic.action.create import _get_random_username_from_email
 from ckan.lib.base import render
 import ckan.logic as logic
+from jinja2 import Environment, FileSystemLoader
+
+template_dir = 'src_extensions/ckanext-tdc/ckanext/tdc/templates/emails/'
+env = Environment(loader=FileSystemLoader(template_dir))
 
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
@@ -427,138 +431,43 @@ def generate_token(context, user):
 
     return user
 
-def generate_email_html(email_type, vars):
-    site_title = vars.get('site_title')
-    site_url = vars.get('site_url')
-    user_name = vars.get('user_name')
-    user_email = vars.get('user_email')
-    message = vars.get('message')
-    organization = vars.get('organization')
+def render_html_template(template_name, vars):
+    template = env.get_template(template_name)
+    return template.render(vars)
 
-    if email_type == "organization_participation":
-        return f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    padding: 20px;
-                }}
-                h1 {{
-                    color: #006064;
-                }}
-                .highlight {{
-                    font-weight: bold;
-                }}
-                .site-link {{
-                    color: #007bff;
-                    text-decoration: none;
-                }}
-                .site-link:hover {{
-                    text-decoration: underline;
-                }}
-            </style>
-        </head>
-        <body>
-            <p><span class="highlight">{user_name} ({user_email})</span> has requested to be added as a member in <span class="highlight">{organization}</span>.</p>
-            <hr>
-            <p>Message from <span class="highlight">{user_name}:</span></p>
-            <p>{message}</p>
-            <hr>
-            <p>To accept the request, please visit <a href="{site_url}" class="site-link">{site_title}</a>.</p>
-        </body>
-        </html>
-        """
-    elif email_type == "user_invite":
-        return f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    padding: 20px;
-                }}
-                h1 {{
-                    color: #006064;
-                }}
-                .highlight {{
-                    font-weight: bold;
-                }}
-                .site-link {{
-                    color: #007bff;
-                    text-decoration: none;
-                }}
-                .site-link:hover {{
-                    text-decoration: underline;
-                }}
-            </style>
-        </head>
-        <body>
-            <p>You have been invited to <span class="highlight">{site_title}</span> by <span class="highlight">{user_name} ({user_email})</span>.</p>
-            <hr>
-            <p>Message from <span class="highlight">{user_name}:</span></p>
-            <p>{message}</p>
-            <hr>
-            <p>To accept this invite, please visit <a href="{site_url}" class="site-link">{site_title}</a>.</p>
-            <p>Have a nice day.</p>
-        </body>
-        </html>
-        """
-    else:
-        raise ValueError("Invalid Email Type.")
+def send_email(email_type, to_email, from_user, **kwargs):
 
-def send_email(email_type, to_email, from_user, message, organization=None):
     site_title = config.get('ckan.site_title')
     site_url = config.get('ckan.site_url')
 
     if email_type == "organization_participation":
         subject_template = 'emails/user_participation_subject.txt'
         subject_vars = {}
-        body_template = 'emails/request_organization_owner.txt'
-        body_vars = {
-            'site_title': site_title,
-            'site_url': site_url,
-            'user_name': from_user.name,
-            'user_email': from_user.email,
-            'message': message,
-            'organization': organization
-        }
     elif email_type == "user_invite":
         subject_template = 'emails/invite_user_subject.txt'
         subject_vars = {
             'site_title': site_title
         }
-        body_template = 'emails/invite_user_body.txt'
-        body_vars = {
-            'site_title': site_title,
-            'site_url': site_url,
-            'user_name': from_user.name,
-            'user_email': from_user.email,
-            'message': message
-        }
+    elif email_type == "new_organization_request":
+        subject_template = 'emails/new_organization_request_subject.txt'
+        subject_vars = {}
     else:
         raise ValueError("Invalid Email Type.")
-
-    subject = render(subject_template, subject_vars)
-    body = render(body_template, body_vars)
-
-    # Generate HTML for the email
-    body_html = generate_email_html(email_type, {
+    
+    body_vars = {
         'site_title': site_title,
         'site_url': site_url,
         'user_name': from_user.name,
         'user_email': from_user.email,
-        'message': message,
-        'organization': organization
-    })
+        **kwargs
+    }
+
+    subject = render(subject_template, subject_vars)
+    body_html = render_html_template(email_type+"_template.html", body_vars)
 
     name = _get_random_username_from_email(to_email)
     mailer._mail_recipient(
-        name, to_email, site_title, site_url, subject, body, body_html=body_html
+        name, to_email, site_title, site_url, subject, "sample_body", body_html=body_html
     )
 
 def invite_user_to_tdc(context, data_dict):
@@ -578,7 +487,7 @@ def invite_user_to_tdc(context, data_dict):
         raise ValueError("Missing Parameters.")
     
     for email in to_emails:
-        send_email("user_invite", email, from_user, message)
+        send_email("user_invite", email, from_user, message=message)
     
     return "Invited User Successfully"
 
@@ -608,17 +517,50 @@ def request_organization_owner(context, data_dict):
     to_emails = []
     for user in org_dict.get("users"):
         if user.get("capacity") == "admin":
-            user_show = get_action('user_show')({}, {
-                'id': user.get("id")
-            })
-            to_emails.append(user_show.get("email"))
+            user_show = model.User.get(user.get("id"))
+            to_emails.append(user_show.email)
     
     for email in to_emails:
-        send_email("organization_participation", email, from_user, message, org_dict.get("name"))
+        send_email("organization_participation", email, from_user, message=message, organization=org_dict.get("name"))
     
     return "Request Sent Successfully"
 
+def request_new_organization(context, data_dict):
     
+    if not context.get('user'):
+        return generic_error_message
+
+    model = context['model']
+    session = context['session']
+
+
+    from_user = model.User.get(context['user'])
+    if not from_user:
+        return generic_error_message
     
+    org_name = data_dict.get("org_name")
+    org_description = data_dict.get("org_description")
+    dataset_description = data_dict.get("dataset_description")
+
+    if not (org_name and org_description and dataset_description):
+        raise ValueError("Missing Parameters.")
+    
+    ## get sysadmins emails
+    sysadmins = session.query(model.User).filter(model.User.sysadmin==True).all()
+    to_emails = [user.email for user in sysadmins if user.email]
+
+    ## send mails
+    for email in to_emails:
+        send_email(
+            "new_organization_request",
+            email,
+            from_user,
+            org_name=org_name,
+            org_description=org_description,
+            dataset_description=dataset_description
+        )
+    
+    return "Request Sent Successfully"
+   
 
 

@@ -1,0 +1,37 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            color: #006064;
+        }
+        .highlight {
+            font-weight: bold;
+        }
+        .site-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .site-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <p><span class="highlight">{{ user_name }} ({{ user_email }})</span> has Requested you to Create a new Organization.</p>
+    <hr>
+    <p>Review the Request and Create an Organization with the Following Information</p>
+    <p>Name: {{ org_name }}</p>
+    <hr>
+    <p>Description: {{ org_description }}</p>
+    <p>Data Description: {{ dataset_description }}</p>
+
+    <p>To accept this invite, please visit <a href="{{ site_url }}" class="site-link">{{ site_title }}</a>.</p>
+    <p>Have a nice day.</p>
+</body>
+</html>
