@@ -10,7 +10,7 @@ import SimpleSearchInput from "@components/ui/simple-search-input";
 import { Checkboxes } from "@pages/search";
 import { SearchDatasetsType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 
 export type Facet = { name: string; display_name: string; count: number };
 

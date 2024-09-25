@@ -6,19 +6,16 @@ import {
 } from "@/components/ui/command";
 import { Button } from "@components/ui/button";
 import { SearchIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
 
 import { Badge } from "@components/ui/badge";
 import datasets from "@data/datasets.json";
 import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { SearchbarFormType } from "@schema/searchbar.schema";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { SearchDatasetsType } from "@schema/dataset.schema";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
-import { SearchDatasetsType } from "@schema/dataset.schema";
 
 const facets: any = {
   in: {
@@ -119,14 +116,13 @@ export default function SearchBar({
   };
 
   useEffect(() => {
-    if(!internalQuery)
-      setInternalQuery(query);
+    if (!internalQuery) setInternalQuery(query);
   }, [query]);
 
   const handleCancelSearch = () => {
     setInternalQuery("");
-    if(facetName)
-      onChange(undefined, facetName)
+    if (facetName) onChange(undefined, facetName);
+    onChange(undefined, "query");
     setTimeout(() => {
       queryInputRef.current?.focus();
       // setFocus("query");
