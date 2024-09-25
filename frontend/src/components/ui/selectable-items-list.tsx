@@ -9,7 +9,7 @@ export const SelectableItemsList = ({
 }: {
   items: { value: string; icon: React.ReactNode; isSelected: boolean }[];
   title: string;
-  selected: string;
+  selected?: string;
   onSelectedItem: (selectedItem: string) => void;
 }) => {
   return (

@@ -10,6 +10,8 @@ import { CKAN, PackageSearchOptions } from "@portaljs/ckan";
 import { env } from "@env.mjs";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { useState } from "react";
+import { PackageSearch } from "@interfaces/ckan/package.interface";
+import { packageSearch } from "@lib/dataset";
 
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
@@ -18,22 +20,23 @@ export default () => {
 
   const [visibility, setVisibility] = useState("All");
 
-  const options: PackageSearchOptions = {
+  const options: PackageSearch = {
     offset: 0,
     limit: 20,
     tags: [],
     groups: [],
     orgs: [],
     include_private: true,
+    include_drafts: true,
     query: `creator_user_id:${session?.user.id}`,
+    token: session?.user.apikey,
   };
 
   const { data } = useSWR(["package_search"], async () => {
-    const ckan = new CKAN(backend_url);
-    return ckan.packageSearch(options);
+    return packageSearch(options);
   });
 
-  const datasets = data?.datasets as Dataset[];
+  const datasets = data?.results as Dataset[];
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
@@ -92,7 +95,7 @@ export default () => {
               isSelected: false,
               value: "Drafts",
             },
-            {
+            /* {
               icon: (
                 <svg
                   width="14"
@@ -112,7 +115,7 @@ export default () => {
               ),
               isSelected: false,
               value: "In Review",
-            },
+            },*/
           ]}
           onSelectedItem={(option) => setVisibility(option)}
           selected={visibility}
@@ -125,9 +128,17 @@ export default () => {
       <div className="order-3 w-fit w-full sm:order-2">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
         <section className="flex flex-col gap-4">
-          {datasets?.map((x) => (
-            <DashboardDatasetCard {...x} />
-          ))}
+          {datasets
+            ?.filter((item) =>
+              visibility === "Drafts"
+                ? item.state === "draft"
+                : visibility === "Public"
+                ? item.state === "active"
+                : true
+            )
+            ?.map((x) => (
+              <DashboardDatasetCard {...x} />
+            ))}
         </section>
       </div>
       <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3  sm:min-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">

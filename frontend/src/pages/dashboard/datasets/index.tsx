@@ -5,8 +5,10 @@ import { NextSeo } from "next-seo";
 import { env } from "@env.mjs";
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import MyDatasetsTabContent from "@components/dashboard/MyDatasetsTabContent";
-import { CKAN, PackageSearchOptions } from "@portaljs/ckan";
+import { CKAN } from "@portaljs/ckan";
 import { SWRConfig, unstable_serialize } from "swr";
+import { packageSearch } from "@lib/dataset";
+import { PackageSearch } from "@interfaces/ckan/package.interface";
 
 export const getServerSideProps: GetServerSideProps<any> = async (context) => {
   const session = await getSession(context);
@@ -18,18 +20,19 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
       },
     };
   }
-  const backend_url = env.NEXT_PUBLIC_CKAN_URL;
-  const ckan = new CKAN(backend_url);
-  const options: PackageSearchOptions = {
+
+  const options: PackageSearch = {
     offset: 0,
     limit: 20,
     tags: [],
     groups: [],
     orgs: [],
     include_private: true,
+    include_drafts: true,
     query: `creator_user_id:${session.user.id}`,
+    token: session.user.apikey,
   };
-  const search_result = await ckan.packageSearch(options);
+  const search_result = await packageSearch(options);
   return {
     props: {
       fallback: {
