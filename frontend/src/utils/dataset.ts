@@ -39,9 +39,9 @@ export const searchDatasets = async ({
     }
 
     const action = `${baseAction}?${queryParams.join("&")}`
-    const datasets:CkanResponse<Dataset[]> = await CkanRequest.post(action, { ckanUrl, apiKey})
+    const datasets:CkanResponse<{results:Dataset[]}> = await CkanRequest.get(action, { ckanUrl, apiKey})
 
-    return datasets;
+    return datasets.result;
 
 };
 

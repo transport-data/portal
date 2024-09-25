@@ -28,7 +28,7 @@ export default function RecentlyUpdatedDatasetsList({
     datasetsQuery.current as unknown as SearchDatasetType
   );
 
-  const datasets = data?.result;
+  const datasets = data?.results;
 
   return (
     <div className="my-10">

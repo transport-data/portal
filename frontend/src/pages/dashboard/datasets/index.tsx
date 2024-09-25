@@ -18,32 +18,15 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
       },
     };
   }
-  const options: SearchDatasetType = {
-    offset: 0,
-    limit: 20,
-    tags: [],
-    groups: [],
-    orgs: [],
-    include_private: true,
-    include_drafts: true,
-    query: `creator_user_id:${session.user.id}`,
-  };
-  const search_result = await searchDatasets({
-    apiKey: session.user.apikey,
-    input: options,
-  });
+
   return {
-    props: {
-      fallback: {
-        [unstable_serialize(["package_search", options])]: search_result,
-      },
-    },
+    props: {},
   };
 };
 
-function DatasetsDashboard({
-  fallback,
-}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
+function DatasetsDashboard({}: InferGetServerSidePropsType<
+  typeof getServerSideProps
+>): JSX.Element {
   const { data: sessionData } = useSession();
 
   if (!sessionData) return <Loading />;
@@ -51,11 +34,10 @@ function DatasetsDashboard({
   return (
     <>
       <NextSeo title="Datasets" />
-      <SWRConfig value={{ fallback }}>
-        <DashboardLayout active="my-datasets">
-          <MyDatasetsTabContent />
-        </DashboardLayout>
-      </SWRConfig>
+
+      <DashboardLayout active="my-datasets">
+        <MyDatasetsTabContent />
+      </DashboardLayout>
     </>
   );
 }

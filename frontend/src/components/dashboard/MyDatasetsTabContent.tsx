@@ -8,6 +8,7 @@ import { useState } from "react";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import { searchDatasets } from "@utils/dataset";
 import { DocumentReportIcon, EyeOffIcon, GlobeAltIcon } from "@lib/icons";
+import { api } from "@utils/api";
 
 export default () => {
   const { data: session } = useSession();
@@ -24,14 +25,9 @@ export default () => {
     query: `creator_user_id:${session?.user.id}`,
   };
 
-  const { data } = useSWR(["package_search"], async () => {
-    return searchDatasets({
-      apiKey: session?.user.apikey ?? "",
-      input: options,
-    });
-  });
+  const { data, isLoading } = api.dataset.search.useQuery(options);
 
-  const datasets = data?.result;
+  const datasets = data?.results;
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">

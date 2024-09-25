@@ -26,23 +26,23 @@ export default function DatasetsStats() {
     {
       id: 1,
       name: "All",
-      stat: datasets?.result.length ?? 0,
+      stat: datasets?.results.length ?? 0,
       icon: CircleStackIcon,
       cta: { title: "View all", href: "/datasets" },
     },
     {
       id: 2,
       name: "Published",
-      stat: datasets?.result.length
-        ? datasets.result.filter((d) => !d.private).length
+      stat: datasets?.results.length
+        ? datasets.results.filter((d) => !d.private).length
         : 0,
       icon: EyeIcon,
     },
     {
       id: 3,
       name: "Private",
-      stat: datasets?.result.length
-        ? datasets.result.filter((d) => d.private).length
+      stat: datasets?.results.length
+        ? datasets.results.filter((d) => d.private).length
         : 0,
       icon: EyeSlashIcon,
     },
