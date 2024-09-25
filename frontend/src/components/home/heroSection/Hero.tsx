@@ -4,6 +4,7 @@ import SearchBar from "@components/search/SearchBar";
 import Video from "./Video";
 import InfoCards from "./InfoCards";
 import PartnersCarousel from "@components/_shared/PartnersCarousel";
+import SearchBarMocked from "@components/search/SearchBarMocked";
 
 export default function Hero() {
   return (
@@ -32,7 +33,7 @@ export default function Hero() {
               analysing transportation data for a more sustainable future.
             </p>
             <div className="mt-8 lg:max-w-[576px]">
-              <SearchBar />
+              <SearchBarMocked />
             </div>
           </div>
           <div className="hidden min-w-[420px] lg:block xl:min-w-[540px]">

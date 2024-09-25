@@ -24,7 +24,7 @@ export default function RecentlyUpdatedDatasetsList({
     include_private: true,
   });
 
-  const { data: datasets } = api.dataset.search.useQuery(
+  const { data: {datasets} = {} } = api.dataset.search.useQuery(
     datasetsQuery.current as unknown as SearchDatasetType
   );
   return (

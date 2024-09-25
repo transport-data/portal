@@ -1,7 +1,7 @@
 import DashboardDatasetCard, {
   DashboardDatasetCardProps,
 } from "@components/_shared/DashboardDatasetCard";
-import DatasetsFilter from "@components/_shared/DatasetsFilter";
+import DatasetsFilterOld from "@components/_shared/DatasetsFilterMocked";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { usersMock } from "./MyOrganizationTabContent";
 
@@ -113,8 +113,8 @@ export default () => {
           onSelectedItem={() => ""}
           title="Categories"
         />
-        <div className="lg:hidden space-y-2.5">
-          <DatasetsFilter />
+        <div className="space-y-2.5 lg:hidden">
+          <DatasetsFilterOld />
         </div>
       </div>
       <div className="order-3 w-fit sm:order-2">
@@ -126,7 +126,7 @@ export default () => {
         </section>
       </div>
       <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
-        <DatasetsFilter />
+        <DatasetsFilterOld />
       </div>
     </div>
   );

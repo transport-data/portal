@@ -25,7 +25,7 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
     tags: [],
     include_private: true,
   });
-  const { data: datasets } = api.dataset.search.useQuery(
+  const { data: {datasets} = {} } = api.dataset.search.useQuery(
     datasetSearch as unknown as SearchDatasetType
   );
 
