@@ -63,6 +63,22 @@ export default ({
     (searchFilter.mode ? 1 : 0) +
     (searchFilter.regions ? 1 : 0);
 
+  let hasFilteredByAllCountriesAndRegions;
+
+  if (!searchFilter.countries && !searchFilter.regions) {
+    hasFilteredByAllCountriesAndRegions = true;
+  } else if (!searchFilter.countries && !countries.length) {
+    hasFilteredByAllCountriesAndRegions =
+      searchFilter.regions?.length === regions.length;
+  } else if (!searchFilter.regions && !regions.length) {
+    hasFilteredByAllCountriesAndRegions =
+      searchFilter.countries?.length === countries.length;
+  } else {
+    hasFilteredByAllCountriesAndRegions =
+      searchFilter.countries?.length === countries.length &&
+      searchFilter.regions?.length === regions.length;
+  }
+
   return (
     <>
       <div className="mb-[12px] flex items-center justify-between gap-6 text-sm">
@@ -117,14 +133,11 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>
             <span className="hide mr-2 text-sm">
-              {(regions.length === searchFilter.regions?.length &&
-                countries.length === searchFilter.countries?.length) ||
-              (!searchFilter.countries?.length && !searchFilter.regions?.length)
+              {hasFilteredByAllCountriesAndRegions
                 ? "All"
                 : searchFilter.regions
-                ? searchFilter.regions?.length
-                : searchFilter.countries
-                ? searchFilter.countries?.length
+                ? (searchFilter.regions?.length ?? 0) +
+                  (searchFilter.countries?.length ?? 0)
                 : 0}
             </span>
           </AccordionTrigger>
