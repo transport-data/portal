@@ -2,7 +2,7 @@ import DatasetsFilter from "@components/_shared/DatasetsFilter";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import DashboardDatasetCard, {
   DashboardDatasetCardProps,
-} from "@components/_shared/DashboardDatasetCard";
+} from "@components/_shared/DashboardDatasetCardOld";
 
 export default () => {
   const datasets: DashboardDatasetCardProps[] = [
@@ -197,7 +197,7 @@ export default () => {
           onSelectedItem={() => ""}
           title="Contributors"
         />
-        <div className="lg:hidden space-y-2.5">
+        <div className="space-y-2.5 lg:hidden">
           <DatasetsFilter />
         </div>
       </div>
