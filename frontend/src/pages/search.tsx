@@ -1,7 +1,6 @@
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Layout from "../components/_shared/Layout";
 
@@ -17,68 +16,23 @@ import { SearchDatasetsType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// export function getServerSideProps({ query }: any) {
-//   return {
-//     props: query,
-//   };
-// }
+export function getServerSideProps({ query }: any) {
+  return {
+    props: query,
+  };
+}
 
-// export default function DatasetSearch({
-//   query,
-//   sector,
-//   mode,
-//   service,
-//   region,
-//   fuel,
-//   before,
-//   after,
-//   country,
-// }: any) {
-export default function DatasetSearch() {
-  const router = useRouter();
-  const { query, sector, mode, service, region, fuel, before, after, country } =
-    router.query;
-  const [lastRouterState, setRouterState] = useState<any>({});
-  useEffect(() => {
-    if (!lastRouterState)
-      setRouterState({
-        query,
-        sector,
-        mode,
-        service,
-        region,
-        fuel,
-        before,
-        after,
-        country,
-      });
-    else if (
-      JSON.stringify({
-        query,
-        sector,
-        mode,
-        service,
-        region,
-        fuel,
-        before,
-        after,
-        country,
-      }) !== JSON.stringify(lastRouterState)
-    ) {
-      setRouterState({
-        query,
-        sector,
-        mode,
-        service,
-        region,
-        fuel,
-        before,
-        after,
-        country,
-      });
-    }
-  }, [query, sector, mode, service, region, fuel, before, after, country]);
-
+export default function DatasetSearch({
+  query,
+  sector,
+  mode,
+  service,
+  region,
+  fuel,
+  before,
+  after,
+  country,
+}: any) {
   let modes: Facet[] = [];
   let services: Facet[] = [];
   let updateFrequencies: Facet[] = [];
@@ -101,44 +55,22 @@ export default function DatasetSearch() {
     setCurrentPage(0);
   };
 
-  const [searchFilter, setSearchFilter] = useState<SearchDatasetsType>({});
-
-  useEffect(() => {
-    setSearchFilter((oldV) => ({
-      ...oldV,
-      startYear: lastRouterState.before ? Number(before) : undefined,
-      endYear: lastRouterState.after ? Number(after) : undefined,
-      mode: lastRouterState.mode as string | undefined,
-      service: lastRouterState.service as string | undefined,
-      sector: lastRouterState.sector as string | undefined,
-      fuel: lastRouterState.fuel as string | undefined,
-      before: lastRouterState.before as string | undefined,
-      after: lastRouterState.after as string | undefined,
-      regions: lastRouterState.region
-        ? [lastRouterState.region as string]
-        : undefined,
-      countries: lastRouterState.country
-        ? [lastRouterState.country as string]
-        : undefined,
-      query: lastRouterState.query as string,
-    }));
-  }, [lastRouterState]);
-
-  // useEffect(() => {
-  //   let endpoint = "/search?";
-  //   for (const key of Object.keys(searchFilter)) {
-  //     if (searchFilter[key as keyof typeof searchFilter])
-  //       if (key === "regions" || key === "countries")
-  //         endpoint += `${key === "countries" ? "country" : "region"}=${
-  //           searchFilter[key as keyof typeof searchFilter]
-  //         }&`;
-  //       else
-  //         endpoint += `${key}=${
-  //           searchFilter[key as keyof typeof searchFilter]
-  //         }&`;
-  //   }
-  //   router.push(endpoint, undefined, { shallow: true });
-  // }, [searchFilter]);
+  const [searchFilter, setSearchFilter] = useState<SearchDatasetsType>({
+    offset: 0,
+    limit: 9,
+    endYear: after ? Number(after) : undefined,
+    mode: mode as string | undefined,
+    service: service as string | undefined,
+    sector: sector as string | undefined,
+    fuel: fuel as string | undefined,
+    before: before as string | undefined,
+    after: after as string | undefined,
+    regions: region ? [region as string] : undefined,
+    countries: country ? [country as string] : undefined,
+    query: query as string,
+    sort: "score desc, metadata_modified desc",
+    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end", "metadata_created"]`,
+  });
 
   const [currentPage, setCurrentPage] = useState(0);
   const {

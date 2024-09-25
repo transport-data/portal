@@ -95,7 +95,6 @@ export default function SearchBar({
         commandRef.current &&
         !commandRef.current.contains(event.target as Node)
       ) {
-        resetFilter();
         if (!hideDatasetSuggestion) setShowCommandList(false);
       }
     };
@@ -126,7 +125,8 @@ export default function SearchBar({
 
   const handleCancelSearch = () => {
     setInternalQuery("");
-    onChange(undefined, facetName)
+    if(facetName)
+      onChange(undefined, facetName)
     setTimeout(() => {
       queryInputRef.current?.focus();
       // setFocus("query");
