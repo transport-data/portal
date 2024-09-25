@@ -21,57 +21,90 @@ export async function searchDatasets<T = Dataset>({
   const buildOrFq = (key: string, values: string[]) =>
     `${key}:(${values.join(" OR ")})`;
 
-  if (options.groups && options.groups.length > 0) {
+  if (options.groups?.length) {
     fqAr.push(buildOrFq("groups", options.groups));
   }
 
-  if (options.orgs && options.orgs.length > 0) {
+  if (options.orgs?.length) {
     fqAr.push(buildOrFq("organization", options.orgs));
   }
 
-  if (options.tags && options.tags.length > 0) {
+  if (options.tags?.length) {
     fqAr.push(buildOrFq("tags", options.tags));
   }
 
-  if (options.resFormat && options.resFormat.length) {
+  if (options.resFormat?.length) {
     fqAr.push(buildOrFq("res_format", options.resFormat));
   }
 
-  if (options.type && options.type.length) {
+  if (options.type?.length) {
     fqAr.push(buildOrFq("type", options.type));
   }
 
-  // if (options.advancedQueries && options.advancedQueries.length > 0) {
-  //   options.advancedQueries.forEach((element) => {
-  //     fqAr.push(
-  //       element.hasPants
-  //         ? `${element.key}:${element.values.join("")}`
-  //         : buildOrFq(element.key, element.values)
-  //     );
-  //   });
-  // }
+  if (options.regions?.length) {
+    fqAr.push(buildOrFq("regions", options.regions));
+  }
+
+  if (options.countries?.length) {
+    fqAr.push(buildOrFq("geographies", options.countries));
+  }
+
+  if (options.fuel) {
+    fqAr.push(buildOrFq("fuel", [options.fuel]));
+  }
+
+  if (options.sector) {
+    fqAr.push(buildOrFq("sectors", [options.sector]));
+  }
+
+  if (options.mode) {
+    fqAr.push(buildOrFq("modes", [options.mode]));
+  }
+
+  if (options.service) {
+    fqAr.push(buildOrFq("services", [options.service]));
+  }
+
+  if (
+    options.publicationDates?.length &&
+    !options.publicationDates.find((x) => x === "*")
+  ) {
+    fqAr.push(
+      buildOrFq(
+        "metadata_created",
+        options.publicationDates.map((x) => {
+          if (x.toLowerCase().includes("last")) {
+            const date = new Date();
+
+            const lastDayOfLastMonth = new Date(
+              date.getFullYear(),
+              date.getMonth(),
+              0
+            );
+
+            const firstDayOfLastMonth = new Date(
+              date.getFullYear(),
+              date.getMonth() - 1,
+              1
+            );
+
+            return `[${firstDayOfLastMonth.toISOString()} TO ${lastDayOfLastMonth.toISOString()}]`;
+          }
+
+          const startOfTheYear = new Date(Number(x), 0, 1);
+          const endOfTheYear = new Date(Number(x), 11, 31);
+
+          return `[${startOfTheYear.toISOString()} TO ${endOfTheYear.toISOString()}]`;
+        })
+      )
+    );
+  }
 
   if (options.private != undefined) {
     fqAr.push(`private:${options.private}`);
   }
 
-  if (options.mode) {
-    fqAr.push(`modes:${options.mode}`);
-  }
-
-  if (options.sector) {
-    fqAr.push(`sectors:${options.sector}`);
-  }
-
-  if (options.service) {
-    fqAr.push(`services:${options.service}`);
-  }
-
-  if (options.region) {
-    fqAr.push(`regions:${options.region}`);
-  }
-
-  if (fqAr.length > 0) {
+  if (fqAr?.length) {
     queryParams.push(`fq=${fqAr.join("+")}`);
   }
 
@@ -95,7 +128,7 @@ export async function searchDatasets<T = Dataset>({
     queryParams.push(`include_private=${options.includePrivate}`);
   }
 
-  if (queryParams.length > 0) {
+  if (queryParams?.length) {
     endpoint += `?${queryParams.join("&")}`;
   }
 

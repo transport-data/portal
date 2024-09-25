@@ -7,9 +7,10 @@ import {
 import { Label } from "@components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import SimpleSearchInput from "@components/ui/simple-search-input";
+import { Checkboxes } from "@pages/search";
 import { SearchDatasetsType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 export type Facet = { name: string; display_name: string; count: number };
 
@@ -18,124 +19,49 @@ export default ({
   orgs,
   resourcesFormats,
   datasetCount,
-  groups,
-  setSearchFilter,
-  resetPagination,
   searchFilter,
   resetFilter,
   regions,
+  countries,
   yearsCoverage,
+  onChange,
   metadataCreatedDates,
 }: {
   tags: Facet[];
-  setSearchFilter: Dispatch<SetStateAction<SearchDatasetsType>>;
-  resetPagination: () => void;
   resetFilter: () => void;
   searchFilter: SearchDatasetsType;
   orgs: Facet[];
   metadataCreatedDates: Facet[];
   datasetCount: number;
   resourcesFormats: Facet[];
-  groups: Facet[];
   regions: Facet[];
+  countries: Facet[];
   yearsCoverage: Facet[];
+  onChange: (
+    items: string[] | boolean | string,
+    key: keyof SearchDatasetsType
+  ) => void;
 }) => {
-  const mapFacetsToFilterItems = (
-    facets: Facet[],
-    isSelectedFn: (v: string) => boolean
-  ) => {
-    return facets.map((x) => ({
-      value: x.name,
-      amountOfDatasets: x.count,
-      selected: isSelectedFn(x.name),
-      label: x.display_name,
-    }));
-  };
-
-  const tabs = [
+  const [tabs, setTabs] = useState([
     { name: "All", current: false },
     { name: "Regions", current: true },
     { name: "Countries", current: false },
-    { name: "Cities", current: false },
-  ];
-
-  const [keywordItems, setKeywordItems] = useState<
-    ReturnType<typeof mapFacetsToFilterItems> | never[]
-  >([]);
-
-  const [publicationDates, setPublicationDates] = useState<
-    ReturnType<typeof mapFacetsToFilterItems> | never[]
-  >([]);
-  const [internalOrgs, setInternalOrgs] = useState<
-    ReturnType<typeof mapFacetsToFilterItems> | never[]
-  >([]);
-
-  const [formats, setFormats] = useState<
-    ReturnType<typeof mapFacetsToFilterItems> | never[]
-  >([]);
-
-  const [years, setYears] = useState<
-    ReturnType<typeof mapFacetsToFilterItems> | never[]
-  >([]);
-
-  const [internalRegions, setInternalRegions] = useState<
-    ReturnType<typeof mapFacetsToFilterItems> | never[]
-  >([]);
-
-  const [totalOfFiltersApplied, setTotalOfFiltersApplied] = useState(0);
-
-  useEffect(() => {
-    setKeywordItems(
-      mapFacetsToFilterItems(tags, (v) => {
-        return !!searchFilter.tags?.includes(v);
-      })
-    );
-
-    setFormats(
-      mapFacetsToFilterItems(resourcesFormats, (v) => {
-        return !!searchFilter.resFormat?.includes(v);
-      })
-    );
-
-    setInternalOrgs(
-      mapFacetsToFilterItems(orgs, (v) => {
-        return !!searchFilter.orgs?.includes(v);
-      })
-    );
-
-    setYears(
-      mapFacetsToFilterItems(yearsCoverage, (v) => {
-        return false;
-      })
-    );
-
-    setPublicationDates(
-      mapFacetsToFilterItems(metadataCreatedDates, (v) => {
-        return !!searchFilter.publicationDate?.includes(v);
-      })
-    );
-
-    setTotalOfFiltersApplied(
-      (searchFilter.tags?.length || 0) +
-        (searchFilter.locations?.length || 0) +
-        (searchFilter.orgs?.length || 0) +
-        (searchFilter.resFormat?.length || 0) +
-        (searchFilter.publicationDate?.length || 0) +
-        (searchFilter.locations?.length || 0) +
-        (searchFilter.sector ? 1 : 0) +
-        (searchFilter.service ? 1 : 0) +
-        (searchFilter.mode ? 1 : 0) +
-        (searchFilter.region ? 1 : 0)
-    );
-  }, [
-    tags,
-    orgs,
-    resourcesFormats,
-    metadataCreatedDates,
-    groups,
-    regions,
-    yearsCoverage,
   ]);
+
+  const totalOfFiltersApplied =
+    (searchFilter.tags?.length || 0) +
+    (searchFilter.orgs?.length || 0) +
+    (searchFilter.resFormat?.length || 0) +
+    (searchFilter.publicationDates?.length || 0) +
+    (searchFilter.countries?.length || 0) +
+    (searchFilter.sector ? 1 : 0) +
+    (searchFilter.service ? 1 : 0) +
+    (searchFilter.after ? 1 : 0) +
+    (searchFilter.before ? 1 : 0) +
+    (searchFilter.fuel ? 1 : 0) +
+    (searchFilter.showArchived ? 1 : 0) +
+    (searchFilter.mode ? 1 : 0) +
+    (searchFilter.regions ? 1 : 0);
 
   return (
     <>
@@ -172,24 +98,17 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Keyword</span>
             <span className="hide mr-2 text-sm">
-              {keywordItems.every((x) => x.selected) ||
-              keywordItems.every((x) => !x.selected)
+              {tags.length === searchFilter.tags?.length ||
+              !searchFilter.tags?.length
                 ? "All"
-                : keywordItems.filter((x) => x.selected).length}
+                : searchFilter.tags?.length}
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              onChange={(items) => {
-                setKeywordItems(items);
-                setSearchFilter((oldValue) => ({
-                  ...oldValue,
-                  offset: 0,
-                  tags: items.filter((x) => x.selected).map((x) => x.value),
-                }));
-                resetPagination();
-              }}
-              items={keywordItems}
+              onChange={(items) => onChange(items, "tags")}
+              items={tags}
+              selectedItems={searchFilter.tags}
               limitToPresentViewAll={9}
             />
           </AccordionContent>
@@ -198,10 +117,15 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>
             <span className="hide mr-2 text-sm">
-              {internalRegions.every((x) => x.selected) ||
-              internalRegions.every((x) => !x.selected)
+              {(regions.length === searchFilter.regions?.length &&
+                countries.length === searchFilter.countries?.length) ||
+              (!searchFilter.countries?.length && !searchFilter.regions?.length)
                 ? "All"
-                : internalRegions.filter((x) => x.selected).length}
+                : searchFilter.regions
+                ? searchFilter.regions?.length
+                : searchFilter.countries
+                ? searchFilter.countries?.length
+                : 0}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -223,11 +147,25 @@ export default ({
               </div>
               <div className="hidden sm:block">
                 <nav aria-label="Tabs" className="-mb-px flex gap-2.5">
-                  {tabs.map((tab) => (
+                  {tabs.map((tab, i) => (
                     <a
                       key={tab.name}
+                      onClick={() => {
+                        setTabs((oldV) => {
+                          const tabs = [...oldV];
+
+                          tabs[i]?.current;
+                          tabs.forEach((x, index) => (x.current = index === i));
+                          return tabs;
+                        });
+                      }}
                       aria-current={tab.current ? "page" : undefined}
                       className={classNames(
+                        i === 1 && !regions?.length
+                          ? "hidden"
+                          : i === 2 && !countries?.length
+                          ? "hidden"
+                          : "block",
                         tab.current
                           ? "border-[#111928] text-[#111928]"
                           : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
@@ -244,8 +182,15 @@ export default ({
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  internalRegions.forEach((x) => (x.selected = true));
-                  setInternalRegions([...internalRegions]);
+                  const currentTabIdx = tabs.findIndex((x) => x.current)!;
+                  if (currentTabIdx === 0) {
+                    onChange([...regions.map((x) => x.name)], "regions");
+                    onChange([...countries.map((x) => x.name)], "countries");
+                  } else if (currentTabIdx === 1) {
+                    onChange([...regions.map((x) => x.name)], "regions");
+                  } else {
+                    onChange([...countries.map((x) => x.name)], "countries");
+                  }
                 }}
               >
                 Check all
@@ -253,19 +198,51 @@ export default ({
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  internalRegions.forEach((x) => (x.selected = false));
-                  setInternalRegions([...internalRegions]);
+                  const currentTabIdx = tabs.findIndex((x) => x.current)!;
+                  if (currentTabIdx === 0) {
+                    onChange([], "regions");
+                    onChange([], "countries");
+                  } else if (currentTabIdx === 1) {
+                    onChange([], "regions");
+                  } else {
+                    onChange([], "countries");
+                  }
                 }}
               >
                 Uncheck all
               </span>
             </div>
             <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
-              <Checkboxes
-                spaceCount
-                items={internalRegions}
-                onChange={(items) => {}}
-              />
+              {tabs[0]?.current ? (
+                <>
+                  <Checkboxes
+                    spaceCount
+                    items={regions}
+                    selectedItems={searchFilter.regions}
+                    onChange={(items) => onChange(items, "regions")}
+                  />
+                  <Checkboxes
+                    spaceCount
+                    items={countries}
+                    selectedItems={searchFilter.countries}
+                    onChange={(items) => onChange(items, "countries")}
+                  />
+                </>
+              ) : tabs[1]?.current ? (
+                <Checkboxes
+                  spaceCount
+                  items={regions}
+                  selectedItems={searchFilter.regions}
+                  onChange={(items) => onChange(items, "regions")}
+                />
+              ) : (
+                <Checkboxes
+                  spaceCount
+                  items={countries}
+                  selectedItems={searchFilter.countries}
+                  onChange={(items) => onChange(items, "countries")}
+                />
+              )}
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -273,9 +250,9 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
             <span className="hide mr-2 text-sm">
-              {years.every((x) => x.selected) || years.every((x) => !x.selected)
+              {/* {yearsCoverage.length === searchFilter.ye
                 ? "All"
-                : years.filter((x) => x.selected).length}
+                : years.filter((x) => x.selected).length} */}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -300,8 +277,8 @@ export default ({
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  years.forEach((x) => (x.selected = true));
-                  setYears([...years]);
+                  // years.forEach((x) => (x.selected = true));
+                  // setYears([...years]);
                 }}
               >
                 Check all
@@ -309,15 +286,14 @@ export default ({
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  years.forEach((x) => (x.selected = false));
-                  setYears([...years]);
+                  // setSearchFilter(oldV => ({...oldV, }))
                 }}
               >
                 Uncheck all
               </span>
             </div>
             <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
-              <Checkboxes items={years} onChange={(items) => {}} />
+              {/* <Checkboxes items={years} onChange={(items) => {}} /> */}
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -325,26 +301,17 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Format</span>
             <span className="hide mr-2 text-sm">
-              {formats.every((x) => x.selected) ||
-              formats.every((x) => !x.selected)
+              {resourcesFormats.length === searchFilter.resFormat?.length ||
+              !searchFilter.resFormat?.length
                 ? "All"
-                : formats.filter((x) => x.selected).length}
+                : searchFilter.resFormat?.length}
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              onChange={(items) => {
-                setFormats(items);
-                setSearchFilter((oldValue) => ({
-                  ...oldValue,
-                  offset: 0,
-                  resFormat: items
-                    .filter((x) => x.selected)
-                    .map((x) => x.value),
-                }));
-                resetPagination();
-              }}
-              items={formats}
+              onChange={(items) => onChange(items, "resFormat")}
+              items={resourcesFormats}
+              selectedItems={searchFilter.resFormat}
               limitToPresentViewAll={9}
             />
           </AccordionContent>
@@ -353,24 +320,17 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Organisation</span>
             <span className="hide mr-2 text-sm">
-              {internalOrgs.every((x) => x.selected) ||
-              internalOrgs.every((x) => !x.selected)
+              {orgs.length === searchFilter.orgs?.length ||
+              !searchFilter.orgs?.length
                 ? "All"
-                : internalOrgs.filter((x) => x.selected).length}
+                : searchFilter.orgs?.length}
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              onChange={(items) => {
-                setInternalOrgs(items);
-                setSearchFilter((oldValue) => ({
-                  ...oldValue,
-                  offset: 0,
-                  orgs: items.filter((x) => x.selected).map((x) => x.value),
-                }));
-                resetPagination();
-              }}
-              items={internalOrgs}
+              onChange={(items) => onChange(items, "orgs")}
+              items={orgs}
+              selectedItems={searchFilter.orgs}
               limitToPresentViewAll={7}
             />
           </AccordionContent>
@@ -379,26 +339,18 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Publication date</span>
             <span className="hide mr-2 text-sm">
-              {publicationDates.every((x) => x.selected) ||
-              publicationDates.every((x) => !x.selected)
+              {metadataCreatedDates.length ===
+                searchFilter.publicationDates?.length ||
+              !searchFilter.publicationDates?.length
                 ? "All"
-                : publicationDates.filter((x) => x.selected).length}
+                : searchFilter.publicationDates?.length}
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
             <Checkboxes
-              onChange={(items) => {
-                setPublicationDates(items);
-                setSearchFilter((oldValue) => ({
-                  ...oldValue,
-                  offset: 0,
-                  publicationDate: items
-                    .filter((x) => x.selected)
-                    .map((x) => x.value),
-                }));
-                resetPagination();
-              }}
-              items={publicationDates}
+              onChange={(items) => onChange(items, "publicationDates")}
+              items={metadataCreatedDates}
+              selectedItems={searchFilter.publicationDates}
               limitToPresentViewAll={7}
             />
           </AccordionContent>
@@ -417,14 +369,7 @@ export default ({
             </p>
             <RadioGroup
               defaultValue={`${!!searchFilter.showArchived}`}
-              onValueChange={(v) => {
-                setSearchFilter((oldValue) => ({
-                  ...oldValue,
-                  offset: 0,
-                  showArchived: v === "true",
-                }));
-                resetPagination();
-              }}
+              onValueChange={(v) => onChange(v === "true", "showArchived")}
               className="flex gap-3.5"
             >
               <div className="flex items-center space-x-2">
@@ -447,67 +392,6 @@ export default ({
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </>
-  );
-};
-
-const Checkboxes = ({
-  spaceCount,
-  onChange,
-  items,
-  limitToPresentViewAll,
-}: {
-  items: {
-    value: string;
-    amountOfDatasets: number;
-    selected: boolean;
-    label: string;
-  }[];
-  limitToPresentViewAll?: number;
-  spaceCount?: boolean;
-  onChange: (
-    v: {
-      value: string;
-      amountOfDatasets: number;
-      selected: boolean;
-      label: string;
-    }[]
-  ) => void;
-}) => {
-  return (
-    <>
-      {items.map((x, index) =>
-        index <= (limitToPresentViewAll ?? 999999 * 999999) ? (
-          <div className="flex items-center gap-2">
-            <input
-              onChange={() => {
-                x.selected = !x.selected;
-                onChange([...items]);
-              }}
-              checked={x.selected}
-              className="remove-input-ring rounded text-[#006064]"
-              type="checkbox"
-            />
-            <label
-              className={spaceCount ? "flex w-full justify-between" : ""}
-              htmlFor=""
-            >
-              {x.label}{" "}
-              {spaceCount ? (
-                <span>{`(${x.amountOfDatasets})`}</span>
-              ) : (
-                `(${x.amountOfDatasets})`
-              )}
-            </label>
-          </div>
-        ) : index === 8 ? (
-          <span className="mt-[1px] cursor-pointer text-[#006064]">
-            View all
-          </span>
-        ) : (
-          <></>
-        )
-      )}
     </>
   );
 };

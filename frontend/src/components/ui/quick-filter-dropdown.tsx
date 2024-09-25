@@ -10,25 +10,31 @@ import { Button } from "./button";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Facet } from "@components/_shared/DatasetsFilter";
+import { Checkboxes } from "@pages/search";
 import { SearchDatasetsType } from "@schema/dataset.schema";
-import { Dispatch, SetStateAction } from "react";
 
 export default function QuickFilterDropdown({
   text,
   items = [],
   filterFieldName,
+  isCheckbox,
+  searchFilter,
   defaultValue = "*",
   hideAllOption,
-  setSearchFilter,
-  resetPagination,
+  onChange,
 }: {
   text: string;
   hideAllOption?: boolean;
-  filterFieldName: string;
-  resetPagination?: () => void;
-  items: Array<{ display_name: string; name: string }>;
+  isCheckbox?: boolean;
+  filterFieldName: keyof SearchDatasetsType;
+  searchFilter: SearchDatasetsType;
+  onChange: (
+    items: string[] | boolean | string,
+    key: keyof SearchDatasetsType
+  ) => void;
+  items: Facet[];
   defaultValue?: string;
-  setSearchFilter: Dispatch<SetStateAction<SearchDatasetsType>>;
 }) {
   if (items.findIndex((x) => x.name === "all") > -1) {
     items.splice(
@@ -61,56 +67,59 @@ export default function QuickFilterDropdown({
         <DropdownMenuLabel className="px-4 py-[12px]">{text}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="p-4">
-          <RadioGroup
-            defaultValue={defaultValue}
-            className="flex flex-col gap-[12px]"
-            onValueChange={(v) => {
-              setSearchFilter((oldValue) => {
-                const newValue: any = { ...oldValue, offset: 0 };
-                newValue[filterFieldName] = v;
-                return newValue;
-              });
-              if (resetPagination) resetPagination();
-            }}
-          >
-            {!hideAllOption && (
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="*"
-                  id="option-one"
-                  className="border-gray-300 text-accent data-[state=checked]:border-accent"
-                  onSelect={(e) => {
-                    console.log(e);
-                  }}
-                />
-                <Label
-                  htmlFor="option-one"
-                  className="text-sm font-medium leading-none text-gray-500"
-                >
-                  All
-                </Label>
-              </div>
-            )}
+          {isCheckbox ? (
+            <Checkboxes
+              removeCount
+              onChange={(items) => onChange(items, filterFieldName)}
+              items={items}
+              selectedItems={searchFilter.regions}
+              limitToPresentViewAll={7}
+            />
+          ) : (
+            <RadioGroup
+              defaultValue={defaultValue}
+              className="flex flex-col gap-[12px]"
+              onValueChange={(items) => onChange(items, filterFieldName)}
+            >
+              {!hideAllOption && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value="*"
+                    id="option-one"
+                    className="border-gray-300 text-accent data-[state=checked]:border-accent"
+                    onSelect={(e) => {
+                      console.log(e);
+                    }}
+                  />
+                  <Label
+                    htmlFor="option-one"
+                    className="text-sm font-medium leading-none text-gray-500"
+                  >
+                    All
+                  </Label>
+                </div>
+              )}
 
-            {items.map((item, i) => (
-              <div
-                className="flex items-center space-x-2"
-                key={`${item.display_name}-${i}`}
-              >
-                <RadioGroupItem
-                  className="border-gray-300 text-accent data-[state=checked]:border-accent"
-                  value={item.name}
-                  id={`${item.display_name}-${i}`}
-                />
-                <Label
-                  htmlFor={`${item.display_name}-${i}`}
-                  className="text-sm font-medium leading-none text-gray-500"
+              {items.map((item, i) => (
+                <div
+                  className="flex items-center space-x-2"
+                  key={`${item.display_name}-${i}`}
                 >
-                  {item.display_name}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
+                  <RadioGroupItem
+                    className="border-gray-300 text-accent data-[state=checked]:border-accent"
+                    value={item.name}
+                    id={`${item.display_name}-${i}`}
+                  />
+                  <Label
+                    htmlFor={`${item.display_name}-${i}`}
+                    className="text-sm font-medium leading-none text-gray-500"
+                  >
+                    {item.display_name}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

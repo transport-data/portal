@@ -121,7 +121,7 @@ export default function DatasetSearchItem({
             <div className="hidden sm:block">•</div>
             <div className="flex gap-[4px]">
               <ClipboardIcon width={14} />
-              Updated on {updateDate}
+              Updated {updateDate}
             </div>
             {filteredFrequency ? (
               <>
