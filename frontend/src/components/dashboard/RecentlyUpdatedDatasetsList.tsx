@@ -24,9 +24,12 @@ export default function RecentlyUpdatedDatasetsList({
     include_private: true,
   });
 
-  const { data: datasets } = api.dataset.search.useQuery(
+  const { data } = api.dataset.search.useQuery(
     datasetsQuery.current as unknown as SearchDatasetType
   );
+
+  const datasets = data?.result;
+
   return (
     <div className="my-10">
       <h2 className="mb-5 text-base font-semibold leading-6">
