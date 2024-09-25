@@ -9,6 +9,7 @@ import { SearchDatasetType } from "@schema/dataset.schema";
 import { searchDatasets } from "@utils/dataset";
 import { DocumentReportIcon, EyeOffIcon, GlobeAltIcon } from "@lib/icons";
 import { api } from "@utils/api";
+import { Skeleton } from "@components/ui/skeleton";
 
 export default () => {
   const { data: session } = useSession();
@@ -28,6 +29,19 @@ export default () => {
   const { data, isLoading } = api.dataset.search.useQuery(options);
 
   const datasets = data?.results;
+
+  const skeletonElements = [];
+
+  for (let x = 0; x < 3; x++) {
+    skeletonElements.push(
+      <div className="flex w-full cursor-pointer gap-6">
+        <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
+          <Skeleton className="h-8 w-8 bg-gray-200" />
+        </div>
+        <Skeleton className="h-[60px] w-full bg-gray-200" />
+      </div>
+    );
+  }
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
@@ -61,17 +75,23 @@ export default () => {
       <div className="order-3 w-fit w-full sm:order-2">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
         <section className="flex flex-col gap-4">
-          {datasets
-            ?.filter((item) =>
-              visibility === "Drafts"
-                ? item.state === "draft"
-                : visibility === "Public"
-                ? item.state === "active"
-                : true
-            )
-            ?.map((x) => (
-              <DashboardDatasetCard {...x} />
-            ))}
+          {isLoading ? (
+            skeletonElements
+          ) : (
+            <>
+              {datasets
+                ?.filter((item) =>
+                  visibility === "Drafts"
+                    ? item.state === "draft"
+                    : visibility === "Public"
+                    ? item.state === "active"
+                    : true
+                )
+                ?.map((x) => (
+                  <DashboardDatasetCard {...x} />
+                ))}
+            </>
+          )}
         </section>
       </div>
       <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3  sm:min-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
