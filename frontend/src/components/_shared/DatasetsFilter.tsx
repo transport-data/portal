@@ -49,32 +49,32 @@ export default ({
   ]);
 
   const totalOfFiltersApplied =
-    (searchFilter.tags?.length || 0) +
-    (searchFilter.orgs?.length || 0) +
-    (searchFilter.resFormat?.length || 0) +
-    (searchFilter.publicationDates?.length || 0) +
-    (searchFilter.countries?.length || 0) +
+    (searchFilter.tags?.length ?? 0) +
+    (searchFilter.orgs?.length ?? 0) +
+    (searchFilter.resFormat?.length ?? 0) +
+    (searchFilter.publicationDates?.length ?? 0) +
+    (searchFilter.countries?.length ?? 0) +
+    (searchFilter.regions?.length ?? 0) +
     (searchFilter.sector ? 1 : 0) +
     (searchFilter.service ? 1 : 0) +
     (searchFilter.after ? 1 : 0) +
     (searchFilter.before ? 1 : 0) +
     (searchFilter.fuel ? 1 : 0) +
     (searchFilter.showArchived ? 1 : 0) +
-    (searchFilter.mode ? 1 : 0) +
-    (searchFilter.regions ? 1 : 0);
+    (searchFilter.mode ? 1 : 0);
 
-  let hasFilteredByAllCountriesAndRegions;
+  let showFilteredByAllCountriesAndRegions;
 
-  if (!searchFilter.countries && !searchFilter.regions) {
-    hasFilteredByAllCountriesAndRegions = true;
+  if (!searchFilter.countries?.length && !searchFilter.regions?.length) {
+    showFilteredByAllCountriesAndRegions = true;
   } else if (!searchFilter.countries && !countries.length) {
-    hasFilteredByAllCountriesAndRegions =
+    showFilteredByAllCountriesAndRegions =
       searchFilter.regions?.length === regions.length;
   } else if (!searchFilter.regions && !regions.length) {
-    hasFilteredByAllCountriesAndRegions =
+    showFilteredByAllCountriesAndRegions =
       searchFilter.countries?.length === countries.length;
   } else {
-    hasFilteredByAllCountriesAndRegions =
+    showFilteredByAllCountriesAndRegions =
       searchFilter.countries?.length === countries.length &&
       searchFilter.regions?.length === regions.length;
   }
@@ -133,7 +133,7 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>
             <span className="hide mr-2 text-sm">
-              {hasFilteredByAllCountriesAndRegions
+              {showFilteredByAllCountriesAndRegions
                 ? "All"
                 : searchFilter.regions
                 ? (searchFilter.regions?.length ?? 0) +
