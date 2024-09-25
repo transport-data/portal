@@ -1,8 +1,9 @@
-import { CKAN, Dataset } from "@portaljs/ckan";
+import { CKAN } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
 import { env } from "@env.mjs";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export const searchDatasets = async ({
   apiKey,
@@ -37,11 +38,10 @@ export const searchDatasets = async ({
         queryParams.push(`include_drafts=${input?.include_drafts}`)
     }
 
-
     const action = `${baseAction}?${queryParams.join("&")}`
-    const res = await CkanRequest.get<any>(action, { ckanUrl, apiKey})
+    const datasets:CkanResponse<Dataset[]> = await CkanRequest.post(action, { ckanUrl, apiKey})
 
-    return res.result as Dataset[];
+    return datasets;
 
 };
 

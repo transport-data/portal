@@ -31,7 +31,7 @@ export default () => {
     });
   });
 
-  const datasets = data?.results as Dataset[];
+  const datasets = data?.result;
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
