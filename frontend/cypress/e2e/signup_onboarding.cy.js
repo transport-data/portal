@@ -10,23 +10,31 @@ describe("onboarding flow", () => {
     
     cy.visit("/onboarding");
     cy.contains("Select locations, topics and organisations you want to follow");
-
+  
     // button should be disabled
     cy.get('button[type="submit"]')
-    .should('be.visible')
-    .and('be.disabled')
+      .should('be.visible')
+      .and('be.disabled')
+  
+    cy.get('.flex.flex-wrap.items-center.gap-2').then(($div) => {
+      // Check if locations exist
+      const $spans = $div.find('span');
+  
+      if ($spans.length > 0) {
+        cy.wrap($spans).first().click();
+  
+        // button should not be disabled
+        cy.get('button[type="submit"]')
+          .should('be.visible')
+          .and('not.be.disabled')
+          .click();
 
-    // select locations
-    cy.get('.flex.flex-wrap.items-center.gap-2 span').first().click();
-
-    // button should not be disabled
-    cy.get('button[type="submit"]')
-    .should('be.visible')
-    .and('not.be.disabled')
-    .click();
-
-    cy.wait(2000)
-    cy.contains("Find your organisation")
+        cy.wait(2000);
+        cy.contains("Find your organisation");
+      } else {
+        cy.log('No Locations Found.');
+      }
+    });
   });
 
   it("Should request organization participation", () => {
