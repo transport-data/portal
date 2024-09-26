@@ -1,24 +1,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { cn } from "@lib/utils";
-import { User } from "@portaljs/ckan";
+import { type User } from "@interfaces/ckan/user.interface";
+import { api } from "@utils/api";
 import { getUser } from "@utils/user";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function UserAvatar({
-  id,
+  user,
   className,
 }: {
-  id: string;
+  user: User;
   className?: string;
 }) {
-  const { data: sessionData } = useSession();
-  const [user, setUser] = useState<User>();
-  const apiKey = sessionData?.user.apikey ?? "";
-
-  useEffect(() => {
-    getUser({ apiKey, id }).then((v) => setUser(v as User));
-  }, []);
+  console.log(user);
   return (
     <Avatar
       className={cn("h-6 w-6 border-2 border-white", className)}

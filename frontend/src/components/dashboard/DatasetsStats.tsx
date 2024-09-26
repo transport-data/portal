@@ -26,7 +26,7 @@ export default function DatasetsStats() {
     {
       id: 1,
       name: "All",
-      stat: datasets?.results.length ?? 0,
+      stat: datasets?.results?.length ?? 0,
       icon: CircleStackIcon,
       cta: { title: "View all", href: "/datasets" },
     },

@@ -11,6 +11,8 @@ import { capitalize } from "remeda";
 import geography from "@data/geography.json";
 import UserAvatar from "./UserAvatar";
 import { EyeOffIcon, GlobeAltIcon } from "@lib/icons";
+import Link from "next/link";
+import { api } from "@utils/api";
 
 export interface DashboardDatasetCardProps {
   tdcValidated?: boolean;
@@ -29,6 +31,8 @@ export default function DashboardDatasetCard(props: Dataset) {
   const router = useRouter();
 
   const {
+    id,
+    name,
     tdc_category,
     title,
     tags,
@@ -37,6 +41,7 @@ export default function DashboardDatasetCard(props: Dataset) {
     state,
     geographies,
     contributors,
+    organization,
   } = props;
 
   const badgeVariant =
@@ -60,9 +65,15 @@ export default function DashboardDatasetCard(props: Dataset) {
       <CircleStackIcon {...badgeIconOptions} />
     );
 
+  const { data: contributorsData, isLoading } = api.user.getUsersByIds.useQuery(
+    {
+      ids: contributors,
+    }
+  );
+
   return (
-    <div
-      onClick={() => router.push("#")}
+    <Link
+      href={`/@${organization?.name}/${id}`}
       className="flex w-full cursor-pointer gap-3 lg:gap-6"
     >
       <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
@@ -157,7 +168,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             </>
           )}
 
-          {geographies && geographies[0] && (
+          {geographies?.length && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
@@ -180,13 +191,13 @@ export default function DashboardDatasetCard(props: Dataset) {
             </>
           )}
 
-          {contributors && contributors[0] && (
+          {contributors?.length && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
                 <span>Contributors</span>
                 <div className="flex -space-x-2 rtl:space-x-reverse">
-                  {contributors.map((x, i) =>
+                  {contributorsData?.map((contributor, i) =>
                     i === 4 ? (
                       <a
                         className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-700 text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800"
@@ -195,7 +206,7 @@ export default function DashboardDatasetCard(props: Dataset) {
                         {contributors.length - 4}
                       </a>
                     ) : i < 4 ? (
-                      <UserAvatar id={x} />
+                      <UserAvatar user={contributor} />
                     ) : (
                       <></>
                     )
@@ -206,6 +217,6 @@ export default function DashboardDatasetCard(props: Dataset) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
