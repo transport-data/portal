@@ -18,9 +18,6 @@ export default () => {
   const options: SearchDatasetType = {
     offset: 0,
     limit: 20,
-    tags: [],
-    groups: [],
-    orgs: [],
     include_private: true,
     include_drafts: true,
     query: `creator_user_id:${session?.user.id}`,
