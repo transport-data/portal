@@ -29,7 +29,7 @@ RUN apk --no-cache add patch
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
-ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher
+ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher activity 
 
 COPY patches/ckan/* ${APP_DIR}/patches/ckan/
 
