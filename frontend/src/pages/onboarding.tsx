@@ -52,7 +52,7 @@ export default function LoginPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const { data: sessionData } = useSession();
   const apiKey = sessionData?.user.apikey;
-  const [errorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [loggingIn] = useState(false);
   const router = useRouter();
@@ -60,6 +60,9 @@ export default function LoginPage({
   const form = useForm<OnboardingFormType>();
   const { handleSubmit, watch } = form;
   const [newOrgRequest, setNewOrgRequest] = useState(false);
+  // states to track whether step was skipped or submitted
+  const [firstStepSkipped, setFirstStepSkipped] = useState(true);
+  const [secondStepSkipped, setSecondStepSkipped] = useState(true);
 
   useEffect(() => {
     setIsSmallScreen(window.innerWidth < 1457);
@@ -173,37 +176,27 @@ export default function LoginPage({
       const org_description = selectedValues.newOrganizationDescription;
       const dataset_description = selectedValues.newOrganizationDataDescription;
       if (isSelected && org_name && org_description && apiKey) {
-        try {
-          const response = await requestNewOrganization({
-            org_name: org_name,
-            org_description: org_description,
-            dataset_description: dataset_description,
-            apiKey: apiKey
-          });
-          if (!response.success) {
-            <ErrorAlert text="Failed to request new organization participation." />
-          }
-        } catch (error) {
-          console.error("Error requesting organization participation:", error);
-          <ErrorAlert text="An error occurred while requesting organization participation." />
+        const response = await requestNewOrganization({
+          org_name: org_name,
+          org_description: org_description,
+          dataset_description: dataset_description,
+          apiKey: apiKey
+        });
+        if (!response.success) {
+          setErrorMessage("An Error Occurred while Submitting New Organization Request");
         }
       }
     } else {
       const org_id = selectedValues.orgInWhichItParticipates?.id;
       const message = selectedValues.messageToParticipateOfTheOrg;
       if (isSelected && org_id && message && apiKey) {
-        try {
-          const response = await requestOrganizationOwner({
-            id: org_id,
-            message: message,
-            apiKey: apiKey,
-          });
-          if (!response.success) {
-            <ErrorAlert text="Failed to request organization participation." />
-          }
-        } catch (error) {
-          console.error("Error requesting organization participation:", error);
-          <ErrorAlert text="An error occurred while requesting organization participation." />
+        const response = await requestOrganizationOwner({
+          id: org_id,
+          message: message,
+          apiKey: apiKey,
+        });
+        if (!response.success) {
+          setErrorMessage(`An Error Occurred while Submitting Organization ${selectedValues.orgInWhichItParticipates.name} Participation Request.`);
         }
       }
     }
@@ -211,18 +204,13 @@ export default function LoginPage({
   
   const submitUserInvites = async (selectedValues: any) => {
     if (selectedValues.newUsersEmailsToInvite && selectedValues.messageToInviteNewUsers) {
-      try {
-        const response = await inviteUser({
-          emails: selectedValues.newUsersEmailsToInvite,
-          message: selectedValues.messageToInviteNewUsers,
-          apiKey: apiKey,
-        });
-        if (!response.success) {
-          <ErrorAlert text="Failed to invite users." />
-        }
-      } catch (error) {
-        console.error("Error inviting users:", error);
-        <ErrorAlert text="An error occurred while inviting users." />
+      const response = await inviteUser({
+        emails: selectedValues.newUsersEmailsToInvite,
+        message: selectedValues.messageToInviteNewUsers,
+        apiKey: apiKey,
+      });
+      if (!response.success) {
+        setErrorMessage("An Error Occurred while Sending Invites");
       }
     }
   };
@@ -247,34 +235,47 @@ export default function LoginPage({
     });
   
     if (apiKey && group_ids.length > 0) {
-      try {
-        const groups = await followGroups({
-          apiKey: apiKey,
-          ids: group_ids,
-        });
-        return groups;
-      } catch (error) {
-        console.error("Error submitting follow preferences:", error);
-        <ErrorAlert text="An error occurred while submitting your follow preferences." />
-      }
+      const response = await followGroups({
+        apiKey: apiKey,
+        ids: group_ids,
+      });
     }
-    return true;
   };
+
+  const submitSelectionAndOrganization = async () => {
+    const selectedValues = form.getValues();
+    // only submit first and second second if Next was clicked
+    if (!firstStepSkipped) {
+      await submitFollowPreferences();
+    }
+    if (!secondStepSkipped) {
+      await submitOrganizationParticipation(selectedValues);
+    }
+  }
   const nextStep = async () => {
+    setErrorMessage(null)
     const selectedValues = form.getValues();
     if (stepNumber === 0) {
-      await submitFollowPreferences();
+      setFirstStepSkipped(false)
     } else if (stepNumber === 1) {
-      await submitOrganizationParticipation(selectedValues);
+      setSecondStepSkipped(false)
     } else if (stepNumber === 2) {
+      await submitSelectionAndOrganization();
       await submitUserInvites(selectedValues);
       router.push("/dashboard/newsfeed");
     }
     setStep(stepNumber + 1);
   };
 
-  const skipStep = () => {
+  const skipStep = async () => {
+    setErrorMessage(null)
+    if (stepNumber === 0) {
+      setFirstStepSkipped(true);
+    } else if (stepNumber === 1) {
+      setSecondStepSkipped(true);
+    }
     if (stepNumber === steps.length - 1) {
+      await submitSelectionAndOrganization();
       router.push("/dashboard/newsfeed");
     }
     setStep(stepNumber + 1);
@@ -393,7 +394,7 @@ export default function LoginPage({
                         (disableButton ? " cursor-not-allowed opacity-20" : "")
                       }
                     >
-                      Next
+                      {stepNumber === 2 ? "Submit" : "Next"}
                     </Button>
                   ))
                   .otherwise(() => (
