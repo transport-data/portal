@@ -73,7 +73,7 @@ export default function DashboardDatasetCard(props: Dataset) {
 
   return (
     <Link
-      href={`/@${organization?.name}/${id}`}
+      href={`/@${organization?.name}/${name}`}
       className="flex w-full cursor-pointer gap-3 lg:gap-6"
     >
       <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
@@ -168,7 +168,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             </>
           )}
 
-          {geographies?.length && (
+          {geographies && geographies.length > 0 && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
@@ -191,7 +191,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             </>
           )}
 
-          {contributors?.length && (
+          {contributors && contributors.length > 0 && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">

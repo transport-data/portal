@@ -36,7 +36,6 @@ export const EditDatasetForm: React.FC<{ initialValues: Dataset }> = ({
     onError: (error) => {
       console.log(error);
       setErrorMessage(error.message);
-      console.log(error);
     },
   });
 
