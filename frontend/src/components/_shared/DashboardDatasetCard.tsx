@@ -63,7 +63,7 @@ export default function DashboardDatasetCard(props: Dataset) {
   return (
     <div
       onClick={() => router.push("#")}
-      className="flex w-full cursor-pointer gap-6"
+      className="flex w-full cursor-pointer gap-3 lg:gap-6"
     >
       <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
         <Badge
@@ -74,7 +74,7 @@ export default function DashboardDatasetCard(props: Dataset) {
       </div>
 
       <div className="w-full space-y-2 text-sm">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
           <h2 className="text-lg font-bold">{title}</h2>
           {tdc_category === "tdc_formatted" && (
             <Badge variant={"success"} className="text-[#03543F]">
@@ -86,7 +86,7 @@ export default function DashboardDatasetCard(props: Dataset) {
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(tags || [])?.map((k) => (
             <Badge variant={"purple"} className="bg-[#E5EDFF] text-[#42389D]">
               {capitalize(k.display_name ?? "")}
@@ -94,7 +94,7 @@ export default function DashboardDatasetCard(props: Dataset) {
           ))}
         </div>
 
-        <div className="flex flex-col gap-2 text-xs md:flex-row md:items-center">
+        <div className="flex flex-wrap  gap-2 text-xs md:flex-row md:items-center">
           {state === "draft" ? (
             <Badge
               variant={"success"}
