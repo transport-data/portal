@@ -24,7 +24,7 @@
             color: #006064;
         }
         .visit_btn {
-            color: #FFFFFF;
+            color: white !important;
             background-color: #006064;
             border-radius: 5px;
             text-align: center;
@@ -32,21 +32,35 @@
             text-decoration: none;
             margin-bottom: 30px;
         }
+        .request-box {
+            border-radius: 5px;
+            background-color: #dfe6e6; 
+            width: 50%;
+            margin: auto;
+            margin-top: 20px;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
-    <p><span class="highlight color">{{ user_name }} ({{ user_email }})</span> has Requested to Create a New Organization on {{ site_title }}</p>
-    <p>Please Review the Request</p>
-
-    <div class="org_detail">
-        <h2 style="background-color: #006064; text-align: center; color: #FFFFFF; padding: 10px 0px;">New Organization Request</h2>
-        <h4><span class="highlight color">Name:</span> {{ org_name }}</h4>
-        <h4><span class="highlight color">Description:</span> {{ org_description }}</h5>
-        <h4><span class="highlight color">Data Description:</span> {{ dataset_description }}</h5>
-    </div>
+    <h2 style="background-color: #006064; text-align: center; color: #FFFFFF; padding: 10px 0px;">New Organization Request</h2>
+    <p>
+        <span class="highlight color" title="{{ user_email }}">
+            {{ user_name }}
+        </span> 
+        has requested to create a new organization on {{ site_title }}.
+    </p>
     
-    <p>To Create the Organization, please visit {{ site_title }}</p>
-    <a href="{{ site_url }}" class="visit_btn">Visit CKAN</a>
+    <h3 class="color" style="text-align: center;">Please review the request.</h3>
+    <div class="request-box">
+        <div>
+            <h4><span class="highlight color">Name:</span> {{ org_name }}</h4>
+            <h4><span class="highlight color">Description:</span> {{ org_description }}</h4>
+            <h4><span class="highlight color">Data Description:</span> {{ dataset_description }}</h4>
+        </div>
+    </div>
+    <p>To create the organization, please visit {{ site_title }}.</p>
+    <a href="{{ site_url }}" class="visit_btn">VISIT CKAN</a>
     <p>Have a nice day.</p>
 </body>
 </html>
