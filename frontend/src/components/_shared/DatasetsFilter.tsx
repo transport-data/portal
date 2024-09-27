@@ -407,6 +407,8 @@ export default ({
               <button
                 className="font-semibold text-[#006064]"
                 onClick={() => {
+                  setStartYear(undefined);
+                  setEndYear(undefined);
                   onChange([
                     { value: undefined, key: "startYear" },
                     { value: undefined, key: "endYear" },
