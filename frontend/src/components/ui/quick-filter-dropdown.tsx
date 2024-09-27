@@ -11,7 +11,7 @@ import { Button } from "./button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Facet } from "@components/_shared/DatasetsFilter";
-import { Checkboxes } from "@pages/search";
+import { Checkboxes, SearchPageOnChange } from "@pages/search";
 import { SearchDatasetsType } from "@schema/dataset.schema";
 
 export default function QuickFilterDropdown({
@@ -29,10 +29,7 @@ export default function QuickFilterDropdown({
   isCheckbox?: boolean;
   filterFieldName: keyof SearchDatasetsType;
   searchFilter: SearchDatasetsType;
-  onChange: (
-    items: string[] | boolean | string,
-    key: keyof SearchDatasetsType
-  ) => void;
+  onChange: SearchPageOnChange;
   items: Facet[];
   defaultValue?: string;
 }) {
@@ -69,8 +66,9 @@ export default function QuickFilterDropdown({
         <div className="p-4">
           {isCheckbox ? (
             <Checkboxes
-              removeCount
-              onChange={(items) => onChange(items, filterFieldName)}
+              onChange={(items) =>
+                onChange([{ value: items, key: filterFieldName }])
+              }
               items={items}
               selectedItems={searchFilter.regions}
               limitToPresentViewAll={7}
@@ -79,7 +77,9 @@ export default function QuickFilterDropdown({
             <RadioGroup
               defaultValue={defaultValue}
               className="flex flex-col gap-[12px]"
-              onValueChange={(items) => onChange(items, filterFieldName)}
+              onValueChange={(items) =>
+                onChange([{ value: items, key: filterFieldName }])
+              }
             >
               {!hideAllOption && (
                 <div className="flex items-center space-x-2">

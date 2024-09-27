@@ -16,6 +16,7 @@ import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { SearchDatasetsType } from "@schema/dataset.schema";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
+import { SearchPageOnChange } from "@pages/search";
 
 const facets: any = {
   in: {
@@ -61,19 +62,9 @@ export default function SearchBar({
   hideDatasetSuggestion,
   onChange,
   query,
-  resetFilter,
 }: {
-  onChange: (
-    items: string[] | boolean | string | undefined,
-    key: keyof SearchDatasetsType
-  ) => void;
+  onChange: SearchPageOnChange;
   query?: string;
-  resetFilter: () => void;
-  onSubmit?: (data: {
-    query: string;
-    facetName: string;
-    facetValue: string;
-  }) => void;
   hideDatasetSuggestion?: boolean;
   facetValue?: string;
   facetName?: keyof SearchDatasetsType;
@@ -104,7 +95,7 @@ export default function SearchBar({
 
   const handleNarrowSelect = (facet: any) => {
     if (facet) {
-      onChange(facet, facetName as any);
+      onChange([{ value: facet, key: facetName! }]);
       queryInputRef.current?.focus();
       // setFocus("query");
     }
@@ -121,8 +112,10 @@ export default function SearchBar({
 
   const handleCancelSearch = () => {
     setInternalQuery("");
-    if (facetName) onChange(undefined, facetName);
-    onChange(undefined, "query");
+    const changes: any = [];
+    if (facetName) changes.push({ value: undefined, key: facetName });
+    changes.push({ value: undefined, key: "query" });
+    onChange(changes);
     setTimeout(() => {
       queryInputRef.current?.focus();
       // setFocus("query");
@@ -133,8 +126,11 @@ export default function SearchBar({
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        if (facetValue && facetName) onChange(facetValue, facetName);
-        onChange(internalQuery, "query");
+        const changes: any = [];
+        if (facetValue && facetName)
+          changes.push({ value: facetValue, key: facetName });
+        changes.push({ value: internalQuery, key: "query" });
+        onChange(changes);
 
         // if (onSubmit) {
         //   onSubmit(getValues());
@@ -202,8 +198,10 @@ export default function SearchBar({
                   badge={`${facetName}: ${item}`}
                   text={""}
                   onSelect={() => {
-                    onChange(item, facetName);
-                    onChange(internalQuery, "query");
+                    onChange([
+                      { value: item, key: facetName },
+                      { value: internalQuery, key: "query" },
+                    ]);
                   }}
                 />
               ))}

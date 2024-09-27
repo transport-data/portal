@@ -22,6 +22,13 @@ export function getServerSideProps({ query }: any) {
   };
 }
 
+export type SearchPageOnChange = (
+  data: {
+    value: string[] | boolean | string | number | undefined;
+    key: keyof SearchDatasetsType;
+  }[]
+) => void;
+
 export default function DatasetSearch({
   query,
   sector,
@@ -33,24 +40,24 @@ export default function DatasetSearch({
   after,
   country,
 }: any) {
-  let modes: Facet[] = [];
-  let services: Facet[] = [];
-  let updateFrequencies: Facet[] = [];
-  let tags: Facet[] = [];
-  let sectors: Facet[] = [];
-  let orgs: Facet[] = [];
-  let resourcesFormats: Facet[] = [];
-  let regions: Facet[] = [];
-  let countries: Facet[] = [];
-  let metadataCreatedDates: Facet[] = [];
-  let yearsCoverage: Facet[] = [];
+  const [modes, setModes] = useState<Facet[]>([]);
+  const [services, setServices] = useState<Facet[]>([]);
+  const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
+  const [tags, setTags] = useState<Facet[]>([]);
+  const [sectors, setSectors] = useState<Facet[]>([]);
+  const [orgs, setOrgs] = useState<Facet[]>([]);
+  const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
+  const [regions, setRegions] = useState<Facet[]>([]);
+  const [countries, setCountries] = useState<Facet[]>([]);
+  const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
+  const [yearsCoverage, setYearsCoverage] = useState<Facet[]>([]);
 
   const resetFilter = () => {
     setSearchFilter({
       offset: 0,
       limit: 9,
       sort: "score desc, metadata_modified desc",
-      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end", "metadata_created"]`,
+      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
     });
     setCurrentPage(0);
   };
@@ -69,7 +76,7 @@ export default function DatasetSearch({
     countries: country ? [country as string] : undefined,
     query: query as string,
     sort: "score desc, metadata_modified desc",
-    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "temporal_coverage_start", "temporal_coverage_end", "metadata_created"]`,
+    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
   });
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -83,128 +90,83 @@ export default function DatasetSearch({
   for (const key in facets) {
     switch (key) {
       case "organization": {
-        orgs = facets[key].items;
+        if (!orgs.length) setOrgs(facets[key].items);
         break;
       }
       case "tags": {
-        tags = facets[key].items;
+        if (!tags.length) setTags(facets[key].items);
         break;
       }
       case "geographies": {
-        countries = facets[key].items;
+        if (!countries.length) setCountries(facets[key].items);
         break;
       }
       case "regions": {
-        regions = facets[key].items;
+        if (!regions.length) setRegions(facets[key].items);
         break;
       }
       case "res_format": {
-        resourcesFormats = facets[key].items;
+        if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
+        break;
+      }
+      case "modes": {
+        if (!modes.length) setModes(facets[key].items);
+        break;
+      }
+      case "services": {
+        if (!services.length) setServices(facets[key].items);
+        break;
+      }
+      case "frequency": {
+        if (!updateFrequencies.length) setUpdateFrequencies(facets[key].items);
+        break;
+      }
+      case "sectors": {
+        if (!sectors.length) setSectors(facets[key].items);
         break;
       }
       case "metadata_created": {
-        const createdByYear = new Map<string, number>();
-        let totalCount = 0;
-        for (let i = 0; i < facets[key].items.length; i++) {
-          const x = facets[key].items[i];
+        if (metadataCreatedDates.length) {
+          break;
+        }
+        const countByYear = new Map<string, number>();
+        const LAST_MONTH_KEY = "Last month";
+        const setYearsCoverage = (map: Map<string, number>) => {
+          setMetadataCreatedDates(
+            Array.from(map.keys())
+              .map((k) => {
+                return {
+                  name: k,
+                  display_name: k,
+                  count: map.get(k) || 0,
+                };
+              })
+              .sort((a, b) => Number(a.display_name) - Number(b.display_name))
+          );
+        };
+
+        facets[key].items.forEach((x: any) => {
           const dateConverted = new Date(x.name);
           const today = new Date();
           const _key =
             dateConverted.getFullYear() === today.getFullYear() &&
             dateConverted.getMonth() === today.getMonth() - 1
-              ? "Last month"
-              : dateConverted.getFullYear().toString();
-          let count = createdByYear.get(_key);
+              ? LAST_MONTH_KEY
+              : x.name.slice(0, 4);
+          let count = countByYear.get(_key);
           if (!count) {
-            createdByYear.set(_key, x.count);
+            countByYear.set(_key, x.count);
           } else {
-            count += x.count;
-            createdByYear.set(_key, count!);
+            countByYear.set(_key, count + x.count);
           }
-
-          totalCount += x.count;
-        }
-
-        metadataCreatedDates = Array.from(createdByYear.keys()).map(
-          (k) =>
-            ({
-              name: k,
-              display_name: k,
-              count: createdByYear.get(k),
-            } as Facet)
-        );
-        metadataCreatedDates.unshift({
-          name: "*",
-          display_name: "All",
-          count: totalCount,
         });
+        countByYear.set(
+          new Date().getFullYear().toString(),
+          (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
+            (countByYear.get(LAST_MONTH_KEY) ?? 0)
+        );
 
-        break;
-      }
-      case "modes": {
-        modes = facets[key].items;
-        break;
-      }
-      case "services": {
-        services = facets[key].items;
-        break;
-      }
-      case "frequency": {
-        updateFrequencies = facets[key].items;
-        break;
-      }
-      case "sectors": {
-        sectors = facets[key].items;
-        break;
-      }
-      case "temporal_coverage_end":
-      case "temporal_coverage_start": {
-        const countByYear = new Map<string, number>();
-        const setYearsCoverage = (map: Map<string, number>) => {
-          yearsCoverage.push(
-            ...Array.from(map.keys()).map((k) => {
-              const date = new Date();
-              date.setFullYear(Number(k));
-              date.setDate(1);
-              date.setMonth(0);
-              return {
-                name: date.toLocaleDateString("en-US").replaceAll("/", "-"),
-                display_name: k,
-                count: map.get(k),
-              } as Facet;
-            })
-          );
-        };
-
-        const addDataToMap = (x: any, map: Map<string, number>) => {
-          const _key = x.name.slice(0, 4);
-          let count = map.get(_key);
-          if (!count) {
-            map.set(_key, x.count);
-          } else {
-            map.set(_key, count + x.count);
-          }
-        };
-
-        facets[key].items.forEach((x: any) => addDataToMap(x, countByYear));
-
-        if (yearsCoverage.length) {
-          yearsCoverage.forEach((x) => {
-            const year = new Date(x.name).getFullYear().toString();
-            const countFound = countByYear.get(year);
-            if (countFound) {
-              x.count = x.count + countFound;
-              countByYear.delete(year);
-            }
-          });
-          setYearsCoverage(countByYear);
-          yearsCoverage.sort(
-            (a, b) => Number(a.display_name) - Number(b.display_name)
-          );
-        } else {
-          setYearsCoverage(countByYear);
-        }
-
+        setYearsCoverage(countByYear);
         break;
       }
       default: {
@@ -213,13 +175,10 @@ export default function DatasetSearch({
     }
   }
 
-  const onChange = (
-    value: string[] | boolean | string | undefined,
-    key: keyof SearchDatasetsType
-  ) => {
+  const onChange: SearchPageOnChange = (data) => {
     setSearchFilter((oldValue) => {
       const updatedValue: any = { ...oldValue, offset: 0 };
-      updatedValue[key] = value;
+      data.forEach((x) => (updatedValue[x.key] = x.value));
       return updatedValue;
     });
     setCurrentPage(0);
@@ -238,11 +197,7 @@ export default function DatasetSearch({
         <div className="container">
           <div className="pt-5">
             <SearchBar
-              onSubmit={(data) =>
-                setSearchFilter((old) => ({ ...old, query: data.query }))
-              }
               onChange={onChange}
-              resetFilter={resetFilter}
               hideDatasetSuggestion
               query={searchFilter.query || ""}
               facetName={
@@ -483,17 +438,12 @@ export default function DatasetSearch({
                   datasetCount={datasetCount || 0}
                   onChange={onChange}
                   searchFilter={searchFilter}
+                  tags={tags}
+                  orgs={orgs}
+                  resourcesFormats={resourcesFormats}
+                  regions={regions}
+                  countries={countries}
                   metadataCreatedDates={metadataCreatedDates}
-                  {...{
-                    tags,
-                    orgs,
-                    resourcesFormats,
-                    regions,
-                    countries,
-                    yearsCoverage,
-                    modes,
-                    services,
-                  }}
                 />
               </div>
             </div>
@@ -505,18 +455,14 @@ export default function DatasetSearch({
 }
 
 export const Checkboxes = ({
-  spaceCount,
   onChange,
   items,
-  removeCount,
   selectedItems = [],
   limitToPresentViewAll,
 }: {
   items: Facet[];
   selectedItems?: string[];
   limitToPresentViewAll?: number;
-  spaceCount?: boolean;
-  removeCount?: boolean;
   onChange: (v: string[]) => void;
 }) => {
   return (
@@ -526,26 +472,17 @@ export const Checkboxes = ({
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <input
               onChange={() => {
-                const itemsCopy = [...selectedItems];
-                if (itemsCopy.includes(x.name)) itemsCopy.splice(index);
-                else itemsCopy.push(x.name);
-                onChange([...itemsCopy]);
+                const selectedItemsCopy = [...selectedItems];
+                const i = selectedItemsCopy.findIndex((c) => c === x.name);
+                if (i > -1) selectedItemsCopy.splice(i, 1);
+                else selectedItemsCopy.push(x.name);
+                onChange([...selectedItemsCopy]);
               }}
               checked={selectedItems.includes(x.name)}
               className="remove-input-ring rounded text-[#006064]"
               type="checkbox"
             />
-            <label
-              className={spaceCount ? "flex w-full justify-between" : ""}
-              htmlFor=""
-            >
-              {x.display_name}{" "}
-              {!removeCount && (
-                <>
-                  {spaceCount ? <span>{`(${x.count})`}</span> : `(${x.count})`}
-                </>
-              )}
-            </label>
+            <label htmlFor="">{x.display_name}</label>
           </div>
         ) : index === 8 ? (
           <span className="mt-[1px] cursor-pointer text-[#006064]">

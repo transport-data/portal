@@ -7,10 +7,16 @@ import {
 import { Label } from "@components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import SimpleSearchInput from "@components/ui/simple-search-input";
-import { Checkboxes } from "@pages/search";
+import { Checkboxes, SearchPageOnChange } from "@pages/search";
 import { SearchDatasetsType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
 import { useState } from "react";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { cn } from "@lib/utils";
 
 export type Facet = { name: string; display_name: string; count: number };
 
@@ -23,7 +29,6 @@ export default ({
   resetFilter,
   regions,
   countries,
-  yearsCoverage,
   onChange,
   metadataCreatedDates,
 }: {
@@ -36,17 +41,17 @@ export default ({
   resourcesFormats: Facet[];
   regions: Facet[];
   countries: Facet[];
-  yearsCoverage: Facet[];
-  onChange: (
-    items: string[] | boolean | string,
-    key: keyof SearchDatasetsType
-  ) => void;
+  onChange: SearchPageOnChange;
 }) => {
   const [tabs, setTabs] = useState([
     { name: "All", current: false },
     { name: "Regions", current: true },
     { name: "Countries", current: false },
   ]);
+
+  const [searchedGeographyText, setSearchedGeographyText] = useState("");
+  const [startYear, setStartYear] = useState<number | undefined>();
+  const [endYear, setEndYear] = useState<number | undefined>();
 
   const totalOfFiltersApplied =
     (searchFilter.tags?.length ?? 0) +
@@ -104,10 +109,6 @@ export default ({
           Clear all
         </span>
       </div>
-      <SimpleSearchInput
-        onTextInput={(x) => console.log(x)}
-        placeholder="Search"
-      />
 
       <Accordion type="single" collapsible className="w-full text-[#6B7280]">
         <AccordionItem value="keyword">
@@ -121,8 +122,14 @@ export default ({
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
+            <div
+              onClick={() => onChange([{ value: [], key: "tags" }])}
+              className="ml-auto cursor-pointer font-semibold text-[#006064]"
+            >
+              Clear filter
+            </div>
             <Checkboxes
-              onChange={(items) => onChange(items, "tags")}
+              onChange={(items) => onChange([{ value: items, key: "tags" }])}
               items={tags}
               selectedItems={searchFilter.tags}
               limitToPresentViewAll={9}
@@ -143,22 +150,65 @@ export default ({
           </AccordionTrigger>
           <AccordionContent>
             <div className="mb-2 mt-[12px]">
+              <div className="mb-2">
+                <SimpleSearchInput
+                  onTextInput={setSearchedGeographyText}
+                  placeholder="Search geographies"
+                />
+              </div>
               <div className="sm:hidden">
                 <label htmlFor="tabs" className="sr-only">
                   Select a tab
                 </label>
                 <select
                   id="tabs"
+                  onChange={({ target: { value: i } }: any) => {
+                    setTabs((oldV) => {
+                      const tabs = [...oldV];
+
+                      tabs[Number(i)]?.current;
+                      tabs.forEach(
+                        (x, index) => (x.current = index === Number(i))
+                      );
+                      return tabs;
+                    });
+                  }}
                   name="tabs"
-                  defaultValue={tabs.find((tab) => tab.current)!.name}
-                  className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-[#111928] focus:outline-none focus:ring-[#111928] sm:text-sm"
+                  defaultValue={tabs.findIndex((tab) => tab.current)}
+                  className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-[#111928] focus:outline-none focus:ring-transparent sm:text-sm"
                 >
-                  {tabs.map((tab) => (
-                    <option key={tab.name}>{tab.name}</option>
+                  {tabs.map((tab, i) => (
+                    <option
+                      value={i}
+                      className={classNames(
+                        i === 1 &&
+                          !regions?.filter((x) =>
+                            x.display_name
+                              .toLowerCase()
+                              .includes(searchedGeographyText.toLowerCase())
+                          ).length
+                          ? "hidden"
+                          : i === 2 &&
+                            !countries?.filter((x) =>
+                              x.display_name
+                                .toLowerCase()
+                                .includes(searchedGeographyText.toLowerCase())
+                            ).length
+                          ? "hidden"
+                          : "block",
+                        tab.current
+                          ? "border-[#111928] text-[#111928]"
+                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                        "cursor-pointer whitespace-nowrap border-b-2 px-1 py-1 text-sm font-medium"
+                      )}
+                      key={tab.name}
+                    >
+                      {tab.name}
+                    </option>
                   ))}
                 </select>
               </div>
-              <div className="hidden sm:block">
+              <div className="hidden justify-between sm:flex">
                 <nav aria-label="Tabs" className="-mb-px flex gap-2.5">
                   {tabs.map((tab, i) => (
                     <a
@@ -174,9 +224,19 @@ export default ({
                       }}
                       aria-current={tab.current ? "page" : undefined}
                       className={classNames(
-                        i === 1 && !regions?.length
+                        i === 1 &&
+                          !regions?.filter((x) =>
+                            x.display_name
+                              .toLowerCase()
+                              .includes(searchedGeographyText.toLowerCase())
+                          ).length
                           ? "hidden"
-                          : i === 2 && !countries?.length
+                          : i === 2 &&
+                            !countries?.filter((x) =>
+                              x.display_name
+                                .toLowerCase()
+                                .includes(searchedGeographyText.toLowerCase())
+                            ).length
                           ? "hidden"
                           : "block",
                         tab.current
@@ -189,20 +249,49 @@ export default ({
                     </a>
                   ))}
                 </nav>
+                <span
+                  onClick={() => {
+                    onChange([
+                      { value: [], key: "regions" },
+                      { value: [], key: "countries" },
+                    ]);
+                  }}
+                  className="cursor-pointer font-semibold text-[#006064]"
+                >
+                  Clear filter
+                </span>
               </div>
             </div>
-            <div className="mb-3 flex gap-2.5 font-semibold text-[#006064]">
+            <div className="mb-3 flex flex-wrap gap-2.5 font-semibold text-[#006064]">
               <span
                 className="cursor-pointer"
                 onClick={() => {
                   const currentTabIdx = tabs.findIndex((x) => x.current)!;
                   if (currentTabIdx === 0) {
-                    onChange([...regions.map((x) => x.name)], "regions");
-                    onChange([...countries.map((x) => x.name)], "countries");
+                    onChange([
+                      {
+                        value: [...regions.map((x) => x.name)],
+                        key: "regions",
+                      },
+                      {
+                        value: [...countries.map((x) => x.name)],
+                        key: "countries",
+                      },
+                    ]);
                   } else if (currentTabIdx === 1) {
-                    onChange([...regions.map((x) => x.name)], "regions");
+                    onChange([
+                      {
+                        value: [...regions.map((x) => x.name)],
+                        key: "regions",
+                      },
+                    ]);
                   } else {
-                    onChange([...countries.map((x) => x.name)], "countries");
+                    onChange([
+                      {
+                        value: [...countries.map((x) => x.name)],
+                        key: "countries",
+                      },
+                    ]);
                   }
                 }}
               >
@@ -213,47 +302,78 @@ export default ({
                 onClick={() => {
                   const currentTabIdx = tabs.findIndex((x) => x.current)!;
                   if (currentTabIdx === 0) {
-                    onChange([], "regions");
-                    onChange([], "countries");
+                    onChange([{ value: [], key: "regions" }]);
+                    onChange([{ value: [], key: "countries" }]);
                   } else if (currentTabIdx === 1) {
-                    onChange([], "regions");
+                    onChange([{ value: [], key: "regions" }]);
                   } else {
-                    onChange([], "countries");
+                    onChange([{ value: [], key: "countries" }]);
                   }
                 }}
               >
                 Uncheck all
               </span>
+              <div
+                className="ml-auto sm:hidden"
+                onClick={() => {
+                  onChange([
+                    { value: [], key: "regions" },
+                    { value: [], key: "countries" },
+                  ]);
+                }}
+              >
+                Clear filter
+              </div>
             </div>
             <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
               {tabs[0]?.current ? (
                 <>
                   <Checkboxes
-                    spaceCount
-                    items={regions}
+                    items={regions.filter((x) =>
+                      x.display_name
+                        .toLowerCase()
+                        .includes(searchedGeographyText.toLowerCase())
+                    )}
                     selectedItems={searchFilter.regions}
-                    onChange={(items) => onChange(items, "regions")}
+                    onChange={(items) =>
+                      onChange([{ value: items, key: "regions" }])
+                    }
                   />
                   <Checkboxes
-                    spaceCount
-                    items={countries}
+                    items={countries.filter((x) =>
+                      x.display_name
+                        .toLowerCase()
+                        .includes(searchedGeographyText.toLowerCase())
+                    )}
                     selectedItems={searchFilter.countries}
-                    onChange={(items) => onChange(items, "countries")}
+                    onChange={(items) =>
+                      onChange([{ value: items, key: "countries" }])
+                    }
                   />
                 </>
               ) : tabs[1]?.current ? (
                 <Checkboxes
-                  spaceCount
-                  items={regions}
+                  items={regions.filter((x) =>
+                    x.display_name
+                      .toLowerCase()
+                      .includes(searchedGeographyText.toLowerCase())
+                  )}
                   selectedItems={searchFilter.regions}
-                  onChange={(items) => onChange(items, "regions")}
+                  onChange={(items) =>
+                    onChange([{ value: items, key: "regions" }])
+                  }
                 />
               ) : (
                 <Checkboxes
-                  spaceCount
-                  items={countries}
+                  items={countries.filter((x) =>
+                    x.display_name
+                      .toLowerCase()
+                      .includes(searchedGeographyText.toLowerCase())
+                  )}
                   selectedItems={searchFilter.countries}
-                  onChange={(items) => onChange(items, "countries")}
+                  onChange={(items) =>
+                    onChange([{ value: items, key: "countries" }])
+                  }
                 />
               )}
             </div>
@@ -263,51 +383,91 @@ export default ({
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
             <span className="hide mr-2 text-sm">
-              {/* {yearsCoverage.length === searchFilter.ye
-                ? "All"
-                : years.filter((x) => x.selected).length} */}
+              {searchFilter.before && searchFilter.after
+                ? searchFilter.before.slice(0, 4) +
+                  " - " +
+                  searchFilter.after?.slice(0, 4)
+                : "All"}
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="mb-3 mt-[12px] flex items-center gap-2">
-              <input
-                className="remove-input-number-arrows block w-[137px] rounded-md
-          border-0 px-4 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-black  focus:ring-1 focus:ring-inset focus:ring-[#111928] sm:text-sm sm:leading-6
-          "
-                placeholder="From"
-                type="number"
-              />
-              <span>—</span>
-              <input
-                className="remove-input-number-arrows block w-[137px] rounded-md
-          border-0 px-4 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-black  focus:ring-1 focus:ring-inset focus:ring-[#111928] sm:text-sm sm:leading-6
-          "
-                placeholder="To"
-                type="number"
-              />
-            </div>
-            <div className="mb-3 flex gap-2.5 font-semibold text-[#006064]">
-              <span
-                className="cursor-pointer"
+            <div className="mt-[12px] flex justify-between">
+              <div
+                className={
+                  !searchFilter.startYear || searchFilter.endYear
+                    ? "invisible"
+                    : ""
+                }
+              >
+                {searchFilter.startYear}
+                <span>—</span>
+                {searchFilter.endYear}
+              </div>
+              <div
+                className="font-semibold text-[#006064]"
                 onClick={() => {
-                  // years.forEach((x) => (x.selected = true));
-                  // setYears([...years]);
+                  onChange([
+                    { value: [], key: "regions" },
+                    { value: [], key: "countries" },
+                  ]);
                 }}
               >
-                Check all
-              </span>
-              <span
-                className="cursor-pointer"
-                onClick={() => {
-                  // setSearchFilter(oldV => ({...oldV, }))
-                }}
-              >
-                Uncheck all
-              </span>
+                Clear filter
+              </div>
             </div>
-            <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll">
-              {/* <Checkboxes items={years} onChange={(items) => {}} /> */}
-            </div>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <div className="mb-3 mt-[12px] flex items-center gap-2">
+                <DatePicker
+                  label="From"
+                  value={startYear ? dayjs(startYear.toString()) : undefined}
+                  onChange={(x) => {
+                    setStartYear(x?.year());
+                    if (!x?.year()) {
+                      setEndYear(undefined);
+                    } else {
+                      setEndYear(x.year() + 1);
+                    }
+                  }}
+                  openTo="year"
+                  views={["year"]}
+                  yearsOrder="desc"
+                  sx={{ maxWidth: 150 }}
+                />
+                <span>—</span>
+                <DatePicker
+                  label="To"
+                  value={endYear ? dayjs(endYear.toString()) : undefined}
+                  onChange={(x) => setEndYear(x?.year())}
+                  disabled={!startYear}
+                  minDate={dayjs((startYear! + 1).toString())}
+                  openTo="year"
+                  views={["year"]}
+                  yearsOrder="desc"
+                  sx={{
+                    maxWidth: 150,
+                    cursor: !startYear ? "not-allowed" : "",
+                  }}
+                />
+                <button
+                  disabled={!endYear || !startYear}
+                  className={cn(
+                    "ml-auto cursor-pointer text-[#006064]",
+                    !endYear || !startYear
+                      ? "cursor-not-allowed opacity-60"
+                      : ""
+                  )}
+                  onClick={() =>
+                    onChange([
+                      { key: "startYear", value: startYear },
+                      { key: "endYear", value: endYear },
+                    ])
+                  }
+                >
+                  Search
+                </button>
+              </div>
+              <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll"></div>
+            </LocalizationProvider>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="format">
@@ -321,8 +481,17 @@ export default ({
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
+            <div
+              onClick={() => onChange([{ value: [], key: "resFormat" }])}
+              className="ml-auto cursor-pointer font-semibold text-[#006064]"
+            >
+              Clear filter
+            </div>
+
             <Checkboxes
-              onChange={(items) => onChange(items, "resFormat")}
+              onChange={(items) =>
+                onChange([{ value: items, key: "resFormat" }])
+              }
               items={resourcesFormats}
               selectedItems={searchFilter.resFormat}
               limitToPresentViewAll={9}
@@ -340,8 +509,15 @@ export default ({
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
+            <div
+              onClick={() => onChange([{ value: [], key: "orgs" }])}
+              className="ml-auto cursor-pointer font-semibold text-[#006064]"
+            >
+              Clear filter
+            </div>
+
             <Checkboxes
-              onChange={(items) => onChange(items, "orgs")}
+              onChange={(items) => onChange([{ value: items, key: "orgs" }])}
               items={orgs}
               selectedItems={searchFilter.orgs}
               limitToPresentViewAll={7}
@@ -360,8 +536,17 @@ export default ({
             </span>
           </AccordionTrigger>
           <AccordionContent className="mt-5 flex flex-col gap-3.5">
+            <div
+              onClick={() => onChange([{ value: [], key: "publicationDates" }])}
+              className="ml-auto cursor-pointer font-semibold text-[#006064]"
+            >
+              Clear filter
+            </div>
+
             <Checkboxes
-              onChange={(items) => onChange(items, "publicationDates")}
+              onChange={(items) =>
+                onChange([{ value: items, key: "publicationDates" }])
+              }
               items={metadataCreatedDates}
               selectedItems={searchFilter.publicationDates}
               limitToPresentViewAll={7}
@@ -382,7 +567,9 @@ export default ({
             </p>
             <RadioGroup
               defaultValue={`${!!searchFilter.showArchived}`}
-              onValueChange={(v) => onChange(v === "true", "showArchived")}
+              onValueChange={(v) =>
+                onChange([{ value: v === "true", key: "showArchived" }])
+              }
               className="flex gap-3.5"
             >
               <div className="flex items-center space-x-2">

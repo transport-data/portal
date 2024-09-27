@@ -65,10 +65,7 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("services", [options.service]));
   }
 
-  if (
-    options.publicationDates?.length &&
-    !options.publicationDates.find((x) => x === "*")
-  ) {
+  if (options.publicationDates?.length) {
     fqAr.push(
       buildOrFq(
         "metadata_created",
@@ -97,6 +94,38 @@ export async function searchDatasets<T = Dataset>({
           return `[${startOfTheYear.toISOString()} TO ${endOfTheYear.toISOString()}]`;
         })
       )
+    );
+  }
+
+  if (options.startYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_start", [
+        `[${new Date(
+          Number(options.startYear),
+          0,
+          1
+        ).toISOString()} TO ${new Date(
+          Number(options.startYear),
+          11,
+          31
+        ).toISOString()}]`,
+      ])
+    );
+  }
+
+  if (options.endYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_end", [
+        `[${new Date(
+          Number(options.endYear),
+          0,
+          1
+        ).toISOString()} TO ${new Date(
+          Number(options.endYear),
+          11,
+          31
+        ).toISOString()}]`,
+      ])
     );
   }
 
@@ -133,7 +162,7 @@ export async function searchDatasets<T = Dataset>({
   }
 
   if (options.facetsFields) {
-    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000`;
+    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000&facet.mincount=0`;
   }
 
   endpoint += `&include_archived=${!!options.showArchived}`;
