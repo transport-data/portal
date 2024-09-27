@@ -416,7 +416,7 @@ Cypress.Commands.add("createDatasetAPI", (organization, name, otherFields) => {
     body: {
       owner_org: organization,
       name: name,
-      author: "csv",
+      author: "datopian",
       author_email: "datopian@datopian.com",
       maintainer: "datopian",
       maintainer_email: "datopian@datopian.com",

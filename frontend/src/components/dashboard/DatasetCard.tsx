@@ -1,4 +1,3 @@
-import { Dataset } from "@portaljs/ckan";
 import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
@@ -6,6 +5,7 @@ import * as timeago from "timeago.js";
 import Modal from "@components/_shared/Modal";
 import { EditDatasetForm } from "@components/dataset/EditDatasetForm";
 import Link from "next/link";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");

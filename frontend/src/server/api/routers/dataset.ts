@@ -16,7 +16,7 @@ export const datasetRouter = createTRPCRouter({
       const user = ctx.session.user;
       const apiKey = user.apikey;
       const searchResults = await searchDatasets({ apiKey, input });
-      return searchResults;
+      return searchResults
     }),
   get: protectedProcedure
     .input(z.object({ name: z.string() }))
@@ -24,7 +24,7 @@ export const datasetRouter = createTRPCRouter({
       const user = ctx.session.user;
       const apiKey = user.apikey;
       const dataset = await getDataset({ id: input.name, apiKey });
-      return dataset.result;
+      return dataset;
     }),
   create: protectedProcedure
     .input(DatasetSchema)
