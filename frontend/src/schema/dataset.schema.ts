@@ -38,6 +38,14 @@ export const DatasetSchema = z.object({
   resources: z.array(ResourceSchema),
 });
 export const SearchDatasetSchema = z.object({
+  advancedQueries: z
+    .array(
+      z.object({
+        values: z.array(z.string()),
+        key: z.string()
+      })
+    )
+    .optional(),
   query: z.string().nullable().optional(),
   mode: z.string().optional(),
   service: z.string().optional(),

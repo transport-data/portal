@@ -21,7 +21,7 @@ export default () => {
     limit: 20,
     private: true,
     includeDrafts: true,
-    query: `creator_user_id:${session?.user.id}`,
+    advancedQueries: [{ key: "creator_user_id", values: [session!.user.id] }],
   };
 
   const { data, isLoading } = api.dataset.search.useQuery(options);
