@@ -75,7 +75,7 @@ export default function DashboardDatasetCard(props: Dataset) {
   return (
     <Link
       href={`/@${organization?.name}/${name}`}
-      className="flex w-full cursor-pointer gap-3 lg:gap-6"
+      className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6"
     >
       <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
         <Badge
