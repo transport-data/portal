@@ -1,16 +1,5 @@
 import z from "zod";
 
-export const SearchDatasetSchema = z.object({
-  query: z.string().default(""),
-  limit: z.number().default(1000),
-  offset: z.number().default(0),
-  groups: z.array(z.string()).default([]),
-  orgs: z.array(z.string()).default([]),
-  tags: z.array(z.string()).default([]),
-  sort: z.string().optional(),
-  include_private: z.boolean().optional(),
-});
-
 export const ResourceSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -48,7 +37,7 @@ export const DatasetSchema = z.object({
   private: z.boolean().default(true),
   resources: z.array(ResourceSchema),
 });
-export const SearchDatasetsSchema = z.object({
+export const SearchDatasetSchema = z.object({
   query: z.string().nullable().optional(),
   mode: z.string().optional(),
   service: z.string().optional(),
@@ -73,9 +62,9 @@ export const SearchDatasetsSchema = z.object({
   resFormat: z.array(z.string()).optional(),
   type: z.array(z.string()).optional(),
   private: z.boolean().optional(),
+  includeDrafts: z.boolean().optional(),
 });
 
 export type SearchDatasetType = z.infer<typeof SearchDatasetSchema>;
-export type SearchDatasetsType = z.infer<typeof SearchDatasetsSchema>;
 export type DatasetFormType = z.infer<typeof DatasetSchema>;
 export type ResourceFormType = z.infer<typeof ResourceSchema>;

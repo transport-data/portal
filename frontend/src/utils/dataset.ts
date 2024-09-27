@@ -1,14 +1,13 @@
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { Dataset } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
-import { DatasetFormType, SearchDatasetsType } from "@schema/dataset.schema";
-
+import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 export async function searchDatasets<T = Dataset>({
   apiKey,
   options,
 }: {
   apiKey: string;
-  options: SearchDatasetsType;
+  options: SearchDatasetType;
 }): Promise<{
   datasets: Array<T>;
   count: number;
@@ -129,10 +128,6 @@ export async function searchDatasets<T = Dataset>({
     );
   }
 
-  if (options.private != undefined) {
-    fqAr.push(`private:${options.private}`);
-  }
-
   if (fqAr?.length) {
     queryParams.push(`fq=${fqAr.join("+")}`);
   }
@@ -153,7 +148,7 @@ export async function searchDatasets<T = Dataset>({
     queryParams.push(`sort=${options.sort}`);
   }
 
-  if (options.includePrivate != undefined) {
+  if (options.private != undefined) {
     queryParams.push(`include_private=${options.includePrivate}`);
   }
 
@@ -166,6 +161,7 @@ export async function searchDatasets<T = Dataset>({
   }
 
   endpoint += `&include_archived=${!!options.showArchived}`;
+  endpoint += `&include_drafts=${!!options.includeDrafts}`;
 
   const response = await CkanRequest.get<any>(endpoint, {
     headers: { Authorization: apiKey },

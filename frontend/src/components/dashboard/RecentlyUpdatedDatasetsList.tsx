@@ -14,19 +14,18 @@ export default function RecentlyUpdatedDatasetsList({
   publicUrl: string;
 }) {
   const datasetsQuery = useRef<SearchDatasetType>({
-    query: "",
     offset: 0,
     limit: 5,
     sort: "metadata_modified desc",
-    groups: [],
-    orgs: [],
-    tags: [],
-    include_private: true,
+    private: true,
   });
 
-  const { data: {datasets} = {} } = api.dataset.search.useQuery(
+  const { data } = api.dataset.search.useQuery(
     datasetsQuery.current as unknown as SearchDatasetType
   );
+
+  const datasets = data?.datasets;
+
   return (
     <div className="my-10">
       <h2 className="mb-5 text-base font-semibold leading-6">
@@ -50,7 +49,7 @@ export default function RecentlyUpdatedDatasetsList({
       >
         {datasets?.map((dataset) => (
           <SwiperSlide key={dataset.id}>
-            <DatasetCard dataset={dataset} publicUrl={publicUrl} />
+            <DatasetCard dataset={dataset as any} publicUrl={publicUrl} />
           </SwiperSlide>
         ))}
       </Swiper>

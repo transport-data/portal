@@ -12,7 +12,7 @@ import {
   PaginationItem,
 } from "@components/ui/pagination";
 import { cn } from "@lib/utils";
-import { SearchDatasetsType } from "@schema/dataset.schema";
+import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -25,7 +25,7 @@ export function getServerSideProps({ query }: any) {
 export type SearchPageOnChange = (
   data: {
     value: string[] | boolean | string | number | undefined;
-    key: keyof SearchDatasetsType;
+    key: keyof SearchDatasetType;
   }[]
 ) => void;
 
@@ -62,7 +62,7 @@ export default function DatasetSearch({
     setCurrentPage(0);
   };
 
-  const [searchFilter, setSearchFilter] = useState<SearchDatasetsType>({
+  const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
     limit: 9,
     endYear: after ? Number(after) : undefined,
@@ -215,7 +215,7 @@ export default function DatasetSearch({
                   ? "before"
                   : searchFilter.service
                   ? "service"
-                  : undefined) as keyof SearchDatasetsType
+                  : undefined) as keyof SearchDatasetType
               }
               facetValue={
                 searchFilter.sector

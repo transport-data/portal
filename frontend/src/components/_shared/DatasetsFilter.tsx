@@ -8,7 +8,7 @@ import { Label } from "@components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import SimpleSearchInput from "@components/ui/simple-search-input";
 import { Checkboxes, SearchPageOnChange } from "@pages/search";
-import { SearchDatasetsType } from "@schema/dataset.schema";
+import { SearchDatasetType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
 import { useState } from "react";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -34,7 +34,7 @@ export default ({
 }: {
   tags: Facet[];
   resetFilter: () => void;
-  searchFilter: SearchDatasetsType;
+  searchFilter: SearchDatasetType;
   orgs: Facet[];
   metadataCreatedDates: Facet[];
   datasetCount: number;

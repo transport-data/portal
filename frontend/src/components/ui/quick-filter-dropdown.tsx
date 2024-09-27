@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Facet } from "@components/_shared/DatasetsFilter";
 import { Checkboxes, SearchPageOnChange } from "@pages/search";
-import { SearchDatasetsType } from "@schema/dataset.schema";
+import { SearchDatasetType } from "@schema/dataset.schema";
 
 export default function QuickFilterDropdown({
   text,
@@ -27,8 +27,8 @@ export default function QuickFilterDropdown({
   text: string;
   hideAllOption?: boolean;
   isCheckbox?: boolean;
-  filterFieldName: keyof SearchDatasetsType;
-  searchFilter: SearchDatasetsType;
+  filterFieldName: keyof SearchDatasetType;
+  searchFilter: SearchDatasetType;
   onChange: SearchPageOnChange;
   items: Facet[];
   defaultValue?: string;

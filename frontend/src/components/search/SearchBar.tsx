@@ -13,7 +13,7 @@ import SearchNarrow from "./SearchFacets";
 import { Badge } from "@components/ui/badge";
 import datasets from "@data/datasets.json";
 import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { SearchDatasetsType } from "@schema/dataset.schema";
+import { SearchDatasetType } from "@schema/dataset.schema";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
 import { SearchPageOnChange } from "@pages/search";
@@ -67,7 +67,7 @@ export default function SearchBar({
   query?: string;
   hideDatasetSuggestion?: boolean;
   facetValue?: string;
-  facetName?: keyof SearchDatasetsType;
+  facetName?: keyof SearchDatasetType;
 }) {
   const commandRef = useRef<HTMLDivElement>(null);
   const queryInputRef = useRef<HTMLInputElement>(null);

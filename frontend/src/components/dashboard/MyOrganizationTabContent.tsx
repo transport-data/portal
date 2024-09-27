@@ -1,7 +1,7 @@
 import DashboardDatasetCard, {
   DashboardDatasetCardProps,
-} from "@components/_shared/DashboardDatasetCard";
-import DatasetsFilterOld from "@components/_shared/DatasetsFilterMocked";
+} from "@components/_shared/DashboardDatasetCardOld";
+import DatasetsFilterMocked from "@components/_shared/DatasetsFilterMocked";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 
 export default () => {
@@ -198,7 +198,7 @@ export default () => {
           title="Contributors"
         />
         <div className="space-y-2.5 lg:hidden">
-          <DatasetsFilterOld />
+          <DatasetsFilterMocked />
         </div>
       </div>
       <div className="order-3 w-fit">
@@ -210,7 +210,7 @@ export default () => {
         </section>
       </div>
       <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:w-[340px] sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
-        <DatasetsFilterOld />
+        <DatasetsFilterMocked />
       </div>
     </div>
   );
