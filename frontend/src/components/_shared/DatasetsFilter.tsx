@@ -393,27 +393,28 @@ export default ({
           <AccordionContent>
             <div className="mt-[12px] flex justify-between">
               <div
-                className={
-                  !searchFilter.startYear || searchFilter.endYear
+                className={cn(
+                  "text-xs",
+                  !searchFilter.startYear || !searchFilter.endYear
                     ? "invisible"
                     : ""
-                }
+                )}
               >
-                {searchFilter.startYear}
-                <span>—</span>
+                Applied filter: {searchFilter.startYear}
+                <span> — </span>
                 {searchFilter.endYear}
               </div>
-              <div
+              <button
                 className="font-semibold text-[#006064]"
                 onClick={() => {
                   onChange([
-                    { value: [], key: "regions" },
-                    { value: [], key: "countries" },
+                    { value: undefined, key: "startYear" },
+                    { value: undefined, key: "endYear" },
                   ]);
                 }}
               >
                 Clear filter
-              </div>
+              </button>
             </div>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <div className="mb-3 mt-[12px] flex items-center gap-2">

@@ -20,7 +20,6 @@ export async function searchDatasets<T = Dataset>({
   const buildOrFq = (key: string, values: string[]) =>
     `${key}:(${values.join(" OR ")})`;
 
-
   if (options.advancedQueries?.length) {
     options.advancedQueries.forEach((element) => {
       fqAr.push(buildOrFq(element.key, element.values));
@@ -103,7 +102,7 @@ export async function searchDatasets<T = Dataset>({
     );
   }
 
-  if (options.startYear) {
+  if (options.startYear && options.endYear) {
     fqAr.push(
       buildOrFq("temporal_coverage_start", [
         `[${new Date(
@@ -111,19 +110,17 @@ export async function searchDatasets<T = Dataset>({
           0,
           1
         ).toISOString()} TO ${new Date(
-          Number(options.startYear),
+          Number(options.endYear),
           11,
           31
         ).toISOString()}]`,
       ])
     );
-  }
-
-  if (options.endYear) {
+  
     fqAr.push(
       buildOrFq("temporal_coverage_end", [
         `[${new Date(
-          Number(options.endYear),
+          Number(options.startYear),
           0,
           1
         ).toISOString()} TO ${new Date(
