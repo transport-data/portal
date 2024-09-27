@@ -31,7 +31,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const organizationsData = await listOrganizations({
     input: {
       detailed: true,
-      includeUsers: true
+      includeUsers: false
     }
   });
   return {
@@ -61,8 +61,8 @@ export default function LoginPage({
   const { handleSubmit, watch } = form;
   const [newOrgRequest, setNewOrgRequest] = useState(false);
   // states to track whether step was skipped or submitted
-  const [firstStepSkipped, setFirstStepSkipped] = useState(true);
-  const [secondStepSkipped, setSecondStepSkipped] = useState(true);
+  const [hasNotSkippedStepOne, setHasNotSkippedStepOne] = useState(true);
+  const [hasNotSkippedStepTwo, setHasNotSkippedStepTwo] = useState(true);
 
   useEffect(() => {
     setIsSmallScreen(window.innerWidth < 1457);
@@ -245,10 +245,10 @@ export default function LoginPage({
   const submitSelectionAndOrganization = async () => {
     const selectedValues = form.getValues();
     // only submit first and second second if Next was clicked
-    if (!firstStepSkipped) {
+    if (!hasNotSkippedStepOne) {
       await submitFollowPreferences();
     }
-    if (!secondStepSkipped) {
+    if (!hasNotSkippedStepTwo) {
       await submitOrganizationParticipation(selectedValues);
     }
   }
@@ -256,9 +256,9 @@ export default function LoginPage({
     setErrorMessage(null)
     const selectedValues = form.getValues();
     if (stepNumber === 0) {
-      setFirstStepSkipped(false)
+      setHasNotSkippedStepOne(false)
     } else if (stepNumber === 1) {
-      setSecondStepSkipped(false)
+      setHasNotSkippedStepTwo(false)
     } else if (stepNumber === 2) {
       await submitSelectionAndOrganization();
       await submitUserInvites(selectedValues);
@@ -270,9 +270,9 @@ export default function LoginPage({
   const skipStep = async () => {
     setErrorMessage(null)
     if (stepNumber === 0) {
-      setFirstStepSkipped(true);
+      setHasNotSkippedStepOne(true);
     } else if (stepNumber === 1) {
-      setSecondStepSkipped(true);
+      setHasNotSkippedStepTwo(true);
     }
     if (stepNumber === steps.length - 1) {
       await submitSelectionAndOrganization();
