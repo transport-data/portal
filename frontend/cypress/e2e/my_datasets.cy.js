@@ -37,18 +37,11 @@ describe("Should Create a Dataset for Signed in User", () => {
 
   it("Should list created Dataset", () => {
     cy.visit("/dashboard/datasets");
-
-    cy.get('.dataset-card h2').each(($el) => {
-      if ($el.text() === datasetTitle) {
-        cy.wrap($el).should('have.text', datasetTitle);
-        return false; 
-      }
-    });
-
+    cy.get('.dataset-card').contains('h2', datasetTitle).should('exist')
   });
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);
+    cy.deleteOrganizationAPI(org);
   });
-
 })
