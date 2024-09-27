@@ -22,13 +22,13 @@ import { listOrganizations, requestOrganizationOwner, requestNewOrganization } f
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
   
-  const topics_data = await listGroups({
+  const topicsData = await listGroups({
     type: 'topic',
   });
-  const location_data = await listGroups({
+  const locationData = await listGroups({
     type: 'geography',
   });
-  const organizations_data = await listOrganizations({
+  const organizationsData = await listOrganizations({
     input: {
       detailed: true,
       includeUsers: true
@@ -37,18 +37,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       csrfToken: csrfToken ? csrfToken : "",
-      organizations_data: organizations_data,
-      topics_data: topics_data,
-      location_data: location_data
+      organizationsData: organizationsData,
+      topicsData: topicsData,
+      locationData: locationData
     },
   };
 }
 
 export default function LoginPage({
   csrfToken, 
-  organizations_data, 
-  topics_data, 
-  location_data
+  organizationsData, 
+  topicsData, 
+  locationData
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const { data: sessionData } = useSession();
   const apiKey = sessionData?.user.apikey;
@@ -68,19 +68,19 @@ export default function LoginPage({
     setIsSmallScreen(window.innerWidth < 1457);
   }, []);
 
-  const [locations, setLocations] = useState(location_data ? location_data.map((loc) => ({
+  const [locations, setLocations] = useState(locationData ? locationData.map((loc) => ({
     id: loc.id,
     name: loc.display_name,
     selected: false
   })) : []);
 
-  const [organizations, setOrganizations] = useState(organizations_data? organizations_data.map((org) => ({
+  const [organizations, setOrganizations] = useState(organizationsData? organizationsData.map((org) => ({
     id: org.id,
     name: org.display_name,
     selected: false 
   })): []);
 
-  const [topics, setTopics] = useState(topics_data? topics_data.map((topic) => ({
+  const [topics, setTopics] = useState(topicsData? topicsData.map((topic) => ({
     id: topic.id,
     name: topic.display_name,
     selected: false
@@ -172,14 +172,14 @@ export default function LoginPage({
 
     const isSelected =  selectedValues.confirmThatItParticipatesOfTheOrg;
     if (newOrgRequest) {
-      const org_name = selectedValues.newOrganizationName;
-      const org_description = selectedValues.newOrganizationDescription;
-      const dataset_description = selectedValues.newOrganizationDataDescription;
-      if (isSelected && org_name && org_description && apiKey) {
+      const orgName = selectedValues.newOrganizationName;
+      const orgDescription = selectedValues.newOrganizationDescription;
+      const datasetDescription = selectedValues.newOrganizationDataDescription;
+      if (isSelected && orgName && orgDescription && apiKey) {
         const response = await requestNewOrganization({
-          org_name: org_name,
-          org_description: org_description,
-          dataset_description: dataset_description,
+          orgName: orgName,
+          orgDescription: orgDescription,
+          datasetDescription: datasetDescription,
           apiKey: apiKey
         });
         if (!response.success) {
@@ -187,11 +187,11 @@ export default function LoginPage({
         }
       }
     } else {
-      const org_id = selectedValues.orgInWhichItParticipates?.id;
+      const orgId = selectedValues.orgInWhichItParticipates?.id;
       const message = selectedValues.messageToParticipateOfTheOrg;
-      if (isSelected && org_id && message && apiKey) {
+      if (isSelected && orgId && message && apiKey) {
         const response = await requestOrganizationOwner({
-          id: org_id,
+          id: orgId,
           message: message,
           apiKey: apiKey,
         });
@@ -216,28 +216,28 @@ export default function LoginPage({
   };
   
   const submitFollowPreferences = async () => {
-    const group_ids: string[] = []
+    const groupIds: string[] = []
     //add selected topics, locations and organization
     topics.forEach(topic => {
       if (topic.selected) {
-        group_ids.push(topic.id);
+        groupIds.push(topic.id);
       }
     });
     locations.forEach(loc => {
       if (loc.selected) {
-        group_ids.push(loc.id);
+        groupIds.push(loc.id);
       }
     });
     organizations.forEach(org => {
       if (org.selected) {
-        group_ids.push(org.id);
+        groupIds.push(org.id);
       }
     });
   
-    if (apiKey && group_ids.length > 0) {
+    if (apiKey && groupIds.length > 0) {
       const response = await followGroups({
         apiKey: apiKey,
-        ids: group_ids,
+        ids: groupIds,
       });
     }
   };
@@ -377,7 +377,7 @@ export default function LoginPage({
               setOrganizations={setOrganizations}
             />
           ) : stepNumber === 1 ? (
-            <OrganizationSelectionStep orgs={organizations_data} form={form} newOrgRequest={newOrgRequest} setNewOrgRequest={setNewOrgRequest} />
+            <OrganizationSelectionStep orgs={organizationsData} form={form} newOrgRequest={newOrgRequest} setNewOrgRequest={setNewOrgRequest} />
           ) : (
             <InviteUsersStep form={form} />
           )}

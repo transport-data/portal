@@ -435,10 +435,10 @@ def render_html_template(template_name, vars):
     template = env.get_template(template_name)
     return template.render(vars)
 
-def send_email(email_type, to_email, from_user, **kwargs):
+def send_email(email_type, to_email, from_user, site_title=None, site_url=None, **kwargs):
 
-    site_title = config.get('ckan.site_title')
-    site_url = config.get('ckan.site_url')
+    site_title = site_title if site_title else config.get('ckan.site_title')
+    site_url = site_url if site_url else config.get('ckan.site_url')
 
     if email_type == "organization_participation":
         subject_template = 'emails/user_participation_subject.txt'

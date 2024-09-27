@@ -33,16 +33,20 @@
             margin-bottom: 30px;
         }
         .message {
-            border-radius: 5px;
-            /* border: 5px solid #006064; */
-            background-color: #399ea2; 
-            margin: 0px;
             padding: 10px;
         }
         .message-box {
+            border-radius: 5px;
+            border: 5px solid #006064;
             width: 30%;
             margin: auto;
-            margin-top: 20px;
+            background-color: white;
+        }
+        .message-heading {
+            background-color: #006064;
+            color: white;
+            margin: 0px;
+            padding: 10px;
         }
     </style>
 </head>
@@ -54,11 +58,11 @@
         </span>
         has requested to be added as a member in <span class="highlight color">{{ organization }}</span>.</p>
     <div class="message-box">
-        <p style="margin: 0px;">Message from <span class="highlight">{{ user_name }}:</span></p>
-        <div class="message">{{message}}</div>
+        <p class="message-heading">Message from <span class="highlight">{{ user_name }}</span></p>
+        <div class="message">{{ message }}</div>
     </div>
     <p>To accept the request, please visit {{ site_title }}</p>
-    <a href="{{ site_url }}" class="visit_btn">VISIT CKAN</a>
+    <a href="{{ site_url }}" class="visit_btn">VISIT {{ site_title }}</a>
     <p>Have a nice day.</p>
 </body>
 </html>

@@ -262,14 +262,14 @@ export const requestOrganizationOwner = async ({
 };
 
 export const requestNewOrganization = async ({
-  org_name,
-  org_description,
-  dataset_description,
+  orgName,
+  orgDescription,
+  datasetDescription,
   apiKey,
 }: {
-  org_name: string;
-  org_description: string;
-  dataset_description: string;
+  orgName: string;
+  orgDescription: string;
+  datasetDescription: string;
   apiKey: string;
 }) => {
   const response: CkanResponse<String> = await CkanRequest.post(
@@ -277,9 +277,9 @@ export const requestNewOrganization = async ({
     {
       apiKey,
       json: { 
-        org_name: org_name,
-        org_description: org_description,
-        dataset_description: dataset_description,
+        org_name: orgName,
+        org_description: orgDescription,
+        dataset_description: datasetDescription,
       },
     }
   );

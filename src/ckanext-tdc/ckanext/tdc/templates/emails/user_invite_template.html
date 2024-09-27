@@ -33,16 +33,20 @@
             margin-bottom: 30px;
         }
         .message {
-            border-radius: 5px;
-            /* border: 5px solid #006064; */
-            background-color: #399ea2; 
-            margin: 0px;
             padding: 10px;
         }
         .message-box {
+            border-radius: 5px;
+            border: 5px solid #006064;
             width: 30%;
             margin: auto;
-            margin-top: 20px;
+            background-color: white;
+        }
+        .message-heading {
+            background-color: #006064;
+            color: white;
+            margin: 0px;
+            padding: 10px;
         }
     </style>
 </head>
@@ -50,15 +54,14 @@
     <h2 style="background-color: #006064; text-align: center; color: #FFFFFF; padding: 10px 0px;">Invitation to TDC</h2>
     <p>
         <span class="highlight color" title="{{ user_email }}">
-            {{ user_name }}
+        {{ user_name }}
         </span>
-        has invited you to <span class="highlight color">TDC</span>
+        has invited you to <span class="highlight color">{{ site_title }}</span>
     </p>
     <div class="message-box">
-        <p style="margin: 0px;">Message from <span class="highlight">{{ user_name }}:</span></p>
-        <div class="message">{{message}}</div>
+        <p class="message-heading">Message from <span class="highlight">{{ user_name }}</span></p>
+        <div class="message">{{ message }}</div>
     </div>
-
     <p>To accept this invite, please visit {{ site_title }}</p>
     <a href="{{ site_url }}" class="visit_btn">VISIT TDC</a>
     <p>Have a nice day.</p>
