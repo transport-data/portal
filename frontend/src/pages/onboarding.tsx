@@ -9,82 +9,103 @@ import InviteUsersStep from "@components/onboarding-steps/InviteUsersStep";
 import OrganizationSelectionStep from "@components/onboarding-steps/OrganizationSelectionStep";
 import { OnboardingFormType } from "@schema/onboarding.schema";
 import type { GetServerSidePropsContext } from "next";
-import { getCsrfToken, useSession } from "next-auth/react";
+import { getCsrfToken } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
-import { listGroups, followGroups } from "@utils/group";
-import { inviteUser } from "@utils/user";
-import { listOrganizations, requestOrganizationOwner, requestNewOrganization } from "@utils/organization";
+import { listGroups } from "@utils/group";
+import { listOrganizations } from "@utils/organization";
+import { api } from "@utils/api";
+import { toast } from "@/components/ui/use-toast";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
-  
+
   const topicsData = await listGroups({
-    type: 'topic',
+    type: "topic",
   });
   const locationData = await listGroups({
-    type: 'geography',
+    type: "geography",
   });
   const organizationsData = await listOrganizations({
     input: {
       detailed: true,
-      includeUsers: false
-    }
+      includeUsers: false,
+    },
   });
   return {
     props: {
       csrfToken: csrfToken ? csrfToken : "",
       organizationsData: organizationsData,
       topicsData: topicsData,
-      locationData: locationData
+      locationData: locationData,
     },
   };
 }
 
 export default function LoginPage({
-  csrfToken, 
-  organizationsData, 
-  topicsData, 
-  locationData
+  csrfToken,
+  organizationsData,
+  topicsData,
+  locationData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
-  const { data: sessionData } = useSession();
-  const apiKey = sessionData?.user.apikey;
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [loggingIn] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
   const form = useForm<OnboardingFormType>();
   const { handleSubmit, watch } = form;
-  const [newOrgRequest, setNewOrgRequest] = useState(false);
-  // states to track whether step was skipped or submitted
-  const [hasNotSkippedStepOne, setHasNotSkippedStepOne] = useState(true);
-  const [hasNotSkippedStepTwo, setHasNotSkippedStepTwo] = useState(true);
+  const onBoardUser = api.user.onboard.useMutation({
+    onSuccess: async () => {
+      toast({
+        description: "Successfully Onboarded user",
+      });
+      form.reset();
+      setErrorMessage(null);
+      await router.push("/dashboard/newsfeed");
+    },
+    onError: (error) => {
+      setLoading(false);
+      setErrorMessage(error.message);
+    },
+  });
 
   useEffect(() => {
     setIsSmallScreen(window.innerWidth < 1457);
   }, []);
 
-  const [locations, setLocations] = useState(locationData ? locationData.map((loc) => ({
-    id: loc.id,
-    name: loc.display_name,
-    selected: false
-  })) : []);
+  const [locations, setLocations] = useState(
+    locationData
+      ? locationData.map((loc) => ({
+          id: loc.id,
+          name: loc.display_name,
+          selected: false,
+        }))
+      : []
+  );
 
-  const [organizations, setOrganizations] = useState(organizationsData? organizationsData.map((org) => ({
-    id: org.id,
-    name: org.display_name,
-    selected: false 
-  })): []);
+  const [organizations, setOrganizations] = useState(
+    organizationsData
+      ? organizationsData.map((org) => ({
+          id: org.id,
+          name: org.display_name,
+          selected: false,
+        }))
+      : []
+  );
 
-  const [topics, setTopics] = useState(topicsData? topicsData.map((topic) => ({
-    id: topic.id,
-    name: topic.display_name,
-    selected: false
-  })) : []);
+  const [topics, setTopics] = useState(
+    topicsData
+      ? topicsData.map((topic) => ({
+          id: topic.id,
+          name: topic.display_name,
+          selected: false,
+        }))
+      : []
+  );
 
   const [stepNumber, setStep] = useState(0);
   const steps = [
@@ -103,9 +124,9 @@ export default function LoginPage({
   useEffect(() => {
     if (stepNumber === 0) {
       const isAnySelected =
-        topics.some(topic => topic.selected) ||
-        locations.some(location => location.selected) ||
-        organizations.some(org => org.selected);
+        topics.some((topic) => topic.selected) ||
+        locations.some((location) => location.selected) ||
+        organizations.some((org) => org.selected);
       setDisableButton(!isAnySelected);
     } else if (stepNumber === 1) {
       setSubtitleText("Prepare to share data");
@@ -129,7 +150,7 @@ export default function LoginPage({
           </Button>
         </>
       );
-      if (newOrgRequest) {
+      if (watch("isNewOrganizationSelected")) {
         setDisableButton(
           !(
             watch("newOrganizationName") &&
@@ -151,146 +172,77 @@ export default function LoginPage({
       setParagraphText(
         "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
-      setDisableButton((watch("newUsersEmailsToInvite") || [])?.length < 1);
     } else {
       setDisableButton(false);
     }
   }, [
     watch("orgInWhichItParticipates"),
     watch("messageToParticipateOfTheOrg"),
-    watch("newUsersEmailsToInvite"),
     watch("confirmThatItParticipatesOfTheOrg"),
     watch("newOrganizationName"),
     watch("newOrganizationDescription"),
+    watch("newOrganizationDataDescription"),
+    watch("isNewOrganizationSelected"),
     topics,
     locations,
     organizations,
     stepNumber,
   ]);
 
-  const submitOrganizationParticipation = async (selectedValues: any) => {
-
-    const isSelected =  selectedValues.confirmThatItParticipatesOfTheOrg;
-    if (newOrgRequest) {
-      const orgName = selectedValues.newOrganizationName;
-      const orgDescription = selectedValues.newOrganizationDescription;
-      const datasetDescription = selectedValues.newOrganizationDataDescription;
-      if (isSelected && orgName && orgDescription && apiKey) {
-        const response = await requestNewOrganization({
-          orgName: orgName,
-          orgDescription: orgDescription,
-          datasetDescription: datasetDescription,
-          apiKey: apiKey
-        });
-        if (!response.success) {
-          setErrorMessage("An Error Occurred while Submitting New Organization Request");
-        }
-      }
-    } else {
-      const orgId = selectedValues.orgInWhichItParticipates?.id;
-      const message = selectedValues.messageToParticipateOfTheOrg;
-      if (isSelected && orgId && message && apiKey) {
-        const response = await requestOrganizationOwner({
-          id: orgId,
-          message: message,
-          apiKey: apiKey,
-        });
-        if (!response.success) {
-          setErrorMessage(`An Error Occurred while Submitting Organization ${selectedValues.orgInWhichItParticipates.name} Participation Request.`);
-        }
-      }
-    }
-  };
-  
-  const submitUserInvites = async (selectedValues: any) => {
-    if (selectedValues.newUsersEmailsToInvite && selectedValues.messageToInviteNewUsers) {
-      const response = await inviteUser({
-        emails: selectedValues.newUsersEmailsToInvite,
-        message: selectedValues.messageToInviteNewUsers,
-        apiKey: apiKey,
-      });
-      if (!response.success) {
-        setErrorMessage("An Error Occurred while Sending Invites");
-      }
-    }
-  };
-  
-  const submitFollowPreferences = async () => {
-    const groupIds: string[] = []
+  const groupFollowPreferences = async () => {
+    const groupIds: string[] = [];
     //add selected topics, locations and organization
-    topics.forEach(topic => {
+    topics.forEach((topic) => {
       if (topic.selected) {
         groupIds.push(topic.id);
       }
     });
-    locations.forEach(loc => {
+    locations.forEach((loc) => {
       if (loc.selected) {
         groupIds.push(loc.id);
       }
     });
-    organizations.forEach(org => {
+    organizations.forEach((org) => {
       if (org.selected) {
         groupIds.push(org.id);
       }
     });
-  
-    if (apiKey && groupIds.length > 0) {
-      const response = await followGroups({
-        apiKey: apiKey,
-        ids: groupIds,
-      });
-    }
+    form.setValue("followingGroups", groupIds);
   };
 
-  const submitSelectionAndOrganization = async () => {
-    const selectedValues = form.getValues();
-    // only submit first and second second if Next was clicked
-    if (!hasNotSkippedStepOne) {
-      await submitFollowPreferences();
-    }
-    if (!hasNotSkippedStepTwo) {
-      await submitOrganizationParticipation(selectedValues);
-    }
-  }
-  const nextStep = async () => {
-    setErrorMessage(null)
-    const selectedValues = form.getValues();
+  const nextStep = async (data: any) => {
     if (stepNumber === 0) {
-      setHasNotSkippedStepOne(false)
+      form.setValue("isInterestSubmitted", true);
+      groupFollowPreferences();
     } else if (stepNumber === 1) {
-      setHasNotSkippedStepTwo(false)
+      form.setValue("isOrganizationSubmitted", true);
     } else if (stepNumber === 2) {
-      await submitSelectionAndOrganization();
-      await submitUserInvites(selectedValues);
-      router.push("/dashboard/newsfeed");
+      setLoading(true);
+      onBoardUser.mutate(data);
     }
     setStep(stepNumber + 1);
   };
 
   const skipStep = async () => {
-    setErrorMessage(null)
     if (stepNumber === 0) {
-      setHasNotSkippedStepOne(true);
+      form.setValue("isInterestSubmitted", false);
     } else if (stepNumber === 1) {
-      setHasNotSkippedStepTwo(true);
-    }
-    if (stepNumber === steps.length - 1) {
-      await submitSelectionAndOrganization();
+      form.setValue("isOrganizationSubmitted", false);
+    } else if (stepNumber === 2) {
+      setLoading(true);
       router.push("/dashboard/newsfeed");
     }
     setStep(stepNumber + 1);
-  }
+  };
 
   return (
     <>
       <NextSeo title="Onboarding" />
       <SingInLayout subtitleText={subtitleText} paragraphText={paragraphText}>
         <form
-          onSubmit={(event) =>
-            void handleSubmit(async (data) => {
-              nextStep();
-            })(event)
-          }
+          onSubmit={handleSubmit((data) => {
+            nextStep(data);
+          })}
           className="w-full bg-white px-28 py-28"
         >
           <input
@@ -303,7 +255,10 @@ export default function LoginPage({
               {steps.map((step, stepIdx) => (
                 <Fragment key={stepIdx}>
                   <div className="w-fit">
-                    <div className="flex items-center gap-2" onClick={ () => setStep(stepIdx) }>
+                    <div
+                      className="flex items-center gap-2"
+                      onClick={() => setStep(stepIdx)}
+                    >
                       {stepNumber === stepIdx ? (
                         <svg
                           className="absolute"
@@ -343,9 +298,7 @@ export default function LoginPage({
 
                       <div
                         style={
-                          isSmallScreen
-                            ? ({} as any)
-                            : { "textWrap": "nowrap" }
+                          isSmallScreen ? ({} as any) : { textWrap: "nowrap" }
                         }
                         className={
                           "whitespace-normal break-keep	text-sm " +
@@ -377,14 +330,14 @@ export default function LoginPage({
               setOrganizations={setOrganizations}
             />
           ) : stepNumber === 1 ? (
-            <OrganizationSelectionStep orgs={organizationsData} form={form} newOrgRequest={newOrgRequest} setNewOrgRequest={setNewOrgRequest} />
+            <OrganizationSelectionStep orgs={organizationsData} form={form} />
           ) : (
             <InviteUsersStep form={form} />
           )}
           <div className="mt-5">
             <div className="mb-5">
               <div className="col-span-full">
-                {match(loggingIn)
+                {match(loading)
                   .with(false, () => (
                     <Button
                       disabled={disableButton}
@@ -402,7 +355,7 @@ export default function LoginPage({
                       disabled
                       className="flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
                     >
-                      <Spinner />
+                      <Spinner className="text-slate-900" />
                     </Button>
                   ))}
               </div>
@@ -412,12 +365,12 @@ export default function LoginPage({
                 ? "You can always do this later."
                 : stepNumber === 1
                 ? "Don’t want to share data?"
-                : "Don’t want to invite anyone?"}{" "}
+                : "Don’t want to submit form?"}{" "}
               <span
-                onClick={() => skipStep() }
+                onClick={() => skipStep()}
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"
               >
-                {stepNumber === 0 ? "Skip" : "Skip this step"}{" "}
+                {stepNumber === 2 ? "Skip" : "Skip this step"}{" "}
               </span>
             </p>
             {errorMessage && <ErrorAlert text={errorMessage} />}

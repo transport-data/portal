@@ -1,34 +1,33 @@
 import TextDivisor from "@components/_shared/TextDivisor";
 import TextEditor from "@components/_shared/TextEditor";
-import {
-  Combobox,
-  ComboboxInput,
-} from "@headlessui/react";
-import { useState } from "react";
+import { Combobox, ComboboxInput } from "@headlessui/react";
 import { OnboardingFormType } from "@schema/onboarding.schema";
 import { UseFormReturn } from "react-hook-form";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from "lucide-react";
 
 export default ({
   form,
-  setRequestNewOrg
 }: {
   form: UseFormReturn<OnboardingFormType, any, undefined>;
-  setRequestNewOrg: any;
 }) => {
-
   return (
     <div className="space-y-5">
       <div>
         <div className="flex">
-              <div className="mt-1"><ArrowLeft size={14} onClick={() => setRequestNewOrg(false)}/></div>
-              <h2 className="ml-3 mb-2.5 text-sxl font-bold text-[#111928]">
-                  Create a new organization
-              </h2>   
-        </div>  
+          <div className="mt-1">
+            <ArrowLeft
+              size={14}
+              onClick={() => form.setValue("isNewOrganizationSelected", false)}
+            />
+          </div>
+          <h2 className="text-sxl mb-2.5 ml-3 font-bold text-[#111928]">
+            Create a new organization
+          </h2>
+        </div>
         <p className="text-gray-500">
-          Please tell us more about your organization. We will review your request and get back to you within 2 working days 
-          to discuss the data you would like to share.
+          Please tell us more about your organization. We will review your
+          request and get back to you within 2 working days to discuss the data
+          you would like to share.
         </p>
       </div>
       <TextDivisor text="About your organization*" />
@@ -47,7 +46,7 @@ export default ({
               onChange={(event) => {
                 form.setValue("newOrganizationName", event.target.value);
               }}
-              displayValue={(orgName:any) => orgName}
+              displayValue={(orgName: any) => orgName}
             />
           </div>
         </Combobox>
@@ -59,7 +58,9 @@ export default ({
       <TextDivisor text="What data would you like to share?" />
       <TextEditor
         placeholder="What data would you like to share via TDC?"
-        setText={(text) => form.setValue("newOrganizationDataDescription", text)}
+        setText={(text) =>
+          form.setValue("newOrganizationDataDescription", text)
+        }
       />
       <div className="flex items-center gap-2">
         <input
