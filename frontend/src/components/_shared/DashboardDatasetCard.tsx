@@ -8,9 +8,8 @@ import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { formatDate } from "@lib/utils";
 import { useRouter } from "next/router";
 import { capitalize } from "remeda";
-import geography from "@data/geography.json";
 import UserAvatar from "./UserAvatar";
-import { EyeOffIcon, GlobeAltIcon } from "@lib/icons";
+import { EyeOffIcon, GlobeAltIcon, RegionIcon } from "@lib/icons";
 import Link from "next/link";
 import { api } from "@utils/api";
 
@@ -42,6 +41,8 @@ export default function DashboardDatasetCard(props: Dataset) {
     geographies,
     contributors,
     organization,
+    groups,
+    regions,
   } = props;
 
   const badgeVariant =
@@ -168,25 +169,19 @@ export default function DashboardDatasetCard(props: Dataset) {
             </>
           )}
 
-          {geographies && geographies.length > 0 && (
+          {regions && regions.length > 0 && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M7.00039 12.5999C8.4856 12.5999 9.90999 12.0099 10.9602 10.9597C12.0104 9.9095 12.6004 8.48512 12.6004 6.9999C12.6004 5.51469 12.0104 4.09031 10.9602 3.0401C9.90999 1.9899 8.4856 1.3999 7.00039 1.3999C5.51518 1.3999 4.0908 1.9899 3.04059 3.0401C1.99039 4.09031 1.40039 5.51469 1.40039 6.9999C1.40039 8.48512 1.99039 9.9095 3.04059 10.9597C4.0908 12.0099 5.51518 12.5999 7.00039 12.5999ZM3.03279 5.6188C3.29269 4.8745 3.75644 4.21818 4.37119 3.7246C4.55879 4.0109 4.88219 4.1999 5.25039 4.1999C5.52887 4.1999 5.79594 4.31053 5.99285 4.50744C6.18977 4.70435 6.30039 4.97143 6.30039 5.2499V5.5999C6.30039 5.97121 6.44789 6.3273 6.71044 6.58985C6.97299 6.8524 7.32909 6.9999 7.70039 6.9999C8.07169 6.9999 8.42779 6.8524 8.69034 6.58985C8.95289 6.3273 9.10039 5.97121 9.10039 5.5999C9.10028 5.2866 9.20526 4.98231 9.39854 4.73573C9.59182 4.48915 9.86223 4.31453 10.1665 4.2398C10.8345 5.00397 11.202 5.98492 11.2004 6.9999C11.2004 7.2379 11.1808 7.4724 11.1423 7.6999H10.5004C10.1291 7.6999 9.77299 7.8474 9.51044 8.10995C9.24789 8.3725 9.10039 8.7286 9.10039 9.0999V10.6378C8.4622 11.0071 7.73771 11.201 7.00039 11.1999V9.7999C7.00039 9.4286 6.85289 9.0725 6.59034 8.80995C6.32779 8.5474 5.97169 8.3999 5.60039 8.3999C5.22909 8.3999 4.87299 8.2524 4.61044 7.98985C4.34789 7.7273 4.20039 7.37121 4.20039 6.9999C4.20051 6.6688 4.08329 6.34837 3.86952 6.09552C3.65576 5.84267 3.3593 5.67377 3.03279 5.6188Z"
-                    fill="#6B7280"
-                  />
-                </svg>
-                {geography.filter((g) => g.code === geographies[0])[0]?.title}
+                <RegionIcon />
+                {regions.map((r, idx) => {
+                  return (
+                    <span key={`group-${r}`}>
+                      {groups?.find((g) => g.name === r)?.display_name}
+                      {idx < regions.length - 1 && ","}
+                    </span>
+                  );
+                })}
               </span>
             </>
           )}

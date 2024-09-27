@@ -32,5 +32,6 @@ export interface Dataset {
     tdc_category:string;
     frequency:string;
     geographies?:string[];
+    regions?:string[];
     contributors:string[];
 }
