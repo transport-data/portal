@@ -13,7 +13,12 @@ import {
   UserInviteSchema,
   UserSchema,
 } from "@schema/user.schema";
-import { addOrganizationMember } from "@utils/organization";
+import { OnboardingSchema } from "@schema/onboarding.schema";
+import {
+  addOrganizationMember,
+  requestOrganizationOwner,
+  requestNewOrganization,
+} from "@utils/organization";
 import {
   createUser,
   deleteUsers,
@@ -21,7 +26,9 @@ import {
   getUsersById,
   listUsers,
   patchUser,
+  inviteUser,
 } from "@utils/user";
+import { followGroups } from "@utils/group";
 import { z } from "zod";
 
 // TODO: extract business logic to utils/user.ts
@@ -194,5 +201,52 @@ export const userRouter = createTRPCRouter({
       const apiKey = user.apikey;
       const users = await deleteUsers({ apiKey, ids: input.ids });
       return users;
+    }),
+  onboard: protectedProcedure
+    .input(OnboardingSchema)
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      // if interests tab is not skipped.
+      if (input.isInterestSubmitted && input.followingGroups) {
+        await followGroups({
+          apiKey: apiKey,
+          ids: input.followingGroups,
+        });
+      }
+      // if organization selection tab is not skipped
+      if (input.isOrganizationSubmitted) {
+        // if request new organization is selected.
+        if (
+          input.isNewOrganizationSelected &&
+          input.newOrganizationName &&
+          input.newOrganizationDescription &&
+          input.newOrganizationDataDescription
+        ) {
+          await requestNewOrganization({
+            apiKey: apiKey,
+            orgName: input.newOrganizationName,
+            orgDescription: input.newOrganizationDescription,
+            datasetDescription: input.newOrganizationDataDescription,
+          });
+        } else if (
+          !input.isNewOrganizationSelected &&
+          input.orgInWhichItParticipates?.id &&
+          input.messageToParticipateOfTheOrg
+        ) {
+          await requestOrganizationOwner({
+            apiKey: apiKey,
+            id: input.orgInWhichItParticipates?.id,
+            message: input.messageToParticipateOfTheOrg,
+          });
+        }
+      }
+      if (input.newUsersEmailsToInvite && input.messageToInviteNewUsers) {
+        await inviteUser({
+          apiKey: apiKey,
+          emails: input.newUsersEmailsToInvite,
+          message: input.messageToInviteNewUsers,
+        });
+      }
     }),
 });

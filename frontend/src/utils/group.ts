@@ -111,3 +111,23 @@ export const deleteGroups = async ({
   );
   return { groups: groups.map((group) => group.result) };
 };
+
+export const followGroups = async ({
+  apiKey,
+  ids,
+}: {
+  apiKey: string;
+  ids: Array<string>;
+}) => {
+  const groups: CkanResponse<Group>[] = await Promise.all(
+    ids.map(
+      async (id) =>
+        await CkanRequest.post(`follow_group`, {
+          apiKey: apiKey,
+          json: { id },
+        })
+    )
+  );
+  return { groups: groups.map((group) => group.result) };
+};
+

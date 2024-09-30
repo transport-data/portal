@@ -2,7 +2,7 @@ import z from "zod";
 const emptyStringToUndefined = z.literal('').transform(() => undefined)
 
 export const SearchDatasetSchema = z.object({
-  query: z.string().default(""),
+  query: z.string().default("").optional(),
   limit: z.number().default(1000),
   offset: z.number().default(0),
   groups: z.array(z.string()).default([]).optional(),
