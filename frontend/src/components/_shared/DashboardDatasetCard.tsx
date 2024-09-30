@@ -6,31 +6,25 @@ import {
 } from "@heroicons/react/20/solid";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { formatDate } from "@lib/utils";
-import { useRouter } from "next/router";
 import { capitalize } from "remeda";
 import UserAvatar from "./UserAvatar";
 import { EyeOffIcon, GlobeAltIcon, RegionIcon } from "@lib/icons";
 import Link from "next/link";
 import { api } from "@utils/api";
+import { Skeleton } from "@components/ui/skeleton";
 
-export interface DashboardDatasetCardProps {
-  tdcValidated?: boolean;
-  title: string;
-  variant: "success" | "purple" | "x";
-  href: string;
-  keywords?: string[];
-  visibility: "public" | "draft" | "private";
-  dateState: string;
-  updateFrequency?: string;
-  region: string;
-  contributors: { imageUrl: string }[];
-}
+export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
+  Array.from({ length }).map((_, x) => (
+    <div key={x} className="flex w-full cursor-pointer gap-6">
+      <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
+        <Skeleton className="h-8 w-8 bg-gray-200" />
+      </div>
+      <Skeleton className="h-[60px] w-full bg-gray-200" />
+    </div>
+  ));
 
 export default function DashboardDatasetCard(props: Dataset) {
-  const router = useRouter();
-
   const {
-    id,
     name,
     tdc_category,
     title,

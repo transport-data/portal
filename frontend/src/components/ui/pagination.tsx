@@ -50,20 +50,20 @@ const PaginationLink = ({
   <a
     aria-current={isActive ? "page" : undefined}
     className={cn(
-      `flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500
-       ${disabled ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700"}`,
-       buttonVariants({
-        variant: isActive ? "outline" : "ghost",
-      }),
-      className
-    )}
-    /*className={cn(
+      `
+       ${
+         disabled
+           ? "cursor-not-allowed opacity-50"
+           : "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+       }`,
       buttonVariants({
         variant: isActive ? "outline" : "ghost",
-        size,
       }),
+      `flex h-8  items-center justify-center rounded-none border border-gray-300 bg-white px-3 leading-tight text-gray-500 ${
+        isActive ? "bg-accent text-white" : ""
+      }`,
       className
-    )}*/
+    )}
     {...props}
     onClick={disabled ? undefined : props.onClick} // Disable click if disabled
   />
@@ -77,7 +77,7 @@ const PaginationPrevious = ({
   <PaginationLink
     aria-label="Go to previous page"
     size="default"
-    className={cn("rounded-s-lg px-2", className)}
+    className={cn("rounded-e-none rounded-s-lg px-2", className)}
     {...props}
   >
     <ChevronLeft className="h-4 w-4" />
@@ -92,7 +92,7 @@ const PaginationNext = ({
   <PaginationLink
     aria-label="Go to next page"
     size="default"
-    className={cn("rounded-e-lg px-2", className)}
+    className={cn("rounded-e-lg rounded-s-none px-2", className)}
     {...props}
   >
     <ChevronRight className="h-4 w-4" />

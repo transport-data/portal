@@ -17,10 +17,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { Button } from "@components/ui/button";
 import { SearchIcon } from "lucide-react";
 import DatasetsFilter from "@components/_shared/DatasetsFilter";
-import DashboardDatasetCard, {
-  DashboardDatasetCardProps,
-} from "@components/_shared/DashboardDatasetCard";
-import { usersMock } from "@components/dashboard/MyOrganizationTabContent";
+
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 
 import example from "@data/example.json";
