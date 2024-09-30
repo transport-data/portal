@@ -45,7 +45,7 @@ describe("List and Search Datasets", () => {
 
   it("Should search and list datasets", () => {
     cy.visit(`/search`);
-    cy.get('input[id=":R2l4mH2:"]').type(datasetName);
+    cy.get('input[placeholder="Find statistics, forecasts & studies"]').type(datasetName);
     cy.get("button[id=search-button]").click();
     cy.get("div").should("contain", datasetName);
   });

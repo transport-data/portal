@@ -109,35 +109,6 @@ Cypress.Commands.add("login", (email, password) => {
   });
 });
 
-// {
-//   name,
-//   notes,
-//   tag_string,
-//   license_id,
-//   owner_org,
-//   temporal_coverage_start,
-//   temporal_coverage_end,
-//   geographies,
-//   regions,
-//   topics,
-//   tdc_category,
-//   sources,
-//   title,
-//   url,
-//   overview_text,
-//   language,
-//   is_archived,
-//   sectors,
-//   modes,
-//   services,
-//   frequency,
-//   indicator,
-//   units,
-//   dimensioning,
-//   related_datasets,
-//   contributors,
-// }
-
 Cypress.Commands.add("createOrganizationViaAPI", (data) => {
   cy.request({
     method: "POST",
