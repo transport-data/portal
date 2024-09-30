@@ -176,6 +176,7 @@ export default function SearchBar({
             </span>
           )}
           <Button
+            id="search-button"
             type="submit"
             className="absolute right-[10px] top-[10px] flex gap-[8px]"
           >

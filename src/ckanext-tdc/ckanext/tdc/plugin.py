@@ -61,9 +61,6 @@ class TdcPlugin(plugins.SingletonPlugin):
 
         metadata_created = data_dict.get("metadata_created", None)
         if metadata_created:
-            year = metadata_created[0:4]
-            data_dict["metadata_created_year"] = year
-
             date = metadata_created[0:10]
             data_dict["metadata_created_date"] = date
 

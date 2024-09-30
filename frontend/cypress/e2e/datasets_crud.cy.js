@@ -20,59 +20,38 @@ const tdc_category =
     ? "tdc_formatted"
     : "tdc_harmonized";
 
-describe("List and Search Topic", () => {
+describe("List and Search Datasets", () => {
   beforeEach(function () {
-    cy.login(ckanUserName, ckanUserPassword);
     cy.createOrganizationViaAPI({ title: org, name: sample_org });
     cy.createDatasetViaAPI({
       name: datasetName,
       title: datasetTile,
       tag_string: tags,
-      owner_org: org,
+      owner_org: sample_org,
       notes: notes,
       geographies: geographies,
       regions: regions,
       tdc_category: tdc_category,
-      temporal_coverage_start,
-      temporal_coverage_end,
-      url,
-      overview_text,
-      language,
-      is_archived,
-      sectors,
-      modes,
-      services,
-      frequency,
-      indicator,
-      units,
-      dimensioning,
-      related_datasets,
-      contributors,
+      temporal_coverage_start: new Date(1990, 1, 1).toISOString(),
+      temporal_coverage_end: new Date(2005, 1, 1).toISOString(),
+      is_archived: false,
+      sectors: ['active-mobility'],
+      modes: ['heavy-rail'],
+      services: ['passenger'],
+      frequency: 'annually',
     });
+    cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("Should search and list topics", () => {
-    //create an org so that it can be searched
-    cy.visit("/dashboard/topics/create");
-    cy.get("input[name=title]").type(sample_topic);
-    cy.get("input[name=name]").should("have.value", sample_topic);
-    cy.get("textarea[name=description]").type("Test description");
-    cy.get("button[type=submit]").click();
-
-    cy.visit("/dashboard/topics/");
-    cy.get("section").should("contain", sample_topic);
-    cy.get("input[name=search]").type(sample_topic);
-    cy.get("section").should("not.contain", "No Topics found");
-    cy.get("section").should("contain", sample_topic);
-
-    cy.visit(`/dashboard/topics/${sample_topic}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", sample_topic);
-      cy.contains("Delete Topic").click();
-      cy.wait(2000);
-      cy.get("#confirmDelete").click();
-    });
+  it("Should search and list datasets", () => {
+    cy.visit(`/search`);
+    cy.get('input[id=":R2l4mH2:"]').type(datasetName);
+    cy.get("button[id=search-button]").click();
+    cy.get("div").should("contain", datasetName);
   });
+
   after(() => {
     cy.deleteDatasetViaAPI(datasetName);
+    cy.deleteOrganizationAPI(sample_org);
   });
 });
