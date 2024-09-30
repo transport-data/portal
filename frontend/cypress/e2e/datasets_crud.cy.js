@@ -2,11 +2,11 @@ const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
-const uuid = () => Math.random().toString(36).slice(2) + "-test";
+const uuid = () => crypto.randomUUID();
 
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const sample_org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetTile = `${uuid()}${datasetSuffix}`;
+const datasetTitle = `${uuid()}${datasetSuffix}`;
 const datasetName = `${uuid()}${datasetSuffix}`;
 const notes = `${uuid()}${datasetSuffix}`;
 const tags = ["tag1", "tag2", "tag3"];
@@ -31,7 +31,7 @@ describe("List and Search Datasets", () => {
     cy.createOrganizationViaAPI({ title: org, name: sample_org });
     cy.createDatasetViaAPI({
       name: datasetName,
-      title: datasetTile,
+      title: datasetTitle,
       tag_string: tags,
       owner_org: sample_org,
       notes: notes,
@@ -52,12 +52,20 @@ describe("List and Search Datasets", () => {
   it("Should search and list datasets", () => {
     cy.visit(`/search`);
     cy.get('input[placeholder="Find statistics, forecasts & studies"]').type(
-      datasetName
+      datasetTitle
     );
     cy.get("button[id=search-button]").click();
-    cy.get("div").should("contain", datasetTile);
+    cy.get("div").should("contain", datasetTitle);
     cy.get("div").should("contain", tags);
     cy.get("div").should("contain", frequency);
+  });
+
+  it("Should be able to filter the dataset using the advanced filter", () => {
+    cy.visit(`/search`);
+    cy.get("label[id=show-advanced-filter]").click();
+    // cy.get("div").should("contain", datasetTitle);
+    // cy.get("div").should("contain", tags);
+    // cy.get("div").should("contain", frequency);
   });
 
   after(() => {

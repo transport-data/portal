@@ -286,6 +286,7 @@ export default function DatasetSearch({
                         />
 
                         <label
+                          id="show-advanced-filter"
                           className={
                             "hidden cursor-pointer items-center sm:inline-flex " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")

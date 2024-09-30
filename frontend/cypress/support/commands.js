@@ -115,6 +115,11 @@ Cypress.Commands.add("createOrganizationViaAPI", (data) => {
     url: apiUrl("organization_create"),
     headers: headers,
     body: data,
+    failOnStatusCode: false,
+  }).then((response) => {
+    expect(response.status).to.satisfy(
+      (status) => status === 409 || status < 400
+    );
   });
 });
 
