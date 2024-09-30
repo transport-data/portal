@@ -1,8 +1,9 @@
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
-import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 import Head from "next/head";
 import { useState } from "react";
 import Layout from "../components/_shared/Layout";
+
+import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 
 import DatasetSearchItem from "@components/search/DatasetSearchItem";
 import SearchBar from "@components/search/SearchBar";

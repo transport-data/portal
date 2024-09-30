@@ -13,7 +13,6 @@ export default function UserAvatar({
   user: User;
   className?: string;
 }) {
-  console.log(user);
   return (
     <Avatar
       className={cn("h-6 w-6 border-2 border-white", className)}

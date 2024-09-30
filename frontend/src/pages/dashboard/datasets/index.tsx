@@ -8,25 +8,7 @@ import { SWRConfig, unstable_serialize } from "swr";
 import { searchDatasets } from "@utils/dataset";
 import { SearchDatasetType } from "@schema/dataset.schema";
 
-export const getServerSideProps: GetServerSideProps<any> = async (context) => {
-  const session = await getSession(context);
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/api/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {},
-  };
-};
-
-function DatasetsDashboard({}: InferGetServerSidePropsType<
-  typeof getServerSideProps
->): JSX.Element {
+function DatasetsDashboard(): JSX.Element {
   const { data: sessionData } = useSession();
 
   if (!sessionData) return <Loading />;
