@@ -11,6 +11,7 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@components/ui/pagination";
+import { Transition } from "@headlessui/react";
 import { cn } from "@lib/utils";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
@@ -51,6 +52,7 @@ export default function DatasetSearch({
   const [countries, setCountries] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
   const [yearsCoverage, setYearsCoverage] = useState<Facet[]>([]);
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
 
   const resetFilter = () => {
     setSearchFilter({
@@ -194,7 +196,7 @@ export default function DatasetSearch({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Layout backgroundEffect effectSize="100px">
-        <div className="container">
+        <div className="container overflow-x-hidden">
           <div className="pt-5">
             <SearchBar
               onChange={onChange}
@@ -281,6 +283,27 @@ export default function DatasetSearch({
                           isCheckbox
                           items={regions}
                         />
+
+                        <label
+                          className={
+                            "inline-flex cursor-pointer items-center " +
+                            (showAdvancedFilter ? "" : "xl:min-w-fit")
+                          }
+                        >
+                          <input
+                            type="checkbox"
+                            checked={showAdvancedFilter}
+                            onChange={() =>
+                              setShowAdvancedFilter(!showAdvancedFilter)
+                            }
+                            className="peer sr-only"
+                          />
+                          <div className="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"></div>
+                          <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            Advanced filter
+                          </span>
+                        </label>
+
                         <div className="w-full sm:hidden">
                           <QuickFilterDropdown
                             searchFilter={searchFilter}
@@ -431,21 +454,34 @@ export default function DatasetSearch({
                   </PaginationContent>
                 </Pagination>
               </div>
+              <Transition show={showAdvancedFilter}>
+                <div
+                  className={cn(
+                    "relative transition ease-in-out",
+                    // Shared closed styles
+                    "data-[closed]:opacity-0",
+                    // Entering styles
+                    "data-[enter]:data-[closed]:translate-x-full data-[enter]:duration-100",
+                    // Leaving styles
+                    "data-[leave]:data-[closed]:translate-x-full data-[leave]:duration-300",
 
-              <div className="order-first w-full border-l pl-5 pt-[12px] lg:order-last lg:max-w-[340px]">
-                <DatasetsFilter
-                  resetFilter={resetFilter}
-                  datasetCount={datasetCount || 0}
-                  onChange={onChange}
-                  searchFilter={searchFilter}
-                  tags={tags}
-                  orgs={orgs}
-                  resourcesFormats={resourcesFormats}
-                  regions={regions}
-                  countries={countries}
-                  metadataCreatedDates={metadataCreatedDates}
-                />
-              </div>
+                    "order-first w-full border-l pl-5 pt-[12px] duration-1000 ease-in lg:order-last lg:max-w-[340px]"
+                  )}
+                >
+                  <DatasetsFilter
+                    resetFilter={resetFilter}
+                    datasetCount={datasetCount || 0}
+                    onChange={onChange}
+                    searchFilter={searchFilter}
+                    tags={tags}
+                    orgs={orgs}
+                    resourcesFormats={resourcesFormats}
+                    regions={regions}
+                    countries={countries}
+                    metadataCreatedDates={metadataCreatedDates}
+                  />
+                </div>
+              </Transition>
             </div>
           </div>
         </div>
