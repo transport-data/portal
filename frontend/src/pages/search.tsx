@@ -1,6 +1,6 @@
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/_shared/Layout";
 
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
@@ -90,93 +90,93 @@ export default function DatasetSearch({
     },
   } = api.dataset.search.useQuery(searchFilter);
 
-  for (const key in facets) {
-    switch (key) {
-      case "organization": {
-        if (!orgs.length) setOrgs(facets[key].items);
-        break;
-      }
-      case "tags": {
-        if (!tags.length) setTags(facets[key].items);
-        break;
-      }
-      case "geographies": {
-        if (!countries.length) setCountries(facets[key].items);
-        break;
-      }
-      case "regions": {
-        if (!regions.length) setRegions(facets[key].items);
-        break;
-      }
-      case "res_format": {
-        if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
-        break;
-      }
-      case "modes": {
-        if (!modes.length) setModes(facets[key].items);
-        break;
-      }
-      case "services": {
-        if (!services.length) setServices(facets[key].items);
-        break;
-      }
-      case "frequency": {
-        if (!updateFrequencies.length) setUpdateFrequencies(facets[key].items);
-        break;
-      }
-      case "sectors": {
-        if (!sectors.length) setSectors(facets[key].items);
-        break;
-      }
-      case "metadata_created": {
-        if (metadataCreatedDates.length) {
+  useEffect(() => {
+    for (const key in facets) {
+      switch (key) {
+        case "organization": {
+          if (!orgs.length) setOrgs(facets[key].items);
           break;
         }
-        const countByYear = new Map<string, number>();
-        const LAST_MONTH_KEY = "Last month";
-        const setYearsCoverage = (map: Map<string, number>) => {
-          setMetadataCreatedDates(
-            Array.from(map.keys())
-              .map((k) => {
-                return {
-                  name: k,
-                  display_name: k,
-                  count: map.get(k) || 0,
-                };
-              })
-              .sort((a, b) => Number(a.display_name) - Number(b.display_name))
+        case "tags": {
+          if (!tags.length) setTags(facets[key].items);
+          break;
+        }
+        case "geographies": {
+          if (!countries.length) setCountries(facets[key].items);
+          break;
+        }
+        case "regions": {
+          if (!regions.length) setRegions(facets[key].items);
+          break;
+        }
+        case "res_format": {
+          if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
+          break;
+        }
+        case "modes": {
+          if (!modes.length) setModes(facets[key].items);
+          break;
+        }
+        case "services": {
+          if (!services.length) setServices(facets[key].items);
+          break;
+        }
+        case "frequency": {
+          if (!updateFrequencies.length)
+            setUpdateFrequencies(facets[key].items);
+          break;
+        }
+        case "sectors": {
+          if (!sectors.length) setSectors(facets[key].items);
+          break;
+        }
+        case "metadata_created": {
+          const countByYear = new Map<string, number>();
+          const LAST_MONTH_KEY = "Last month";
+          const setYearsCoverage = (map: Map<string, number>) => {
+            setMetadataCreatedDates(
+              Array.from(map.keys())
+                .map((k) => {
+                  return {
+                    name: k,
+                    display_name: k,
+                    count: map.get(k) || 0,
+                  };
+                })
+                .sort((a, b) => Number(a.display_name) - Number(b.display_name))
+            );
+          };
+
+          facets[key].items.forEach((x: any) => {
+            const dateConverted = new Date(x.name);
+            const today = new Date();
+            const _key =
+              dateConverted.getFullYear() === today.getFullYear() &&
+              dateConverted.getMonth() === today.getMonth() - 1
+                ? LAST_MONTH_KEY
+                : x.name.slice(0, 4);
+            let count = countByYear.get(_key);
+            if (!count) {
+              countByYear.set(_key, x.count);
+            } else {
+              countByYear.set(_key, count + x.count);
+            }
+          });
+          countByYear.set(
+            new Date().getFullYear().toString(),
+            (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
+              (countByYear.get(LAST_MONTH_KEY) ?? 0)
           );
-        };
 
-        facets[key].items.forEach((x: any) => {
-          const dateConverted = new Date(x.name);
-          const today = new Date();
-          const _key =
-            dateConverted.getFullYear() === today.getFullYear() &&
-            dateConverted.getMonth() === today.getMonth() - 1
-              ? LAST_MONTH_KEY
-              : x.name.slice(0, 4);
-          let count = countByYear.get(_key);
-          if (!count) {
-            countByYear.set(_key, x.count);
-          } else {
-            countByYear.set(_key, count + x.count);
-          }
-        });
-        countByYear.set(
-          new Date().getFullYear().toString(),
-          (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
-            (countByYear.get(LAST_MONTH_KEY) ?? 0)
-        );
-
-        setYearsCoverage(countByYear);
-        break;
-      }
-      default: {
-        break;
+          setYearsCoverage(countByYear);
+          break;
+        }
+        default: {
+          break;
+        }
       }
     }
-  }
+  }, [facets]);
 
   const onChange: SearchPageOnChange = (data) => {
     setSearchFilter((oldValue) => {
