@@ -63,7 +63,6 @@ dataset_fields:
   validators: ignore_missing scheming_multiple_text
   output_validators: scheming_load_json
 
-# Only for indexing purposes
 - field_name: topics
   label: Topics
   form_snippet: null
@@ -212,7 +211,6 @@ dataset_fields:
   label: Units
   preset: multiple_text
   validators: ignore_missing scheming_multiple_text
-
 
 - field_name: dimensioning
   label: Dimensioning

@@ -20,11 +20,13 @@ import { useForm } from "react-hook-form";
 import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
-import { Button } from "@components/ui/button";
+import { Button, LoaderButton } from "@components/ui/button";
 import { GeneralForm } from "@components/dataset/form/General";
 import { UploadsForm } from "@components/dataset/form/Uploads";
 import { toast } from "@components/ui/use-toast";
 import { match } from "ts-pattern";
+import { useRouter } from "next/router";
+import { v4 as uuidv4 } from "uuid";
 
 const docs = [
   {
@@ -51,37 +53,94 @@ const docs = [
 
 const CreateDatasetDashboard: NextPage = () => {
   const { data: sessionData } = useSession();
+  const router = useRouter();
+  const createDataset = api.dataset.create.useMutation({
+    onSuccess: async (data) => {
+      toast({
+        description: `Successfully created the ${
+          data.title ?? data.name
+        } dataset`,
+      });
+      await router.push("/dashboard/newsfeed");
+    },
+    onError: (error) =>
+      toast({
+        title: "Error creating dataset",
+        description: error.message,
+        variant: "danger",
+      }),
+  });
   const [current, send] = useMachine(datasetOnboardingMachine);
   const form = useForm<DatasetFormType>({
     resolver: zodResolver(DatasetSchema),
     mode: "onBlur",
     defaultValues: {
+      id: uuidv4(),
+      title: "",
+      notes: '',
       countries: [],
-      regions: [],
-      userRepresents: false,
+      topics: [],
+      sectors: [],
+      services: [],
+      modes: [],
       tags: [],
+      units: [],
+      related_datasets: [],
     },
   });
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
-    console.log('TESTING')
-    toast({
-      title: "You submitted the following dataset:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    return createDataset.mutate(data);
   }
   const currentStep = match(current.value)
     .with("general", () => 0)
     .with("metadata", () => 1)
     .with("uploads", () => 2)
     .otherwise(() => 4);
-  const disableNext = Object.keys(form.formState.errors).length > 0;
-  console.log('ERRORS', form.formState.errors)
+  const checkDisableNext = () =>
+    match(current.value)
+      .with("general", () => {
+        const errorPaths = Object.keys(form.formState.errors);
+        console.log("ERROR PATHS", errorPaths);
+        return [
+          "title",
+          "overview",
+          "notes",
+          "id",
+          "is_archived",
+          "name",
+          "owner_org",
+          "tags",
+        ].some((e) => {
+          return errorPaths.includes(e);
+        });
+      })
+      .with("metadata", () => {
+        const errorPaths = Object.keys(form.formState.errors);
+        return [
+          "sources",
+          "language",
+          "frequency",
+          "tdc_category",
+          "modes",
+          "services",
+          "sectors",
+          "temporal_coverage_start",
+          "temporal_coverage_end",
+          "countries",
+          "regions",
+          "units",
+          "dimensioning",
+          "related_datasets",
+        ].some((e) => errorPaths.includes(e));
+      })
+      .with("uploads", () => {
+        const errorPaths = Object.keys(form.formState.errors);
+        return ["resources", "license"].some((e) => errorPaths.includes(e));
+      })
+      .otherwise(() => false);
 
+  console.log('ERRORS', form.formState.errors)
   return (
     <>
       <NextSeo title="Create dataset" />
@@ -96,8 +155,12 @@ const CreateDatasetDashboard: NextPage = () => {
                   <Button
                     type="button"
                     className="w-full"
-                    onClick={() => {
-                      send("next");
+                    onClick={async () => {
+                      await form.trigger();
+                      if (checkDisableNext()) {
+                        return;
+                      }
+                      return send("next");
                     }}
                   >
                     Next
@@ -119,8 +182,12 @@ const CreateDatasetDashboard: NextPage = () => {
                     <Button
                       type="button"
                       className="w-full"
-                      onClick={() => {
-                        send("next");
+                      onClick={async () => {
+                        await form.trigger();
+                        if (checkDisableNext()) {
+                          return;
+                        }
+                        return send("next");
                       }}
                     >
                       Next
@@ -140,16 +207,16 @@ const CreateDatasetDashboard: NextPage = () => {
                     >
                       Prev
                     </Button>
-                    <Button className="w-full" type="submit">
+                    <LoaderButton loading={createDataset.isLoading} className="w-full" type="submit">
                       Submit
-                    </Button>
+                    </LoaderButton>
                   </div>
                 </>
               )}
             </form>
           </Form>
         </div>
-        <div className="flex flex-col items-center bg-gray-50 py-8 px-4 lg:px-20 order-first lg:order-last">
+        <div className="order-first flex flex-col items-center bg-gray-50 px-4 py-8 lg:order-last lg:px-20">
           <div className="flex h-full flex-col items-center justify-center gap-3">
             <h1 className="self-stretch text-4xl font-extrabold leading-9 text-black">
               Before you add data.

@@ -22,60 +22,22 @@ import { FileUploader } from "./FileUploader";
 import { formatBytes, formatIcon, getFileName } from "@lib/utils";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { UploadResult } from "@uppy/core";
-
-const licenses = [
-  {
-    label: "CC BY",
-    value: "cc_by",
-  },
-  {
-    label: "CC BY-SA",
-    value: "cc_by_sa",
-  },
-  {
-    label: "CC BY-NC",
-    value: "cc_by_nc",
-  },
-  {
-    label: "CC BY-NC-SA",
-    value: "cc_by_nc_sa",
-  },
-  {
-    label: "CC BY-NC-ND",
-    value: "cc_by_nc_nd",
-  },
-  {
-    label: "CC BY-ND",
-    value: "cc_by_nd",
-  },
-  {
-    label: "CC0",
-    value: "cc0",
-  },
-  {
-    label: "Public Domain",
-    value: "public_domain",
-  },
-  {
-    label: "Proprietary",
-    value: "proprietary",
-  },
-  {
-    label: "Other",
-    value: "other",
-  },
-];
+import { api } from "@utils/api";
+import { P, match } from "ts-pattern";
+import Spinner from "@components/_shared/Spinner";
+import { env } from "@env.mjs";
 
 export function UploadsForm() {
   const form = useFormContext<DatasetFormType>();
+  const licenses = api.dataset.listLicenses.useQuery();
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
     {
       control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
       name: "resources", // unique name for your Field Array
     }
   );
-  const docs = fields.filter(f => f.type === "doc")
-  const files = fields.filter(f => f.type === "file")
+  const docs = fields.filter((f) => f.type === "documentation");
+  const files = fields.filter((f) => f.type === "data");
   return (
     <div className="py-4">
       <div className="pb-4 text-xl font-bold leading-normal text-primary">
@@ -91,11 +53,22 @@ export function UploadsForm() {
             <FileUploader
               id="files-upload"
               onUploadSuccess={(response: UploadResult) => {
-                const url = response.successful[0]?.uploadURL ?? null;
+                let url = response.successful[0]?.uploadURL as string;
+                //get last and second to last items in url, last is going to be the name and second to last is going to be the resourceId
+                const urlParts = url.split("/");
+                const resourceId = urlParts[urlParts.length - 2];
+                url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
+                  "id"
+                )}/resource/${resourceId}/${
+                  response.successful[0]?.name ?? ""
+                }`;
                 append({
+                  id: resourceId,
                   name: response.successful[0]?.name ?? "",
                   url: url as string,
-                  type: "file",
+                  url_type: "upload",
+                  resource_type: "data",
+                  type: "data",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
                 });
@@ -117,7 +90,7 @@ export function UploadsForm() {
                           aria-hidden="true"
                           className="h-8 w-8 flex-shrink-0 text-gray-400"
                         />
-                        <div className="ml-4 flex flex-col min-w-0 flex-1">
+                        <div className="ml-4 flex min-w-0 flex-1 flex-col">
                           <span className="truncate font-medium">
                             {r.name ?? getFileName(r.url ?? "")}
                           </span>
@@ -129,19 +102,24 @@ export function UploadsForm() {
                         </div>
                       </div>
                       <div className="ml-4 flex-shrink-0">
-                        <button
-                          onClick={() => remove(index)}
-                          className="font-medium text-gray-500 hover:text-accent"
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
+                        <label htmlFor="nothing">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              remove(index);
+                            }}
+                            type="button"
+                            className="font-medium text-gray-500 hover:text-accent"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </label>
                       </div>
                     </li>
                   ))}
                 </ul>
               )}
             </FileUploader>
-
           </div>
         </div>
         <div>
@@ -152,12 +130,22 @@ export function UploadsForm() {
             <FileUploader
               id="docs-upload"
               onUploadSuccess={(response: UploadResult) => {
-                console.log('Upload success', response.successful[0])
-                const url = response.successful[0]?.uploadURL ?? null;
+                let url = response.successful[0]?.uploadURL as string;
+                //get last and second to last items in url, last is going to be the name and second to last is going to be the resourceId
+                const urlParts = url.split("/");
+                const resourceId = urlParts[urlParts.length - 2];
+                url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
+                  "id"
+                )}/resource/${resourceId}/${
+                  response.successful[0]?.name ?? ""
+                }`;
                 append({
+                  id: resourceId,
                   name: response.successful[0]?.name ?? "",
                   url: url as string,
-                  type: "doc",
+                  url_type: "upload",
+                  resource_type: "documentation",
+                  type: "documentation",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
                 });
@@ -179,7 +167,7 @@ export function UploadsForm() {
                           aria-hidden="true"
                           className="h-8 w-8 flex-shrink-0 text-gray-400"
                         />
-                        <div className="ml-4 flex flex-col min-w-0 flex-1">
+                        <div className="ml-4 flex min-w-0 flex-1 flex-col">
                           <span className="truncate font-medium">
                             {r.name ?? getFileName(r.url ?? "")}
                           </span>
@@ -214,23 +202,45 @@ export function UploadsForm() {
             name="license"
             render={({ field }) => (
               <FormItem>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select copyright license" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {licenses.map((license, index) => (
-                      <SelectItem key={index} value={license.value}>
-                        {license.label}
-                      </SelectItem>
+                <FormControl>
+                  {match(licenses)
+                    .with({ isLoading: true }, () => (
+                      <span className="flex items-center gap-x-2 text-sm">
+                        <Spinner />{" "}
+                        <span className="mt-1">Loading licenses...</span>
+                      </span>
+                    ))
+                    .with({ isError: true, errors: P.select() }, (errors) => (
+                      <span className="flex items-center text-sm text-red-600">
+                        Error({JSON.stringify(errors)}) loading licenses, please
+                        refresh the page
+                      </span>
+                    ))
+                    .with({ isSuccess: true, data: P.select() }, (data) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select license for dataset" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {data.map((license) => (
+                            <SelectItem key={license.id} value={license.id}>
+                              {license.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ))
+                    .otherwise(() => (
+                      <span className="flex items-center text-sm text-red-600">
+                        Error loading licenses, please refresh the page
+                      </span>
                     ))}
-                  </SelectContent>
-                </Select>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

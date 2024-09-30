@@ -1,9 +1,12 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { ListboxLabel } from "@headlessui/react";
 import { DatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
 import {
   createDataset,
   deleteDatasets,
   getDataset,
+  getDatasetSchema,
+  licensesList,
   patchDataset,
   searchDatasets,
 } from "@utils/dataset";
@@ -16,7 +19,7 @@ export const datasetRouter = createTRPCRouter({
       const user = ctx.session.user;
       const apiKey = user.apikey;
       const searchResults = await searchDatasets({ apiKey, input });
-      return searchResults
+      return searchResults;
     }),
   get: protectedProcedure
     .input(z.object({ name: z.string() }))
@@ -26,12 +29,19 @@ export const datasetRouter = createTRPCRouter({
       const dataset = await getDataset({ id: input.name, apiKey });
       return dataset;
     }),
+  schema: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const apiKey = user.apikey;
+    const schema = await getDatasetSchema({ apiKey });
+    return schema;
+  }),
   create: protectedProcedure
     .input(DatasetSchema)
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const dataset = await createDataset({ apiKey, input });
+      const _dataset = { ...input, related_datasets: input.related_datasets.map(d => d.name) }
+      const dataset = await createDataset({ apiKey, input: _dataset });
       return dataset;
     }),
   patch: protectedProcedure
@@ -50,4 +60,10 @@ export const datasetRouter = createTRPCRouter({
       const datasets = await deleteDatasets({ apiKey, ids: input.ids });
       return datasets;
     }),
+  listLicenses: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const apiKey = user.apikey;
+    const licenses = await licensesList({ apiKey });
+    return licenses;
+  }),
 });
