@@ -74,7 +74,6 @@ export default function SearchBar({
   const [showCommandList, setShowCommandList] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showAllFacets, setShowAllFacets] = useState<boolean>(false);
-  const [debounceTimeout, setDebounceTimeout] = useState<any>(null);
   const [internalQuery, setInternalQuery] = useState<any>(query);
 
   useEffect(() => {
@@ -157,6 +156,7 @@ export default function SearchBar({
             </Badge>
           )}
           <CommandInput
+            id="search-input-test-id"
             ref={queryInputRef}
             className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
             onFocus={() => {

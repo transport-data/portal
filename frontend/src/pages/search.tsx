@@ -299,7 +299,14 @@ export default function DatasetSearch({
                             }
                             className="peer sr-only"
                           />
-                          <div className="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"></div>
+                          <div
+                            className={cn(
+                              showAdvancedFilter
+                                ? "after:-start-[8px]"
+                                : "after:start-[2px]",
+                              "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+                            )}
+                          ></div>
                           <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Advanced filter
                           </span>
@@ -393,6 +400,9 @@ export default function DatasetSearch({
                   </div>
                   <section className="mt-8">
                     <div className="flex flex-col gap-8">
+                      {!datasets.length && (
+                        <p className="text-sm">No datasets found</p>
+                      )}
                       {datasets.map((item, i) => (
                         <DatasetSearchItem
                           frequencies={updateFrequencies}
@@ -403,76 +413,82 @@ export default function DatasetSearch({
                     </div>
                   </section>
                 </div>
-                <Pagination className="mx-0 mt-8 justify-start">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <button
-                        disabled={currentPage === 0}
-                        aria-label="Go to next page"
-                        className={cn(
-                          "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
-                          "rounded-s-lg px-2",
-                          currentPage === 0 ? "cursor-not-allowed" : ""
-                        )}
-                        onClick={() => {
-                          setSearchFilter((oldV) => ({
-                            ...oldV,
-                            offset: (currentPage - 1) * 9,
-                          }));
-                          setCurrentPage((oldV) => oldV - 1);
-                        }}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                    </PaginationItem>
-                    {pages.map((x, i) =>
-                      i > currentPage + 2 || i < currentPage - 2 ? (
-                        <></>
-                      ) : (
-                        <PaginationItem>
-                          <button
-                            disabled={currentPage === i}
-                            onClick={() => {
-                              setSearchFilter((oldV) => ({
-                                ...oldV,
-                                offset: i * 9,
-                              }));
-                              setCurrentPage(i);
-                            }}
-                            className={cn(
-                              `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
-                              currentPage === i ? "cursor-auto bg-gray-100" : ""
-                            )}
-                          >
-                            {i + 1}
-                          </button>
-                        </PaginationItem>
-                      )
-                    )}
-                    <PaginationItem>
-                      <button
-                        disabled={currentPage === pages.length - 1}
-                        aria-label="Go to next page"
-                        onClick={() => {
-                          setSearchFilter((oldV) => ({
-                            ...oldV,
-                            offset: (currentPage + 1) * 9,
-                          }));
-                          setCurrentPage((oldV) => oldV + 1);
-                        }}
-                        className={cn(
-                          "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
-                          "rounded-e-lg px-2",
-                          currentPage === pages.length - 1
-                            ? "cursor-not-allowed"
-                            : ""
-                        )}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                {pages.length ? (
+                  <Pagination className="mx-0 mt-8 justify-start">
+                    <PaginationContent>
+                      <PaginationItem>
+                        <button
+                          disabled={currentPage === 0}
+                          aria-label="Go to next page"
+                          className={cn(
+                            "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                            "rounded-s-lg px-2",
+                            currentPage === 0 ? "cursor-not-allowed" : ""
+                          )}
+                          onClick={() => {
+                            setSearchFilter((oldV) => ({
+                              ...oldV,
+                              offset: (currentPage - 1) * 9,
+                            }));
+                            setCurrentPage((oldV) => oldV - 1);
+                          }}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                      </PaginationItem>
+                      {pages.map((x, i) =>
+                        i > currentPage + 2 || i < currentPage - 2 ? (
+                          <></>
+                        ) : (
+                          <PaginationItem>
+                            <button
+                              disabled={currentPage === i}
+                              onClick={() => {
+                                setSearchFilter((oldV) => ({
+                                  ...oldV,
+                                  offset: i * 9,
+                                }));
+                                setCurrentPage(i);
+                              }}
+                              className={cn(
+                                `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
+                                currentPage === i
+                                  ? "cursor-auto bg-gray-100"
+                                  : ""
+                              )}
+                            >
+                              {i + 1}
+                            </button>
+                          </PaginationItem>
+                        )
+                      )}
+                      <PaginationItem>
+                        <button
+                          disabled={currentPage === pages.length - 1}
+                          aria-label="Go to next page"
+                          onClick={() => {
+                            setSearchFilter((oldV) => ({
+                              ...oldV,
+                              offset: (currentPage + 1) * 9,
+                            }));
+                            setCurrentPage((oldV) => oldV + 1);
+                          }}
+                          className={cn(
+                            "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                            "rounded-e-lg px-2",
+                            currentPage === pages.length - 1
+                              ? "cursor-not-allowed"
+                              : ""
+                          )}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                ) : (
+                  <></>
+                )}
               </div>
               <Transition show={showAdvancedFilter}>
                 <div
