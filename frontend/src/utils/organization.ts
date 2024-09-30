@@ -238,3 +238,50 @@ export const purgeOrganization = async ({
   );
   return purgedOrganization.result;
 };
+
+export const requestOrganizationOwner = async ({
+  id,
+  message,
+  apiKey,
+}: {
+  id: string;
+  message: string;
+  apiKey: string;
+}) => {
+  const response: CkanResponse<String> = await CkanRequest.post(
+    "request_organization_owner",
+    {
+      apiKey,
+      json: { 
+        id: id,
+        message: message
+      },
+    }
+  );
+  return response;
+};
+
+export const requestNewOrganization = async ({
+  orgName,
+  orgDescription,
+  datasetDescription,
+  apiKey,
+}: {
+  orgName: string;
+  orgDescription: string;
+  datasetDescription: string;
+  apiKey: string;
+}) => {
+  const response: CkanResponse<String> = await CkanRequest.post(
+    "request_new_organization",
+    {
+      apiKey,
+      json: { 
+        org_name: orgName,
+        org_description: orgDescription,
+        dataset_description: datasetDescription,
+      },
+    }
+  );
+  return response;
+};
