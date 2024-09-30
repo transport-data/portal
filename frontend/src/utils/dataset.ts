@@ -11,7 +11,14 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 //We need to use this cause the way the combobox to input related_datasets is setup
-type DatasetCreateType = Omit<DatasetFormType, "related_datasets"> & { related_datasets: Array<string> };
+type DatasetCreateType = Omit<
+  DatasetFormType,
+  "related_datasets" | "temporal_coverage_start" | "temporal_coverage_end"
+> & {
+  related_datasets: Array<string>;
+  temporal_coverage_start: string;
+  temporal_coverage_end: string;
+};
 
 export const searchDatasets = async ({
   apiKey,

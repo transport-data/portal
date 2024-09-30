@@ -40,7 +40,13 @@ export const datasetRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const _dataset = { ...input, related_datasets: input.related_datasets.map(d => d.name) }
+    //convert the date to string YYYY-MM-DD
+      const _dataset = {
+        ...input,
+        related_datasets: input.related_datasets.map((d) => d.name),
+        temporal_coverage_start: input.temporal_coverage_start.toISOString().split('T')[0] ?? '',
+        temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
+      };
       const dataset = await createDataset({ apiKey, input: _dataset });
       return dataset;
     }),
