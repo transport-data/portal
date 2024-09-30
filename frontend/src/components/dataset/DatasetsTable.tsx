@@ -3,10 +3,10 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SearchDatasetForm } from "./DatasetSearchForm";
 import type { SearchDatasetType } from "@schema/dataset.schema";
-import type { Dataset } from "@portaljs/ckan";
 import Modal from "@components/_shared/Modal";
 import { EditDatasetForm } from "./EditDatasetForm";
 import Spinner from "@components/_shared/Spinner";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export const DatasetTable: React.FC<{ publicUrl: string }> = ({
   publicUrl,
@@ -25,9 +25,11 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
     tags: [],
     include_private: true,
   });
-  const { data: datasets } = api.dataset.search.useQuery(
+  const { data } = api.dataset.search.useQuery(
     datasetSearch as unknown as SearchDatasetType
   );
+
+  const datasets = data?.results;
 
   const utils = api.useContext();
   const deleteDatasets = api.dataset.delete.useMutation({
@@ -49,7 +51,9 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
 
   function toggleAll() {
     if (datasets) {
-      setSelectedDatasets(checked || indeterminate ? [] : datasets);
+      setSelectedDatasets(
+        checked || indeterminate ? [] : (datasets as Array<any>)
+      );
       setChecked(!checked && !indeterminate);
       setIndeterminate(false);
     }
@@ -71,7 +75,7 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
                       ids: selectedDatasets.map((dataset) => dataset.id),
                     });
                   }}
-                  className="inline-flex items-center rounded bg-background px-2 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed  dark:bg-background-dark dark:ring-slate-600"
+                  className="dark:bg-background-dark inline-flex items-center rounded bg-background px-2 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50  disabled:cursor-not-allowed dark:ring-slate-600"
                 >
                   {deleteDatasets.isLoading && (
                     <Spinner className="mr-2 h-3 w-3" />
@@ -175,7 +179,7 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
                           <td className="px-3 py-4 text-sm opacity-75">
                             {dataset.title}
                           </td>
-                          <td className="text-justify px-3 py-4 text-sm opacity-75">
+                          <td className="px-3 py-4 text-justify text-sm opacity-75">
                             {dataset.notes}
                           </td>
                           <td className="px-3 py-4 text-sm opacity-75">

@@ -4,11 +4,12 @@ export const SearchDatasetSchema = z.object({
   query: z.string().default(""),
   limit: z.number().default(1000),
   offset: z.number().default(0),
-  groups: z.array(z.string()).default([]),
-  orgs: z.array(z.string()).default([]),
-  tags: z.array(z.string()).default([]),
+  groups: z.array(z.string()).default([]).optional(),
+  orgs: z.array(z.string()).default([]).optional(),
+  tags: z.array(z.string()).default([]).optional(),
   sort: z.string().optional(),
   include_private: z.boolean().optional(),
+  include_drafts : z.boolean().optional()
 });
 
 export const ResourceSchema = z.object({

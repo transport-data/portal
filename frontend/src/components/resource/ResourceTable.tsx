@@ -1,10 +1,10 @@
-import type { Dataset } from "@portaljs/ckan";
 import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Resource } from "@portaljs/ckan";
 import { api } from "@utils/api";
 import Modal from "@components/_shared/Modal";
 import { EditResourceForm } from "./EditResourceForm";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export const ResourceTable: React.FC<{
   datasetData: Dataset;
@@ -62,7 +62,7 @@ export const ResourceTable: React.FC<{
                         ),
                       });
                     }}
-                    className="inline-flex items-center rounded bg-background px-2 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white dark:bg-background-dark dark:ring-slate-600"
+                    className="dark:bg-background-dark inline-flex items-center rounded bg-background px-2 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white dark:ring-slate-600"
                   >
                     Delete all
                   </button>
@@ -169,7 +169,7 @@ export const ResourceTable: React.FC<{
                           </span>
                         )}
                       </td>
-                      <td className="text-justify px-3 py-4 text-sm opacity-75">
+                      <td className="px-3 py-4 text-justify text-sm opacity-75">
                         {resource.description}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm opacity-75">

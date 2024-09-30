@@ -9,6 +9,8 @@ from ckan.plugins import toolkit as tk
 import json
 from ckanext.scheming import helpers as scheming_helpers
 import ckan.lib.authenticator as authenticator
+from ckan.common import current_user
+from ckan.authz import users_role_for_group_or_org
 import ckan.lib.mailer as mailer
 from ckan.logic.action.create import _get_random_username_from_email
 from ckan.lib.base import render
@@ -21,7 +23,6 @@ env = Environment(loader=FileSystemLoader(template_dir))
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
 
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -60,6 +61,12 @@ def _fix_geographies_field(data_dict):
     """
     geography_names = data_dict.get("geographies", [])
     region_names = data_dict.get("regions", [])
+
+    if isinstance(geography_names, str):
+        geography_names = [geography_names]
+
+    if isinstance(region_names, str):
+        region_names = [region_names]
 
     has_geographies = isinstance(
         geography_names, list) and len(geography_names) > 0
@@ -140,29 +147,55 @@ def _update_contributors(data_dict, is_update=False):
     data_dict["contributors"] = [current_user_id]
 
 
-@tk.chained_action
-def package_create(up_func, context, data_dict):
+def _fix_user_group_permission(data_dict):
+    """
+    By default, any user should be able to create datasets
+    with any geography or topic.
+    To do that, add user as member of groups.
+    """
+    groups = data_dict.get("groups", [])
+    user_id = current_user.id
+
+    if len(groups) > 0 and user_id:
+        priviliged_context = {"ignore_auth": True}
+        group_member_create_action = tk.get_action("group_member_create")
+
+        for group in groups:
+            group_id = group.get("name")
+            capacity = users_role_for_group_or_org(group_id, user_id)
+            if capacity not in ["member", "editor", "admin"]:
+                group_member_create_data_dict = {
+                        "id": group.get("name"),
+                        "username": user_id,
+                        "role": "member"}
+                group_member_create_action(priviliged_context,
+                                           group_member_create_data_dict)
+
+
+def _before_dataset_create_or_update(data_dict, is_update=False):
     _fix_geographies_field(data_dict)
     _fix_topics_field(data_dict)
-    _update_contributors(data_dict)
+    _update_contributors(data_dict, is_update=is_update)
+    _fix_user_group_permission(data_dict)
+
+
+@tk.chained_action
+def package_create(up_func, context, data_dict):
+    _before_dataset_create_or_update(data_dict)
     result = up_func(context, data_dict)
     return result
 
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
-    _fix_geographies_field(data_dict)
-    _fix_topics_field(data_dict)
-    _update_contributors(data_dict, is_update=True)
+    _before_dataset_create_or_update(data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 
 
 @tk.chained_action
 def package_patch(up_func, context, data_dict):
-    _fix_geographies_field(data_dict)
-    _fix_topics_field(data_dict)
-    _update_contributors(data_dict, is_update=True)
+    _before_dataset_create_or_update(data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 

@@ -17,9 +17,10 @@ const ResourcesDashboard: NextPage<{ datasetName: string }> = ({
   datasetName,
 }) => {
   const router = useRouter();
-  const { data: datasetData, isError } = api.dataset.get.useQuery({
+  const { data, isError } = api.dataset.get.useQuery({
     name: datasetName,
   });
+  const datasetData = data?.result;
   const [showAddForm, setShowAddForm] = useState(false);
   if (isError) void router.push("/404");
   if (!datasetData) return <Loading />;

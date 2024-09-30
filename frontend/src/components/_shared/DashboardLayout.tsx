@@ -15,6 +15,7 @@ import { NextSeo } from "next-seo";
 import Loading from "./Loading";
 import Link from "next/link";
 import { cn } from "@lib/utils";
+import Heading from "./Heading";
 
 interface DashboardLayotProps {
   children: React.ReactNode;
@@ -97,11 +98,11 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
               <div className="mt-4 pb-16 md:flex md:items-center md:justify-between">
                 <div className="min-w-0 flex-1">
                   <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
-                    <div className="mt-6 md:flex md:items-center md:justify-between">
+                    <div className=" md:flex md:items-center md:justify-between">
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
+                        <Heading level={1} size="7xl" align="left">
                           Dashboard
-                        </h2>
+                        </Heading>
                       </div>
                     </div>
                   </h2>
@@ -142,7 +143,9 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
               </div>
             </div>
           </div>
-          <div className="container py-8">{children}</div>
+          <div className="bg-[#F9FAFB] lg:min-h-screen">
+            <div className="container pt-5">{children}</div>
+          </div>
         </div>
       </Layout>
     </>
