@@ -287,7 +287,7 @@ export default function DatasetSearch({
 
                         <label
                           className={
-                            "inline-flex cursor-pointer items-center " +
+                            "hidden cursor-pointer items-center sm:inline-flex " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")
                           }
                         >
@@ -337,6 +337,25 @@ export default function DatasetSearch({
                             ]}
                           />
                         </div>
+                        <label
+                          className={
+                            "inline-flex cursor-pointer items-center sm:hidden " +
+                            (showAdvancedFilter ? "" : "xl:min-w-fit")
+                          }
+                        >
+                          <input
+                            type="checkbox"
+                            checked={showAdvancedFilter}
+                            onChange={() =>
+                              setShowAdvancedFilter(!showAdvancedFilter)
+                            }
+                            className="peer sr-only"
+                          />
+                          <div className="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"></div>
+                          <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            Advanced filter
+                          </span>
+                        </label>
                       </div>
                     </div>
                     <div className="hidden sm:block">
