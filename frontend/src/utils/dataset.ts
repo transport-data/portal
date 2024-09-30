@@ -16,10 +16,17 @@ export const searchDatasets = async ({
   const ckanUrl =env.NEXT_PUBLIC_CKAN_URL;
     const baseAction = `package_search`
 
-    let queryParams: string[] = []
+    let queryParams: string[] = [];
+
+    const buildOrFq = (key: string, values: string[]) =>
+      `${key}:(${values.join(" OR ")})`;
 
     if (input?.query) {
         queryParams.push(`q=${input.query}`)
+    }
+
+    if (input.orgs?.length) {
+      queryParams.push(`fq=${buildOrFq("organization", input.orgs)}`);
     }
 
     if (input?.offset) {
@@ -39,7 +46,7 @@ export const searchDatasets = async ({
     }
 
     const action = `${baseAction}?${queryParams.join("&")}`
-    const datasets:CkanResponse<{results:Dataset[]}> = await CkanRequest.get(action, { ckanUrl, apiKey})
+    const datasets:CkanResponse<{results:Dataset[], count:number}> = await CkanRequest.get(action, { ckanUrl, apiKey})
 
     return datasets.result;
 
