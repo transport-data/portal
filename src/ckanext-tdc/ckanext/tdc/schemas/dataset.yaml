@@ -205,7 +205,7 @@ dataset_fields:
   - value: not_planned
     label: Not Planned
 
-- field_name: indicator
+- field_name: indicators
   label: Indicators
   preset: multiple_text
   validators: ignore_missing scheming_multiple_text
@@ -252,6 +252,7 @@ dataset_fields:
       label: Date
     - field_name: comment
       label: Comment
+  help_text: Any other information about the metadata values, for instance discrepancies or unclear or missing information.
 
 resource_fields:
 
