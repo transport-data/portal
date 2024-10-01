@@ -35,7 +35,7 @@ export const DatasetSchema = z.object({
     ),
   title: z.string(),
   notes: z.string().min(1, { message: "Description is required" }),
-  overview: z.string().optional().nullable(),
+  overview_text: z.string().optional().nullable(),
   owner_org: z.string({ message: "Organization is required" }),
   topics: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),

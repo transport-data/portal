@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import { Check } from "lucide-react";
 import { Checkbox } from "@components/ui/checkbox";
+import { useSession } from "next-auth/react";
 
 export function GeneralForm({ editing = false }: { editing?: boolean} ) {
   const formObj = useFormContext<DatasetFormType>();
@@ -61,6 +62,8 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
     tags.data && tags.data.includes(tag);
 
   const userOrganization = api.organization.listForUser.useQuery();
+  const allOrganizations = api.organization.list.useQuery();
+  const session = useSession()
   const topics = api.group.list.useQuery({
     showGeographyShapes: false,
     type: "topic",
@@ -115,7 +118,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                {match(userOrganization)
+                {match(session.data?.user.sysadmin ? allOrganizations : userOrganization)
                   .with({ isLoading: true }, () => (
                     <span className="flex items-center gap-x-2 text-sm">
                       <Spinner />{" "}
@@ -290,7 +293,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           Overview
         </div>
         <RTEForm
-          name="overview"
+          name="overview_text"
           placeholder="Write a overview description of this dataset"
           formObj={formObj}
         />

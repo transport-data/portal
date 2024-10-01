@@ -85,6 +85,9 @@ const CreateDatasetDashboard: NextPage = () => {
       related_datasets: [],
     },
   });
+  useEffect(() => {
+    if (!form.formState.dirtyFields["name"]) form.setValue("name", slugify(form.watch("title")));
+  }, [form.watch("title")]);
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
     return createDataset.mutate(data);
@@ -136,9 +139,6 @@ const CreateDatasetDashboard: NextPage = () => {
       })
       .otherwise(() => false);
 
-  useEffect(() => {
-    if (!form.formState.dirtyFields["name"]) form.setValue("name", slugify(form.watch("title")));
-  }, [form.watch("title")]);
   return (
     <>
       <NextSeo title="Create dataset" />
