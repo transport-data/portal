@@ -27,7 +27,7 @@ import { api } from "@utils/api";
 import { useState } from "react";
 
 export function RelatedDatasetsField() {
-  const { control, register, setValue, getValues } = useFormContext<DatasetFormType>();
+  const { control, register, setValue, getValues, watch } = useFormContext<DatasetFormType>();
   const [searchedDataset, setSearchedDataset] = useState("");
   const datasets = api.dataset.search.useQuery({
     query: searchedDataset,
@@ -92,7 +92,7 @@ export function RelatedDatasetsField() {
                       },
                       (data) => (
                         <>
-                          {data.results.map((d) => (
+                          {data.results.filter(d => d.id !== watch('id')).map((d) => (
                             <CommandItem
                               value={d.name}
                               key={d.name}

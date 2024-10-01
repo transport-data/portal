@@ -43,7 +43,7 @@ import {
 import { Check } from "lucide-react";
 import { Checkbox } from "@components/ui/checkbox";
 
-export function GeneralForm() {
+export function GeneralForm({ editing = false }: { editing?: boolean} ) {
   const formObj = useFormContext<DatasetFormType>();
   const {
     getValues,
@@ -66,9 +66,6 @@ export function GeneralForm() {
     type: "topic",
   });
 
-  useEffect(() => {
-    if (!dirtyFields["name"]) setValue("name", slugify(watch("title")));
-  }, [watch("title")]);
   return (
     <div className="flex flex-col gap-y-4 py-4">
       <div className="text-xl font-bold leading-normal text-primary">
@@ -101,7 +98,7 @@ export function GeneralForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Dataset slug" {...field} />
+                <Input disabled={editing} className="disabled:bg-gray-200" placeholder="Dataset slug" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -143,9 +140,8 @@ export function GeneralForm() {
                       </FormControl>
                       <SelectContent>
                         {data
-                          .filter((group) => group.name !== watch("name"))
                           .map((group, index) => (
-                            <SelectItem key={index} value={group.name}>
+                            <SelectItem key={index} value={group.id}>
                               {group.title ?? group.display_name ?? group.name}
                             </SelectItem>
                           ))}
@@ -316,6 +312,23 @@ export function GeneralForm() {
           </FormItem>
         )}
       />
+      <FormField
+        control={control}
+        name="private"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+            <div className="space-y-1 leading-none">
+              <FormLabel>Is this dataset private?</FormLabel>
+            </div>
+          </FormItem>
+        )}
+      />
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Keywords (max. 3)
@@ -395,7 +408,7 @@ export function GeneralForm() {
                                 {data.map((t) => (
                                   <CommandItem
                                     disabled={
-                                      field.value.some(t => t.name) ||
+                                      field.value.some(_t => _t.name === t) ||
                                       field.value.length >= 3
                                     }
                                     className="disabled:opacity-50"

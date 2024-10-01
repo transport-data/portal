@@ -11,7 +11,7 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 //We need to use this cause the way the combobox to input related_datasets is setup
-type DatasetCreateType = Omit<
+type DatasetCreateEditType = Omit<
   DatasetFormType,
   "related_datasets" | "temporal_coverage_start" | "temporal_coverage_end"
 > & {
@@ -101,7 +101,7 @@ export const createDataset = async ({
   input,
 }: {
   apiKey: string;
-  input: DatasetCreateType;
+  input: DatasetCreateEditType;
 }) => {
   const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
     `package_create`,
@@ -118,7 +118,7 @@ export const patchDataset = async ({
   input,
 }: {
   apiKey: string;
-  input: DatasetFormType;
+  input: DatasetCreateEditType;
 }) => {
   const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
     "package_patch",

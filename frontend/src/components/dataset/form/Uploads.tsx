@@ -24,6 +24,7 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import { UploadResult } from "@uppy/core";
 import { api } from "@utils/api";
 import { P, match } from "ts-pattern";
+import * as R from "remeda";
 import Spinner from "@components/_shared/Spinner";
 import { env } from "@env.mjs";
 
@@ -102,18 +103,21 @@ export function UploadsForm() {
                         </div>
                       </div>
                       <div className="ml-4 flex-shrink-0">
-                        <label htmlFor="nothing">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              remove(index);
+                              const _index = R.findIndex(
+                                fields,
+                                (f) => f.id === r.id
+                              );
+                              console.log('INDEX', _index)
+                              remove(_index);
                             }}
                             type="button"
                             className="font-medium text-gray-500 hover:text-accent"
                           >
                             <TrashIcon className="h-5 w-5" />
                           </button>
-                        </label>
                       </div>
                     </li>
                   ))}
@@ -180,7 +184,15 @@ export function UploadsForm() {
                       </div>
                       <div className="ml-4 flex-shrink-0">
                         <button
-                          onClick={() => remove(index)}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const _index = R.findIndex(
+                              fields,
+                              (f) => f.id === r.id
+                            );
+                            remove(_index);
+                          }}
                           className="font-medium text-gray-500 hover:text-accent"
                         >
                           <TrashIcon className="h-5 w-5" />
@@ -199,7 +211,7 @@ export function UploadsForm() {
           </div>
           <FormField
             control={form.control}
-            name="license"
+            name="license_id"
             render={({ field }) => (
               <FormItem>
                 <FormControl>

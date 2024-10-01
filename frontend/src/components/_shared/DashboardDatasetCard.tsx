@@ -12,6 +12,7 @@ import UserAvatar from "./UserAvatar";
 import { EyeOffIcon, GlobeAltIcon, RegionIcon } from "@lib/icons";
 import Link from "next/link";
 import { api } from "@utils/api";
+import { Button } from "@components/ui/button";
 
 export interface DashboardDatasetCardProps {
   tdcValidated?: boolean;
@@ -73,10 +74,7 @@ export default function DashboardDatasetCard(props: Dataset) {
   );
 
   return (
-    <Link
-      href={`/@${organization?.name}/${name}`}
-      className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6"
-    >
+    <div className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6">
       <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
         <Badge
           className="flex h-8 w-8 items-center justify-center pl-1.5 pr-1.5"
@@ -87,7 +85,22 @@ export default function DashboardDatasetCard(props: Dataset) {
 
       <div className="w-full space-y-2 text-sm">
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
-          <h2 className="text-lg font-bold">{title}</h2>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/@${organization?.name}/${name}`}
+              className="text-lg font-bold"
+            >
+              {title}
+            </Link>
+            <Button
+              variant="default"
+              size="pill"
+              className="px-2.5 py-0.5 text-sm"
+              asChild
+            >
+              <Link href={`/dashboard/datasets/${name}/edit`}>Edit</Link>
+            </Button>
+          </div>
           {tdc_category === "tdc_formatted" && (
             <Badge variant={"success"} className="text-[#03543F]">
               TDC Formatted
@@ -212,6 +225,6 @@ export default function DashboardDatasetCard(props: Dataset) {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

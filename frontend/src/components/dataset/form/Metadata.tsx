@@ -116,7 +116,7 @@ export function MetadataForm() {
   });
   const datasetSchema = api.dataset.schema.useQuery();
   return (
-    <div className="w-full">
+    <div className="w-full py-6">
       <div className="text-xl font-bold leading-normal text-primary">
         Add metadata
       </div>
@@ -382,7 +382,7 @@ export function MetadataForm() {
       </div>
       <FormField
         control={control}
-        name="countries"
+        name="geographies"
         render={({ field }) => (
           <FormItem className="flex flex-col py-4">
             {match(geographies)
@@ -465,7 +465,7 @@ export function MetadataForm() {
                                         newCountries = newCountries.filter(
                                           (v, i, a) => a.indexOf(v) === i
                                         );
-                                        setValue("countries", newCountries);
+                                        setValue("geographies", newCountries);
                                       }}
                                     >
                                       {r.title ?? r.name}
@@ -481,19 +481,17 @@ export function MetadataForm() {
                                     onSelect={() => {
                                       match(field.value.includes(c.name))
                                         .with(true, () => {
-                                          console.log("testing");
                                           setValue(
-                                            "countries",
-                                            getValues("countries").filter(
+                                            "geographies",
+                                            getValues("geographies").filter(
                                               (v) => v !== c.name
                                             )
                                           );
                                         })
                                         .with(false, () => {
-                                          console.log("testing 2");
                                           setValue(
-                                            "countries",
-                                            getValues("countries").concat(
+                                            "geographies",
+                                            getValues("geographies").concat(
                                               c.name
                                             )
                                           );
