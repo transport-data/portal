@@ -39,7 +39,7 @@ export default function EventsSection({
         ))}
       </div>
       <Link
-        href="#"
+        href="/events"
         className="flex items-center gap-[6px] self-center text-accent"
       >
         View all
