@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  Fragment
 } from "react";
 
 export const TagsButtonsSelectionGroup = ({
@@ -41,6 +42,7 @@ export const TagsButtonsSelectionGroup = ({
       {data.map((x, i) =>
         i === indexToShowMoreButton ? (
           <span
+            key={i}
             onClick={() => {
               setIndexToShowMoreButton(invalidIndex);
             }}
@@ -49,9 +51,10 @@ export const TagsButtonsSelectionGroup = ({
             + More
           </span>
         ) : i > indexToShowMoreButton ? (
-          <></>
+          <Fragment key={i}></Fragment>
         ) : (
           <span
+            key={i}
             onClick={() => {
               x.selected = !x.selected;
               setData([...data]);

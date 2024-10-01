@@ -5,6 +5,7 @@ from: 2024-10-15
 to: 2024-10-16
 organization: International Transport Forum
 location: Leipziger Messe GmbH (CCL), Germany
+link: https://www.google.com
 ---
 
 The Annual Summit of the International Transport Forum is the world's largest gathering of transport ministers and the premier global transport policy event.

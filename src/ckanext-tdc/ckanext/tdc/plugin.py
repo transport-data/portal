@@ -33,7 +33,10 @@ class TdcPlugin(plugins.SingletonPlugin):
                 "package_patch": action.package_patch,
                 "package_search": action.package_search,
                 "group_list": action.group_list,
-                "user_login": action.user_login
+                "user_login": action.user_login,
+                "invite_user_to_tdc": action.invite_user_to_tdc,
+                "request_organization_owner": action.request_organization_owner,
+                "request_new_organization": action.request_new_organization
                 }
 
     # IPackageController

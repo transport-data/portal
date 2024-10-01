@@ -32,7 +32,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
   const createUser = api.user.createUser.useMutation({
     onSuccess: async () => {
       await signIn("credentials", {
-        callbackUrl: "/dashboard/newsfeed",
+        callbackUrl: "/onboarding",
         username: watch("name"),
         password: watch("password"),
       });
@@ -57,7 +57,7 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
               <a
                 onClick={() =>
                   signIn("github", {
-                    callbackUrl: "/dashboard/newsfeed",
+                    callbackUrl: "/onboarding",
                   })
                 }
                 className="col-span-12 flex w-full cursor-pointer items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"

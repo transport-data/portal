@@ -1,0 +1,83 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+        }
+        .color {
+            color: #006064;
+        }
+        .background {
+            background-color: #006064;
+        }
+        .highlight {
+            font-weight: bold;
+        }
+        .visit_btn {
+            color: white !important;
+            border-radius: 5px;
+            text-align: center;
+            padding: 10px 25px;
+            text-decoration: none;
+            margin: 30px 20px;
+        }
+        .request-box {
+            border-radius: 5px;
+            border: 2px solid #006064;
+            background-color: white; 
+            width: 50%;
+            margin: auto;
+        }
+        .details {
+            border: 2px solid #006064;
+            background-color: white;
+            color: black;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .heading {
+            padding: 0px;
+            margin-bottom: 5px;
+        }
+        .request-heading {
+            color: white;
+            text-align: center;
+            padding: 5px;
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="background" style="text-align: center; color: #FFFFFF; padding: 10px 0px;">New Organization Request</h2>
+    <p style="margin-top: 15px;">
+        <span class="highlight color" title="{{ user_email }}">
+            {{ user_name }}
+        </span> 
+        has requested to create a new organization on {{ site_title }}.
+    </p>
+
+    <div class="request-box">
+        <h3 class="background request-heading">Please review the request.</h3>
+        <div style="padding: 0px 15px 15px 15px;">
+            <h4 class="highlight color heading">Name</h4>
+            <div class="details">
+                {{ org_name }}
+            </div>
+            <h4 class="highlight color heading">Description</h4>
+            <div class="details">
+                {{ org_description }}
+            </div>
+            <h4 class="highlight color heading">Data Description</h4>
+            <div class="details">
+                {{ dataset_description }}
+            </div>
+        </div>
+    </div>
+    <p>To create the organization, please visit {{ site_title }}.</p>
+    <a href="{{ site_url }}" class="background visit_btn">VISIT {{ site_title }}</a>
+    <p>Have a nice day.</p>
+</body>
+</html>

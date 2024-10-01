@@ -2,6 +2,7 @@ import { ErrorAlert } from "@components/_shared/Alerts";
 import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
+import type { InferGetServerSidePropsType } from "next";
 
 import InterestsSteps from "@components/onboarding-steps/InterestsSteps";
 import InviteUsersStep from "@components/onboarding-steps/InviteUsersStep";
@@ -11,131 +12,100 @@ import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
+import { listGroups } from "@utils/group";
+import { listOrganizations } from "@utils/organization";
+import { api } from "@utils/api";
+import { toast } from "@/components/ui/use-toast";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const csrfToken = await getCsrfToken(context);
+
+  const topicsData = await listGroups({
+    type: "topic",
+  });
+  const locationData = await listGroups({
+    type: "geography",
+  });
+  const organizationsData = await listOrganizations({
+    input: {
+      detailed: true,
+      includeUsers: false,
+    },
+  });
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
+      csrfToken: csrfToken ? csrfToken : "",
+      organizationsData: organizationsData,
+      topicsData: topicsData,
+      locationData: locationData,
     },
   };
 }
 
-export default function LoginPage({ csrfToken }: { csrfToken: string }) {
-  const [errorMessage] = useState<string | null>(null);
+export default function LoginPage({
+  csrfToken,
+  organizationsData,
+  topicsData,
+  locationData,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [loggingIn] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
   const form = useForm<OnboardingFormType>();
   const { handleSubmit, watch } = form;
-
-  const orgs = [
-    { id: 1, name: "Asia Development Bank (ADB)" },
-    { id: 2, name: "CAF - Banco de desarrollo de América Latina" },
-    { id: 3, name: "Chalmers University" },
-    { id: 4, name: "European Bank for Reconstrution and Development (EBRD)" },
-    { id: 5, name: "Fabrique des Mobilités" },
-    { id: 6, name: "FIA Foundation" },
-  ];
+  const onBoardUser = api.user.onboard.useMutation({
+    onSuccess: async () => {
+      toast({
+        description: "Successfully Onboarded user",
+      });
+      form.reset();
+      setErrorMessage(null);
+      await router.push("/dashboard/newsfeed");
+    },
+    onError: (error) => {
+      setLoading(false);
+      setErrorMessage(error.message);
+    },
+  });
 
   useEffect(() => {
     setIsSmallScreen(window.innerWidth < 1457);
   }, []);
 
-  const [locations, setLocations] = useState([
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Asia" },
-    { selected: false, name: "Australia and oceania" },
-    { selected: false, name: "Europe" },
-    { selected: false, name: "South America" },
-    { selected: false, name: "Middle East and North Africa" },
-    { selected: false, name: "EU" },
-    { selected: false, name: "OECD" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-    { selected: false, name: "Africa" },
-  ]);
+  const [locations, setLocations] = useState(
+    locationData
+      ? locationData.map((loc) => ({
+          id: loc.id,
+          name: loc.display_name,
+          selected: false,
+        }))
+      : []
+  );
 
-  const [organizations, setOrganizations] = useState([
-    { selected: false, name: "Transport Data Commons" },
-    { selected: false, name: "World Bank" },
-    { selected: false, name: "ITF-OECD" },
-    { selected: false, name: "UNECE" },
-    { selected: false, name: "ADB" },
-    { selected: false, name: "Eurostat" },
-    { selected: false, name: "IEA" },
-    { selected: false, name: "KFW" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-  ]);
+  const [organizations, setOrganizations] = useState(
+    organizationsData
+      ? organizationsData.map((org) => ({
+          id: org.id,
+          name: org.display_name,
+          selected: false,
+        }))
+      : []
+  );
 
-  const [topics, setTopics] = useState([
-    { selected: false, name: "Air travel" },
-    { selected: false, name: "Passenger travel" },
-    { selected: false, name: "Transportation Emissions" },
-    { selected: false, name: "Road Safety" },
-    { selected: false, name: "Rail" },
-    { selected: false, name: "Freight" },
-    { selected: false, name: "Electric vehicles" },
-    { selected: false, name: "Public Transit " },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-    { selected: false, name: "ITDP" },
-  ]);
+  const [topics, setTopics] = useState(
+    topicsData
+      ? topicsData.map((topic) => ({
+          id: topic.id,
+          name: topic.display_name,
+          selected: false,
+        }))
+      : []
+  );
 
   const [stepNumber, setStep] = useState(0);
   const steps = [
@@ -152,7 +122,13 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
   );
 
   useEffect(() => {
-    if (stepNumber === 1) {
+    if (stepNumber === 0) {
+      const isAnySelected =
+        topics.some((topic) => topic.selected) ||
+        locations.some((location) => location.selected) ||
+        organizations.some((org) => org.selected);
+      setDisableButton(!isAnySelected);
+    } else if (stepNumber === 1) {
       setSubtitleText("Prepare to share data");
       setParagraphText(
         <>
@@ -174,30 +150,88 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
           </Button>
         </>
       );
-      setDisableButton(
-        !(
-          watch("orgInWhichItParticipates") &&
-          watch("messageToParticipateOfTheOrg")
-        )
-      );
+      if (watch("isNewOrganizationSelected")) {
+        setDisableButton(
+          !(
+            watch("newOrganizationName") &&
+            watch("newOrganizationDescription") &&
+            watch("confirmThatItParticipatesOfTheOrg")
+          )
+        );
+      } else {
+        setDisableButton(
+          !(
+            watch("orgInWhichItParticipates") &&
+            watch("messageToParticipateOfTheOrg") &&
+            watch("confirmThatItParticipatesOfTheOrg")
+          )
+        );
+      }
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
         "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
-      setDisableButton((watch("newUsersEmailsToInvite") || [])?.length < 1);
     } else {
       setDisableButton(false);
     }
   }, [
     watch("orgInWhichItParticipates"),
     watch("messageToParticipateOfTheOrg"),
-    watch("newUsersEmailsToInvite"),
+    watch("confirmThatItParticipatesOfTheOrg"),
+    watch("newOrganizationName"),
+    watch("newOrganizationDescription"),
+    watch("newOrganizationDataDescription"),
+    watch("isNewOrganizationSelected"),
+    topics,
+    locations,
+    organizations,
     stepNumber,
   ]);
 
-  const nextStep = () => {
-    if (stepNumber === steps.length - 1) return router.push("/dashboard/newsfeed");
+  const groupFollowPreferences = async () => {
+    const groupIds: string[] = [];
+    //add selected topics, locations and organization
+    topics.forEach((topic) => {
+      if (topic.selected) {
+        groupIds.push(topic.id);
+      }
+    });
+    locations.forEach((loc) => {
+      if (loc.selected) {
+        groupIds.push(loc.id);
+      }
+    });
+    organizations.forEach((org) => {
+      if (org.selected) {
+        groupIds.push(org.id);
+      }
+    });
+    form.setValue("followingGroups", groupIds);
+  };
+
+  const nextStep = async (data: any) => {
+    if (stepNumber === 0) {
+      form.setValue("isInterestSubmitted", true);
+      groupFollowPreferences();
+    } else if (stepNumber === 1) {
+      form.setValue("isOrganizationSubmitted", true);
+    } else if (stepNumber === 2) {
+      setLoading(true);
+      onBoardUser.mutate(data);
+    }
+    setStep(stepNumber + 1);
+  };
+
+  const skipStep = async () => {
+    if (stepNumber === 0) {
+      form.setValue("isInterestSubmitted", false);
+    } else if (stepNumber === 1) {
+      form.setValue("isOrganizationSubmitted", false);
+    } else if (stepNumber === 2) {
+      setLoading(true);
+      router.push("/dashboard/newsfeed");
+    }
     setStep(stepNumber + 1);
   };
 
@@ -206,11 +240,9 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
       <NextSeo title="Onboarding" />
       <SingInLayout subtitleText={subtitleText} paragraphText={paragraphText}>
         <form
-          onSubmit={(event) =>
-            void handleSubmit(async (data) => {
-              nextStep();
-            })(event)
-          }
+          onSubmit={handleSubmit((data) => {
+            nextStep(data);
+          })}
           className="w-full bg-white px-28 py-28"
         >
           <input
@@ -221,9 +253,12 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
           <div className="pb-8">
             <div className="flex items-center justify-between gap-4 md:flex-col md:items-start lg:flex-row lg:items-center">
               {steps.map((step, stepIdx) => (
-                <>
+                <Fragment key={stepIdx}>
                   <div className="w-fit">
-                    <div className="flex items-center gap-2">
+                    <div
+                      className="flex items-center gap-2"
+                      onClick={() => setStep(stepIdx)}
+                    >
                       {stepNumber === stepIdx ? (
                         <svg
                           className="absolute"
@@ -234,8 +269,8 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                           fill="none"
                         >
                           <path
-                            fill-rule="evenodd"
-                            clip-rule="evenodd"
+                            fillRule="evenodd"
+                            clipRule="evenodd"
                             d="M8.00005 14.6998C9.90961 14.6998 11.741 13.9412 13.0912 12.591C14.4415 11.2407 15.2 9.40936 15.2 7.4998C15.2 5.59025 14.4415 3.7589 13.0912 2.40864C11.741 1.05837 9.90961 0.299805 8.00005 0.299805C6.09049 0.299805 4.25914 1.05837 2.90888 2.40864C1.55862 3.7589 0.800049 5.59025 0.800049 7.4998C0.800049 9.40936 1.55862 11.2407 2.90888 12.591C4.25914 13.9412 6.09049 14.6998 8.00005 14.6998ZM11.3363 6.3361C11.5003 6.16636 11.591 5.93902 11.589 5.70304C11.5869 5.46707 11.4923 5.24134 11.3254 5.07447C11.1585 4.9076 10.9328 4.81295 10.6968 4.8109C10.4608 4.80885 10.2335 4.89956 10.0637 5.06351L7.10005 8.02721L5.93635 6.86351C5.76661 6.69956 5.53927 6.60885 5.30329 6.6109C5.06731 6.61295 4.84158 6.7076 4.67471 6.87447C4.50784 7.04134 4.41319 7.26707 4.41114 7.50304C4.40909 7.73902 4.49981 7.96636 4.66375 8.1361L6.46375 9.9361C6.63252 10.1048 6.8614 10.1996 7.10005 10.1996C7.3387 10.1996 7.56757 10.1048 7.73635 9.9361L11.3363 6.3361Z"
                             fill="#006064"
                           />
@@ -263,9 +298,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
 
                       <div
                         style={
-                          isSmallScreen
-                            ? ({} as any)
-                            : { "text-wrap": "nowrap" }
+                          isSmallScreen ? ({} as any) : { textWrap: "nowrap" }
                         }
                         className={
                           "whitespace-normal break-keep	text-sm " +
@@ -283,7 +316,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                   ) : (
                     <div className="min-w-[15%] border-t border-gray-300 md:min-w-full lg:min-w-[15%]" />
                   )}
-                </>
+                </Fragment>
               ))}
             </div>
           </div>
@@ -297,14 +330,14 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
               setOrganizations={setOrganizations}
             />
           ) : stepNumber === 1 ? (
-            <OrganizationSelectionStep orgs={orgs} form={form} />
+            <OrganizationSelectionStep orgs={organizationsData} form={form} />
           ) : (
             <InviteUsersStep form={form} />
           )}
           <div className="mt-5">
             <div className="mb-5">
               <div className="col-span-full">
-                {match(loggingIn)
+                {match(loading)
                   .with(false, () => (
                     <Button
                       disabled={disableButton}
@@ -314,7 +347,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                         (disableButton ? " cursor-not-allowed opacity-20" : "")
                       }
                     >
-                      Next
+                      {stepNumber === 2 ? "Submit" : "Next"}
                     </Button>
                   ))
                   .otherwise(() => (
@@ -322,7 +355,7 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                       disabled
                       className="flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
                     >
-                      <Spinner />
+                      <Spinner className="text-slate-900" />
                     </Button>
                   ))}
               </div>
@@ -332,12 +365,12 @@ export default function LoginPage({ csrfToken }: { csrfToken: string }) {
                 ? "You can always do this later."
                 : stepNumber === 1
                 ? "Don’t want to share data?"
-                : "Don’t want to invite anyone?"}{" "}
+                : "Don’t want to submit form?"}{" "}
               <span
-                onClick={() => nextStep()}
+                onClick={() => skipStep()}
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"
               >
-                {stepNumber === 0 ? "Skip" : "Skip this step"}{" "}
+                {stepNumber === 2 ? "Skip" : "Skip this step"}{" "}
               </span>
             </p>
             {errorMessage && <ErrorAlert text={errorMessage} />}

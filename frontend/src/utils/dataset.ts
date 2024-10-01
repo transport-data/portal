@@ -32,17 +32,23 @@ export const searchDatasets = async ({
 
   let queryParams: string[] = [];
 
-  if (input?.query) {
-    queryParams.push(`q=${input.query}`);
-  }
+
+
+    const buildOrFq = (key: string, values: string[]) =>
+      `${key}:(${values.join(" OR ")})`;
 
   if (input?.offset) {
     queryParams.push(`start=${input.offset}`);
   }
 
-  if (input?.limit || input?.limit == 0) {
-    queryParams.push(`rows=${input.limit}`);
-  }
+
+    if (input.orgs?.length) {
+      queryParams.push(`fq=${buildOrFq("organization", input.orgs)}`);
+    }
+
+    if (input?.offset) {
+        queryParams.push(`start=${input.offset}`)
+    }
 
   if (input?.sort) {
     queryParams.push(`sort=${input?.sort}`);
@@ -52,11 +58,14 @@ export const searchDatasets = async ({
     queryParams.push(`include_drafts=${input?.include_drafts}`);
   }
 
-  const action = `${baseAction}?${queryParams.join("&")}`;
-  const datasets: CkanResponse<{ results: Dataset[] }> = await CkanRequest.get(
-    action,
-    { ckanUrl, apiKey }
-  );
+
+    if (input?.include_drafts) {
+        queryParams.push(`include_drafts=${input?.include_drafts}`)
+    }
+
+    const action = `${baseAction}?${queryParams.join("&")}`
+    const datasets:CkanResponse<{results:Dataset[], count:number}> = await CkanRequest.get(action, { ckanUrl, apiKey})
+
 
   return datasets.result;
 };
