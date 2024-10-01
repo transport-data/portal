@@ -98,11 +98,18 @@ describe("Create and edit datasets", () => {
           expect(response.body.result.resources).to.have.length(3);
         }
       );
+      cy.visit(`/dashboard/datasets/${dataset}/edit`).then(() => {
+        cy.contains('Delete Dataset').click()
+        cy.wait(2000)
+        cy.get('#confirmDelete').click()
+        cy.visit('/dashboard/datasets').then(() => {
+          cy.get("section").should("not.contain", dataset + " edited");
+        })
+      });
     });
   });
 
   after(() => {
-    cy.deleteDatasetAPI(dataset);
     cy.deleteOrganizationAPI(ownerOrg);
     cy.deleteGroupAPI(topic1);
     cy.deleteGroupAPI(topic2);

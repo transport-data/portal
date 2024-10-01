@@ -13,6 +13,8 @@ import {
 import { Button, LoaderButton } from "@components/ui/button";
 import { useState } from "react";
 import { toast } from "@components/ui/use-toast";
+import { SearchDatasetType } from "@schema/dataset.schema";
+import { useSession } from "next-auth/react";
 
 export function DeleteDatasetButton({
   datasetId,
@@ -24,6 +26,14 @@ export function DeleteDatasetButton({
   children?: React.ReactNode;
 }) {
   const utils = api.useContext();
+  const { data: session } = useSession();
+  const options: SearchDatasetType = {
+    offset: 0,
+    limit: 20,
+    include_private: true,
+    include_drafts: true,
+    query: `creator_user_id:${session?.user.id}`,
+  };
   const [open, setOpen] = useState(false);
   const deleteDataset = api.dataset.delete.useMutation({
     onSuccess: async () => {
@@ -31,7 +41,7 @@ export function DeleteDatasetButton({
         description: "Succesfully deleted dataset",
       })
       onSuccess();
-      await utils.dataset.search.invalidate();
+      await utils.dataset.search.invalidate(options);
       setOpen(false)
     },
     onError: (e) => {
