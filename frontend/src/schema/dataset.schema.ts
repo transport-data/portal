@@ -53,8 +53,6 @@ export const SearchDatasetSchema = z.object({
   regions: z.array(z.string()).optional(),
   countries: z.array(z.string()).optional(),
   fuel: z.string().optional(),
-  before: z.string().optional(),
-  after: z.string().optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),
   groups: z.array(z.string()).optional(),

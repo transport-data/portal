@@ -17,6 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { cn } from "@lib/utils";
+import React from "react";
 
 export type Facet = { name: string; display_name: string; count: number };
 
@@ -50,8 +51,8 @@ export default ({
   ]);
 
   const [searchedGeographyText, setSearchedGeographyText] = useState("");
-  const [startYear, setStartYear] = useState<number | undefined>();
-  const [endYear, setEndYear] = useState<number | undefined>();
+  // const [startYear, setStartYear] = useState<number | undefined>();
+  // const [endYear, setEndYear] = useState<number | undefined>();
 
   const totalOfFiltersApplied =
     (searchFilter.tags?.length ?? 0) +
@@ -62,8 +63,8 @@ export default ({
     (searchFilter.regions?.length ?? 0) +
     (searchFilter.sector ? 1 : 0) +
     (searchFilter.service ? 1 : 0) +
-    (searchFilter.after ? 1 : 0) +
-    (searchFilter.before ? 1 : 0) +
+    (searchFilter.endYear ? 1 : 0) +
+    (searchFilter.startYear ? 1 : 0) +
     (searchFilter.fuel ? 1 : 0) +
     (searchFilter.showArchived ? 1 : 0) +
     (searchFilter.mode ? 1 : 0);
@@ -379,7 +380,7 @@ export default ({
             </div>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="yearsCovered">
+        {/* <AccordionItem value="yearsCovered">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
             <span className="hide mr-2 text-sm">
@@ -452,6 +453,7 @@ export default ({
                   }}
                 />
                 <button
+                  id="years-covered-search-button"
                   disabled={!endYear || !startYear}
                   className={cn(
                     "ml-auto cursor-pointer text-[#006064]",
@@ -472,7 +474,7 @@ export default ({
               <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll"></div>
             </LocalizationProvider>
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
         <AccordionItem value="format">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Format</span>

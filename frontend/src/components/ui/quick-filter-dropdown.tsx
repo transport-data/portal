@@ -51,7 +51,7 @@ export default function QuickFilterDropdown({
         <Button
           size="sm"
           variant="input"
-          className="flex items-center gap-1 rounded-[8px] shadow-none ring-[#E5E7EB]"
+          className="flex items-center lg:w-fit gap-1 rounded-[8px] shadow-none ring-[#E5E7EB]"
         >
           <span className="text-sm font-normal text-gray-500">{text}: </span>
           <span className="text-sm font-medium text-gray-900">

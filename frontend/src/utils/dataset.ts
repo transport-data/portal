@@ -1,7 +1,7 @@
 import CkanRequest from "@datopian/ckan-api-client-js";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
 export async function searchDatasets<T = Dataset>({
   apiKey,
   options,
@@ -116,7 +116,7 @@ export async function searchDatasets<T = Dataset>({
         ).toISOString()}]`,
       ])
     );
-  
+
     fqAr.push(
       buildOrFq("temporal_coverage_end", [
         `[${new Date(
@@ -128,6 +128,30 @@ export async function searchDatasets<T = Dataset>({
           11,
           31
         ).toISOString()}]`,
+      ])
+    );
+  } else if (options.endYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_start", [
+        `[* TO ${new Date(Number(options.endYear - 1), 11, 31).toISOString()}]`,
+      ])
+    );
+
+    fqAr.push(
+      buildOrFq("temporal_coverage_end", [
+        `[* TO ${new Date(Number(options.endYear - 1), 11, 31).toISOString()}]`,
+      ])
+    );
+  } else if (options.startYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_start", [
+        `[${new Date(Number(options.startYear + 1), 0, 1).toISOString()} TO *]`,
+      ])
+    );
+
+    fqAr.push(
+      buildOrFq("temporal_coverage_end", [
+        `[${new Date(Number(options.startYear + 1), 0, 1).toISOString()} TO *]`,
       ])
     );
   }

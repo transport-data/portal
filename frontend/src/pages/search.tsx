@@ -17,6 +17,8 @@ import { cn } from "@lib/utils";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
+import React from "react";
 
 export function getServerSideProps({ query }: any) {
   return {
@@ -69,12 +71,11 @@ export default function DatasetSearch({
     offset: 0,
     limit: 9,
     endYear: after ? Number(after) : undefined,
+    startYear: after ? Number(after) : undefined,
     mode: mode as string | undefined,
     service: service as string | undefined,
     sector: sector as string | undefined,
     fuel: fuel as string | undefined,
-    before: before as string | undefined,
-    after: after as string | undefined,
     regions: region ? [region as string] : undefined,
     countries: country ? [country as string] : undefined,
     query: query as string,
@@ -134,27 +135,46 @@ export default function DatasetSearch({
           const countByYear = new Map<string, number>();
           const LAST_MONTH_KEY = "Last month";
           const setYearsCoverage = (map: Map<string, number>) => {
-            setMetadataCreatedDates(
-              Array.from(map.keys())
-                .map((k) => {
-                  return {
-                    name: k,
-                    display_name: k,
-                    count: map.get(k) || 0,
-                  };
-                })
-                .sort((a, b) => Number(a.display_name) - Number(b.display_name))
+            const data = Array.from(map.keys()).map((k) => {
+              return {
+                name: k,
+                display_name: k,
+                count: map.get(k) || 0,
+              };
+            });
+            const [lastMonthFacet] = data.splice(
+              data.findIndex((x) =>
+                x.display_name.toLowerCase().includes("last")
+              ),
+              1
             );
+
+            data.sort(
+              (a, b) => Number(a.display_name) - Number(b.display_name)
+            );
+            data.splice(1, 0, lastMonthFacet!);
+            setMetadataCreatedDates(data);
           };
 
           facets[key].items.forEach((x: any) => {
             const dateConverted = new Date(x.name);
             const today = new Date();
-            const _key =
-              dateConverted.getFullYear() === today.getFullYear() &&
-              dateConverted.getMonth() === today.getMonth() - 1
-                ? LAST_MONTH_KEY
-                : x.name.slice(0, 4);
+            let _key;
+            // this is checking if the dataset was created at December of last year and today is January making the dataset be in last month filter
+            if (
+              today.getFullYear() - dateConverted.getFullYear() === 1 &&
+              today.getMonth() === 0 &&
+              dateConverted.getMonth() === 11
+            ) {
+              _key = LAST_MONTH_KEY;
+            } else {
+              _key =
+                dateConverted.getFullYear() === today.getFullYear() &&
+                dateConverted.getMonth() === today.getMonth() - 1
+                  ? LAST_MONTH_KEY
+                  : x.name.slice(0, 4);
+            }
+
             let count = countByYear.get(_key);
             if (!count) {
               countByYear.set(_key, x.count);
@@ -167,6 +187,10 @@ export default function DatasetSearch({
             (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
               (countByYear.get(LAST_MONTH_KEY) ?? 0)
           );
+
+          if (!countByYear.get(LAST_MONTH_KEY)) {
+            countByYear.set(LAST_MONTH_KEY, 0);
+          }
 
           setYearsCoverage(countByYear);
           break;
@@ -210,11 +234,11 @@ export default function DatasetSearch({
                   ? "mode"
                   : searchFilter.regions?.at(0)
                   ? "region"
-                  : searchFilter.after
+                  : searchFilter.startYear
                   ? "after"
                   : searchFilter.fuel
                   ? "fuel"
-                  : searchFilter.before
+                  : searchFilter.endYear
                   ? "before"
                   : searchFilter.service
                   ? "service"
@@ -227,12 +251,12 @@ export default function DatasetSearch({
                   ? searchFilter.mode
                   : searchFilter.regions?.at(0)
                   ? searchFilter.regions.at(0)
-                  : searchFilter.after
-                  ? searchFilter.after
+                  : searchFilter.startYear
+                  ? searchFilter.startYear.toString()
                   : searchFilter.fuel
                   ? searchFilter.fuel
-                  : searchFilter.before
-                  ? searchFilter.before
+                  : searchFilter.endYear
+                  ? searchFilter.endYear.toString()
                   : searchFilter.service
                   ? searchFilter.service
                   : undefined
@@ -243,18 +267,28 @@ export default function DatasetSearch({
             <div className="flex flex-col gap-4 lg:flex-row lg:gap-[64px]">
               <div className="mb-8 flex w-full flex-col justify-between">
                 <div>
-                  <div className="flex flex-col flex-wrap items-center justify-between gap-2 md:flex-row xl:flex-nowrap">
+                  <div className="flex flex-col flex-wrap items-center justify-between gap-2 md:flex-row">
                     <div className="flex flex-col items-center gap-4 md:flex-row">
-                      <span className="text-base font-medium text-gray-900">
+                      <div className="text-base font-medium text-gray-900 break-keep	text-nowrap">
                         Quick filters:
-                      </span>
-                      <div className="flex flex-wrap items-center gap-2 sm:flex-row sm:flex-nowrap">
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:flex-row xl:flex-nowrap">
                         <QuickFilterDropdown
                           searchFilter={searchFilter}
                           onChange={onChange}
                           defaultValue={searchFilter.sector}
                           text="Sector"
                           filterFieldName="sector"
+                          items={sectors}
+                        />
+                        <DateQuickFilterDropdown
+                          searchFilter={searchFilter}
+                          onChange={onChange}
+                          defaultStartValue={searchFilter.startYear}
+                          defaultEndValue={searchFilter.endYear}
+                          text="Years covered"
+                          filterStartFieldName="startYear"
+                          filterEndFieldName="endYear"
                           items={sectors}
                         />
                         <QuickFilterDropdown
@@ -288,7 +322,7 @@ export default function DatasetSearch({
                         <label
                           id="show-advanced-filter"
                           className={
-                            "hidden cursor-pointer items-center sm:inline-flex " +
+                            "hidden cursor-pointer items-center lg:inline-flex " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")
                           }
                         >
@@ -302,9 +336,8 @@ export default function DatasetSearch({
                           />
                           <div
                             className={cn(
-                              showAdvancedFilter
-                                ? "after:-start-[8px]"
-                                : "after:start-[2px]",
+                              showAdvancedFilter ? 'xl:after:-start-2 after:start-[2px]' :
+                              "after:start-[2px]",
                               "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
                             )}
                           ></div>
@@ -313,7 +346,7 @@ export default function DatasetSearch({
                           </span>
                         </label>
 
-                        <div className="w-full sm:hidden">
+                        <div className="w-full lg:hidden">
                           <QuickFilterDropdown
                             searchFilter={searchFilter}
                             onChange={onChange}
@@ -347,7 +380,7 @@ export default function DatasetSearch({
                         </div>
                         <label
                           className={
-                            "inline-flex cursor-pointer items-center sm:hidden " +
+                            "inline-flex cursor-pointer items-center lg:hidden " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")
                           }
                         >
@@ -359,14 +392,19 @@ export default function DatasetSearch({
                             }
                             className="peer sr-only"
                           />
-                          <div className="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"></div>
+                          <div
+                            className={cn(
+                              "after:start-[2px]",
+                              "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+                            )}
+                          ></div>
                           <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Advanced filter
                           </span>
                         </label>
                       </div>
                     </div>
-                    <div className="hidden sm:block">
+                    <div className="hidden lg:block">
                       <QuickFilterDropdown
                         searchFilter={searchFilter}
                         onChange={onChange}
@@ -544,6 +582,7 @@ export const Checkboxes = ({
         index <= (limitToPresentViewAll ?? 999999 * 999999) ? (
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <input
+              id={x.name}
               onChange={() => {
                 const selectedItemsCopy = [...selectedItems];
                 const i = selectedItemsCopy.findIndex((c) => c === x.name);
@@ -555,7 +594,7 @@ export const Checkboxes = ({
               className="remove-input-ring rounded text-[#006064]"
               type="checkbox"
             />
-            <label htmlFor="">{x.display_name}</label>
+            <label htmlFor={x.name}>{x.display_name}</label>
           </div>
         ) : index === 8 ? (
           <span className="mt-[1px] cursor-pointer text-[#006064]">
