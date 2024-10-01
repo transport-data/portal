@@ -206,13 +206,14 @@ dataset_fields:
     label: Not Planned
 
 - field_name: indicator
-  label: Indicator
+  label: Indicators
+  preset: multiple_text
+  validators: ignore_missing scheming_multiple_text
 
 - field_name: units
   label: Units
   preset: multiple_text
   validators: ignore_missing scheming_multiple_text
-
 
 - field_name: dimensioning
   label: Dimensioning
@@ -229,6 +230,28 @@ dataset_fields:
   form_snippet: null
   validators: ignore_missing scheming_multiple_text
   output_validators: scheming_load_json
+
+- field_name: data_provider
+  label: Data Provider
+  hel_text: Organization or individual that provides the data and any related metadata
+  
+- field_name: url
+  label: URL
+  hel_text: Location on the internet with further information about the dataset
+
+- field_name: data_access
+  label: Data Access
+  help_text: Any conditions on data access, e.g. publicly available, proprietary, fee or subscription required, available on request, etc.
+
+- field_name: comments
+  label: Comments
+  repeating_subfields:
+    - field_name: initials
+      label: Initials
+    - field_name: date
+      label: Date
+    - field_name: comment
+      label: Comment
 
 resource_fields:
 
