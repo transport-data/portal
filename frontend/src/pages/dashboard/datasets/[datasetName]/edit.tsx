@@ -34,6 +34,7 @@ import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { getDataset } from "@utils/dataset";
 import { getServerAuthSession } from "@server/auth";
 import { Dataset as TdcDataset } from "@interfaces/ckan/dataset.interface";
+import { DeleteDatasetButton } from "@components/dataset/DeleteDatasetButton";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -212,9 +213,15 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
                   <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                     <div className="mt-6 md:flex md:items-center md:justify-between">
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
-                          Edit Dataset
-                        </h2>
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
+                            Edit Dataset
+                          </h2>
+                          <DeleteDatasetButton
+                            datasetId={dataset.id}
+                            onSuccess={() => router.push("/dashboard/datasets")}
+                          />
+                        </div>
                       </div>
                     </div>
                   </h2>
