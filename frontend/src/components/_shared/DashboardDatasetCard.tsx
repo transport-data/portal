@@ -80,12 +80,9 @@ export default function DashboardDatasetCard(props: Dataset) {
       <div className="w-full space-y-2 text-sm">
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
           <div className="flex items-center gap-2">
-            <Link
-              href={`/@${organization?.name}/${name}`}
-              className="text-lg font-bold"
-            >
-              {title}
-            </Link>
+            <h2 className="text-lg font-bold">
+              <Link href={`/@${organization?.name}/${name}`}>{title}</Link>
+            </h2>
             <Button
               variant="default"
               size="pill"

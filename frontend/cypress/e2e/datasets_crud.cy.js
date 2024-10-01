@@ -52,8 +52,6 @@ describe("Create and edit datasets", () => {
     cy.get('button[name="day"]').contains("2").click();
     cy.contains("Modes").click();
     cy.wait(1000);
-    cy.contains("Select country").click();
-    cy.contains("Africa").click();
     cy.get('input[name="indicator"]').type("indicator");
     cy.get('input[name="dimensioning"]').type("dimensioning");
     cy.wait(1000);
