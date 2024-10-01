@@ -89,6 +89,13 @@ def _fix_geographies_field(data_dict):
         group_list = group_list_action(
             priviliged_context, group_list_data_dict)
 
+        group_list_names = [x.get("name") for x in group_list]
+        for group_name in geography_names + region_names:
+            if group_name not in group_list_names:
+                raise logic.ValidationError(
+                        {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
+
+
         for group in group_list:
             geography_type = group.get("geography_type")
             group_name = group.get("name")
