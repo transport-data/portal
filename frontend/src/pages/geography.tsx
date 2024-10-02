@@ -110,7 +110,7 @@ export default function DatasetsPage({
 
           map.on("click", x.id, (e) => {
             router.push(
-              `/search?region=${(e.features || [])[0]?.properties.ISO_A2}`
+              `/search?country=${(e.features || [])[0]?.properties.ISO_A2}`
             );
           });
 
