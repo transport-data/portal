@@ -22,10 +22,15 @@ export default function SearchDatasetItem({
   metadata_modified,
   regions,
   groups,
+  notes,
+  modes,
 }: Dataset) {
-  console.log(owner_org);
   return (
-    <CommandItem asChild className="group flex gap-[12px] py-2" value={title}>
+    <CommandItem
+      asChild
+      className="group flex gap-[12px] py-2"
+      value={`${title} ${notes}`}
+    >
       <Link href={`/@${organization?.name}/${name}`}>
         <DatasetBadge tdc_category={tdc_category} />
         <div>

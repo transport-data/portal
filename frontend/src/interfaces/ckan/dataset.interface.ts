@@ -14,6 +14,7 @@ export interface Dataset {
     metadata_modified?: string;
     name: string;
     notes?: string;
+    modes?:string[];
     num_resources: number;
     num_tags: number;
     owner_org?: string;

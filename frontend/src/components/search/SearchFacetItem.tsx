@@ -10,6 +10,7 @@ export default function SearchFacetItem({
   context,
   showIcon = true,
   showBadge = true,
+  href,
   onSelect,
 }: {
   badge?: string;
@@ -18,6 +19,7 @@ export default function SearchFacetItem({
   context?: string;
   showIcon?: boolean;
   showBadge?: boolean;
+  href?: string;
   onSelect?: Function;
 }) {
   //const Element = onSelect ?
@@ -41,7 +43,7 @@ export default function SearchFacetItem({
     </CommandItem>
   ) : (
     <CommandItem className="flex items-center gap-2 text-gray-700" asChild>
-      <Link href={"/search"}>
+      <Link href={href ?? "/search"}>
         <ItemContent />
       </Link>
     </CommandItem>
