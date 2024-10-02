@@ -253,6 +253,10 @@ dataset_fields:
       label: Comment
   help_text: Any other information about the metadata values, for instance discrepancies or unclear or missing information.
 
+- field_name: introduction_text
+  label: Introduction and key takeaways
+  preset: markdown
+
 resource_fields:
 
 - field_name: url
