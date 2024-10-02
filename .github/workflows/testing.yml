@@ -57,6 +57,8 @@ jobs:
           while ! docker exec ckan-tdc-db pg_isready -U ckandbuser -d ckandb; do
             sleep 1
           done
+      - name: Run seeding geographies
+        run: docker exec ckan-tdc-dev sh -c "ckan -c ckan.ini create-default-geographies"
       - name: Copy .env
         run: cp .env.example .env
         working-directory: ./frontend

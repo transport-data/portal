@@ -111,3 +111,23 @@ export const deleteUser = async ({
 
   return user.result;
 };
+
+export const inviteUser = async ({
+  emails,
+  message,
+  apiKey,
+}: {
+  emails: string[];
+  message: string;
+  apiKey?: string;
+}) => {
+  const response: CkanResponse<string> = await CkanRequest.post(`invite_user_to_tdc`, {
+    apiKey: apiKey,
+    json: { 
+      emails: emails,
+      message: message
+    },
+  });
+
+  return response;
+};

@@ -32,7 +32,7 @@ describe("Create and edit org members", () => {
     cy.visit(`/dashboard/organizations/${org}/members`);
     cy.contains(adminUser);
     cy.contains("admin");
-    cy.contains("Invite member").click();
+    cy.contains("Add member").click();
     cy.get("button[role=combobox]").eq(0).click();
     cy.contains(`${normalUser} - ${normalUserEmail}`).click();
     cy.get('#userLabel').click();

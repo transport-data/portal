@@ -7,6 +7,7 @@ import {
   MapPinIcon,
 } from "@heroicons/react/20/solid";
 import { cn, formatDatePeriod } from "@lib/utils";
+import Link from "next/link";
 import Markdown from "react-markdown";
 import remarkFrontmatter from "remark-frontmatter";
 
@@ -21,6 +22,7 @@ export default function EventCard({
   location,
   showContent = true,
   showImage = true,
+  link,
 }: {
   title: string;
   className?: string;
@@ -32,6 +34,7 @@ export default function EventCard({
   location?: string;
   showContent?: boolean;
   showImage?: boolean;
+  link?: string;
 }) {
   return (
     <div
@@ -66,13 +69,18 @@ export default function EventCard({
           <span className="text-sm font-medium">{location}</span>
         </div>
       </div>
-      <Button
-        variant="outline"
-        className="border-gray flex w-fit items-center gap-2 hover:bg-gray-100 hover:text-gray-900"
-      >
-        Show details
-        <ArrowRightIcon width={20} />
-      </Button>
+      {link && (
+        <Button
+          variant="outline"
+          className="border-gray flex w-fit items-center gap-2 hover:bg-gray-100 hover:text-gray-900"
+          asChild
+        >
+          <Link href={link} target="_blank">
+            Show details
+            <ArrowRightIcon width={20} />
+          </Link>
+        </Button>
+      )}
     </div>
   );
 }

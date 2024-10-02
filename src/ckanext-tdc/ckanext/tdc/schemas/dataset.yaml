@@ -63,7 +63,6 @@ dataset_fields:
   validators: ignore_missing scheming_multiple_text
   output_validators: scheming_load_json
 
-# Only for indexing purposes
 - field_name: topics
   label: Topics
   form_snippet: null
@@ -205,14 +204,15 @@ dataset_fields:
   - value: not_planned
     label: Not Planned
 
-- field_name: indicator
-  label: Indicator
+- field_name: indicators
+  label: Indicators
+  preset: multiple_text
+  validators: ignore_missing scheming_multiple_text
 
 - field_name: units
   label: Units
   preset: multiple_text
   validators: ignore_missing scheming_multiple_text
-
 
 - field_name: dimensioning
   label: Dimensioning
@@ -229,6 +229,33 @@ dataset_fields:
   form_snippet: null
   validators: ignore_missing scheming_multiple_text
   output_validators: scheming_load_json
+
+- field_name: data_provider
+  label: Data Provider
+  hel_text: Organization or individual that provides the data and any related metadata
+  
+- field_name: url
+  label: URL
+  hel_text: Location on the internet with further information about the dataset
+
+- field_name: data_access
+  label: Data Access
+  help_text: Any conditions on data access, e.g. publicly available, proprietary, fee or subscription required, available on request, etc.
+
+- field_name: comments
+  label: Comments
+  repeating_subfields:
+    - field_name: initials
+      label: Initials
+    - field_name: date
+      label: Date
+    - field_name: comment
+      label: Comment
+  help_text: Any other information about the metadata values, for instance discrepancies or unclear or missing information.
+
+- field_name: introduction_text
+  label: Introduction and key takeaways
+  preset: markdown
 
 resource_fields:
 

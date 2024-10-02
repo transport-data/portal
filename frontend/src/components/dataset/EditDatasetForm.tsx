@@ -7,8 +7,9 @@ import { Button } from "@components/ui/button";
 import { useState } from "react";
 import { api } from "@utils/api";
 import { ErrorAlert } from "@components/_shared/Alerts";
-import type { Dataset } from "@portaljs/ckan";
+
 import notify from "@utils/notify";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export const EditDatasetForm: React.FC<{ initialValues: Dataset }> = ({
   initialValues,
@@ -32,7 +33,10 @@ export const EditDatasetForm: React.FC<{ initialValues: Dataset }> = ({
       setErrorMessage(null);
       await utils.dataset.search.invalidate();
     },
-    onError: (error) => { console.log(error); setErrorMessage(error.message); console.log(error) },
+    onError: (error) => {
+      console.log(error);
+      setErrorMessage(error.message);
+    },
   });
 
   return (
@@ -46,7 +50,11 @@ export const EditDatasetForm: React.FC<{ initialValues: Dataset }> = ({
       >
         <DatasetForm formObj={formObj} />
         <div className="col-span-full">
-          <Button type="submit" variant="secondary" className="mt-8 w-full py-4">
+          <Button
+            type="submit"
+            variant="secondary"
+            className="mt-8 w-full py-4"
+          >
             Edit dataset
           </Button>
         </div>

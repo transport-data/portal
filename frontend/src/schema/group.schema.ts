@@ -28,5 +28,15 @@ export const GroupSchema = z.object({
   type: z.string().default("topic"),
 });
 
+export type GroupTree = {
+  id: string;
+  name: string;
+  title?: string;
+  highlighted: boolean;
+  children: GroupTree[];
+};
+
 export type GroupFormType = z.infer<typeof GroupSchema>;
-export type Group = GroupDefault & { groups: Array<{ id: string; name: string }> };
+export type Group = GroupDefault & {
+  groups: Array<{ id: string; name: string }>;
+};

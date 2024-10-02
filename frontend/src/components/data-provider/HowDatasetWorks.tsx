@@ -16,11 +16,11 @@ export default () => {
         </p>
       </div>
 
-      <div className="mt-16 hidden w-full md:flex md:flex-wrap gap-8 xl:flex-nowrap">
+      <div className="mt-16 hidden w-full gap-8 md:flex md:flex-wrap xl:flex-nowrap">
         {...cards}
       </div>
-      <div className="h-96 md:hidden">
-        <Carousel className="dark" slide={false} >
+      <div className="h-96 md:hidden my-4">
+        <Carousel className="dark" slide={false}>
           {...cards}
         </Carousel>
       </div>
@@ -45,7 +45,7 @@ const LongArrowRightIcon = ({ className }: { className?: string }) => (
 );
 
 const cards = [
-  <div className="md:px-0 px-14 flex flex-col gap-8 md:w-[296px] md:min-w-[296px]">
+  <div className="flex flex-col gap-8 px-14 md:w-[296px] md:min-w-[296px] md:px-0">
     <div className="flex min-h-fit items-center gap-8">
       <div className="flex h-16 w-16 items-center justify-center rounded-md bg-[#E1EFFE]">
         <svg
@@ -63,7 +63,9 @@ const cards = [
           />
         </svg>
       </div>
-      <LongArrowRightIcon />
+      <div className="hidden md:block">
+        <LongArrowRightIcon />
+      </div>
     </div>
     <section className="space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Public Data</h1>
@@ -85,7 +87,7 @@ const cards = [
       </p>
     </section>
   </div>,
-  <div className="md:px-0 px-14 flex flex-col gap-8 md:w-[296px] md:min-w-[296px]">
+  <div className="flex flex-col gap-8 px-14 md:w-[296px] md:min-w-[296px] md:px-0">
     <div className="flex min-h-fit items-center gap-8">
       <Badge
         className="flex h-16 w-16 items-center"
@@ -113,7 +115,9 @@ const cards = [
         }
         variant="purple"
       />
-      <LongArrowRightIcon />
+      <div className="hidden md:block">
+        <LongArrowRightIcon />
+      </div>
     </div>
     <section className="space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Community Data</h1>
@@ -139,14 +143,16 @@ const cards = [
       </p>
     </section>
   </div>,
-  <div className="md:px-0 px-14 flex flex-col gap-8 md:w-[296px] md:min-w-[296px]">
+  <div className="flex flex-col gap-8 px-14 md:w-[296px] md:min-w-[296px] md:px-0">
     <div className="flex min-h-fit items-center gap-8">
       <Badge
         className="flex h-16 w-16 items-center pl-3"
         icon={<CheckCircleIcon width={40} height={40} />}
         variant="success"
       ></Badge>
-      <LongArrowRightIcon />
+      <div className="hidden md:block">
+        <LongArrowRightIcon />
+      </div>
     </div>
     <section className="space-y-4">
       <h1 className="text-xl font-bold text-gray-900">TDC Formatted</h1>
@@ -175,7 +181,7 @@ const cards = [
       </p>
     </section>
   </div>,
-  <div className="md:px-0 px-14 flex flex-col gap-8 md:w-[296px] md:min-w-[296px]">
+  <div className="flex flex-col gap-8 px-14 md:w-[296px] md:min-w-[296px] md:px-0">
     <div className="flex min-h-fit items-center gap-8">
       <Badge
         className="flex h-16 w-16 items-center pl-4"

@@ -9,8 +9,21 @@ from ckan.plugins import toolkit as tk
 import json
 from ckanext.scheming import helpers as scheming_helpers
 import ckan.lib.authenticator as authenticator
+from ckan.common import current_user
+from ckan.authz import users_role_for_group_or_org
+import ckan.lib.mailer as mailer
+from ckan.logic.action.create import _get_random_username_from_email
+from ckan.lib.base import render
+import ckan.logic as logic
+from jinja2 import Environment, FileSystemLoader
+from ckanext.tdc.conversions import converters
 
-import logging
+template_dir = 'src_extensions/ckanext-tdc/ckanext/tdc/templates/emails/'
+env = Environment(loader=FileSystemLoader(template_dir))
+
+NotAuthorized = logic.NotAuthorized
+get_action = logic.get_action
+
 log = logging.getLogger(__name__)
 
 
@@ -50,6 +63,12 @@ def _fix_geographies_field(data_dict):
     geography_names = data_dict.get("geographies", [])
     region_names = data_dict.get("regions", [])
 
+    if isinstance(geography_names, str):
+        geography_names = [geography_names]
+
+    if isinstance(region_names, str):
+        region_names = [region_names]
+
     has_geographies = isinstance(
         geography_names, list) and len(geography_names) > 0
     has_regions = isinstance(region_names, list) and len(region_names) > 0
@@ -70,6 +89,12 @@ def _fix_geographies_field(data_dict):
         }
         group_list = group_list_action(
             priviliged_context, group_list_data_dict)
+
+        group_list_names = [x.get("name") for x in group_list]
+        for group_name in geography_names + region_names:
+            if group_name not in group_list_names:
+                raise logic.ValidationError(
+                        {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
 
         for group in group_list:
             geography_type = group.get("geography_type")
@@ -102,6 +127,8 @@ def _update_contributors(data_dict, is_update=False):
     is updated based on which user did the update
     """
     current_user = tk.current_user
+    if not hasattr(current_user, "id"):
+        return
     current_user_id = current_user.id
 
     if is_update:
@@ -129,29 +156,68 @@ def _update_contributors(data_dict, is_update=False):
     data_dict["contributors"] = [current_user_id]
 
 
-@tk.chained_action
-def package_create(up_func, context, data_dict):
+def _fix_user_group_permission(data_dict):
+    """
+    By default, any user should be able to create datasets
+    with any geography or topic.
+    To do that, add user as member of groups.
+    """
+    groups = data_dict.get("groups", [])
+    if not hasattr(current_user, "id"):
+        return
+    user_id = current_user.id
+
+    if len(groups) > 0 and user_id:
+        priviliged_context = {"ignore_auth": True}
+        group_member_create_action = tk.get_action("group_member_create")
+
+        for group in groups:
+            group_id = group.get("name")
+            capacity = users_role_for_group_or_org(group_id, user_id)
+            if capacity not in ["member", "editor", "admin"]:
+                group_member_create_data_dict = {
+                        "id": group.get("name"),
+                        "username": user_id,
+                        "role": "member"}
+                group_member_create_action(priviliged_context,
+                                           group_member_create_data_dict)
+
+
+def _before_dataset_create_or_update(data_dict, is_update=False):
     _fix_geographies_field(data_dict)
     _fix_topics_field(data_dict)
-    _update_contributors(data_dict)
+    _update_contributors(data_dict, is_update=is_update)
+    _fix_user_group_permission(data_dict)
+
+
+@tk.chained_action
+def package_create(up_func, context, data_dict):
+    _before_dataset_create_or_update(data_dict)
     result = up_func(context, data_dict)
     return result
 
+@tk.chained_action
+def package_delete(up_func, context, data_dict):
+    package = tk.get_action('package_show')(context, {'id': data_dict['id']})
+    package_search = tk.get_action('package_search')
+    search_result = package_search(context, {'fq': f"related_datasets:{package['name']}"})
+    for item in search_result.get('results', []):
+        related_datasets = item.get('related_datasets', [])
+        related_datasets.remove(package['name'])
+        tk.get_action('package_patch')({ "ignore_auth": True }, {'id': item['id'], 'related_datasets': related_datasets})
+    result = up_func(context, data_dict)
+    return result
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
-    _fix_geographies_field(data_dict)
-    _fix_topics_field(data_dict)
-    _update_contributors(data_dict, is_update=True)
+    _before_dataset_create_or_update(data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 
 
 @tk.chained_action
 def package_patch(up_func, context, data_dict):
-    _fix_geographies_field(data_dict)
-    _fix_topics_field(data_dict)
-    _update_contributors(data_dict, is_update=True)
+    _before_dataset_create_or_update(data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 
@@ -215,6 +281,29 @@ def _add_display_name_to_custom_group_facets(search_response):
                             item["display_name"] = group_display_name or group_title or item_name
 
 
+def _add_display_name_to_contributors_facets(search_response):
+    """
+    This function fixes search facets for contributors 
+    to use a proper display_name and display_image
+    """
+
+    if "search_facets" in search_response:
+        search_facets = search_response["search_facets"]
+
+        if "contributors" in search_facets:
+            priviliged_context = {"ignore_auth": True}
+            user_show_action = tk.get_action("user_show")
+            contributors_facet = search_facets["contributors"]
+            for contributor in contributors_facet["items"]:
+                name = contributor["name"]
+                user = user_show_action(priviliged_context, {"id": name})
+                fullname = user.get("fullname")
+                display_name = user.get("display_name")
+                contributor["display_name"] = display_name or fullname or name
+                image_display_url = user.get("image_display_url")
+                contributor["display_image"] = image_display_url
+
+
 def _add_display_name_to_multi_select_facets(search_response):
     dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
     search_facets = search_response.get("search_facets", [])
@@ -247,9 +336,10 @@ def package_search(up_func, context, data_dict):
     result = up_func(context, data_dict)
     _add_display_name_to_custom_group_facets(result)
     _add_display_name_to_multi_select_facets(result)
+    _add_display_name_to_contributors_facets(result)
     return result
 
-  
+
 @tk.chained_action
 @tk.side_effect_free
 def group_list(up_func, context, data_dict):
@@ -266,7 +356,7 @@ def group_list(up_func, context, data_dict):
 
     return result
 
-  
+
 generic_error_message = {
     'errors': {'auth': [_('Unable to authenticate user')]},
     'error_summary': {_('auth'): _('Unable to authenticate user')},
@@ -419,3 +509,152 @@ def generate_token(context, user):
         log.error(e)
 
     return user
+
+
+def render_html_template(template_name, vars):
+    template = env.get_template(template_name)
+    return template.render(vars)
+
+
+def send_email(email_type, to_email, from_user, site_title=None, site_url=None, **kwargs):
+
+    site_title = site_title if site_title else config.get('ckan.site_title')
+    site_url = site_url if site_url else config.get('ckan.site_url')
+
+    if email_type == "organization_participation":
+        subject_template = 'emails/user_participation_subject.txt'
+        subject_vars = {}
+    elif email_type == "user_invite":
+        subject_template = 'emails/invite_user_subject.txt'
+        subject_vars = {
+            'site_title': site_title
+        }
+    elif email_type == "new_organization_request":
+        subject_template = 'emails/new_organization_request_subject.txt'
+        subject_vars = {}
+    else:
+        raise ValueError("Invalid Email Type.")
+
+    body_vars = {
+        'site_title': site_title,
+        'site_url': site_url,
+        'user_name': from_user.name,
+        'user_email': from_user.email,
+        **kwargs
+    }
+
+    subject = render(subject_template, subject_vars)
+    body_html = render_html_template(email_type+"_template.html", body_vars)
+
+    name = _get_random_username_from_email(to_email)
+    mailer._mail_recipient(
+        name, to_email, site_title, site_url, subject, "sample_body", body_html=body_html
+    )
+
+
+def invite_user_to_tdc(context, data_dict):
+    if not context.get('user'):
+        return generic_error_message
+
+    model = context['model']
+
+    from_user = model.User.get(context['user'])
+    if not from_user:
+        return generic_error_message
+
+    to_emails = data_dict.get("emails")
+    message = data_dict.get("message")
+
+    if not (to_emails and message):
+        raise ValueError("Missing Parameters.")
+
+    for email in to_emails:
+        send_email("user_invite", email, from_user, message=message)
+
+    return "Invited User Successfully"
+
+
+def request_organization_owner(context, data_dict):
+
+    if not context.get('user'):
+        return generic_error_message
+
+    model = context['model']
+
+    from_user = model.User.get(context['user'])
+    if not from_user:
+        return generic_error_message
+
+    org_id = data_dict.get("id")
+    message = data_dict.get("message")
+
+    if not org_id:
+        raise ValueError("Missing Parameters.")
+
+    data_dict = {
+        'id': org_id,
+        'include_users': True,
+    }
+    org_dict = get_action('organization_show')({}, data_dict)
+    # find admin users of the org
+    to_emails = []
+    for user in org_dict.get("users"):
+        if user.get("capacity") == "admin":
+            user_show = model.User.get(user.get("id"))
+            to_emails.append(user_show.email)
+
+    for email in to_emails:
+        send_email("organization_participation", email, from_user, message=message, organization=org_dict.get("name"))
+
+    return "Request Sent Successfully"
+
+
+def request_new_organization(context, data_dict):
+
+    if not context.get('user'):
+        return generic_error_message
+
+    model = context['model']
+    session = context['session']
+
+    from_user = model.User.get(context['user'])
+    if not from_user:
+        return generic_error_message
+
+    org_name = data_dict.get("org_name")
+    org_description = data_dict.get("org_description")
+    dataset_description = data_dict.get("dataset_description")
+
+    if not (org_name and org_description and dataset_description):
+        raise ValueError("Missing Parameters.")
+
+    # get sysadmins emails
+    sysadmins = session.query(model.User).filter(model.User.sysadmin==True).all()
+    to_emails = [user.email for user in sysadmins if user.email]
+
+    # send mails
+    for email in to_emails:
+        send_email(
+            "new_organization_request",
+            email,
+            from_user,
+            org_name=org_name,
+            org_description=org_description,
+            dataset_description=dataset_description
+        )
+    return "Request Sent Successfully"
+
+
+@tk.chained_action
+@tk.side_effect_free
+def package_show(up_func, context, data_dict):
+    output_format = data_dict.get("output_format", "json")
+
+    result = up_func(context, data_dict)
+
+    if output_format != "json":
+        converter = converters.get(output_format)
+        if converter:
+            result = converter(result).convert()
+
+    return result

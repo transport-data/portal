@@ -1,7 +1,6 @@
-import { type CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { GroupFormType, type Group } from "@schema/group.schema";
-import { GeoJSONSource } from "maplibre-gl";
+import { type CkanResponse } from "@schema/ckan.schema";
+import { GroupFormType, GroupTree, type Group } from "@schema/group.schema";
 
 export const getGroup = async ({
   apiKey,
@@ -58,7 +57,24 @@ export const listGroups = async ({
       >
     >
   >(action, {
-    apiKey: apiKey ?? '',
+    apiKey: apiKey ?? "",
+  });
+  return groups.result;
+};
+
+export const groupTree = async ({
+  apiKey,
+  type,
+}: {
+  apiKey?: string;
+  type: "topic" | "geography";
+}) => {
+  // TODO: implement pagination and other parameters
+  let action = "group_tree?";
+  action += `&type=${type}`;
+
+  const groups = await CkanRequest.get<CkanResponse<GroupTree[]>>(action, {
+    apiKey: apiKey ?? "",
   });
   return groups.result;
 };
@@ -111,3 +127,23 @@ export const deleteGroups = async ({
   );
   return { groups: groups.map((group) => group.result) };
 };
+
+export const followGroups = async ({
+  apiKey,
+  ids,
+}: {
+  apiKey: string;
+  ids: Array<string>;
+}) => {
+  const groups: CkanResponse<Group>[] = await Promise.all(
+    ids.map(
+      async (id) =>
+        await CkanRequest.post(`follow_group`, {
+          apiKey: apiKey,
+          json: { id },
+        })
+    )
+  );
+  return { groups: groups.map((group) => group.result) };
+};
+
