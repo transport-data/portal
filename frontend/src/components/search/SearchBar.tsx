@@ -2,23 +2,16 @@ import { Button } from "@components/ui/button";
 import { SearchIcon } from "lucide-react";
 import {
   Command,
-  CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@/components/ui/command";
 import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
-
-//import datasets from "@data/datasets.json";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
-import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
-//import { SearchbarFormType, SearchbarSchema } from "@schema/searchbar.schema";
-import { useForm } from "react-hook-form";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 import { Badge } from "@components/ui/badge";
 import { useRouter } from "next/router";
 import { api } from "@utils/api";
@@ -49,8 +42,6 @@ export default function SearchBar() {
     facetsFields: `["regions", "sectors", "modes", "services"]`,
   });
 
-  // Retrieve the stored searches or initialize as an empty array
-
   const facets: any = {
     regions: {
       field: "in",
@@ -74,6 +65,7 @@ export default function SearchBar() {
     },
   };
 
+  /* handle click outside the search container to close command list */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const isInput = event.target instanceof HTMLInputElement;
@@ -91,7 +83,7 @@ export default function SearchBar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  //get stored searches
   useEffect(() => {
     if (typeof window !== "undefined") {
       setStoredSearches(
