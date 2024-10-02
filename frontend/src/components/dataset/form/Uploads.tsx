@@ -24,7 +24,7 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import { UploadResult } from "@uppy/core";
 import { api } from "@utils/api";
 import { P, match } from "ts-pattern";
-import * as R from "remeda";
+import { findIndex } from "remeda";
 import Spinner from "@components/_shared/Spinner";
 import { env } from "@env.mjs";
 
@@ -106,7 +106,7 @@ export function UploadsForm() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              const _index = R.findIndex(
+                              const _index = findIndex(
                                 fields,
                                 (f) => f.id === r.id
                               );
@@ -187,7 +187,7 @@ export function UploadsForm() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const _index = R.findIndex(
+                            const _index = findIndex(
                               fields,
                               (f) => f.id === r.id
                             );
