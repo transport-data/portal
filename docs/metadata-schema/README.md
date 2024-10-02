@@ -86,7 +86,8 @@ Example of a request body to create a dataset:
       "initials": "JD",
       "date": "2024-01-01",
       "comment": "This is an internal comment"
-  }]
+  }],
+  "introduction_text": "# Hello world"
 }
 ```
 
@@ -521,6 +522,22 @@ This field is used to support TDC Formatted datasets. The value should be a list
 ```json
 {
     "related_datasets": ["related-dataset-id"]
+}
+```
+
+#### Introduction text
+
+| API field name | Type | Required | DCAT-AP field | Default value |
+| -- | -- | -- | -- | -- |
+| introduction_text | markdown | No | No | N/A |
+
+This text is shown on the dataset page under the Overview tab when the dataset is TDC Harmonized.
+
+**Example:**
+
+```json
+{
+    "introduction_text": "# Hello world"
 }
 ```
 
