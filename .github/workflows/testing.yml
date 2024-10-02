@@ -80,6 +80,12 @@ jobs:
       - name: Print Error Logs
         if: failure()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
+      - name: Upload artifacts
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./frontend/cypress/screenshots
+          if-no-files-found: ignore
       - name: Tear down containers
         if: failure() || success()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans
