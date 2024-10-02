@@ -28,7 +28,6 @@ export async function getServerSideProps(ctx: any) {
   const groups = await listGroups({
     type: 'topic',
     apiKey: ctx.session?.apiKey || ""
-
   });
   const tags = await ckan.getAllTags();
   const orgs = await listOrganizations({
