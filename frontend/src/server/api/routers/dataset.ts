@@ -12,10 +12,10 @@ import { z } from "zod";
 export const datasetRouter = createTRPCRouter({
   search: protectedProcedure
     .input(SearchDatasetSchema)
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input:options, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const searchResults = await searchDatasets({ apiKey, input });
+      const searchResults = await searchDatasets({ apiKey, options });
       return searchResults
     }),
   get: protectedProcedure

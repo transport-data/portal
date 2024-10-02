@@ -1,51 +1,56 @@
+import DatasetBadge from "@components/dataset/DatasetBadge";
+import { Badge } from "@components/ui/badge";
 import { CommandItem } from "@components/ui/command";
 import {
   BuildingLibraryIcon,
   CheckCircleIcon,
+  CircleStackIcon,
   ClipboardIcon,
   GlobeAltIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
-import { DatabaseIcon } from "lucide-react";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { formatDate } from "@lib/utils";
 import Link from "next/link";
 
 export default function SearchDatasetItem({
-  state,
+  name,
   title,
   organization,
+  owner_org,
+  tdc_category,
   metadata_modified,
-  tags,
-  description,
-  region,
-}: {
-  state: string;
-  title: string;
-  organization: string;
-  metadata_modified?: string;
-  tags: Array<string>;
-  description?: string;
-  region?: string;
-}) {
+  regions,
+  groups,
+}: Dataset) {
+  console.log(owner_org);
   return (
-    <CommandItem asChild className="flex gap-[12px] py-2">
-      <Link href="/@sample-org/sample-dataset">
-        <DatasetBadge state={state} />
+    <CommandItem asChild className="group flex gap-[12px] py-2" value={title}>
+      <Link href={`/@${organization?.name}/${name}`}>
+        <DatasetBadge tdc_category={tdc_category} />
         <div>
-          <h5 className="text-sm font-normal text-gray-700">{title}</h5>
-          <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
+          <h5 className="text-sm font-normal text-gray-700 group-hover:text-white">
+            {title}
+          </h5>
+          <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 group-hover:text-slate-300 sm:flex-row">
             <div className="flex gap-[4px]">
               <BuildingLibraryIcon width={14} />
-              {organization}
+              {organization?.title}
             </div>
             <span className="hidden sm:block">•</span>
             <div className="flex gap-[4px]">
               <ClipboardIcon width={14} />
-              Updated on 23 March, 2023
+              Updated on {formatDate(metadata_modified ?? "")}
             </div>
             <span className="hidden sm:block">•</span>
             <div className="flex gap-[4px]">
               <GlobeAltIcon width={14} />
-              {region}
+              {regions?.map((r, idx) => (
+                <span key={`group-${r}`}>
+                  {groups?.find((g) => g.name === r)?.display_name}
+                  {idx < regions.length - 1 && ","}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -53,28 +58,3 @@ export default function SearchDatasetItem({
     </CommandItem>
   );
 }
-
-const DatasetBadge = ({ state }: { state?: string }) => {
-  const defaults =
-    "flex items-center justify-center w-[32px] h-[32px] rounded-[8px]";
-  return (
-    <>
-      {!state && (
-        <span className={`${defaults} bg-purple-100 text-purple-600`}>
-          <DatabaseIcon width={20} />
-        </span>
-      )}
-      {state === "TDC Formatted" && (
-        <span className={`${defaults} bg-green-100 text-green-600`}>
-          <CheckCircleIcon width={20} />
-        </span>
-      )}
-
-      {state === "TDC Harmonised" && (
-        <span className={`${defaults} bg-yellow-100 text-yellow-600`}>
-          <ShieldCheckIcon width={20} />
-        </span>
-      )}
-    </>
-  );
-};

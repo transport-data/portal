@@ -15,7 +15,8 @@ export default function SearchFacets({
   onSelect?: Function;
 }) {
   const [items, setItems] = useState(facets);
-  const entries: Array<any> = Object.entries(items);
+  const entries: Array<any> = Object.entries(items ?? {});
+
   return (
     <CommandGroup
       heading={
@@ -34,11 +35,10 @@ export default function SearchFacets({
         .map(([facetName, facet]) => (
           <SearchNarrowItem
             key={facetName}
-            badge={`${facetName}:`}
+            badge={`${facet.field}:`}
             text={facet.description}
             onSelect={() => {
               onSelect && onSelect(facetName);
-              //onSelect();
             }}
           />
         ))}

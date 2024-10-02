@@ -1,17 +1,5 @@
 import z from "zod";
 
-export const SearchDatasetSchema = z.object({
-  query: z.string().default("").optional(),
-  limit: z.number().default(1000),
-  offset: z.number().default(0),
-  groups: z.array(z.string()).default([]).optional(),
-  orgs: z.array(z.string()).default([]).optional(),
-  tags: z.array(z.string()).default([]).optional(),
-  sort: z.string().optional(),
-  include_private: z.boolean().optional(),
-  include_drafts : z.boolean().optional()
-});
-
 export const ResourceSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -34,10 +22,12 @@ export const DatasetSchema = z.object({
   notes: z.string().optional().nullable(),
   tags: z.array(z.string()),
   userRepresents: z.boolean().default(false),
-  sources: z.array(z.object({
-    name: z.string(),
-    url: z.string().url().optional(),
-  })),
+  sources: z.array(
+    z.object({
+      name: z.string(),
+      url: z.string().url().optional(),
+    })
+  ),
   language: z.string().optional(),
   referencePeriodStart: z.date(),
   referencePeriodEnd: z.date(),
@@ -46,6 +36,39 @@ export const DatasetSchema = z.object({
   license: z.string().optional(),
   private: z.boolean().default(true),
   resources: z.array(ResourceSchema),
+});
+export const SearchDatasetSchema = z.object({
+  advancedQueries: z
+    .array(
+      z.object({
+        values: z.array(z.string()),
+        key: z.string()
+      })
+    )
+    .optional(),
+  query: z.string().nullable().optional(),
+  mode: z.string().optional(),
+  service: z.string().optional(),
+  sector: z.string().optional(),
+  regions: z.array(z.string()).optional(),
+  countries: z.array(z.string()).optional(),
+  fuel: z.string().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+  groups: z.array(z.string()).optional(),
+  orgs: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  sort: z.string().optional(),
+  facetsFields: z.string().nullable().optional(),
+  includePrivate: z.boolean().optional(),
+  showArchived: z.boolean().optional(),
+  startYear: z.number().optional(),
+  endYear: z.number().optional(),
+  publicationDates: z.array(z.string()).optional(),
+  resFormat: z.array(z.string()).optional(),
+  type: z.array(z.string()).optional(),
+  private: z.boolean().optional(),
+  includeDrafts: z.boolean().optional(),
 });
 
 export type SearchDatasetType = z.infer<typeof SearchDatasetSchema>;

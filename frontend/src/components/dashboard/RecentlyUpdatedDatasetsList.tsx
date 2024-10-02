@@ -21,14 +21,12 @@ export default function RecentlyUpdatedDatasetsList({
     groups: [],
     orgs: [],
     tags: [],
-    include_private: true,
+    includePrivate: true,
   });
 
   const { data } = api.dataset.search.useQuery(
     datasetsQuery.current as unknown as SearchDatasetType
   );
-
-  const datasets = data?.results;
 
   return (
     <div className="my-10">
@@ -51,7 +49,7 @@ export default function RecentlyUpdatedDatasetsList({
           },
         }}
       >
-        {datasets?.map((dataset) => (
+        {data?.datasets?.map((dataset) => (
           <SwiperSlide key={dataset.id}>
             <DatasetCard dataset={dataset} publicUrl={publicUrl} />
           </SwiperSlide>

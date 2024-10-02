@@ -13,70 +13,63 @@ import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
 
-import datasets from "@data/datasets.json";
+//import datasets from "@data/datasets.json";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
 import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { SearchbarFormType, SearchbarSchema } from "@schema/searchbar.schema";
+//import { SearchbarFormType, SearchbarSchema } from "@schema/searchbar.schema";
 import { useForm } from "react-hook-form";
 import { Badge } from "@components/ui/badge";
 import { useRouter } from "next/router";
-
-const facets: any = {
-  in: {
-    field: "region",
-    description: "a region, country or a city",
-    options: [
-      "Africa",
-      "Asia",
-      "Australia and Oceania",
-      "Europe",
-      "North America",
-      "South America",
-      "United States",
-    ],
-  },
-  /*after: {
-    description: "referencing data after a date",
-  },
-  before: {
-    description: "referencing data before a date",
-  },*/
-  sector: {
-    description: "road, rail, aviation, water transportation",
-    options: ["road", "rail", "aviation", "water transportation"],
-  },
-  mode: {
-    description: "car, 2W, 3W, multi-modal etc.",
-    options: ["car", "2W", "3W", "multi-modal"],
-  },
-  service: {
-    description: "passenger or freight",
-    options: ["passenger", "freight"],
-  },
-  fuel: {
-    description: "battery electric, petrol, diesel etc.",
-    options: ["battery electric", "petrol", "diesel"],
-  },
-};
+import { api } from "@utils/api";
 
 export default function SearchBar() {
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
   const commandRef = useRef<HTMLDivElement>(null);
   const [showCommandList, setShowCommandList] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showAllFacets, setShowAllFacets] = useState<boolean>(false);
-  const router = useRouter();
 
-  const form = useForm<SearchbarFormType>();
-  const {
-    handleSubmit,
-    setValue,
-    register,
-    watch,
-    reset,
-    getValues,
-    setFocus,
-  } = form;
+  const [query, setQuery] = useState("");
+  const [facetValue, setFacetValue] = useState<{
+    display_name: string;
+    name: string;
+  }>({
+    display_name: "",
+    name: "",
+  });
+  const [facetName, setFacetName] = useState("");
+
+  const { data } = api.dataset.search.useQuery({
+    limit: query?.length > 1 ? 10 : 0,
+    query: query,
+    ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
+    facetsFields: `["regions", "sectors", "modes", "services"]`,
+  });
+
+  const facets: any = {
+    regions: {
+      field: "in",
+      description: "a region, country or a city",
+      options: data?.facets?.regions?.items,
+    },
+    sectors: {
+      field: "sector",
+      description: "road, rail, aviation, water transportation",
+      options: data?.facets?.sectors?.items,
+    },
+    modes: {
+      field: "mode",
+      description: "car, 2W, 3W, multi-modal etc.",
+      options: data?.facets?.modes?.items,
+    },
+    services: {
+      field: "service",
+      description: "passenger or freight",
+      options: data?.facets?.services?.items,
+    },
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -85,7 +78,7 @@ export default function SearchBar() {
         commandRef.current &&
         !commandRef.current.contains(event.target as Node)
       ) {
-        reset();
+        //reset();
         setShowCommandList(false);
       }
     };
@@ -98,62 +91,65 @@ export default function SearchBar() {
 
   const handleNarrowSelect = (facet: any) => {
     if (facet) {
-      setValue("facetName", facet);
-      setFocus("query");
+      setFacetName(facet);
+      //setFocus("query");
     }
   };
 
   const handleTyping = (value: string) => {
-    setValue("query", value);
+    setQuery(value);
     setIsTyping(value.length > 0);
   };
 
   const handleCancelSearch = () => {
-    reset();
-    setTimeout(() => {
-      setFocus("query");
-    }, 150);
+    setFacetName("");
+    setFacetValue({
+      display_name: "",
+      name: "",
+    });
+    setQuery("");
+    setShowCommandList(false);
+    setTimeout(() => {}, 150);
   };
-
-  const facetValue = watch("facetValue");
-  const facetName = watch("facetName");
-  const query = watch("query");
 
   return (
     <form
-      onSubmit={(event) =>
-        void handleSubmit(async (data) => {
-          const { facetName, facetValue, query } = getValues();
-          const queryParams = new URLSearchParams({
-            [facetName]: facetValue,
-            query,
-          }).toString();
-
-          router.push(`/datasets?${queryParams}`);
-          return false;
-        })(event)
-      }
+      onSubmit={(event) => {
+        event.preventDefault();
+        const queryParams = new URLSearchParams({
+          [facetName]: facetValue?.name,
+          query,
+        }).toString();
+        router.push(`/search?${queryParams}`);
+        return false;
+      }}
       className=""
     >
       <Command className="relative" shouldFilter={true} ref={commandRef}>
         <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] bg-popover text-popover-foreground">
-          {facetValue && (
+          {/* badge with selected filter */}
+          {facetValue?.name && (
             <Badge
               variant="muted"
               className="ml-[16px] min-w-fit border border-gray-200 bg-gray-100 px-[6px] py-[2px]"
             >
-              {facetName}: {facetValue}
+              {facets[facetName]?.field}: {facetValue?.display_name}
             </Badge>
           )}
+          {/* search input*/}
           <CommandInput
+            ref={inputRef}
             className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
-            onFocus={() => setShowCommandList(true)}
+            onFocus={() => {
+              console.log("dsakjas");
+              setShowCommandList(true);
+            }}
             placeholder="Find statistics, forecasts & studies"
             onInput={(e) => handleTyping((e.target as HTMLInputElement).value)}
             value={query}
-            {...register("query")}
           />
-          {(isTyping || facetName || facetValue) && (
+          {/* clear search */}
+          {(isTyping || facetName || facetValue.name) && (
             <span
               className="absolute right-[120px] z-[20] cursor-pointer p-2 text-gray-500"
               role="button"
@@ -162,6 +158,7 @@ export default function SearchBar() {
               <XMarkIcon width={20} />
             </span>
           )}
+          {/* submit search */}
           <Button
             type="submit"
             className="absolute right-[10px] top-[10px] flex gap-[8px]"
@@ -170,70 +167,61 @@ export default function SearchBar() {
             Search
           </Button>
         </div>
+
         <CommandList
           className={`absolute top-0 z-[15] mt-[70px] max-h-[500px] w-full bg-white shadow-[0px_4px_6px_0px_#0000000D] ${
             showCommandList ? "block" : "hidden"
           }`}
         >
-          {facets[facetName]?.options?.length && !facetValue ? (
-            <CommandGroup
-              heading={<CommandListHeader title="Narrow your search" />}
-            >
-              {facets[facetName]?.options?.map((item: string, i: number) => (
-                <SearchFacetItem
-                  key={`${item}-${i}`}
-                  badge={`${facetName}: ${item}`}
-                  text={""}
-                  onSelect={() => {
-                    setValue("facetValue", item);
-                    setFocus("query");
-                  }}
-                />
-              ))}
-            </CommandGroup>
+          {facets[facetName]?.options?.length && !facetValue.name ? (
+            <>
+              <CommandGroup
+                heading={<CommandListHeader title="Narrow your search" />}
+              >
+                {facets[facetName]?.options?.map((item: any, i: number) => (
+                  <SearchFacetItem
+                    key={`${item}-${i}`}
+                    badge={`${facets[facetName].field}: ${item.display_name}`}
+                    text={""}
+                    onSelect={() => {
+                      setFacetValue(item);
+                      //focus
+                    }}
+                  />
+                ))}
+              </CommandGroup>
+            </>
           ) : (
             <>
-              {!isTyping && (
+              {!isTyping && !facetValue?.name && (
                 <>
-                  {!facetValue && (
-                    <SearchNarrow
-                      facets={facets}
-                      headerAction={() => setShowAllFacets(!showAllFacets)}
-                      showAll={showAllFacets}
-                      onSelect={(facet: any) => handleNarrowSelect(facet)}
+                  <SearchNarrow
+                    facets={facets}
+                    headerAction={() => setShowAllFacets(!showAllFacets)}
+                    showAll={showAllFacets}
+                    onSelect={(facet: any) => handleNarrowSelect(facet)}
+                  />
+                  <CommandGroup
+                    heading={<CommandListHeader title="Recent searches" />}
+                  >
+                    <SearchFacetItem
+                      text={"passanger activity"}
+                      icon={
+                        <VariableIcon width={20} className="text-gray-500" />
+                      }
+                      context={"Indicator"}
                     />
-                  )}
-                  {!facetValue && (
-                    <CommandGroup
-                      heading={<CommandListHeader title="Recent searches" />}
-                    >
-                      <SearchFacetItem
-                        text={"passanger activity"}
-                        icon={
-                          <VariableIcon width={20} className="text-gray-500" />
-                        }
-                        context={"Indicator"}
-                      />
-                      <SearchFacetItem
-                        badge={"in: Asia"}
-                        text={"passenger transport activity"}
-                      />
-                      <SearchFacetItem text={"heavy duty vehicles"} />
-                      <SearchFacetItem text={"passenger vehicles"} />
-                    </CommandGroup>
-                  )}
+                    <SearchFacetItem
+                      badge={"in: Asia"}
+                      text={"passenger transport activity"}
+                    />
+                    <SearchFacetItem text={"heavy duty vehicles"} />
+                    <SearchFacetItem text={"passenger vehicles"} />
+                  </CommandGroup>
                 </>
               )}
-              {(isTyping || facetValue) && (
+              {/*(query?.length > 1 || facetValue) && data?.datasets.length && (
                 <>
-                  <CommandGroup
-                    heading={<CommandListHeader title="Datasets" />}
-                  >
-                    {datasets.slice(0, 2).map((dataset, index) => (
-                      <SearchDatasetItem {...dataset} key={index} />
-                    ))}
-                  </CommandGroup>
-
                   <CommandGroup
                     heading={<CommandListHeader title="Indicators" />}
                   >
@@ -264,9 +252,28 @@ export default function SearchBar() {
                     </CommandGroup>
                   )}
                 </>
-              )}
+              )*/}
             </>
           )}
+
+          {isTyping &&
+            (data?.datasets && data.datasets.length > 0 ? (
+              <CommandGroup
+                heading={<CommandListHeader title="Datasets" />}
+                className="block"
+              >
+                {data?.datasets?.map((dataset, index) => (
+                  <SearchDatasetItem {...dataset} />
+                ))}
+              </CommandGroup>
+            ) : (
+              <CommandGroup
+                heading={<CommandListHeader title="Datasets" />}
+                className="block"
+              >
+                <span className="px-4">No datasets found.</span>
+              </CommandGroup>
+            ))}
         </CommandList>
       </Command>
     </form>

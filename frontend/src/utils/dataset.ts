@@ -1,56 +1,208 @@
-import { CKAN } from "@portaljs/ckan";
-import { CkanResponse } from "@schema/ckan.schema";
-import { env } from "@env.mjs";
-import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
+import { env } from "@env.mjs";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { CkanResponse } from "@schema/ckan.schema";
+import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 
-export const searchDatasets = async ({
+export async function searchDatasets<T = Dataset>({
   apiKey,
-  input,
+  options,
 }: {
   apiKey: string;
-  input: SearchDatasetType;
-}) => {
+  options: SearchDatasetType;
+}): Promise<{
+  datasets: Array<T>;
+  count: number;
+  facets: Record<string, any>;
+}> {
+  let endpoint = "package_search";
+  let fqAr = [];
+  let queryParams = [];
 
-  const ckanUrl =env.NEXT_PUBLIC_CKAN_URL;
-    const baseAction = `package_search`
+  const buildOrFq = (key: string, values: string[]) =>
+    `${key}:(${values.join(" OR ")})`;
 
-    let queryParams: string[] = [];
+  if (options.advancedQueries?.length) {
+    options.advancedQueries.forEach((element) => {
+      fqAr.push(buildOrFq(element.key, element.values));
+    });
+  }
 
-    const buildOrFq = (key: string, values: string[]) =>
-      `${key}:(${values.join(" OR ")})`;
+  if (options.groups?.length) {
+    fqAr.push(buildOrFq("groups", options.groups));
+  }
 
-    if (input?.query) {
-        queryParams.push(`q=${input.query}`)
-    }
+  if (options.orgs?.length) {
+    fqAr.push(buildOrFq("organization", options.orgs));
+  }
 
-    if (input.orgs?.length) {
-      queryParams.push(`fq=${buildOrFq("organization", input.orgs)}`);
-    }
+  if (options.tags?.length) {
+    fqAr.push(buildOrFq("tags", options.tags));
+  }
 
-    if (input?.offset) {
-        queryParams.push(`start=${input.offset}`)
-    }
+  if (options.resFormat?.length) {
+    fqAr.push(buildOrFq("res_format", options.resFormat));
+  }
 
-    if (input?.limit || input?.limit == 0) {
-        queryParams.push(`rows=${input.limit}`)
-    }
+  if (options.type?.length) {
+    fqAr.push(buildOrFq("type", options.type));
+  }
 
-    if (input?.sort) {
-        queryParams.push(`sort=${input?.sort}`)
-    }
+  if (options.regions?.length) {
+    fqAr.push(buildOrFq("regions", options.regions));
+  }
 
-    if (input?.include_drafts) {
-        queryParams.push(`include_drafts=${input?.include_drafts}`)
-    }
+  if (options.countries?.length) {
+    fqAr.push(buildOrFq("geographies", options.countries));
+  }
 
-    const action = `${baseAction}?${queryParams.join("&")}`
-    const datasets:CkanResponse<{results:Dataset[], count:number}> = await CkanRequest.get(action, { ckanUrl, apiKey})
+  if (options.fuel) {
+    fqAr.push(buildOrFq("fuel", [options.fuel]));
+  }
 
-    return datasets.result;
+  if (options.sector) {
+    fqAr.push(buildOrFq("sectors", [options.sector]));
+  }
 
-};
+  if (options.mode) {
+    fqAr.push(buildOrFq("modes", [options.mode]));
+  }
+
+  if (options.service) {
+    fqAr.push(buildOrFq("services", [options.service]));
+  }
+
+  if (options.publicationDates?.length) {
+    fqAr.push(
+      buildOrFq(
+        "metadata_created",
+        options.publicationDates.map((x) => {
+          if (x.toLowerCase().includes("last")) {
+            const date = new Date();
+
+            const lastDayOfLastMonth = new Date(
+              date.getFullYear(),
+              date.getMonth(),
+              0
+            );
+
+            const firstDayOfLastMonth = new Date(
+              date.getFullYear(),
+              date.getMonth() - 1,
+              1
+            );
+
+            return `[${firstDayOfLastMonth.toISOString()} TO ${lastDayOfLastMonth.toISOString()}]`;
+          }
+
+          const startOfTheYear = new Date(Number(x), 0, 1);
+          const endOfTheYear = new Date(Number(x), 11, 31);
+
+          return `[${startOfTheYear.toISOString()} TO ${endOfTheYear.toISOString()}]`;
+        })
+      )
+    );
+  }
+
+  if (options.startYear && options.endYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_start", [
+        `[${new Date(
+          Number(options.startYear),
+          0,
+          1
+        ).toISOString()} TO ${new Date(
+          Number(options.endYear),
+          11,
+          31
+        ).toISOString()}]`,
+      ])
+    );
+
+    fqAr.push(
+      buildOrFq("temporal_coverage_end", [
+        `[${new Date(
+          Number(options.startYear),
+          0,
+          1
+        ).toISOString()} TO ${new Date(
+          Number(options.endYear),
+          11,
+          31
+        ).toISOString()}]`,
+      ])
+    );
+  } else if (options.endYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_start", [
+        `[* TO ${new Date(Number(options.endYear - 1), 11, 31).toISOString()}]`,
+      ])
+    );
+
+    fqAr.push(
+      buildOrFq("temporal_coverage_end", [
+        `[* TO ${new Date(Number(options.endYear - 1), 11, 31).toISOString()}]`,
+      ])
+    );
+  } else if (options.startYear) {
+    fqAr.push(
+      buildOrFq("temporal_coverage_start", [
+        `[${new Date(Number(options.startYear + 1), 0, 1).toISOString()} TO *]`,
+      ])
+    );
+
+    fqAr.push(
+      buildOrFq("temporal_coverage_end", [
+        `[${new Date(Number(options.startYear + 1), 0, 1).toISOString()} TO *]`,
+      ])
+    );
+  }
+
+  if (fqAr?.length) {
+    queryParams.push(`fq=${fqAr.join("+")}`);
+  }
+
+  if (options.offset != undefined) {
+    queryParams.push(`start=${options.offset}`);
+  }
+
+  if (options.limit != undefined) {
+    queryParams.push(`rows=${options.limit}`);
+  }
+
+  if (options.query && options.query != "") {
+    queryParams.push(`q=${options.query}`);
+  }
+
+  if (options.sort) {
+    queryParams.push(`sort=${options.sort}`);
+  }
+
+  if (options.private || options.includePrivate) {
+    queryParams.push(`include_private=${true}`);
+  }
+
+  if (queryParams?.length) {
+    endpoint += `?${queryParams.join("&")}`;
+  }
+
+  if (options.facetsFields) {
+    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000&facet.mincount=0`;
+  }
+
+  endpoint += `&include_archived=${!!options.showArchived}`;
+  endpoint += `&include_drafts=${!!options.includeDrafts}`;
+
+  const response = await CkanRequest.get<any>(endpoint, {
+    headers: { Authorization: apiKey },
+  });
+
+  return {
+    datasets: response.result.results,
+    count: response.result.count,
+    facets: response.result.search_facets,
+  };
+}
 
 export const getDataset = async ({
   id,

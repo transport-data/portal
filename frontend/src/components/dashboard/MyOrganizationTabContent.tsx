@@ -46,14 +46,12 @@ export default () => {
   const options: SearchDatasetType = {
     offset: offset,
     limit: datasetsPerPage,
-    include_private: true,
-    include_drafts: true,
+    includePrivate: true,
+    includeDrafts: true,
     orgs: orgsForUser?.map((o) => o?.name) || [],
   };
 
   const { data, isLoading } = api.dataset.search.useQuery(options);
-
-  const datasets = data?.results;
 
   const totalDatasets = data?.count ?? 0;
 
@@ -108,7 +106,7 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {datasets
+              {data?.datasets
                 ?.filter((item) =>
                   visibility === "Drafts"
                     ? item.state === "draft"
