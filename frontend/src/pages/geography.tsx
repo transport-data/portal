@@ -10,6 +10,7 @@ import { useEffect } from "react";
 
 import Layout from "../components/_shared/Layout";
 import Link from "next/link";
+import React from "react";
 
 export async function getServerSideProps(ctx) {
   return {
