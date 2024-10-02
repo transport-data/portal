@@ -49,6 +49,13 @@ export const DatasetSchema = z.object({
       url: z.string().url().optional().or(emptyStringToUndefined),
     })
   ),
+  comments: z.array(
+    z.object({
+      initials: z.string(),
+      comment: z.string(),
+      date: z.date().default(() => new Date()),
+    })
+  ),
   language: z.string().optional(),
   frequency: z.string().optional(),
   tdc_category: z.string(),
@@ -60,9 +67,12 @@ export const DatasetSchema = z.object({
   geographies: z.array(z.string()).default([]),
   license_id: z.string().optional(),
   private: z.boolean().default(true),
-  indicator: z.string(),
+  indicators: z.array(z.string()).default([]),
   dimensioning: z.string(),
   units: z.array(z.string()).default([]),
+  url: z.string().url().optional().or(emptyStringToUndefined),
+  data_provider: z.string().optional().or(emptyStringToUndefined),
+  data_access: z.string().optional().or(emptyStringToUndefined),
   related_datasets: z.array(z.object({
     name: z.string(),
     title: z.string()

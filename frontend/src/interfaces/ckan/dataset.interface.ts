@@ -45,6 +45,7 @@ export interface Dataset {
   tags?: Array<Tag>;
   total_downloads?: number;
   tdc_category: string;
+  indicators?: string[]
   frequency: string;
   geographies?: string[];
   regions?: string[];

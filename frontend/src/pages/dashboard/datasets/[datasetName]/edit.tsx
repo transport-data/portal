@@ -111,6 +111,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       topics: dataset.topics ?? [],
       sectors: dataset.sectors ?? [],
       services: dataset.services ?? [],
+      indicators: dataset.indicators ?? [],
       tags: dataset.tags ?? [],
       temporal_coverage_start: dataset.temporal_coverage_start
         ? convertStringToDate(dataset.temporal_coverage_start)
@@ -176,6 +177,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       })
       .otherwise(() => false);
 
+  console.log('FORM ERRORS', form.formState.errors)
   return (
     <>
       <NextSeo title="Edit dataset" />

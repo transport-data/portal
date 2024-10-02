@@ -22,7 +22,7 @@ describe("Create and edit datasets", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("Should dataset", () => {
+  it("Should create edit then delete datasets", () => {
     cy.visit("/dashboard/datasets/create");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);

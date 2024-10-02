@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -44,69 +45,10 @@ import Spinner from "@components/_shared/Spinner";
 import { DefaultTooltip } from "@components/ui/tooltip";
 import { getChoicesFromField } from "@utils/dataset";
 import { RelatedDatasetsField } from "./RelatedDatasetsField";
+import { IndicatorsField } from "./IndicatorField";
 import { UnitsField } from "./UnitsField";
-
-function SourcesForm() {
-  const { control, register } = useFormContext<DatasetFormType>();
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control, // control props comes from useForm (optional: if you are using FormProvider)
-      name: "sources", // unique name for your Field Array
-    }
-  );
-  return (
-    <div className="py-4">
-      <div className="flex items-center pb-4 text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-        Sources
-      </div>
-      {fields.map((field, index) => (
-        <>
-          <div
-            className="grid grid-cols-1 gap-4 pb-2 lg:grid-cols-2"
-            key={field.id}
-          >
-            <FormField
-              control={control}
-              name={`sources.${index}.title`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Source title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name={`sources.${index}.url`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Link (Optional)" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </>
-      ))}
-      <Button
-        onClick={() =>
-          append({
-            title: "",
-            url: "",
-          })
-        }
-        type="button"
-        variant="secondary"
-      >
-        Add a source
-      </Button>
-    </div>
-  );
-}
+import { SourcesForm } from "./SourcesForm";
+import { CommentsForm } from "./CommentsForm";
 
 export function MetadataForm() {
   const { control, setValue, getValues, watch } =
@@ -121,6 +63,7 @@ export function MetadataForm() {
         Add metadata
       </div>
       <SourcesForm />
+      <CommentsForm />
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
         Update Frequency
       </div>
@@ -325,9 +268,7 @@ export function MetadataForm() {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
+                    disabled={(date) => date < new Date("1900-01-01")}
                     initialFocus
                   />
                 </PopoverContent>
@@ -365,9 +306,7 @@ export function MetadataForm() {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
+                    disabled={(date) => date < new Date("1900-01-01")}
                     initialFocus
                   />
                 </PopoverContent>
@@ -884,18 +823,7 @@ export function MetadataForm() {
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Indicator
         </div>
-        <FormField
-          control={control}
-          name="indicator"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="indicator..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <IndicatorsField />
       </div>
       <div className="flex flex-col gap-y-2 py-2">
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
@@ -910,6 +838,70 @@ export function MetadataForm() {
                 <Input placeholder="Dimensioning..." {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="flex flex-col gap-y-2 py-2">
+        <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Data Provider
+        </div>
+        <FormField
+          control={control}
+          name="data_provider"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Data Provider..." {...field} />
+              </FormControl>
+              <FormMessage />
+              <FormDescription>
+                Organization or individual that provides the data and any
+                related metadata
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="flex flex-col gap-y-2 py-2">
+        <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          Data Access
+        </div>
+        <FormField
+          control={control}
+          name="data_access"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Data Provider..." {...field} />
+              </FormControl>
+              <FormMessage />
+              <FormDescription>
+                Any conditions on data access, e.g. publicly available,
+                proprietary, fee or subscription required, available on request,
+                etc.
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="flex flex-col gap-y-2 py-2">
+        <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+          URL
+        </div>
+        <FormField
+          control={control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="URL..." {...field} />
+              </FormControl>
+              <FormMessage />
+              <FormDescription>
+                Location on the internet with further information about the
+                dataset
+              </FormDescription>
             </FormItem>
           )}
         />
