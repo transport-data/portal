@@ -32,6 +32,7 @@ class TdcPlugin(plugins.SingletonPlugin):
                 "package_update": action.package_update,
                 "package_patch": action.package_patch,
                 "package_search": action.package_search,
+                "package_show": action.package_show,
                 "group_list": action.group_list,
                 "user_login": action.user_login,
                 "invite_user_to_tdc": action.invite_user_to_tdc,
