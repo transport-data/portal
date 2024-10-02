@@ -83,7 +83,7 @@ describe("List and Search Datasets", () => {
 
   it("Should filter the dataset using the advanced filter and the quick filters", () => {
     cy.visit(`/search`);
-    cy.get("label[id=show-advanced-filter]").scrollIntoView().click();
+    cy.get("label[id=show-advanced-filter-large-w]").scrollIntoView().click();
     cy.get("button").contains("Keyword").scrollIntoView().click();
     cy.get(`input[id=${tags[0]}]`).click();
 
