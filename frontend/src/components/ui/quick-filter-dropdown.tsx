@@ -49,9 +49,10 @@ export default function QuickFilterDropdown({
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
+          id={`quick-filter-dropdown-button-${filterFieldName}`}
           size="sm"
           variant="input"
-          className="flex items-center lg:w-fit gap-1 rounded-[8px] shadow-none ring-[#E5E7EB]"
+          className="flex items-center gap-1 rounded-[8px] shadow-none ring-[#E5E7EB] lg:w-fit"
         >
           <span className="text-sm font-normal text-gray-500">{text}: </span>
           <span className="text-sm font-medium text-gray-900">
@@ -106,9 +107,9 @@ export default function QuickFilterDropdown({
                   key={`${item.display_name}-${i}`}
                 >
                   <RadioGroupItem
+                    id={`quick-filter-dropdown-${filterFieldName}-item-${item.name}`}
                     className="border-gray-300 text-accent data-[state=checked]:border-accent"
                     value={item.name}
-                    id={`${item.display_name}-${i}`}
                   />
                   <Label
                     htmlFor={`${item.display_name}-${i}`}

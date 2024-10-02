@@ -289,7 +289,6 @@ export default function DatasetSearch({
                           text="Years covered"
                           filterStartFieldName="startYear"
                           filterEndFieldName="endYear"
-                          items={sectors}
                         />
                         <QuickFilterDropdown
                           searchFilter={searchFilter}
@@ -320,7 +319,7 @@ export default function DatasetSearch({
                         />
 
                         <label
-                          id="show-advanced-filter"
+                          id="show-advanced-filter-large-w"
                           className={
                             "hidden cursor-pointer items-center lg:inline-flex " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")
@@ -379,6 +378,7 @@ export default function DatasetSearch({
                           />
                         </div>
                         <label
+                          id="show-advanced-filter"
                           className={
                             "inline-flex cursor-pointer items-center lg:hidden " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")

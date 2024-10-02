@@ -8,7 +8,6 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "./button";
 
-import { Facet } from "@components/_shared/DatasetsFilter";
 import { cn } from "@lib/utils";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -22,21 +21,16 @@ export default function DateQuickFilterDropdown({
   text,
   filterStartFieldName,
   filterEndFieldName,
-  isCheckbox,
   searchFilter,
   defaultStartValue,
   defaultEndValue,
-  hideAllOption,
   onChange,
 }: {
   text: string;
-  hideAllOption?: boolean;
-  isCheckbox?: boolean;
   searchFilter: SearchDatasetType;
   onChange: SearchPageOnChange;
   filterStartFieldName: keyof SearchDatasetType;
   filterEndFieldName: keyof SearchDatasetType;
-  items: Facet[];
   defaultStartValue?: number;
   defaultEndValue?: number;
 }) {
@@ -57,6 +51,7 @@ export default function DateQuickFilterDropdown({
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
+          id={`quick-filter-by-${filterStartFieldName}-${filterEndFieldName}`}
           size="sm"
           variant="input"
           className="flex lg:w-fit items-center gap-1 rounded-[8px] shadow-none ring-[#E5E7EB]"

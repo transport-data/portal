@@ -11,6 +11,7 @@ import {
 import { Tooltip } from "flowbite-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import React from "react";
 
 export default function DatasetSearchItem({
   tags,
@@ -40,6 +41,7 @@ export default function DatasetSearchItem({
 
   return (
     <div
+      id={`dataset-search-item-${title}`}
       className="flex w-full cursor-pointer gap-5"
       onClick={() => router.push(`/${organization.title}/${id}`)}
     >
