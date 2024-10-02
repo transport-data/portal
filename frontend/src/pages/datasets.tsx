@@ -13,8 +13,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { listGroups } from "@utils/group";
 import { listOrganizations } from "@utils/organization";
+import React from "react";
 
-export async function getStaticProps() {
+export async function getServerSideProps(ctx: any) {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
   const ckan = new CKAN(backend_url);
   const search_result = await ckan.packageSearch({
@@ -26,7 +27,8 @@ export async function getStaticProps() {
   });
   const groups = await listGroups({
     type: 'topic',
-    showCoordinates: false,
+    apiKey: ctx.session?.apiKey || ""
+
   });
   const tags = await ckan.getAllTags();
   const orgs = await listOrganizations({
@@ -55,7 +57,7 @@ export default function DatasetsPage({
   groups,
   tags,
   orgs,
-}: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const router = useRouter();
   const { q } = router.query;
   const [options, setOptions] = useState<PackageSearchOptions>({

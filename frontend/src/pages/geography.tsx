@@ -1,6 +1,5 @@
 import { Badge } from "@components/ui/badge";
 import { listGroups } from "@utils/group";
-import * as getCountryISO2 from "country-iso-3-to-2";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { InferGetServerSidePropsType } from "next";
@@ -11,8 +10,9 @@ import { useEffect } from "react";
 import Layout from "../components/_shared/Layout";
 import Link from "next/link";
 import React from "react";
+import { Group } from "@schema/group.schema";
 
-export async function getServerSideProps(ctx) {
+export async function getServerSideProps(ctx: any) {
   return {
     props: {
       groups: (
@@ -22,23 +22,12 @@ export async function getServerSideProps(ctx) {
           showCoordinates: true,
           limit: 350,
         })
-      ).filter((x) => x.geography_type === "country"),
+      ).filter((x) => x.geography_type === "country") as Array<
+        Group & { iso2: string; geography_shape: any }
+      >,
     },
   };
 }
-
-const formatCalculatorNumber = (number: number) => {
-  if (isNaN(number)) {
-    return "0";
-  }
-
-  const formattedNumber = Number(number).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 10,
-  });
-
-  return formattedNumber;
-};
 
 export default function DatasetsPage({
   groups,
@@ -151,9 +140,7 @@ export default function DatasetsPage({
                 x.title
               }
               </div>
-              <div style="color: #9CA3AF">${getCountryISO2(
-                x.name.toUpperCase()
-              )}</div>
+              <div style="color: #9CA3AF">${(x.iso2 || "").toUpperCase()}</div>
 
 
                 </div>
@@ -903,7 +890,7 @@ const hexToRgb = (hex: string) => {
   return arrByte[1] + "," + arrByte[2] + "," + arrByte[3];
 };
 
-const interpolateColor = (color1, color2, factor: number = 0.5) => {
+const interpolateColor = (color1: any, color2: any, factor: number = 0.5) => {
   let result = color1.slice();
   for (let i = 0; i < 3; i++) {
     result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
@@ -911,7 +898,7 @@ const interpolateColor = (color1, color2, factor: number = 0.5) => {
   return result;
 };
 
-const interpolateColors = (color1, color2, steps: number) => {
+const interpolateColors = (color1: any, color2: any, steps: number) => {
   let stepFactor = 1 / (steps - 1),
     interpolatedColorArray = [];
 
@@ -927,4 +914,18 @@ const interpolateColors = (color1, color2, steps: number) => {
   }
 
   return interpolatedColorArray;
+};
+
+
+const formatCalculatorNumber = (number: number) => {
+  if (isNaN(number)) {
+    return "0";
+  }
+
+  const formattedNumber = Number(number).toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 10,
+  });
+
+  return formattedNumber;
 };
