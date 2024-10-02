@@ -1,5 +1,6 @@
 import { Badge } from "@components/ui/badge";
 import { listGroups } from "@utils/group";
+import * as getCountryISO3To2 from "country-iso-3-to-2";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { InferGetServerSidePropsType } from "next";
@@ -7,10 +8,10 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import Layout from "../components/_shared/Layout";
-import Link from "next/link";
-import React from "react";
 import { Group } from "@schema/group.schema";
+import Link from "next/link";
+import Layout from "../components/_shared/Layout";
+import React from "react";
 
 export async function getServerSideProps(ctx: any) {
   return {
@@ -23,7 +24,7 @@ export async function getServerSideProps(ctx: any) {
           limit: 350,
         })
       ).filter((x) => x.geography_type === "country") as Array<
-        Group & { iso2: string; geography_shape: any }
+        Group & { geography_shape: any }
       >,
     },
   };
@@ -44,7 +45,10 @@ export default function DatasetsPage({
     }
   });
 
+  const countriesFlagsByName = new Map<string, boolean>();
+
   const router = useRouter();
+  console.log(countriesFlagsByName);
 
   useEffect(() => {
     const map = new maplibregl.Map({
@@ -92,8 +96,26 @@ export default function DatasetsPage({
         return colors[index];
       };
 
-      groups.forEach((x) => {
+      groups.forEach(async (x) => {
         if (x.geography_shape) {
+          const countryAsISO2 = getCountryISO3To2(
+            x.name.toUpperCase()
+          ).toLowerCase();
+          countriesFlagsByName.set(
+            x.name,
+            await (await fetch(`https://flagcdn.com/h60/${countryAsISO2}.png`))
+              .blob()
+              .then(
+                (blob) =>
+                  new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as any);
+                    reader.onerror = () =>
+                      reject(new Error("Error reading the blob"));
+                    reader.readAsDataURL(blob);
+                  })
+              )
+          );
           map.addSource(x.id, {
             type: "geojson",
             data: x.geography_shape,
@@ -133,14 +155,16 @@ export default function DatasetsPage({
                 `        
               <div>
               <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" src="${
-                x.image_display_url || x.image_url
+                x.image_display_url ||
+                x.image_url ||
+                countriesFlagsByName.get(x.name)
               }"></img>
                 
               <div class="country-title" style="color: white'; font-size: 14px">${
                 x.title
               }
               </div>
-              <div style="color: #9CA3AF">${(x.iso2 || "").toUpperCase()}</div>
+              <div style="color: #9CA3AF">${countryAsISO2.toUpperCase()}</div>
 
 
                 </div>
@@ -915,7 +939,6 @@ const interpolateColors = (color1: any, color2: any, steps: number) => {
 
   return interpolatedColorArray;
 };
-
 
 const formatCalculatorNumber = (number: number) => {
   if (isNaN(number)) {
