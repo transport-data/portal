@@ -27,6 +27,19 @@ export async function getServerSideProps(ctx) {
   };
 }
 
+const formatCalculatorNumber = (number: number) => {
+  if (isNaN(number)) {
+    return "0";
+  }
+
+  const formattedNumber = Number(number).toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 10,
+  });
+
+  return formattedNumber;
+};
+
 export default function DatasetsPage({
   groups,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
@@ -145,9 +158,9 @@ export default function DatasetsPage({
 
                 </div>
                 
-                <div style="color: white; font-size: 30px">${
+                <div style="color: white; font-size: 30px">${formatCalculatorNumber(
                   x.package_count
-                }+</div>
+                )}</div>
                 <div style="color: #9CA3AF; font-size: 16px">Datasets</div>
               `
               )
