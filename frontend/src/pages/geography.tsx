@@ -207,7 +207,7 @@ export default function DatasetsPage({
 
       // map.on("click", "countries-layer", (e) => {
       //   router.push(
-      //     `/search?region=${(e.features || [])[0]?.properties.ISO_A2}`
+      //     `/search?country=${(e.features || [])[0]?.properties.ISO_A2}`
       //   );
       // });
 
@@ -329,7 +329,7 @@ const LetterCard = ({
     <div className="flex flex-col gap-3">
       {countries.map((word) => (
         <Link
-          href={`/search?region=${word.name}`}
+          href={`/search?country=${word.name}`}
           className="cursor-pointer break-words text-[#6B7280] hover:underline"
         >
           {word.title}
