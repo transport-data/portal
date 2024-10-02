@@ -83,10 +83,16 @@ describe("List and Search Datasets", () => {
 
   it("Should filter the dataset using the advanced filter and the quick filters", () => {
     cy.visit(`/search`);
-    cy.get("#show-advanced-filter").scrollIntoView().click({ force: true });
-    cy.get("#show-advanced-filter-large-w")
-      .scrollIntoView()
-      .click({ force: true });
+    cy.get("#show-advanced-filter").then((x) => {
+      if (x.length) {
+        return cy.wrap(x).scrollIntoView().click({ force: true });
+      } else
+        return cy
+          .get("#show-advanced-filter-large-w")
+          .scrollIntoView()
+          .click({ force: true });
+    });
+
     cy.get("button").contains("Keyword").scrollIntoView().click();
     cy.get(`input[id=${tags[0]}]`).click();
 
@@ -117,8 +123,8 @@ describe("List and Search Datasets", () => {
     cy.get("body").click();
     cy.get("button[id=quick-filter-dropdown-button-modes]")
       .scrollIntoView()
-      .click()
-    cy.get("#show-all-checkboxes").click()
+      .click();
+    cy.get("#show-all-checkboxes").click();
     cy.get(`#${modes[0]}`).scrollIntoView().click();
 
     validateDataset();
