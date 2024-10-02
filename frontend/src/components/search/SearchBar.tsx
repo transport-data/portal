@@ -30,7 +30,6 @@ export default function SearchBar() {
   const [showCommandList, setShowCommandList] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showAllFacets, setShowAllFacets] = useState<boolean>(false);
-
   const [query, setQuery] = useState("");
   const [facetValue, setFacetValue] = useState<{
     display_name: string;
@@ -41,12 +40,16 @@ export default function SearchBar() {
   });
   const [facetName, setFacetName] = useState("");
 
+  const [storedSearches, setStoredSearches] = useState<Array<any>>();
+
   const { data } = api.dataset.search.useQuery({
     limit: query?.length > 1 ? 10 : 0,
     query: query,
     ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
     facetsFields: `["regions", "sectors", "modes", "services"]`,
   });
+
+  // Retrieve the stored searches or initialize as an empty array
 
   const facets: any = {
     regions: {
@@ -89,16 +92,27 @@ export default function SearchBar() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setStoredSearches(
+        JSON.parse(localStorage?.getItem("tdcRecentSearches") ?? "[]")
+      );
+    }
+  }, []);
+
   const handleNarrowSelect = (facet: any) => {
     if (facet) {
       setFacetName(facet);
-      //setFocus("query");
     }
   };
 
   const handleTyping = (value: string) => {
     setQuery(value);
     setIsTyping(value.length > 0);
+
+    if (value.length === 0) {
+      handleCancelSearch();
+    }
   };
 
   const handleCancelSearch = () => {
@@ -108,19 +122,38 @@ export default function SearchBar() {
       name: "",
     });
     setQuery("");
-    setShowCommandList(false);
-    setTimeout(() => {}, 150);
+    setIsTyping(false);
+  };
+
+  const storeRecentSearch = (search: any) => {
+    const _storedSearches: Array<any> = [...(storedSearches ?? [])];
+    // Add the new search to the beginning of the array
+    _storedSearches.unshift(search);
+    // Ensure only the last 5 searches are stored
+    if (_storedSearches.length > 5) {
+      _storedSearches.pop(); // Remove the oldest search
+    }
+    // Store the updated array back to localStorage
+    localStorage.setItem("tdcRecentSearches", JSON.stringify(_storedSearches));
   };
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        const queryParams = new URLSearchParams({
-          [facetName]: facetValue?.name,
+        const queryObject = {
+          ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
           query,
-        }).toString();
-        router.push(`/search?${queryParams}`);
+        };
+        const queryParams = new URLSearchParams(queryObject);
+
+        storeRecentSearch({
+          facetName,
+          facetValue: facetValue.name,
+          query,
+        });
+
+        router.push(`/search?${queryParams.toString()}`);
         return false;
       }}
       className=""
@@ -201,23 +234,38 @@ export default function SearchBar() {
                     showAll={showAllFacets}
                     onSelect={(facet: any) => handleNarrowSelect(facet)}
                   />
-                  <CommandGroup
-                    heading={<CommandListHeader title="Recent searches" />}
-                  >
-                    <SearchFacetItem
-                      text={"passanger activity"}
-                      icon={
-                        <VariableIcon width={20} className="text-gray-500" />
-                      }
-                      context={"Indicator"}
-                    />
-                    <SearchFacetItem
-                      badge={"in: Asia"}
-                      text={"passenger transport activity"}
-                    />
-                    <SearchFacetItem text={"heavy duty vehicles"} />
-                    <SearchFacetItem text={"passenger vehicles"} />
-                  </CommandGroup>
+
+                  {storedSearches && storedSearches.length > 0 && (
+                    <CommandGroup
+                      heading={<CommandListHeader title="Recent searches" />}
+                    >
+                      {storedSearches.map((recent) => {
+                        const badge = recent.facetValue
+                          ? `${facets[recent.facetName]?.field}: ${
+                              facets[recent.facetName]?.options?.find(
+                                (o: any) => o.name === recent.facetValue
+                              )?.display_name
+                            }`
+                          : "";
+                        return (
+                          <SearchFacetItem badge={badge} text={recent.query} />
+                        );
+                      })}
+                      {/* <SearchFacetItem
+                        text={"passanger activity"}
+                        icon={
+                          <VariableIcon width={20} className="text-gray-500" />
+                        }
+                        context={"Indicator"}
+                      />
+                      <SearchFacetItem
+                        badge={"in: Asia"}
+                        text={"passenger transport activity"}
+                      />
+                      <SearchFacetItem text={"heavy duty vehicles"} />
+                      <SearchFacetItem text={"passenger vehicles"} />*/}
+                    </CommandGroup>
+                  )}
                 </>
               )}
               {/*(query?.length > 1 || facetValue) && data?.datasets.length && (
@@ -256,24 +304,16 @@ export default function SearchBar() {
             </>
           )}
 
-          {isTyping &&
-            (data?.datasets && data.datasets.length > 0 ? (
-              <CommandGroup
-                heading={<CommandListHeader title="Datasets" />}
-                className="block"
-              >
-                {data?.datasets?.map((dataset, index) => (
-                  <SearchDatasetItem {...dataset} />
-                ))}
-              </CommandGroup>
-            ) : (
-              <CommandGroup
-                heading={<CommandListHeader title="Datasets" />}
-                className="block"
-              >
-                <span className="px-4">No datasets found.</span>
-              </CommandGroup>
-            ))}
+          {isTyping && data?.datasets && data.datasets.length > 0 && (
+            <CommandGroup
+              heading={<CommandListHeader title="Datasets" />}
+              className="block"
+            >
+              {data?.datasets?.map((dataset, index) => (
+                <SearchDatasetItem {...dataset} />
+              ))}
+            </CommandGroup>
+          )}
         </CommandList>
       </Command>
     </form>
