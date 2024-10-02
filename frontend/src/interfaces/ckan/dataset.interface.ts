@@ -32,6 +32,11 @@ export interface Dataset {
   version?: string;
   activity_stream?: Array<Activity>;
   resources: Array<Resource>;
+  comments: Array<{
+    initials : string;
+    comment : string;
+    date : string;
+  }>
   related_datasets?: Array<string>;
   temporal_coverage_start?: string;
   temporal_coverage_end?: string;

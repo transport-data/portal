@@ -76,6 +76,9 @@ type Dataset = Omit<TdcDataset, "related_datasets"> & {
 };
 
 function convertStringToDate(date: string) {
+  if (date.length > 10) {
+    return new Date(date);
+  }
   const [year, month, day] = date.split("-").map(Number);
   const dateObject = new Date(year as number, (month as number) - 1, day);
   return dateObject;
@@ -113,6 +116,12 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       services: dataset.services ?? [],
       indicators: dataset.indicators ?? [],
       tags: dataset.tags ?? [],
+      comments: dataset.comments
+        ? dataset.comments.map((c) => ({
+            ...c,
+            date: convertStringToDate(c.date),
+          }))
+        : [],
       temporal_coverage_start: dataset.temporal_coverage_start
         ? convertStringToDate(dataset.temporal_coverage_start)
         : undefined,
@@ -177,7 +186,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       })
       .otherwise(() => false);
 
-  console.log('FORM ERRORS', form.formState.errors)
+  console.log("FORM ERRORS", form.formState.errors);
   return (
     <>
       <NextSeo title="Edit dataset" />
