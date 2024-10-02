@@ -48,12 +48,14 @@ export const listGroups = async ({
     action += `&limit=${limit}`;
   }
 
-  console.log(action)
-
   const groups = await CkanRequest.get<
     CkanResponse<
       Array<
-        Group & { geography_type?: string; geography_shape?: GeoJSON.GeoJSON }
+        Group & {
+          geography_type?: string;
+          geography_shape?: GeoJSON.GeoJSON;
+          iso2?: string;
+        }
       >
     >
   >(action, {
@@ -146,4 +148,3 @@ export const followGroups = async ({
   );
   return { groups: groups.map((group) => group.result) };
 };
-
