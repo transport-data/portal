@@ -80,10 +80,10 @@ jobs:
       - name: Print Error Logs
         if: failure()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
-      - name: Upload artifacts
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: cypress-screenshots
+          name: Frontend screenshots
           path: ./frontend/cypress/screenshots
           if-no-files-found: ignore
       - name: Tear down containers
