@@ -1,14 +1,19 @@
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import { useSession } from "next-auth/react";
+
 import Loading from "@components/_shared/Loading";
+import { Dashboard } from "@components/_shared/Dashboard";
 import { api } from "@utils/api";
 import { useMachine } from "@xstate/react";
 import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
 import {
+  ArrowLeftCircleIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/20/solid";
+import Spinner from "@components/_shared/Spinner";
 import { NextSeo } from "next-seo";
-import { formatIcon, slugify } from "@lib/utils";
+import { formatIcon } from "@lib/utils";
 import { Steps } from "@components/dataset/form/Steps";
 import { MetadataForm } from "@components/dataset/form/Metadata";
 import { useForm } from "react-hook-form";
@@ -22,41 +27,72 @@ import { toast } from "@components/ui/use-toast";
 import { match } from "ts-pattern";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ErrorAlert } from "@components/_shared/Alerts";
+import Layout from "@components/_shared/Layout";
+import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
+import { getDataset } from "@utils/dataset";
+import { getServerAuthSession } from "@server/auth";
+import { Dataset as TdcDataset } from "@interfaces/ckan/dataset.interface";
+import { DeleteDatasetButton } from "@components/dataset/DeleteDatasetButton";
 
-const docs = [
-  {
-    title: "Data Submission Guidelines",
-    format: "PDF",
-    url: "https://example.com",
-  },
-  {
-    title: "Data Submission Guidelines",
-    format: "PDF",
-    url: "https://example.com",
-  },
-  {
-    title: "Data Submission Guidelines",
-    format: "PDF",
-    url: "https://example.com",
-  },
-  {
-    title: "Step by Step Guide to Data Submission",
-    format: "MP4",
-    url: "https://example.com",
-  },
-];
+export async function getServerSideProps(
+  context: GetServerSidePropsContext<{ datasetName: string }>
+) {
+  const session = await getServerAuthSession(context);
+  const _dataset = await getDataset({
+    id: context?.params?.datasetName ?? "",
+    apiKey: session?.user.apikey ?? "",
+  });
+  if (!_dataset) {
+    return {
+      notFound: true,
+    };
+  }
+  const dataset = _dataset.result;
+  if (!dataset.related_datasets || dataset.related_datasets.length === 0)
+    return { props: { dataset } };
+  //we need to do this to have the title for the related_datasets in the combobox
+  const relatedDatasets = await Promise.all(
+    dataset.related_datasets.map((id) =>
+      getDataset({
+        id,
+        apiKey: session?.user.apikey ?? "",
+      })
+    )
+  );
+  return {
+    props: {
+      dataset: {
+        ...dataset,
+        related_datasets: relatedDatasets.map((d) => d.result),
+      },
+    },
+  };
+}
 
-const CreateDatasetDashboard: NextPage = () => {
+type Dataset = Omit<TdcDataset, "related_datasets"> & {
+  related_datasets: TdcDataset[];
+};
+
+function convertStringToDate(date: string) {
+  if (date.length > 10) {
+    return new Date(date);
+  }
+  const [year, month, day] = date.split("-").map(Number);
+  const dateObject = new Date(year as number, (month as number) - 1, day);
+  return dateObject;
+}
+
+const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
   const { data: sessionData } = useSession();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
-  const createDataset = api.dataset.create.useMutation({
+  const editDataset = api.dataset.patch.useMutation({
     onSuccess: async (data) => {
       setErrorMessage(null);
       toast({
-        description: `Successfully created the ${
+        description: `Successfully edited the ${
           data.title ?? data.name
         } dataset`,
       });
@@ -71,27 +107,37 @@ const CreateDatasetDashboard: NextPage = () => {
     resolver: zodResolver(DatasetSchema),
     mode: "onBlur",
     defaultValues: {
-      id: uuidv4(),
-      private: true,
-      title: "",
-      notes: "",
-      geographies: [],
-      topics: [],
-      sectors: [],
-      services: [],
-      modes: [],
-      tags: [],
-      units: [],
-      indicators: [],
-      related_datasets: [],
+      ...dataset,
+      units: dataset.units ?? [],
+      modes: dataset.modes ?? [],
+      geographies: dataset.geographies ?? [],
+      topics: dataset.topics ?? [],
+      sectors: dataset.sectors ?? [],
+      services: dataset.services ?? [],
+      indicators: dataset.indicators ?? [],
+      tags: dataset.tags ?? [],
+      comments: dataset.comments
+        ? dataset.comments.map((c) => ({
+            ...c,
+            date: convertStringToDate(c.date),
+          }))
+        : [],
+      temporal_coverage_start: dataset.temporal_coverage_start
+        ? convertStringToDate(dataset.temporal_coverage_start)
+        : undefined,
+      temporal_coverage_end: dataset.temporal_coverage_end
+        ? convertStringToDate(dataset.temporal_coverage_end)
+        : undefined,
+      related_datasets:
+        dataset.related_datasets?.map((d) => ({
+          name: d.name,
+          title: d.title ?? d.name,
+        })) ?? [],
     },
   });
-  useEffect(() => {
-    if (!form.formState.dirtyFields["name"]) form.setValue("name", slugify(form.watch("title")));
-  }, [form.watch("title")]);
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
-    return createDataset.mutate(data);
+    return editDataset.mutate(data);
   }
   const currentStep = match(current.value)
     .with("general", () => 0)
@@ -140,17 +186,68 @@ const CreateDatasetDashboard: NextPage = () => {
       })
       .otherwise(() => false);
 
+  console.log("FORM ERRORS", form.formState.errors);
   return (
     <>
-      <NextSeo title="Create dataset" />
-      <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
-        <div className="flex flex-col justify-center gap-y-4 px-4 py-8 lg:px-20">
+      <NextSeo title="Edit dataset" />
+      <Layout>
+        <div className="container w-full">
+          <div className="pt-8">
+            <div>
+              <nav aria-label="Back" className="sm:hidden">
+                <button
+                  onClick={() => window.history.back()}
+                  className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
+                >
+                  <ChevronLeftIcon
+                    aria-hidden="true"
+                    className="-ml-1 mr-1 h-3.5 w-3.5 flex-shrink-0 text-gray-400"
+                  />
+                  Back
+                </button>
+              </nav>
+              <nav aria-label="Breadcrumb" className="hidden sm:flex">
+                <DefaultBreadCrumb
+                  links={[
+                    { label: "Home", href: "/" },
+                    { label: "Dashboard", href: "/dashboard" },
+                    { label: "Datasets", href: "/dashboard/datasets" },
+                    {
+                      label: "Edit Dataset",
+                      href: `/dashboard/datasets/${dataset.name}/edit`,
+                    },
+                  ]}
+                />
+              </nav>
+              <div className="mt-4 pb-16 md:flex md:items-center md:justify-between">
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
+                    <div className="mt-6 md:flex md:items-center md:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
+                            Edit Dataset
+                          </h2>
+                          <DeleteDatasetButton
+                            datasetId={dataset.id}
+                            onSuccess={() => router.push("/dashboard/datasets")}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container pb-16">
           <Steps currentStep={currentStep} />
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               {current.matches("general") && (
                 <>
-                  <GeneralForm />
+                  <GeneralForm editing />
                   <Button
                     type="button"
                     className="w-full"
@@ -207,7 +304,7 @@ const CreateDatasetDashboard: NextPage = () => {
                       Prev
                     </Button>
                     <LoaderButton
-                      loading={createDataset.isLoading}
+                      loading={editDataset.isLoading}
                       className="w-full"
                       type="submit"
                     >
@@ -219,7 +316,7 @@ const CreateDatasetDashboard: NextPage = () => {
               {errorMessage && (
                 <div className="mt-4">
                   <ErrorAlert
-                    title="Error creating dataset"
+                    title="Error editing dataset"
                     text={errorMessage}
                   />
                 </div>
@@ -227,53 +324,9 @@ const CreateDatasetDashboard: NextPage = () => {
             </form>
           </Form>
         </div>
-        <div className="order-first flex flex-col items-center bg-gray-50 px-4 py-8 lg:order-last lg:px-20">
-          <div className="flex h-full flex-col items-center justify-center gap-3">
-            <h1 className="self-stretch text-4xl font-extrabold leading-9 text-black">
-              Before you add data.
-            </h1>
-            <p className="self-stretch text-base font-normal leading-normal text-gray-500">
-              Please make sure you familiarised yourself with our data
-              submission guidelines to ensure that your data meets our quality
-              standards and is properly formatted. This will help ensure that
-              your data is accurately represented and can be effectively used by
-              TDC users.
-            </p>
-            <ul
-              role="list"
-              className="w-full divide-y divide-gray-100 rounded-md border border-gray-200"
-            >
-              {docs.map((d, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
-                >
-                  <div className="flex flex-1 items-center">
-                    <img
-                      src={formatIcon(d.format.toLowerCase() ?? "")}
-                      aria-hidden="true"
-                      className="h-8 w-8 flex-shrink-0 text-gray-400"
-                    />
-                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                      <span className="truncate font-medium">{d.title}</span>
-                    </div>
-                  </div>
-                  <div className="ml-4 flex-shrink-0">
-                    <a
-                      href={d.url}
-                      className="font-medium text-gray-500 hover:text-accent"
-                    >
-                      <ChevronRightIcon className="h-5 w-5" />
-                    </a>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
+      </Layout>
     </>
   );
 };
 
-export default CreateDatasetDashboard;
+export default EditDatasetDashboard;

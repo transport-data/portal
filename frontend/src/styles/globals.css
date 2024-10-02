@@ -405,3 +405,7 @@ snap-tabs {
 div.w-fit[data-testid="flowbite-tooltip-target"] {
   height: fit-content;
 }
+
+.overview-field .ProseMirror {
+  height: 300px;
+}

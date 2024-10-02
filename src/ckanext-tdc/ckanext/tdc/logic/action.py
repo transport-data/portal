@@ -16,6 +16,7 @@ from ckan.logic.action.create import _get_random_username_from_email
 from ckan.lib.base import render
 import ckan.logic as logic
 from jinja2 import Environment, FileSystemLoader
+from ckanext.tdc.conversions import converters
 
 template_dir = 'src_extensions/ckanext-tdc/ckanext/tdc/templates/emails/'
 env = Environment(loader=FileSystemLoader(template_dir))
@@ -89,6 +90,12 @@ def _fix_geographies_field(data_dict):
         group_list = group_list_action(
             priviliged_context, group_list_data_dict)
 
+        group_list_names = [x.get("name") for x in group_list]
+        for group_name in geography_names + region_names:
+            if group_name not in group_list_names:
+                raise logic.ValidationError(
+                        {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
+
         for group in group_list:
             geography_type = group.get("geography_type")
             group_name = group.get("name")
@@ -120,6 +127,8 @@ def _update_contributors(data_dict, is_update=False):
     is updated based on which user did the update
     """
     current_user = tk.current_user
+    if not hasattr(current_user, "id"):
+        return
     current_user_id = current_user.id
 
     if is_update:
@@ -154,6 +163,8 @@ def _fix_user_group_permission(data_dict):
     To do that, add user as member of groups.
     """
     groups = data_dict.get("groups", [])
+    if not hasattr(current_user, "id"):
+        return
     user_id = current_user.id
 
     if len(groups) > 0 and user_id:
@@ -185,6 +196,17 @@ def package_create(up_func, context, data_dict):
     result = up_func(context, data_dict)
     return result
 
+@tk.chained_action
+def package_delete(up_func, context, data_dict):
+    package = tk.get_action('package_show')(context, {'id': data_dict['id']})
+    package_search = tk.get_action('package_search')
+    search_result = package_search(context, {'fq': f"related_datasets:{package['name']}"})
+    for item in search_result.get('results', []):
+        related_datasets = item.get('related_datasets', [])
+        related_datasets.remove(package['name'])
+        tk.get_action('package_patch')({ "ignore_auth": True }, {'id': item['id'], 'related_datasets': related_datasets})
+    result = up_func(context, data_dict)
+    return result
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
@@ -293,7 +315,7 @@ def package_search(up_func, context, data_dict):
     _add_display_name_to_multi_select_facets(result)
     return result
 
-  
+
 @tk.chained_action
 @tk.side_effect_free
 def group_list(up_func, context, data_dict):
@@ -310,7 +332,7 @@ def group_list(up_func, context, data_dict):
 
     return result
 
-  
+
 generic_error_message = {
     'errors': {'auth': [_('Unable to authenticate user')]},
     'error_summary': {_('auth'): _('Unable to authenticate user')},
@@ -464,9 +486,11 @@ def generate_token(context, user):
 
     return user
 
+
 def render_html_template(template_name, vars):
     template = env.get_template(template_name)
     return template.render(vars)
+
 
 def send_email(email_type, to_email, from_user, site_title=None, site_url=None, **kwargs):
 
@@ -486,7 +510,7 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
         subject_vars = {}
     else:
         raise ValueError("Invalid Email Type.")
-    
+
     body_vars = {
         'site_title': site_title,
         'site_url': site_url,
@@ -503,6 +527,7 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
         name, to_email, site_title, site_url, subject, "sample_body", body_html=body_html
     )
 
+
 def invite_user_to_tdc(context, data_dict):
     if not context.get('user'):
         return generic_error_message
@@ -512,17 +537,18 @@ def invite_user_to_tdc(context, data_dict):
     from_user = model.User.get(context['user'])
     if not from_user:
         return generic_error_message
-    
+
     to_emails = data_dict.get("emails")
     message = data_dict.get("message")
 
     if not (to_emails and message):
         raise ValueError("Missing Parameters.")
-    
+
     for email in to_emails:
         send_email("user_invite", email, from_user, message=message)
-    
+
     return "Invited User Successfully"
+
 
 def request_organization_owner(context, data_dict):
 
@@ -534,55 +560,55 @@ def request_organization_owner(context, data_dict):
     from_user = model.User.get(context['user'])
     if not from_user:
         return generic_error_message
-    
+
     org_id = data_dict.get("id")
     message = data_dict.get("message")
 
     if not org_id:
         raise ValueError("Missing Parameters.")
-    
+
     data_dict = {
         'id': org_id,
         'include_users': True,
     }
     org_dict = get_action('organization_show')({}, data_dict)
-    ## find admin users of the org
+    # find admin users of the org
     to_emails = []
     for user in org_dict.get("users"):
         if user.get("capacity") == "admin":
             user_show = model.User.get(user.get("id"))
             to_emails.append(user_show.email)
-    
+
     for email in to_emails:
         send_email("organization_participation", email, from_user, message=message, organization=org_dict.get("name"))
-    
+
     return "Request Sent Successfully"
 
+
 def request_new_organization(context, data_dict):
-    
+
     if not context.get('user'):
         return generic_error_message
 
     model = context['model']
     session = context['session']
 
-
     from_user = model.User.get(context['user'])
     if not from_user:
         return generic_error_message
-    
+
     org_name = data_dict.get("org_name")
     org_description = data_dict.get("org_description")
     dataset_description = data_dict.get("dataset_description")
 
     if not (org_name and org_description and dataset_description):
         raise ValueError("Missing Parameters.")
-    
-    ## get sysadmins emails
+
+    # get sysadmins emails
     sysadmins = session.query(model.User).filter(model.User.sysadmin==True).all()
     to_emails = [user.email for user in sysadmins if user.email]
 
-    ## send mails
+    # send mails
     for email in to_emails:
         send_email(
             "new_organization_request",
@@ -592,8 +618,19 @@ def request_new_organization(context, data_dict):
             org_description=org_description,
             dataset_description=dataset_description
         )
-    
     return "Request Sent Successfully"
-   
 
 
+@tk.chained_action
+@tk.side_effect_free
+def package_show(up_func, context, data_dict):
+    output_format = data_dict.get("output_format", "json")
+
+    result = up_func(context, data_dict)
+
+    if output_format != "json":
+        converter = converters.get(output_format)
+        if converter:
+            result = converter(result).convert()
+
+    return result

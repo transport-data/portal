@@ -199,6 +199,13 @@ Cypress.Commands.add("createDataset", (dataset = false, private_vis = true) => {
   });
 });
 
+Cypress.Commands.add("getDatasetData", (name) => {
+  cy.request({
+    url: apiUrl("package_show") + `?id=${name}`,
+    headers: headers,
+  });
+});
+
 Cypress.Commands.add("createLinkedDataset", () => {
   cy.visit({ url: "/dataset" }).then((resp) => {
     const datasetName = getRandomDatasetName();
@@ -363,13 +370,14 @@ Cypress.Commands.add("purgeOrganization", (orgName) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationAPI", (name) => {
+Cypress.Commands.add("createOrganizationAPI", (name, title) => {
   cy.request({
     method: "POST",
     url: apiUrl("organization_create"),
     headers: headers,
     body: {
       name: name,
+      title: title ?? name,
       description: "Some organization description",
     },
   });
@@ -429,6 +437,39 @@ Cypress.Commands.add(
       body: body,
     });
   }
+);
+
+Cypress.Commands.add(
+  "createTopicAPI",
+  (name, relationshipType, relationships) => {
+    const body = {
+      name: name,
+      title: name,
+      description: "Some group description",
+      additional_description: "Some additional group description",
+      group_relationship_type: "",
+      parent: "",
+      children: "",
+      type: 'topic'
+    };
+
+    if (relationshipType) {
+      body.group_relationship_type = relationshipType;
+    }
+    if (relationships) {
+      if (relationshipType === "parent") {
+        body.children = relationships.join(",");
+      } else if (relationshipType === "child") {
+        body.parent = relationships;
+      }
+    }
+    cy.request({
+      method: "POST",
+      url: apiUrl("group_create"),
+      headers: headers,
+      body: body,
+    });
+  },
 );
 
 Cypress.Commands.add("deleteGroupAPI", (name) => {
