@@ -281,6 +281,29 @@ def _add_display_name_to_custom_group_facets(search_response):
                             item["display_name"] = group_display_name or group_title or item_name
 
 
+def _add_display_name_to_contributors_facets(search_response):
+    """
+    This function fixes search facets for contributors 
+    to use a proper display_name and display_image
+    """
+
+    if "search_facets" in search_response:
+        search_facets = search_response["search_facets"]
+
+        if "contributors" in search_facets:
+            priviliged_context = {"ignore_auth": True}
+            user_show_action = tk.get_action("user_show")
+            contributors_facet = search_facets["contributors"]
+            for contributor in contributors_facet["items"]:
+                name = contributor["name"]
+                user = user_show_action(priviliged_context, {"id": name})
+                fullname = user.get("fullname")
+                display_name = user.get("display_name")
+                contributor["display_name"] = display_name or fullname or name
+                image_display_url = user.get("image_display_url")
+                contributor["display_image"] = image_display_url
+
+
 def _add_display_name_to_multi_select_facets(search_response):
     dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
     search_facets = search_response.get("search_facets", [])
@@ -313,6 +336,7 @@ def package_search(up_func, context, data_dict):
     result = up_func(context, data_dict)
     _add_display_name_to_custom_group_facets(result)
     _add_display_name_to_multi_select_facets(result)
+    _add_display_name_to_contributors_facets(result)
     return result
 
 
