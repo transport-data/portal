@@ -10,6 +10,7 @@ const datasetTitle = `${uuid()}${datasetSuffix}`;
 const datasetName = `${uuid()}${datasetSuffix}`;
 const notes = `${uuid()}${datasetSuffix}`;
 const tags = ["tag1", "tag2", "tag3"];
+const geographies = ["cpv"];
 const regions = ["afr"];
 const random = Math.random() * 100;
 const tdc_category =

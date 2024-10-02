@@ -82,6 +82,7 @@ const CreateDatasetDashboard: NextPage = () => {
       modes: [],
       tags: [],
       units: [],
+      indicators: [],
       related_datasets: [],
     },
   });

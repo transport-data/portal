@@ -104,6 +104,11 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                 <Input disabled={editing} className="disabled:bg-gray-200" placeholder="Dataset slug" {...field} />
               </FormControl>
               <FormMessage />
+              <FormDescription>
+                {editing
+                  ? "Slug cannot be changed once dataset is created."
+                  : "Slug will be used in the URL of the dataset page. ex: datasets/{slug}"}
+              </FormDescription>
             </FormItem>
           )}
         />
