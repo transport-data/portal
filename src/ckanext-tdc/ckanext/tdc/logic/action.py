@@ -127,6 +127,8 @@ def _update_contributors(data_dict, is_update=False):
     is updated based on which user did the update
     """
     current_user = tk.current_user
+    if not hasattr(current_user, "id"):
+        return
     current_user_id = current_user.id
 
     if is_update:
@@ -161,6 +163,8 @@ def _fix_user_group_permission(data_dict):
     To do that, add user as member of groups.
     """
     groups = data_dict.get("groups", [])
+    if not hasattr(current_user, "id"):
+        return
     user_id = current_user.id
 
     if len(groups) > 0 and user_id:
@@ -192,6 +196,17 @@ def package_create(up_func, context, data_dict):
     result = up_func(context, data_dict)
     return result
 
+@tk.chained_action
+def package_delete(up_func, context, data_dict):
+    package = tk.get_action('package_show')(context, {'id': data_dict['id']})
+    package_search = tk.get_action('package_search')
+    search_result = package_search(context, {'fq': f"related_datasets:{package['name']}"})
+    for item in search_result.get('results', []):
+        related_datasets = item.get('related_datasets', [])
+        related_datasets.remove(package['name'])
+        tk.get_action('package_patch')({ "ignore_auth": True }, {'id': item['id'], 'related_datasets': related_datasets})
+    result = up_func(context, data_dict)
+    return result
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
