@@ -70,11 +70,11 @@ export default function DatasetSearch({
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
     limit: 9,
-    endYear: after ? Number(after) : undefined,
+    endYear: before ? Number(after) : undefined,
     startYear: after ? Number(after) : undefined,
-    mode: mode as string | undefined,
-    service: service as string | undefined,
-    sector: sector as string | undefined,
+    modes: mode ? [mode as string] : undefined,
+    services: service ? [service as string] : undefined,
+    sectors: sector ? [sector as string] : undefined,
     fuel: fuel as string | undefined,
     regions: region ? [region as string] : undefined,
     countries: country ? [country as string] : undefined,
@@ -228,9 +228,9 @@ export default function DatasetSearch({
               hideDatasetSuggestion
               query={searchFilter.query || ""}
               facetName={
-                (searchFilter.sector
+                (searchFilter.sectors
                   ? "sector"
-                  : searchFilter.mode
+                  : searchFilter.modes
                   ? "mode"
                   : searchFilter.regions?.at(0)
                   ? "region"
@@ -240,15 +240,15 @@ export default function DatasetSearch({
                   ? "fuel"
                   : searchFilter.endYear
                   ? "before"
-                  : searchFilter.service
+                  : searchFilter.services
                   ? "service"
                   : undefined) as keyof SearchDatasetType
               }
               facetValue={
-                searchFilter.sector
-                  ? searchFilter.sector
-                  : searchFilter.mode
-                  ? searchFilter.mode
+                searchFilter.sectors
+                  ? searchFilter.sectors.at(0)
+                  : searchFilter.modes
+                  ? searchFilter.modes.at(0)
                   : searchFilter.regions?.at(0)
                   ? searchFilter.regions.at(0)
                   : searchFilter.startYear
@@ -257,8 +257,8 @@ export default function DatasetSearch({
                   ? searchFilter.fuel
                   : searchFilter.endYear
                   ? searchFilter.endYear.toString()
-                  : searchFilter.service
-                  ? searchFilter.service
+                  : searchFilter.services
+                  ? searchFilter.services.at(0)
                   : undefined
               }
             />
@@ -269,16 +269,17 @@ export default function DatasetSearch({
                 <div>
                   <div className="flex flex-col flex-wrap items-center justify-between gap-2 md:flex-row">
                     <div className="flex flex-col items-center gap-4 md:flex-row">
-                      <div className="text-base font-medium text-gray-900 break-keep	text-nowrap">
+                      <div className="text-nowrap break-keep text-base font-medium	text-gray-900">
                         Quick filters:
                       </div>
                       <div className="flex flex-wrap items-center gap-2 sm:flex-row xl:flex-nowrap">
                         <QuickFilterDropdown
                           searchFilter={searchFilter}
                           onChange={onChange}
-                          defaultValue={searchFilter.sector}
+                          isCheckbox
+                          defaultValue={searchFilter.sectors}
                           text="Sector"
-                          filterFieldName="sector"
+                          filterFieldName="sectors"
                           items={sectors}
                         />
                         <DateQuickFilterDropdown
@@ -294,16 +295,18 @@ export default function DatasetSearch({
                           searchFilter={searchFilter}
                           onChange={onChange}
                           text="Mode"
-                          filterFieldName="mode"
-                          defaultValue={searchFilter.mode}
+                          isCheckbox
+                          filterFieldName="modes"
+                          defaultValue={searchFilter.modes}
                           items={modes}
                         />
                         <QuickFilterDropdown
                           searchFilter={searchFilter}
                           onChange={onChange}
                           text="Service"
-                          filterFieldName="service"
-                          defaultValue={searchFilter.service}
+                          isCheckbox
+                          filterFieldName="services"
+                          defaultValue={searchFilter.services}
                           items={services}
                         />
                         <QuickFilterDropdown
@@ -335,8 +338,9 @@ export default function DatasetSearch({
                           />
                           <div
                             className={cn(
-                              showAdvancedFilter ? 'xl:after:-start-2 after:start-[2px]' :
-                              "after:start-[2px]",
+                              showAdvancedFilter
+                                ? "after:start-[2px] xl:after:-start-2"
+                                : "after:start-[2px]",
                               "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
                             )}
                           ></div>
@@ -548,6 +552,8 @@ export default function DatasetSearch({
                     datasetCount={datasetCount || 0}
                     onChange={onChange}
                     searchFilter={searchFilter}
+                    defaultStartValue={searchFilter.startYear}
+                    defaultEndValue={searchFilter.endYear}
                     tags={tags}
                     orgs={orgs}
                     resourcesFormats={resourcesFormats}

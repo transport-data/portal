@@ -15,7 +15,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DateQuickFilterDropdown({
   text,
@@ -34,8 +34,16 @@ export default function DateQuickFilterDropdown({
   defaultStartValue?: number;
   defaultEndValue?: number;
 }) {
-  const [startYear, setStartYear] = useState<number | undefined>();
-  const [endYear, setEndYear] = useState<number | undefined>();
+  const [startYear, setStartYear] = useState<number | undefined>(
+    defaultStartValue
+  );
+  const [endYear, setEndYear] = useState<number | undefined>(defaultEndValue);
+
+  useEffect(() => {
+    if (defaultStartValue !== startYear) setStartYear(defaultStartValue);
+    if (defaultEndValue !== endYear) setEndYear(defaultEndValue);
+  }, [defaultStartValue, defaultEndValue]);
+
   const selectedText =
     !searchFilter.startYear && searchFilter.endYear
       ? `before ${searchFilter.endYear}`
@@ -54,7 +62,7 @@ export default function DateQuickFilterDropdown({
           id={`quick-filter-by-${filterStartFieldName}-${filterEndFieldName}`}
           size="sm"
           variant="input"
-          className="flex lg:w-fit items-center gap-1 rounded-[8px] shadow-none ring-[#E5E7EB]"
+          className="flex items-center gap-1 rounded-[8px] shadow-none ring-[#E5E7EB] lg:w-fit"
         >
           <span className="text-sm font-normal text-gray-500">{text}: </span>
           <span className="text-sm font-medium text-gray-900">

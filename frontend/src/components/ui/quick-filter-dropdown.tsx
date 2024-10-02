@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Facet } from "@components/_shared/DatasetsFilter";
 import { Checkboxes, SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
+import React from "react";
 
 export default function QuickFilterDropdown({
   text,
@@ -31,7 +32,7 @@ export default function QuickFilterDropdown({
   searchFilter: SearchDatasetType;
   onChange: SearchPageOnChange;
   items: Facet[];
-  defaultValue?: string;
+  defaultValue?: string | string[];
 }) {
   if (items.findIndex((x) => x.name === "all") > -1) {
     items.splice(
@@ -43,7 +44,18 @@ export default function QuickFilterDropdown({
   const selectedText =
     defaultValue === "*"
       ? "All"
-      : items.find((i) => i.name === defaultValue)?.display_name;
+      : typeof searchFilter[filterFieldName] === "object"
+      ? (searchFilter[filterFieldName] as []).length > 1
+        ? (searchFilter[filterFieldName] as []).length
+        : (searchFilter[filterFieldName] as string[]).length === 1
+        ? items.find(
+            (x) => x.name === (searchFilter[filterFieldName] as string[])[0]
+          )?.display_name
+        : "All"
+      : typeof searchFilter[filterFieldName] === "string"
+      ? items.find((x) => x.name === searchFilter[filterFieldName])
+          ?.display_name
+      : "All";
 
   return (
     <DropdownMenu modal={false}>
@@ -64,6 +76,16 @@ export default function QuickFilterDropdown({
       <DropdownMenuContent className="rounded-[8px] p-0">
         <DropdownMenuLabel className="px-4 py-[12px]">{text}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {isCheckbox ? (
+          <div
+            onClick={() => onChange([{ value: [], key: filterFieldName }])}
+            className="ml-auto flex cursor-pointer justify-end px-4 pt-2 text-sm font-semibold text-[#006064]"
+          >
+            Clear filter
+          </div>
+        ) : (
+          <></>
+        )}
         <div className="p-4">
           {isCheckbox ? (
             <Checkboxes
@@ -71,12 +93,12 @@ export default function QuickFilterDropdown({
                 onChange([{ value: items, key: filterFieldName }])
               }
               items={items}
-              selectedItems={searchFilter.regions}
+              selectedItems={(searchFilter[filterFieldName] as []) || []}
               limitToPresentViewAll={7}
             />
           ) : (
             <RadioGroup
-              defaultValue={defaultValue}
+              defaultValue={defaultValue as string}
               className="flex flex-col gap-[12px]"
               onValueChange={(items) =>
                 onChange([{ value: items, key: filterFieldName }])

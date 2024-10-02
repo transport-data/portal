@@ -10,7 +10,7 @@ import SimpleSearchInput from "@components/ui/simple-search-input";
 import { Checkboxes, SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,6 +28,8 @@ export default ({
   datasetCount,
   searchFilter,
   resetFilter,
+  defaultStartValue,
+  defaultEndValue,
   regions,
   countries,
   onChange,
@@ -37,6 +39,8 @@ export default ({
   resetFilter: () => void;
   searchFilter: SearchDatasetType;
   orgs: Facet[];
+  defaultStartValue?: number;
+  defaultEndValue?: number;
   metadataCreatedDates: Facet[];
   datasetCount: number;
   resourcesFormats: Facet[];
@@ -51,8 +55,10 @@ export default ({
   ]);
 
   const [searchedGeographyText, setSearchedGeographyText] = useState("");
-  // const [startYear, setStartYear] = useState<number | undefined>();
-  // const [endYear, setEndYear] = useState<number | undefined>();
+  const [startYear, setStartYear] = useState<number | undefined>(
+    defaultStartValue
+  );
+  const [endYear, setEndYear] = useState<number | undefined>(defaultEndValue);
 
   const totalOfFiltersApplied =
     (searchFilter.tags?.length ?? 0) +
@@ -61,13 +67,13 @@ export default ({
     (searchFilter.publicationDates?.length ?? 0) +
     (searchFilter.countries?.length ?? 0) +
     (searchFilter.regions?.length ?? 0) +
-    (searchFilter.sector ? 1 : 0) +
-    (searchFilter.service ? 1 : 0) +
+    (searchFilter.sectors?.length ? 1 : 0) +
+    (searchFilter.services?.length ? 1 : 0) +
     (searchFilter.endYear ? 1 : 0) +
     (searchFilter.startYear ? 1 : 0) +
     (searchFilter.fuel ? 1 : 0) +
     (searchFilter.showArchived ? 1 : 0) +
-    (searchFilter.mode ? 1 : 0);
+    (searchFilter.modes?.length ? 1 : 0);
 
   let showFilteredByAllCountriesAndRegions;
 
@@ -84,6 +90,22 @@ export default ({
       searchFilter.countries?.length === countries.length &&
       searchFilter.regions?.length === regions.length;
   }
+
+  useEffect(() => {
+    if (defaultStartValue !== startYear) setStartYear(defaultStartValue);
+    if (defaultEndValue !== endYear) setEndYear(defaultEndValue);
+  }, [defaultStartValue, defaultEndValue]);
+
+  const selectedText =
+    !searchFilter.startYear && searchFilter.endYear
+      ? `Before ${searchFilter.endYear}`
+      : searchFilter.startYear && !searchFilter.endYear
+      ? `After ${searchFilter.startYear}`
+      : searchFilter.startYear && searchFilter.endYear
+      ? searchFilter.startYear.toString().slice(0, 4) +
+        " to " +
+        searchFilter.endYear?.toString().slice(0, 4)
+      : "All";
 
   return (
     <>
@@ -380,16 +402,10 @@ export default ({
             </div>
           </AccordionContent>
         </AccordionItem>
-        {/* <AccordionItem value="yearsCovered">
+        <AccordionItem value="yearsCovered">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Years covered</span>
-            <span className="hide mr-2 text-sm">
-              {searchFilter.before && searchFilter.after
-                ? searchFilter.before.slice(0, 4) +
-                  " - " +
-                  searchFilter.after?.slice(0, 4)
-                : "All"}
-            </span>
+            <span className="hide mr-2 text-sm">{selectedText}</span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="mt-[12px] flex justify-between">
@@ -442,14 +458,14 @@ export default ({
                   label="To"
                   value={endYear ? dayjs(endYear.toString()) : undefined}
                   onChange={(x) => setEndYear(x?.year())}
-                  disabled={!startYear}
-                  minDate={dayjs((startYear! + 1).toString())}
+                  minDate={
+                    startYear ? dayjs((startYear! + 1).toString()) : undefined
+                  }
                   openTo="year"
                   views={["year"]}
                   yearsOrder="desc"
                   sx={{
                     maxWidth: 150,
-                    cursor: !startYear ? "not-allowed" : "",
                   }}
                 />
                 <button
@@ -474,7 +490,7 @@ export default ({
               <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll"></div>
             </LocalizationProvider>
           </AccordionContent>
-        </AccordionItem> */}
+        </AccordionItem>
         <AccordionItem value="format">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Format</span>

@@ -77,9 +77,9 @@ export const SearchDatasetSchema = z.object({
     )
     .optional(),
   query: z.string().nullable().optional(),
-  mode: z.string().optional(),
-  service: z.string().optional(),
-  sector: z.string().optional(),
+  modes: z.array(z.string()).optional(),
+  services: z.array(z.string()).optional(),
+  sectors: z.array(z.string()).optional(),
   regions: z.array(z.string()).optional(),
   countries: z.array(z.string()).optional(),
   fuel: z.string().optional(),

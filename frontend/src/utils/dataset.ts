@@ -3,10 +3,7 @@ import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 
-import {
-  DatasetSchemaType,
-  License
-} from "@schema/dataset.schema";
+import { DatasetSchemaType, License } from "@schema/dataset.schema";
 
 //We need to use this cause the way the combobox to input related_datasets is setup
 type DatasetCreateEditType = Omit<
@@ -74,16 +71,16 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("fuel", [options.fuel]));
   }
 
-  if (options.sector) {
-    fqAr.push(buildOrFq("sectors", [options.sector]));
+  if (options.sectors) {
+    fqAr.push(buildOrFq("sectors", options.sectors));
   }
 
-  if (options.mode) {
-    fqAr.push(buildOrFq("modes", [options.mode]));
+  if (options.modes) {
+    fqAr.push(buildOrFq("modes", options.modes));
   }
 
-  if (options.service) {
-    fqAr.push(buildOrFq("services", [options.service]));
+  if (options.services) {
+    fqAr.push(buildOrFq("services", options.services));
   }
 
   if (options.publicationDates?.length) {
@@ -116,6 +113,10 @@ export async function searchDatasets<T = Dataset>({
         })
       )
     );
+  }
+
+  if (options.query) {
+    fqAr.push(buildOrFq("text", [`*${options.query}*`]));
   }
 
   if (options.startYear && options.endYear) {
@@ -182,10 +183,6 @@ export async function searchDatasets<T = Dataset>({
 
   if (options.limit != undefined) {
     queryParams.push(`rows=${options.limit}`);
-  }
-
-  if (options.query && options.query != "") {
-    queryParams.push(`q=${options.query}`);
   }
 
   if (options.sort) {
