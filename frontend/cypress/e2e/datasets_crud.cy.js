@@ -124,12 +124,7 @@ describe("List and Search Datasets", () => {
     cy.get("button[id=quick-filter-dropdown-button-modes]")
       .scrollIntoView()
       .click();
-
-    cy.get("#show-all-checkboxes").then((x) => {
-      if (x.length) {
-        return cy.wrap(x).scrollIntoView().click({ force: true });
-      } else return cy.get(`#${modes[0]}`).scrollIntoView().click();
-    });
+    cy.get(`#${modes[0]}`).scrollIntoView().click();
 
     validateDataset();
   });
