@@ -116,7 +116,7 @@ export async function searchDatasets<T = Dataset>({
   }
 
   if (options.query) {
-    fqAr.push(buildOrFq("text", [`*${options.query}*`]));
+    fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }
 
   if (options.startYear && options.endYear) {

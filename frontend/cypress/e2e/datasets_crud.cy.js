@@ -83,7 +83,10 @@ describe("List and Search Datasets", () => {
 
   it("Should filter the dataset using the advanced filter and the quick filters", () => {
     cy.visit(`/search`);
-    cy.get("label[id=show-advanced-filter-large-w]").scrollIntoView().click();
+    cy.get("#show-advanced-filter").scrollIntoView().click({ force: true });
+    cy.get("#show-advanced-filter-large-w")
+      .scrollIntoView()
+      .click({ force: true });
     cy.get("button").contains("Keyword").scrollIntoView().click();
     cy.get(`input[id=${tags[0]}]`).click();
 
@@ -102,20 +105,21 @@ describe("List and Search Datasets", () => {
       .type(temporal_coverage_end.slice(0, 4));
     cy.get(`button[id=years-covered-search-button]`).click();
 
-    cy.get("button[id=quick-filter-dropdown-button-service]")
+    cy.get("button[id=quick-filter-dropdown-button-services]")
       .scrollIntoView()
       .click();
-    cy.get(`#quick-filter-dropdown-service-item-${services[0]}`).click();
+    cy.get(`#${services[0]}`).click();
 
-    cy.get("button[id=quick-filter-dropdown-button-sector]")
+    cy.get("button[id=quick-filter-dropdown-button-sectors]")
       .scrollIntoView()
       .click();
-    cy.get(`#quick-filter-dropdown-sector-item-${sectors[0]}`).click();
-
-    cy.get("button[id=quick-filter-dropdown-button-mode]")
+    cy.get(`#${sectors[0]}`).click();
+    cy.get("body").click();
+    cy.get("button[id=quick-filter-dropdown-button-modes]")
       .scrollIntoView()
-      .click();
-    cy.get(`#quick-filter-dropdown-mode-item-${modes[0]}`).click();
+      .click()
+    cy.get("#show-all-checkboxes").click()
+    cy.get(`#${modes[0]}`).scrollIntoView().click();
 
     validateDataset();
   });

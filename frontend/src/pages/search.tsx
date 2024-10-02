@@ -322,13 +322,13 @@ export default function DatasetSearch({
                         />
 
                         <label
-                          id="show-advanced-filter-large-w"
                           className={
                             "hidden cursor-pointer items-center lg:inline-flex " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")
                           }
                         >
                           <input
+                            id="show-advanced-filter-large-w"
                             type="checkbox"
                             checked={showAdvancedFilter}
                             onChange={() =>
@@ -382,13 +382,13 @@ export default function DatasetSearch({
                           />
                         </div>
                         <label
-                          id="show-advanced-filter"
                           className={
                             "inline-flex cursor-pointer items-center lg:hidden " +
                             (showAdvancedFilter ? "" : "xl:min-w-fit")
                           }
                         >
                           <input
+                            id="show-advanced-filter"
                             type="checkbox"
                             checked={showAdvancedFilter}
                             onChange={() =>
@@ -582,10 +582,11 @@ export const Checkboxes = ({
   limitToPresentViewAll?: number;
   onChange: (v: string[]) => void;
 }) => {
+  const [showAll, setShowAll] = useState<boolean>(!limitToPresentViewAll);
   return (
     <>
       {items.map((x, index) =>
-        index <= (limitToPresentViewAll ?? 999999 * 999999) ? (
+        index <= ((limitToPresentViewAll && !showAll) ? limitToPresentViewAll : 999999 * 999999) ? (
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <input
               id={x.name}
@@ -603,7 +604,11 @@ export const Checkboxes = ({
             <label htmlFor={x.name}>{x.display_name}</label>
           </div>
         ) : index === 8 ? (
-          <span className="mt-[1px] cursor-pointer text-[#006064]">
+          <span
+            id={"show-all-checkboxes"}
+            onClick={() => setShowAll(true)}
+            className="mt-[1px] cursor-pointer text-[#006064]"
+          >
             View all
           </span>
         ) : (

@@ -21,6 +21,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@components/ui/pagination";
+import React from "react";
 
 export default () => {
   const { data: session } = useSession();
@@ -34,7 +35,9 @@ export default () => {
     limit: datasetsPerPage,
     includePrivate: true,
     includeDrafts: true,
-    query: `creator_user_id:${session?.user.id}`,
+    advancedQueries: [
+      { key: "creator_user_id", values: [`${session?.user.id}`] },
+    ],
   };
 
   const { data, isLoading } = api.dataset.search.useQuery(options);
