@@ -12,6 +12,7 @@ import { searchDatasets } from "@utils/dataset";
 import { DocumentReportIcon, EyeOffIcon, GlobeAltIcon } from "@lib/icons";
 import { api } from "@utils/api";
 import { Skeleton } from "@components/ui/skeleton";
+import DatasetsFilterMocked from "@components/_shared/DatasetsFilterMocked";
 import {
   Pagination,
   PaginationContent,
@@ -20,6 +21,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@components/ui/pagination";
+import React from "react";
 
 export default () => {
   const { data: session } = useSession();
@@ -31,14 +33,16 @@ export default () => {
   const options: SearchDatasetType = {
     offset: offset,
     limit: datasetsPerPage,
-    include_private: true,
-    include_drafts: true,
-    query: `creator_user_id:${session?.user.id}`,
+    includePrivate: true,
+    includeDrafts: true,
+    advancedQueries: [
+      { key: "creator_user_id", values: [`${session?.user.id}`] },
+    ],
   };
 
   const { data, isLoading } = api.dataset.search.useQuery(options);
 
-  const datasets = data?.results;
+  const datasets = data?.datasets;
 
   const totalDatasets = data?.count ?? 0;
 
@@ -70,7 +74,7 @@ export default () => {
           title="Categories"
         />
         <div className="space-y-2.5 lg:hidden">
-          <DatasetsFilter />
+          <DatasetsFilterMocked />
         </div>
       </div>
       <div className="order-3 w-fit w-full sm:order-2">
@@ -125,7 +129,7 @@ export default () => {
         </section>
       </div>
       <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3  sm:min-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
-        <DatasetsFilter />
+        <DatasetsFilterMocked />
       </div>
     </div>
   );
