@@ -13,7 +13,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { listGroups } from "@utils/group";
 import { listOrganizations } from "@utils/organization";
-import SearchBarMocked from "@components/search/SearchBarMocked";
 
 export async function getStaticProps() {
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -26,16 +25,16 @@ export async function getStaticProps() {
     orgs: [],
   });
   const groups = await listGroups({
-    type: 'topic',
+    type: "topic",
     showCoordinates: false,
   });
   const tags = await ckan.getAllTags();
   const orgs = await listOrganizations({
     input: {
       includeUsers: false,
-      detailed: true
-    }
-  })
+      detailed: true,
+    },
+  });
   return {
     props: {
       fallback: {
@@ -322,7 +321,7 @@ export default function DatasetsPage({
               and 120+ countries.
             </p>
             <div className="mt-8 ">
-              <SearchBarMocked />
+              <SearchBar />
             </div>
             <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
               You can also browse the topics below to find what you are looking

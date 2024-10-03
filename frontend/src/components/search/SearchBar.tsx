@@ -42,14 +42,21 @@ export default function SearchBar() {
     name: "",
   });
   const [facetName, setFacetName] = useState("");
-  const [indicator, setIndicator] = useState("");
+
   const [storedSearches, setStoredSearches] =
     useState<Array<RecentSearchProps>>();
 
   const { data, isLoading } = api.dataset.search.useQuery({
     limit: query?.length > 1 ? 10 : 0,
     query: query,
-    ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
+    ...(facetValue.name
+      ? {
+          [facetName]:
+            facetName === "startYear" || facetName === "endYear"
+              ? facetValue.name
+              : [facetValue.name],
+        }
+      : {}),
     facetsFields: `["regions", "sectors", "modes", "services", "indicator", "temporal_coverage_start", "temporal_coverage_end"]`,
   });
 
@@ -58,8 +65,9 @@ export default function SearchBar() {
       field: "in",
       description: "a region, country or a city",
       options: data?.facets?.regions?.items,
+      isMultiple: true,
     },
-    /*startYear: {
+    startYear: {
       field: "after",
       description: "referencing data after an year",
       options: (data?.facets?.temporal_coverage_start?.items as any[])
@@ -86,29 +94,31 @@ export default function SearchBar() {
           (obj, index, self) =>
             index === self.findIndex((o) => o.name === obj.name)
         ),
-    },*/
+    },
 
     sectors: {
       field: "sector",
       description: "road, rail, aviation, water transportation",
       options: data?.facets?.sectors?.items,
+      isMultiple: true,
     },
     modes: {
       field: "mode",
       description: "car, 2W, 3W, multi-modal etc.",
       options: data?.facets?.modes?.items,
+      isMultiple: true,
     },
     services: {
       field: "service",
       description: "passenger or freight",
       options: data?.facets?.services?.items,
+      isMultiple: true,
     },
   };
 
   /* handle click outside the search container to close command list */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isInput = event.target instanceof HTMLInputElement;
       if (
         commandRef.current &&
         !commandRef.current.contains(event.target as Node)
@@ -163,8 +173,13 @@ export default function SearchBar() {
   };
 
   const handleSubmit = () => {
+    const value = facets[facetName]?.isMultiple
+      ? [facetValue.name]
+      : facetValue.name;
+
+    console.log(value);
     const queryObject = {
-      ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
+      ...(facetValue.name ? { [facetName]: value } : {}),
       query,
     };
     const queryParams = new URLSearchParams(queryObject);
@@ -356,13 +371,15 @@ export default function SearchBar() {
                               const context = recent.indicator
                                 ? "Indicator"
                                 : "";
-
-                              const text = indicator;
+                              console.log(recent);
 
                               return (
                                 <SearchFacetItem
                                   badge={badge}
-                                  text={recent.indicator || recent.query}
+                                  text={
+                                    recent.indicator?.display_name ||
+                                    recent.query
+                                  }
                                   icon={icon}
                                   context={context}
                                 />
