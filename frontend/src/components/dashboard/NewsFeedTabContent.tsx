@@ -16,7 +16,7 @@ import { Building, Database, CircleCheck } from "lucide-react";
 import { DocumentReportIcon } from "@lib/icons";
 import DashboardNewsFeedCard from "./DashboardNewsFeedCard";
 import { format } from "date-fns";
-import { Activity } from "@portaljs/ckan";
+import { DashboardNewsfeedCardProps } from "./DashboardNewsFeedCard";
 
 const groupByDate = (activities: any) => {
   return activities.reduce((groups: any, activity: any) => {
@@ -207,9 +207,11 @@ export default () => {
               Object.entries(groupedActivities).map(([date, activities]) => (
                 <div className="rounded border bg-white px-4 pt-4" key={date}>
                   <h4 className="mb-5 font-semibold">{date}</h4>{" "}
-                  {(activities as Activity[])?.map((activity) => (
-                    <DashboardNewsFeedCard {...activity} key={activity.id} />
-                  ))}
+                  {(activities as DashboardNewsfeedCardProps[])?.map(
+                    (activity) => (
+                      <DashboardNewsFeedCard {...activity} key={activity.id} />
+                    )
+                  )}
                 </div>
               ))
             ) : (

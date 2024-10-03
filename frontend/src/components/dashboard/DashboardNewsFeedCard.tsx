@@ -1,7 +1,28 @@
-import { Activity } from "@portaljs/ckan";
+import { User } from "@portaljs/ckan";
 import { EyeOff, Globe, Building, Database } from "lucide-react";
 
-export default (activity: Activity) => {
+export interface DashboardNewsfeedCardProps {
+  id: string;
+  timestamp: string;
+  user_id: string;
+  object_id?: string;
+  activity_type?: string;
+  user_data?: User;
+  data?: {
+    group?: {
+      title?: string;
+      state?: string;
+    };
+    package?: {
+      name?: string;
+      title?: string;
+      private?: boolean;
+      state?: string;
+    };
+  };
+}
+
+export default (activity: DashboardNewsfeedCardProps) => {
   const activitySegments = activity.activity_type?.split(" ");
   const activityType = activitySegments ? activitySegments[0] : "changed";
   const activityTarget = activitySegments
