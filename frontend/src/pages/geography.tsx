@@ -35,6 +35,16 @@ export default function DatasetsPage({
   const countriesFlagsByName = new Map<string, boolean>();
   const letterMap = new Map<string, { name: string; title: string }[]>();
   const router = useRouter();
+  groups.forEach((country) => {
+    let letter = country.title[0]!.toLowerCase();
+    if (letter === "Å".toLowerCase()) letter = "a";
+    const array = letterMap.get(letter);
+    if (!array) {
+      letterMap.set(letter, [{ name: country.name, title: country.title }]);
+    } else {
+      array.push({ name: country.name, title: country.title });
+    }
+  });
 
   useEffect(() => {
     // This is caching the flags to the frontend stop to make requests to the server to get each flag
@@ -62,14 +72,6 @@ export default function DatasetsPage({
               })
           )
       );
-      let letter = country.title[0]!.toLowerCase();
-      if (letter === "Å".toLowerCase()) letter = "a";
-      const array = letterMap.get(letter);
-      if (!array) {
-        letterMap.set(letter, [{ name: country.name, title: country.title }]);
-      } else {
-        array.push({ name: country.name, title: country.title });
-      }
     });
 
     const map = new maplibregl.Map({
@@ -330,6 +332,7 @@ const LetterCard = ({
     <div className="flex flex-col gap-3">
       {countries.map((word) => (
         <Link
+          id={word.title}
           href={`/search?country=${word.name}`}
           className="cursor-pointer break-words text-[#6B7280] hover:underline"
         >
