@@ -1,6 +1,5 @@
 import { Badge } from "@components/ui/badge";
 import { listGroups } from "@utils/group";
-import * as getCountryISO3To2 from "country-iso-3-to-2";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { InferGetServerSidePropsType } from "next";
@@ -24,7 +23,7 @@ export async function getServerSideProps(ctx: any) {
           limit: 350,
         })
       ).filter((x) => x.geography_type === "country") as Array<
-        Group & { geography_shape: any }
+        Group & { geography_shape: any; iso2: string }
       >,
     },
   };
@@ -33,24 +32,46 @@ export async function getServerSideProps(ctx: any) {
 export default function DatasetsPage({
   groups,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
-  const letterMap = new Map<string, { name: string; title: string }[]>();
-  groups.forEach((country) => {
-    let letter = country.title[0]!.toLowerCase();
-    if (letter === "Å".toLowerCase()) letter = "a";
-    const array = letterMap.get(letter);
-    if (!array) {
-      letterMap.set(letter, [{ name: country.name, title: country.title }]);
-    } else {
-      array.push({ name: country.name, title: country.title });
-    }
-  });
-
   const countriesFlagsByName = new Map<string, boolean>();
-
+  const letterMap = new Map<string, { name: string; title: string }[]>();
   const router = useRouter();
-  console.log(countriesFlagsByName);
 
   useEffect(() => {
+    // This is caching the flags to the frontend stop to make requests to the server to get each flag
+    groups.forEach(async (country) => {
+      countriesFlagsByName.set(
+        country.name,
+        await (
+          await fetch(
+            country.image_display_url ||
+              country.image_url ||
+              `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
+          ).catch(() =>
+            fetch(`https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`)
+          )
+        )
+          .blob()
+          .then(
+            (blob) =>
+              new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as any);
+                reader.onerror = () =>
+                  reject(new Error("Error reading the blob"));
+                reader.readAsDataURL(blob);
+              })
+          )
+      );
+      let letter = country.title[0]!.toLowerCase();
+      if (letter === "Å".toLowerCase()) letter = "a";
+      const array = letterMap.get(letter);
+      if (!array) {
+        letterMap.set(letter, [{ name: country.name, title: country.title }]);
+      } else {
+        array.push({ name: country.name, title: country.title });
+      }
+    });
+
     const map = new maplibregl.Map({
       style: style,
       container: "map",
@@ -98,24 +119,6 @@ export default function DatasetsPage({
 
       groups.forEach(async (x) => {
         if (x.geography_shape) {
-          const countryAsISO2 = getCountryISO3To2(
-            x.name.toUpperCase()
-          ).toLowerCase();
-          countriesFlagsByName.set(
-            x.name,
-            await (await fetch(`https://flagcdn.com/h60/${countryAsISO2}.png`))
-              .blob()
-              .then(
-                (blob) =>
-                  new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result as any);
-                    reader.onerror = () =>
-                      reject(new Error("Error reading the blob"));
-                    reader.readAsDataURL(blob);
-                  })
-              )
-          );
           map.addSource(x.id, {
             type: "geojson",
             data: x.geography_shape,
@@ -154,17 +157,15 @@ export default function DatasetsPage({
               .setHTML(
                 `        
               <div>
-              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" src="${
-                x.image_display_url ||
-                x.image_url ||
-                countriesFlagsByName.get(x.name)
-              }"></img>
+              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" src="${countriesFlagsByName.get(
+                x.name
+              )}"></img>
                 
               <div class="country-title" style="color: white'; font-size: 14px">${
                 x.title
               }
               </div>
-              <div style="color: #9CA3AF">${countryAsISO2.toUpperCase()}</div>
+              <div style="color: #9CA3AF">${x.iso2.toUpperCase()}</div>
 
 
                 </div>
