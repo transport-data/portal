@@ -49,6 +49,7 @@ export default function SearchBar() {
   const { data, isLoading } = api.dataset.search.useQuery({
     limit: query?.length > 1 ? 10 : 0,
     query: query,
+    sort: "score desc, metadata_modified desc",
     ...(facetValue.name
       ? {
           [facetName]:
@@ -177,26 +178,25 @@ export default function SearchBar() {
       ? [facetValue.name]
       : facetValue.name;
 
-    console.log(value);
     const queryObject = {
       ...(facetValue.name ? { [facetName]: value } : {}),
-      query,
+      query: inputValue,
     };
     const queryParams = new URLSearchParams(queryObject);
 
-    storeRecentSearch({
-      facetName,
-      facetValue: facetValue.name,
-      query,
-    });
+    storeRecentSearch(queryObject);
+
+    setShowCommandList(false);
 
     router.push(`/search?${queryParams.toString()}`);
   };
 
   const storeRecentSearch = (search: RecentSearchProps) => {
+    console.log(search);
+
     const _storedSearches: Array<RecentSearchProps> = [
       ...(storedSearches ?? []),
-    ];
+    ].filter((item) => JSON.stringify(item) !== JSON.stringify(search));
     // Add the new search to the beginning of the array
     _storedSearches.unshift(search);
     // Ensure only the last 5 searches are stored
@@ -242,7 +242,11 @@ export default function SearchBar() {
             placeholder="Find statistics, forecasts & studies"
             onInput={(e) => handleTyping((e.target as HTMLInputElement).value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter") handleSubmit();
+              if (event.key === "Enter") {
+                event.preventDefault();
+                handleSubmit();
+              }
+              return false;
             }}
             value={inputValue}
           />
@@ -299,7 +303,7 @@ export default function SearchBar() {
                         heading={<CommandListHeader title="Datasets" />}
                         className="block"
                       >
-                        {data?.datasets?.map((dataset, index) => (
+                        {data?.datasets?.slice(0, 5)?.map((dataset, index) => (
                           <SearchDatasetItem {...dataset} />
                         ))}
                       </CommandGroup>
@@ -309,20 +313,20 @@ export default function SearchBar() {
                       <CommandGroup
                         heading={<CommandListHeader title="Indicators" />}
                       >
-                        {filteredIndicators.map((indicator, x) => (
+                        {filteredIndicators.slice(0, 5).map((indicator, x) => (
                           <SearchFacetItem
                             key={`indicator-${x}`}
                             text={indicator.display_name}
                             onSelect={() => {
-                              storeRecentSearch({
+                              /*storeRecentSearch({
                                 indicator: indicator,
-                              });
+                              });*/
                             }}
                             href={`/search?indicator=${indicator.name}`}
                             icon={
                               <VariableIcon
                                 width={20}
-                                className="text-gray-500"
+                                className="min-w-[20px] text-gray-500"
                               />
                             }
                             context={"Indicator"}
