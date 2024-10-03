@@ -34,18 +34,22 @@ export default function SearchFacetItem({
     </>
   );
 
-  return onSelect ? (
+  return href ? (
     <CommandItem
       className="flex items-center gap-2 text-gray-700"
-      onSelect={() => onSelect()}
+      asChild
+      onSelect={() => (onSelect ? onSelect() : null)}
     >
-      <ItemContent />
-    </CommandItem>
-  ) : (
-    <CommandItem className="flex items-center gap-2 text-gray-700" asChild>
       <Link href={href ?? "/search"}>
         <ItemContent />
       </Link>
+    </CommandItem>
+  ) : (
+    <CommandItem
+      className="flex items-center gap-2 text-gray-700"
+      onSelect={() => (onSelect ? onSelect() : null)}
+    >
+      <ItemContent />
     </CommandItem>
   );
 }

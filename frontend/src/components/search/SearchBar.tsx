@@ -22,10 +22,10 @@ interface FacetValueProps {
 }
 
 interface RecentSearchProps {
-  facetName: string;
-  facetValue: string;
-  query: string;
-  indicator?: string;
+  facetName?: string;
+  facetValue?: string;
+  query?: string;
+  indicator?: any;
 }
 
 export default function SearchBar() {
@@ -46,7 +46,7 @@ export default function SearchBar() {
   const [storedSearches, setStoredSearches] =
     useState<Array<RecentSearchProps>>();
 
-  const { data } = api.dataset.search.useQuery({
+  const { data, isLoading } = api.dataset.search.useQuery({
     limit: query?.length > 1 ? 10 : 0,
     query: query,
     ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
@@ -165,7 +165,6 @@ export default function SearchBar() {
   const handleSubmit = () => {
     const queryObject = {
       ...(facetValue.name ? { [facetName]: [facetValue.name] } : {}),
-      indicator,
       query,
     };
     const queryParams = new URLSearchParams(queryObject);
@@ -174,7 +173,6 @@ export default function SearchBar() {
       facetName,
       facetValue: facetValue.name,
       query,
-      indicator,
     });
 
     router.push(`/search?${queryParams.toString()}`);
@@ -301,9 +299,11 @@ export default function SearchBar() {
                             key={`indicator-${x}`}
                             text={indicator.display_name}
                             onSelect={() => {
-                              setIndicator(indicator.name);
-                              handleSubmit();
+                              storeRecentSearch({
+                                indicator: indicator.display_name,
+                              });
                             }}
+                            href={`/search?indicator=${indicator.name}`}
                             icon={
                               <VariableIcon
                                 width={20}
@@ -337,18 +337,36 @@ export default function SearchBar() {
                             }
                           >
                             {storedSearches.map((recent) => {
-                              const badge = recent.facetValue
-                                ? `${facets[recent.facetName]?.field}: ${
-                                    facets[recent.facetName]?.options?.find(
-                                      (o: any) => o.name === recent.facetValue
-                                    )?.display_name
-                                  }`
+                              const badge =
+                                recent.facetValue && recent.facetName
+                                  ? `${facets[recent.facetName]?.field}: ${
+                                      facets[recent.facetName]?.options?.find(
+                                        (o: any) => o.name === recent.facetValue
+                                      )?.display_name
+                                    }`
+                                  : "";
+
+                              const icon = recent.indicator ? (
+                                <VariableIcon
+                                  width={20}
+                                  className="text-gray-500"
+                                />
+                              ) : null;
+
+                              const context = recent.indicator
+                                ? "Indicator"
                                 : "";
+
+                              const text = indicator
+                                ? indicator.display_name
+                                : query;
 
                               return (
                                 <SearchFacetItem
                                   badge={badge}
-                                  text={recent.query}
+                                  text={recent.indicator || recent.query}
+                                  icon={icon}
+                                  context={context}
                                 />
                               );
                             })}
