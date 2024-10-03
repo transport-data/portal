@@ -17,19 +17,15 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
   const [selectedDatasets, setSelectedDatasets] = useState<Dataset[]>([]);
   const [editingDataset, setEditingDataset] = useState<Dataset | null>(null);
   const [datasetSearch, setDatasetSearch] = useState<SearchDatasetType>({
-    orgs: [],
-    query: "",
     offset: 0,
     limit: 1000,
-    groups: [],
-    tags: [],
-    include_private: true,
+    private: true,
   });
   const { data } = api.dataset.search.useQuery(
-    datasetSearch as unknown as SearchDatasetType
+    datasetSearch as SearchDatasetType
   );
 
-  const datasets = data?.results;
+  const datasets = data?.datasets;
 
   const utils = api.useContext();
   const deleteDatasets = api.dataset.delete.useMutation({

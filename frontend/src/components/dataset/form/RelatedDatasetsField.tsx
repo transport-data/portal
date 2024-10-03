@@ -25,6 +25,7 @@ import { Check } from "lucide-react";
 import { P, match } from "ts-pattern";
 import { api } from "@utils/api";
 import { useState } from "react";
+import React from "react";
 
 export function RelatedDatasetsField() {
   const { control, register, setValue, getValues, watch } = useFormContext<DatasetFormType>();
@@ -92,7 +93,7 @@ export function RelatedDatasetsField() {
                       },
                       (data) => (
                         <>
-                          {data.results.filter(d => d.id !== watch('id')).map((d) => (
+                          {data.datasets.filter(d => d.id !== watch('id')).map((d) => (
                             <CommandItem
                               value={d.name}
                               key={d.name}

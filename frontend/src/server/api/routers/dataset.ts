@@ -18,7 +18,7 @@ export const datasetRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const searchResults = await searchDatasets({ apiKey, input });
+      const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
   get: protectedProcedure

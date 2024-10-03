@@ -15,10 +15,10 @@ export default function DatasetsStats() {
     orgs: [],
     groups: [],
     tags: [],
-    include_private: true,
+    includePrivate: true,
   });
 
-  const { data: datasets } = api.dataset.search.useQuery(
+  const { data: {datasets} = {} } = api.dataset.search.useQuery(
     datasetsQuery.current as unknown as SearchDatasetType
   );
 
@@ -26,23 +26,23 @@ export default function DatasetsStats() {
     {
       id: 1,
       name: "All",
-      stat: datasets?.results?.length ?? 0,
+      stat: datasets?.length ?? 0,
       icon: CircleStackIcon,
       cta: { title: "View all", href: "/datasets" },
     },
     {
       id: 2,
       name: "Published",
-      stat: datasets?.results.length
-        ? datasets.results.filter((d) => !d.private).length
+      stat: datasets?.length
+        ? datasets.filter((d) => !d.private).length
         : 0,
       icon: EyeIcon,
     },
     {
       id: 3,
       name: "Private",
-      stat: datasets?.results.length
-        ? datasets.results.filter((d) => d.private).length
+      stat: datasets?.length
+        ? datasets.filter((d) => d.private).length
         : 0,
       icon: EyeSlashIcon,
     },
