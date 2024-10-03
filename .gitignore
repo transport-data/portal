@@ -14,3 +14,4 @@ node_modules/*
 */node_modules/*
 integration-tests/node_modules/*
 frontend/markdown.db
+frontend/.markdowndb

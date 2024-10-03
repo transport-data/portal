@@ -77,8 +77,18 @@ Example of a request body to create a dataset:
   "sectors": ["aviation"],
   "modes": ["car"],
   "services": ["passenger"],
-  "frequency": "annually"
-}`
+  "frequency": "annually",
+  "indicators": ["indicator 1"],
+  "data_provider": "Datopian",
+  "url": "https://datopian.com",
+  "data_access": "Publicly available",
+  "comments": [{
+      "initials": "JD",
+      "date": "2024-01-01",
+      "comment": "This is an internal comment"
+  }],
+  "introduction_text": "# Hello world"
+}
 ```
 
 #### Title
@@ -383,19 +393,87 @@ Expected update frequency of this dataset.
 }
 ```
 
-#### Indicator
+#### Indicators
 
 | API field name | Type | Required | DCAT-AP field | Default value |
 | -- | -- | -- | -- | -- |
-| indicator | string | No | No | N/A |
+| indicators | string[] | No | No | N/A |
 
-Indicator of the dataset.
+Indicators of the dataset.
 
 **Example:**
 
 ```json
 {
-    "indicator": "Air freight"
+    "indicators": "Air freight"
+}
+```
+
+#### Data provider
+
+| API field name | Type | Required | DCAT-AP field | Default value |
+| -- | -- | -- | -- | -- |
+| data_provider | string | No | No | N/A |
+
+Organization or individual that provides the data and any related metadata.
+
+**Example:**
+
+```json
+{
+    "data_provider": "Datopian"
+}
+```
+
+#### URL
+
+| API field name | Type | Required | DCAT-AP field | Default value |
+| -- | -- | -- | -- | -- |
+| url | string | No | No | N/A |
+
+Location on the internet with further information about the dataset.
+
+**Example:**
+
+```json
+{
+    "url": "https://datopian.com"
+}
+```
+
+#### Data access
+
+| API field name | Type | Required | DCAT-AP field | Default value |
+| -- | -- | -- | -- | -- |
+| data_access | string | No | No | N/A |
+
+Any conditions on data access, e.g. publicly available, proprietary, fee or subscription required, available on request, etc.
+
+**Example:**
+
+```json
+{
+    "data_access": "Publicly available"
+}
+```
+
+#### Comments
+
+| API field name | Type | Required | DCAT-AP field | Default value |
+| -- | -- | -- | -- | -- |
+| comments | {"initials": string, "date": string, "comment": string}[] | No | No | N/A |
+
+Any other information about the metadata values, for instance discrepancies or unclear or missing information.
+
+**Example:**
+
+```json
+{
+    "comments": [{
+        "initials": "JD",
+        "date": "2024-01-01",
+        "comment": "Some fields are missing..."
+    }]
 }
 ```
 
@@ -444,6 +522,22 @@ This field is used to support TDC Formatted datasets. The value should be a list
 ```json
 {
     "related_datasets": ["related-dataset-id"]
+}
+```
+
+#### Introduction text
+
+| API field name | Type | Required | DCAT-AP field | Default value |
+| -- | -- | -- | -- | -- |
+| introduction_text | markdown | No | No | N/A |
+
+This text is shown on the dataset page under the Overview tab when the dataset is TDC Harmonized.
+
+**Example:**
+
+```json
+{
+    "introduction_text": "# Hello world"
 }
 ```
 

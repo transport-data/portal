@@ -300,7 +300,7 @@ export default function SearchBar() {
                             text={indicator.display_name}
                             onSelect={() => {
                               storeRecentSearch({
-                                indicator: indicator.display_name,
+                                indicator: indicator,
                               });
                             }}
                             href={`/search?indicator=${indicator.name}`}
@@ -357,9 +357,7 @@ export default function SearchBar() {
                                 ? "Indicator"
                                 : "";
 
-                              const text = indicator
-                                ? indicator.display_name
-                                : query;
+                              const text = indicator;
 
                               return (
                                 <SearchFacetItem

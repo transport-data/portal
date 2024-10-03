@@ -6,6 +6,7 @@ import {
   listGroups,
   patchGroup,
   getGroup,
+  groupTree,
 } from "@utils/group";
 import { z } from "zod";
 
@@ -32,6 +33,21 @@ export const groupRouter = createTRPCRouter({
         apiKey,
         type: input.type,
         showCoordinates: input.showGeographyShapes,
+      });
+      return groups;
+    }),
+  tree: protectedProcedure
+    .input(
+      z.object({
+        type: z.enum(["topic", "geography"]).optional().default("topic"),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const groups = await groupTree({
+        apiKey,
+        type: input.type,
       });
       return groups;
     }),

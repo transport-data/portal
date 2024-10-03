@@ -57,6 +57,8 @@ jobs:
           while ! docker exec ckan-tdc-db pg_isready -U ckandbuser -d ckandb; do
             sleep 1
           done
+      - name: Run seeding geographies
+        run: docker exec ckan-tdc-dev sh -c "ckan -c ckan.ini create-default-geographies"
       - name: Copy .env
         run: cp .env.example .env
         working-directory: ./frontend
@@ -78,6 +80,12 @@ jobs:
       - name: Print Error Logs
         if: failure()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Frontend screenshots
+          path: ./frontend/cypress/screenshots
+          if-no-files-found: ignore
       - name: Tear down containers
         if: failure() || success()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans

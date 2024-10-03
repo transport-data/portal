@@ -105,7 +105,7 @@ export const listUserOrganizations = async ({
 }) => {
   const organizationList = await CkanRequest.get<
     CkanResponse<(Organization & { capacity: "admin" | "editor" | "member" })[]>
-  >(`organization_list_for_user?id=${id}`, {
+  >(`organization_list_for_user?id=${id}&include_dataset_count=true`, {
     apiKey: apiKey,
   });
   const organizations = organizationList.result;

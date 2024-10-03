@@ -4,6 +4,18 @@ import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 
+import { DatasetSchemaType, License } from "@schema/dataset.schema";
+
+//We need to use this cause the way the combobox to input related_datasets is setup
+type DatasetCreateEditType = Omit<
+  DatasetFormType,
+  "related_datasets" | "temporal_coverage_start" | "temporal_coverage_end"
+> & {
+  related_datasets: Array<string>;
+  temporal_coverage_start: string;
+  temporal_coverage_end: string;
+};
+
 export async function searchDatasets<T = Dataset>({
   apiKey,
   options,
@@ -56,20 +68,16 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("geographies", options.countries));
   }
 
-  if (options.fuel) {
-    fqAr.push(buildOrFq("fuel", [options.fuel]));
+  if (options.sectors?.length) {
+    fqAr.push(buildOrFq("sectors", options.sectors));
   }
 
-  if (options.sector) {
-    fqAr.push(buildOrFq("sectors", [options.sector]));
+  if (options.modes?.length) {
+    fqAr.push(buildOrFq("modes", options.modes));
   }
 
-  if (options.mode) {
-    fqAr.push(buildOrFq("modes", [options.mode]));
-  }
-
-  if (options.service) {
-    fqAr.push(buildOrFq("services", [options.service]));
+  if (options.services?.length) {
+    fqAr.push(buildOrFq("services", options.services));
   }
 
   if (options.publicationDates?.length) {
@@ -102,6 +110,15 @@ export async function searchDatasets<T = Dataset>({
         })
       )
     );
+  }
+
+  
+  if (options.fuel) {
+    fqAr.push(buildOrFq("fuel", [options.fuel]));
+  }
+
+  if (options.query) {
+    fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }
 
   if (options.startYear && options.endYear) {
@@ -170,10 +187,6 @@ export async function searchDatasets<T = Dataset>({
     queryParams.push(`rows=${options.limit}`);
   }
 
-  if (options.query && options.query != "") {
-    queryParams.push(`q=${options.query}`);
-  }
-
   if (options.sort) {
     queryParams.push(`sort=${options.sort}`);
   }
@@ -192,7 +205,7 @@ export async function searchDatasets<T = Dataset>({
 
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
-
+  console.log(endpoint)
   const response = await CkanRequest.get<any>(endpoint, {
     headers: { Authorization: apiKey },
   });
@@ -222,12 +235,29 @@ export const getDataset = async ({
   return dataset;
 };
 
+export const getDatasetSchema = async ({ apiKey }: { apiKey: string }) => {
+  const dataset: CkanResponse<DatasetSchemaType> = await CkanRequest.get(
+    "scheming_dataset_schema_show?type=dataset",
+    {
+      apiKey,
+    }
+  );
+  return dataset.result;
+};
+
+export function getChoicesFromField(schema: DatasetSchemaType, field: string) {
+  const fieldSchema = schema.dataset_fields.find((f) => f.field_name === field);
+  if (!fieldSchema || !fieldSchema.choices)
+    return [] as Array<{ value: string; label: string }>;
+  return fieldSchema.choices;
+}
+
 export const createDataset = async ({
   apiKey,
   input,
 }: {
   apiKey: string;
-  input: DatasetFormType;
+  input: DatasetCreateEditType;
 }) => {
   const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
     `package_create`,
@@ -244,7 +274,7 @@ export const patchDataset = async ({
   input,
 }: {
   apiKey: string;
-  input: DatasetFormType;
+  input: DatasetCreateEditType;
 }) => {
   const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
     "package_patch",
@@ -273,4 +303,14 @@ export const deleteDatasets = async ({
     )
   );
   return { datasets: datasets.map((dataset) => dataset.result) };
+};
+
+export const licensesList = async ({ apiKey }: { apiKey: string }) => {
+  const licenses: CkanResponse<License[]> = await CkanRequest.get(
+    `license_list`,
+    {
+      apiKey: apiKey,
+    }
+  );
+  return licenses.result;
 };

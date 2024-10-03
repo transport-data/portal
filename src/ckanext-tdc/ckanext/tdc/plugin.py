@@ -7,6 +7,7 @@ import ckanext.tdc.logic.auth as auth
 
 import json
 import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -20,24 +21,26 @@ class TdcPlugin(plugins.SingletonPlugin):
     # IConfigurer
 
     def update_config(self, config_):
-        toolkit.add_template_directory(config_, 'templates')
-        toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('fanstatic', 'tdc')
+        toolkit.add_template_directory(config_, "templates")
+        toolkit.add_public_directory(config_, "public")
+        toolkit.add_resource("fanstatic", "tdc")
 
     # IActions
 
     def get_actions(self):
         return {
-                "package_create": action.package_create,
-                "package_update": action.package_update,
-                "package_patch": action.package_patch,
-                "package_search": action.package_search,
-                "group_list": action.group_list,
-                "user_login": action.user_login,
-                "invite_user_to_tdc": action.invite_user_to_tdc,
-                "request_organization_owner": action.request_organization_owner,
-                "request_new_organization": action.request_new_organization
-                }
+            "package_create": action.package_create,
+            "package_delete": action.package_delete,
+            "package_update": action.package_update,
+            "package_patch": action.package_patch,
+            "package_search": action.package_search,
+            "package_show": action.package_show,
+            "group_list": action.group_list,
+            "user_login": action.user_login,
+            "invite_user_to_tdc": action.invite_user_to_tdc,
+            "request_organization_owner": action.request_organization_owner,
+            "request_new_organization": action.request_new_organization,
+        }
 
     # IPackageController
 
@@ -45,13 +48,15 @@ class TdcPlugin(plugins.SingletonPlugin):
         # This is a fix so that solr stores a list
         # instead of a string for multivalued fields
         multi_value_extra_fields = [
-                "topics",
-                "geographies",
-                "regions",
-                "sectors",
-                "modes",
-                "services",
-                "contributors"]
+            "topics",
+            "geographies",
+            "regions",
+            "sectors",
+            "modes",
+            "related_datasets",
+            "services",
+            "contributors",
+        ]
         for field in multi_value_extra_fields:
             value = data_dict.get(field, None)
             if value is not None and isinstance(value, str):
@@ -61,9 +66,6 @@ class TdcPlugin(plugins.SingletonPlugin):
 
         metadata_created = data_dict.get("metadata_created", None)
         if metadata_created:
-            year = metadata_created[0:4]
-            data_dict["metadata_created_year"] = year
-
             date = metadata_created[0:10]
             data_dict["metadata_created_date"] = date
 
