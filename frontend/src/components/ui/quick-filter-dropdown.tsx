@@ -77,11 +77,13 @@ export default function QuickFilterDropdown({
         <DropdownMenuLabel className="px-4 py-[12px]">{text}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {isCheckbox ? (
-          <div
-            onClick={() => onChange([{ value: [], key: filterFieldName }])}
-            className="ml-auto flex cursor-pointer justify-end px-4 pt-2 text-sm font-semibold text-[#006064]"
-          >
-            Clear filter
+          <div className="ml-auto flex justify-end px-4 pt-2 text-sm font-semibold text-[#006064]">
+            <span
+              onClick={() => onChange([{ value: [], key: filterFieldName }])}
+              className="max-w-fit cursor-pointer"
+            >
+              Clear filter
+            </span>
           </div>
         ) : (
           <></>

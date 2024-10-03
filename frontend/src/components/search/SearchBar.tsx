@@ -17,6 +17,7 @@ import { SearchDatasetType } from "@schema/dataset.schema";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
 import { SearchPageOnChange } from "@pages/search";
+import React from "react";
 
 const facets: any = {
   in: {
@@ -70,6 +71,7 @@ export default function SearchBar({
   facetName?: keyof SearchDatasetType;
 }) {
   const commandRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const queryInputRef = useRef<HTMLInputElement>(null);
   const [showCommandList, setShowCommandList] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -158,6 +160,11 @@ export default function SearchBar({
           <CommandInput
             id="search-input-test-id"
             ref={queryInputRef}
+            onKeyDown={(x) => {
+              if (x.key.toLowerCase() === "enter") {
+                buttonRef.current?.click();
+              }
+            }}
             className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
             onFocus={() => {
               if (!hideDatasetSuggestion) setShowCommandList(true);
@@ -176,6 +183,7 @@ export default function SearchBar({
             </span>
           )}
           <Button
+            ref={buttonRef}
             id="search-button"
             type="submit"
             className="absolute right-[10px] top-[10px] flex gap-[8px]"

@@ -67,19 +67,15 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("geographies", options.countries));
   }
 
-  if (options.fuel) {
-    fqAr.push(buildOrFq("fuel", [options.fuel]));
-  }
-
-  if (options.sectors) {
+  if (options.sectors?.length) {
     fqAr.push(buildOrFq("sectors", options.sectors));
   }
 
-  if (options.modes) {
+  if (options.modes?.length) {
     fqAr.push(buildOrFq("modes", options.modes));
   }
 
-  if (options.services) {
+  if (options.services?.length) {
     fqAr.push(buildOrFq("services", options.services));
   }
 
@@ -113,6 +109,11 @@ export async function searchDatasets<T = Dataset>({
         })
       )
     );
+  }
+
+  
+  if (options.fuel) {
+    fqAr.push(buildOrFq("fuel", [options.fuel]));
   }
 
   if (options.query) {
@@ -203,7 +204,7 @@ export async function searchDatasets<T = Dataset>({
 
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
-
+  console.log(endpoint)
   const response = await CkanRequest.get<any>(endpoint, {
     headers: { Authorization: apiKey },
   });

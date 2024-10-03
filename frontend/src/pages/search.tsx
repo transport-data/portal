@@ -19,6 +19,7 @@ import { api } from "@utils/api";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
 import React from "react";
+import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
 
 export function getServerSideProps({ query }: any) {
   return {
@@ -85,6 +86,7 @@ export default function DatasetSearch({
 
   const [currentPage, setCurrentPage] = useState(0);
   const {
+    isLoading,
     data: { datasets, count: datasetCount, facets } = {
       datasets: [],
       facets: {} as any,
@@ -443,16 +445,19 @@ export default function DatasetSearch({
                   </div>
                   <section className="mt-8">
                     <div className="flex flex-col gap-8">
-                      {!datasets.length && (
+                      {isLoading ? (
+                        <DatasetsCardsLoading />
+                      ) : !datasets.length ? (
                         <p className="text-sm">No datasets found</p>
+                      ) : (
+                        datasets.map((item, i) => (
+                          <DatasetSearchItem
+                            frequencies={updateFrequencies}
+                            key={`dataset-result-${i}`}
+                            {...item}
+                          />
+                        ))
                       )}
-                      {datasets.map((item, i) => (
-                        <DatasetSearchItem
-                          frequencies={updateFrequencies}
-                          key={`dataset-result-${i}`}
-                          {...item}
-                        />
-                      ))}
                     </div>
                   </section>
                 </div>
@@ -586,7 +591,10 @@ export const Checkboxes = ({
   return (
     <>
       {items.map((x, index) =>
-        index <= ((limitToPresentViewAll && !showAll) ? limitToPresentViewAll : 999999 * 999999) ? (
+        index <=
+        (limitToPresentViewAll && !showAll
+          ? limitToPresentViewAll
+          : 999999 * 999999) ? (
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <input
               id={x.name}

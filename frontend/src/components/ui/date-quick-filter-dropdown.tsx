@@ -76,18 +76,20 @@ export default function DateQuickFilterDropdown({
         <DropdownMenuSeparator />
         <div className="p-4">
           <div className="flex justify-end">
-            <button
-              className="font-semibold text-[#006064]"
-              onClick={() => {
-                setStartYear(undefined);
-                setEndYear(undefined);
-                onChange([
-                  { value: undefined, key: filterStartFieldName },
-                  { value: undefined, key: filterEndFieldName },
-                ]);
-              }}
-            >
-              Clear filter
+            <button className="font-semibold text-[#006064]">
+              <span
+                onClick={() => {
+                  setStartYear(undefined);
+                  setEndYear(undefined);
+                  onChange([
+                    { value: undefined, key: filterStartFieldName },
+                    { value: undefined, key: filterEndFieldName },
+                  ]);
+                }}
+                className="max-w-fit cursor-pointer"
+              >
+                Clear filter
+              </span>
             </button>
           </div>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
