@@ -93,6 +93,9 @@ export default function DatasetSearch({
     },
   } = api.dataset.search.useQuery(searchFilter);
 
+
+  api.dataset.search.useQuery({...searchFilter, offset: (currentPage + 1) * 9});
+
   useEffect(() => {
     for (const key in facets) {
       switch (key) {
@@ -467,7 +470,7 @@ export default function DatasetSearch({
                       <PaginationItem>
                         <button
                           disabled={currentPage === 0}
-                          aria-label="Go to next page"
+                          aria-label="Go to previous page"
                           className={cn(
                             "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
                             "rounded-s-lg px-2",
