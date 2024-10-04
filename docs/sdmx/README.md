@@ -9,7 +9,7 @@ In order to see some examples of datasets metadata using this metadata schema, c
 https://ckan.tdc.dev.datopian.com/api/action/package_search
 
 > [!tip]
-> Note that an individual's dataset metadata can be fetched with the [package_show endpoint](https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_show).
+> Note that an individual dataset's metadata can be fetched with the [package_show endpoint](https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_show).
 
 ### Mapping
 
