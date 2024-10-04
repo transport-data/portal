@@ -7,7 +7,12 @@ export const SelectableItemsList = ({
   selected,
   onSelectedItem,
 }: {
-  items: { value: string; icon: React.ReactNode; isSelected: boolean }[];
+  items: {
+    text?: string;
+    value: string;
+    icon: React.ReactNode;
+    isSelected: boolean;
+  }[];
   title: string;
   selected?: string;
   onSelectedItem: (selectedItem: string) => void;
@@ -26,7 +31,7 @@ export const SelectableItemsList = ({
             )}
           >
             <span>{x.icon}</span>
-            <span>{x.value}</span>
+            <span>{x.text || x.value}</span>
           </div>
         ))}
       </div>

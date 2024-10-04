@@ -1,7 +1,8 @@
 import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
-import DashboardDatasetCard from "@components/_shared/DashboardDatasetCardOld";
+import DashboardDatasetCard from "@components/_shared/DashboardDatasetCard";
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import DatasetsFilterMocked from "@components/_shared/DatasetsFilterMocked";
+import UserAvatar from "@components/_shared/UserAvatar";
 import {
   Pagination,
   PaginationContent,
@@ -19,6 +20,7 @@ import { api } from "@utils/api";
 import { useEffect, useState } from "react";
 
 export default () => {
+  const [contributors, setContributors] = useState<Facet[]>([]);
   const [modes, setModes] = useState<Facet[]>([]);
   const [services, setServices] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
@@ -31,36 +33,14 @@ export default () => {
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
   const [yearsCoverage, setYearsCoverage] = useState<Facet[]>([]);
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
-
-  const resetFilter = () => {
-    setSearchFilter({
-      offset: 0,
-      limit: 9,
-      sort: "score desc, metadata_modified desc",
-      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
-    });
-    setCurrentPage(0);
-  };
-
   const [visibility, setVisibility] = useState("All");
   const [contributor, setContributor] = useState("All");
   const { data: orgsForUser } = api.organization.listForUser.useQuery();
-  const contributors: any = [];
-  const datasetsPerPage = 20;
-  const [userOrganizationsList, setUserOrganizationsList] = useState<
-    (Organization & {
-      groups: Array<{
-        id: string;
-        name: string;
-      }>;
-    } & {
-      capacity: "admin" | "editor" | "member";
-    })[]
-  >();
 
+  const datasetsPerPage = 9;
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
-    limit: 9,
+    limit: datasetsPerPage,
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
@@ -77,13 +57,24 @@ export default () => {
     },
   } = api.dataset.search.useQuery(searchFilter);
 
+  const resetFilter = () => {
+    setSearchFilter({
+      offset: 0,
+      limit: datasetsPerPage,
+      orgs: orgsForUser?.map((org) => org.name),
+      sort: "score desc, metadata_modified desc",
+      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+    });
+    setCurrentPage(1);
+  };
+
   const onChange: SearchPageOnChange = (data) => {
     setSearchFilter((oldValue) => {
       const updatedValue: any = { ...oldValue, offset: 0 };
       data.forEach((x) => (updatedValue[x.key] = x.value));
       return updatedValue;
     });
-    setCurrentPage(0);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -97,6 +88,10 @@ export default () => {
   useEffect(() => {
     for (const key in facets) {
       switch (key) {
+        case "contributors": {
+          if (!contributors.length) setContributors(facets[key].items);
+          break;
+        }
         case "organization": {
           if (!orgs.length)
             setOrgs(
@@ -210,33 +205,8 @@ export default () => {
     }
   }, [facets, orgsForUser]);
 
-  /*const organizations = orgsForUser?.map((org, x) => {
-    const { data: orgData } = api.organization.get.useQuery({
-      name: org?.name ?? "",
-      includeUsers: true,
-    });
-    orgData?.users?.forEach((user) => {
-      contributors.push({
-        icon: <UserAvatar user={user as User} />,
-        value: user.display_name as string,
-        isSelected: false,
-      });
-    });
-    return orgData;
-  });*/
-  /* const options: SearchDatasetType = {
-    offset: offset,
-    limit: datasetsPerPage,
-    includePrivate: true,
-    includeDrafts: true,
-    orgs: orgsForUser?.map((o) => o?.name) || [],
-  };*/
-
-  // const { data, isLoading } = api.dataset.search.useQuery(options);
-
   const totalDatasets = datasetCount ?? 0;
-
-  const totalPages = Math.ceil(totalDatasets ?? 0 / datasetsPerPage);
+  const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
@@ -246,20 +216,38 @@ export default () => {
             {
               icon: <DocumentReportIcon />,
               isSelected: true,
-              value: "All",
+              text: "All",
+              value: "*",
             },
             {
               icon: <GlobeAltIcon />,
               isSelected: false,
-              value: "Public",
+              text: "Public",
+              value: "active",
             },
             {
               icon: <EyeOffIcon />,
               isSelected: false,
-              value: "Drafts",
+              text: "Drafts",
+              value: "draft",
             },
           ]}
-          onSelectedItem={(option) => setVisibility(option)}
+          onSelectedItem={(v) => {
+            setSearchFilter((_value) => ({
+              ..._value,
+              ...{
+                advancedQueries: [
+                  ...(_value.advancedQueries ?? []).filter(
+                    (aq) => aq.key !== "state"
+                  ),
+                  ...(v === "*" ? [] : [{ key: "state", values: [v] }]),
+                ],
+              },
+              offset: 0,
+            }));
+            setCurrentPage(1);
+            setVisibility(v);
+          }}
           selected={visibility}
           title="Categories"
         />
@@ -267,17 +255,53 @@ export default () => {
           items={[
             {
               isSelected: true,
-              value: "All",
+              value: "*",
+              text: "All",
               icon: <DocumentReportIcon />,
             },
-            ...(contributors ?? []),
+            ...(contributors?.length ? contributors : [])?.map((c: any) => ({
+              icon: (
+                <UserAvatar image={c.display_image} name={c.display_name} />
+              ),
+              text: c.display_name as string,
+              value: c.name as string,
+              isSelected: false,
+            })),
           ]}
-          onSelectedItem={(v) => setContributor(v)}
+          onSelectedItem={(v) => {
+            setSearchFilter((_value) => ({
+              ..._value,
+              ...{
+                advancedQueries: [
+                  ...(_value.advancedQueries ?? []).filter(
+                    (aq) => aq.key !== "contributors"
+                  ),
+                  ...(v === "*" ? [] : [{ key: "contributors", values: [v] }]),
+                ],
+              },
+              offset: 0,
+            }));
+            setCurrentPage(1);
+            setContributor(v);
+          }}
           selected={contributor}
           title="Contributors"
         />
         <div className="space-y-2.5 lg:hidden">
-          <DatasetsFilterMocked />
+          <DatasetsFilter
+            resetFilter={resetFilter}
+            datasetCount={datasetCount || 0}
+            onChange={onChange}
+            searchFilter={searchFilter}
+            defaultStartValue={searchFilter.startYear}
+            defaultEndValue={searchFilter.endYear}
+            tags={tags}
+            orgs={orgs}
+            resourcesFormats={resourcesFormats}
+            regions={regions}
+            countries={countries}
+            metadataCreatedDates={metadataCreatedDates}
+          />
         </div>
       </div>
       <div className="order-3 w-fit w-full sm:order-2">
@@ -287,17 +311,11 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {datasets
-                ?.filter((item) =>
-                  visibility === "Drafts"
-                    ? item.state === "draft"
-                    : visibility === "Public"
-                    ? item.state === "active"
-                    : true
-                )
-                ?.map((x) => (
-                  <DashboardDatasetCard {...(x as any)} />
-                ))}
+              {datasets?.length > 0 ? (
+                datasets?.map((x) => <DashboardDatasetCard {...(x as any)} />)
+              ) : (
+                <div className="text-[14px]">No datasets found...</div>
+              )}
 
               {totalPages > 1 && (
                 <Pagination className="mt-8 justify-start">
@@ -305,13 +323,25 @@ export default () => {
                     <PaginationItem>
                       <PaginationPrevious
                         disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => {
+                          setSearchFilter((oldV) => ({
+                            ...oldV,
+                            offset: (currentPage - 1) * datasetsPerPage,
+                          }));
+                          setCurrentPage(currentPage - 1);
+                        }}
                       />
                     </PaginationItem>
                     {Array.from({ length: totalPages }).map((_, x) => (
                       <PaginationItem
                         key={`page-${x}`}
-                        onClick={() => setCurrentPage(x + 1)}
+                        onClick={() => {
+                          setSearchFilter((oldV) => ({
+                            ...oldV,
+                            offset: x * datasetsPerPage,
+                          }));
+                          setCurrentPage(x + 1);
+                        }}
                       >
                         <PaginationLink
                           href="#"
@@ -324,7 +354,13 @@ export default () => {
                     <PaginationItem>
                       <PaginationNext
                         disabled={currentPage === totalDatasets}
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => {
+                          setSearchFilter((oldV) => ({
+                            ...oldV,
+                            offset: (currentPage + 1) * datasetsPerPage,
+                          }));
+                          setCurrentPage(currentPage + 1);
+                        }}
                       />
                     </PaginationItem>
                   </PaginationContent>

@@ -91,7 +91,9 @@ export default function DashboardDatasetCard(props: Dataset) {
               className="px-2.5 py-0.5 text-sm"
               asChild
             >
-              <Link href={`/dashboard/datasets/${name}/edit`}><PencilIcon className="w-3 h-3 mr-1" /> Edit</Link>
+              <Link href={`/dashboard/datasets/${name}/edit`}>
+                <PencilIcon className="mr-1 h-3 w-3" /> Edit
+              </Link>
             </Button>
           </div>
           {tdc_category === "tdc_formatted" && (
@@ -213,7 +215,10 @@ export default function DashboardDatasetCard(props: Dataset) {
                         {contributors.length - 4}
                       </a>
                     ) : i < 4 ? (
-                      <UserAvatar user={contributor} />
+                      <UserAvatar
+                        image={contributor.image_display_url}
+                        name={contributor.display_name ?? ""}
+                      />
                     ) : (
                       <></>
                     )
