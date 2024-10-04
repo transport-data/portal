@@ -24,7 +24,7 @@ export const DatasetSchema = z.object({
   title: z.string(),
   notes: z.string().min(1, { message: "Description is required" }),
   overview_text: z.string().optional().nullable(),
-  owner_org: z.string({ message: "Organization is required" }),
+  owner_org: z.string({ description: "Organization is required" }),
   topics: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),
   tags: z.array(z.object({
@@ -57,7 +57,7 @@ export const DatasetSchema = z.object({
   license_id: z.string().optional(),
   private: z.boolean().default(true),
   indicators: z.array(z.string()).default([]),
-  dimensioning: z.string(),
+  dimensioning: z.string().optional().nullable(),
   units: z.array(z.string()).default([]),
   url: z.string().url().optional().or(emptyStringToUndefined),
   data_provider: z.string().optional().or(emptyStringToUndefined),

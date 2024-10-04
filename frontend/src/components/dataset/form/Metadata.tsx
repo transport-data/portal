@@ -224,6 +224,7 @@ export function MetadataForm() {
                         <CommandItem
                           value={language.code}
                           key={language.code}
+                          keywords={[language.name]}
                           onSelect={() => {
                             setValue("language", language.code);
                           }}
@@ -430,6 +431,7 @@ export function MetadataForm() {
                                   <CommandItem
                                     value={c.name}
                                     key={c.name}
+                                    keywords={[c.title ?? c.name]}
                                     onSelect={() => {
                                       match(field.value.includes(c.name))
                                         .with(true, () => {
@@ -551,6 +553,7 @@ export function MetadataForm() {
                             {sectors.map((s) => (
                               <CommandItem
                                 value={s.value}
+                                keywords={[s.label]}
                                 key={s.value}
                                 onSelect={() => {
                                   match(field.value.includes(s.value))
@@ -669,6 +672,7 @@ export function MetadataForm() {
                             {services.map((s) => (
                               <CommandItem
                                 value={s.value}
+                                keywords={[s.label]}
                                 key={s.value}
                                 onSelect={() => {
                                   match(field.value.includes(s.value))
@@ -788,6 +792,7 @@ export function MetadataForm() {
                             {modes.map((m) => (
                               <CommandItem
                                 value={m.value}
+                                keywords={[m.label]}
                                 key={m.value}
                                 onSelect={() => {
                                   match(field.value.includes(m.value))
