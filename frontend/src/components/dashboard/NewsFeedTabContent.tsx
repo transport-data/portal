@@ -106,8 +106,8 @@ export default () => {
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return searchResults?.slice(startIndex, endIndex);
-  }, [searchResults, currentPage, itemsPerPage]);
+    return sortedResults?.slice(startIndex, endIndex);
+  }, [sortedResults, currentPage, itemsPerPage]);
 
   const groupedActivities = useMemo(() => {
     return groupByDate(paginatedData || []);
