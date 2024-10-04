@@ -120,7 +120,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     //  404s if the org doesn't exist
     const organization = await getOrganization({
-      input: { id: orgName },
+      input: { id: orgName, includeUsers: true },
       apiKey,
     });
     return { props: { organization } };

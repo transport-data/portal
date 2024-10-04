@@ -49,10 +49,11 @@ import { IndicatorsField } from "./IndicatorField";
 import { UnitsField } from "./UnitsField";
 import { SourcesForm } from "./SourcesForm";
 import { CommentsForm } from "./CommentsForm";
+import { RTEForm } from "@components/ui/formRte";
 
 export function MetadataForm() {
-  const { control, setValue, getValues, watch } =
-    useFormContext<DatasetFormType>();
+  const formObj = useFormContext<DatasetFormType>();
+  const { control, setValue, getValues, watch } = formObj;
   const geographies = api.group.tree.useQuery({
     type: "geography",
   });
@@ -164,6 +165,18 @@ export function MetadataForm() {
             Related Datasets
           </div>
           <RelatedDatasetsField />
+        </>
+      )}
+      {watch("tdc_category") === "tdc_harmonized" && (
+        <>
+          <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+            Introduction and key takeaways
+          </div>
+          <RTEForm
+            name="introduction_text"
+            placeholder="Write a overview description of this dataset"
+            formObj={formObj}
+          />
         </>
       )}
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">

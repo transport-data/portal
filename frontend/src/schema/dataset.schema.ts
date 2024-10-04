@@ -47,6 +47,7 @@ export const DatasetSchema = z.object({
   language: z.string().optional(),
   frequency: z.string().optional(),
   tdc_category: z.string(),
+  introduction_text: z.string().optional().nullable(),
   modes: z.array(z.string()).default([]),
   services: z.array(z.string()).default([]),
   sectors: z.array(z.string()).default([]),
