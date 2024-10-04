@@ -4,7 +4,7 @@ type HeadingProps = {
   className?: string;
   color?: string;
 
-  children?: React.ReactNode;
+  children: React.ReactNode;
   size?:
     | "xs"
     | "sm"
@@ -31,7 +31,7 @@ type HeadingProps = {
   leading?: "none" | "tight" | "snug" | "normal" | "relaxed" | "loose";
 };
 
-const Heading: React.FC<HeadingProps> = ({
+export function Heading({
   level = 1,
   text,
   className = "",
@@ -41,16 +41,16 @@ const Heading: React.FC<HeadingProps> = ({
   weight = "extrabold",
   align = "center",
   leading = "tight",
-}) => {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+}: HeadingProps) {
+  const Tag = `h${level}` as any;
 
   return (
     <Tag
       className={`font-${weight} text-${size} ${color} text-${align} leading-${leading} ${className} `}
     >
-      {children || text}
+        {children || text}
     </Tag>
   );
-};
+}
 
 export default Heading;

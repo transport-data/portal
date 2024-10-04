@@ -27,9 +27,9 @@ import { Checkbox } from "@components/ui/checkbox";
 
 const contactSchema = z.object({
   email: z.string().email(),
-  topic: z.string({ message: "Please select a topic" }),
-  subject: z.string({ message: "Please enter a subject" }),
-  message: z.string({ message: "Please enter a message" }),
+  topic: z.string({ description: "Please select a topic" }),
+  subject: z.string({ description: "Please enter a subject" }),
+  message: z.string({ description: "Please enter a message" }),
   privacyPolicy: z.boolean().refine((value) => value === true, {
     message: "Please confirm that you have read and agree with the terms",
   }),
