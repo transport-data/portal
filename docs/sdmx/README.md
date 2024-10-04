@@ -2,7 +2,7 @@
 
 ## CKAN metadata schema -> TDCI metadata sctructure
 
-The TDC CKAN extension uses the metadata schema defined in the (metadata schema documentation)[../metadata-schema].
+The TDC CKAN extension uses the metadata schema defined in the [metadata schema documentation](../metadata-schema).
 
 In order to see some examples of datasets metadata using this metadata schema, check out:
 
