@@ -17,10 +17,8 @@ type DatasetCreateEditType = Omit<
 };
 
 export async function searchDatasets<T = Dataset>({
-  apiKey,
   options,
 }: {
-  apiKey: string;
   options: SearchDatasetType;
 }): Promise<{
   datasets: Array<T>;
@@ -206,9 +204,7 @@ export async function searchDatasets<T = Dataset>({
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
   console.log(endpoint)
-  const response = await CkanRequest.get<any>(endpoint, {
-    headers: { Authorization: apiKey },
-  });
+  const response = await CkanRequest.get<any>(endpoint);
 
   return {
     datasets: response.result.results,
