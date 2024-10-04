@@ -1,5 +1,6 @@
 import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
 import DashboardDatasetCard from "@components/_shared/DashboardDatasetCardOld";
+import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import DatasetsFilterMocked from "@components/_shared/DatasetsFilterMocked";
 import {
   Pagination,
@@ -11,18 +12,204 @@ import {
 } from "@components/ui/pagination";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { DocumentReportIcon, EyeOffIcon, GlobeAltIcon } from "@lib/icons";
+import { SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
+import { Organization } from "@schema/organization.schema";
 import { api } from "@utils/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default () => {
-  const [page, setPage] = useState(1);
+  const [modes, setModes] = useState<Facet[]>([]);
+  const [services, setServices] = useState<Facet[]>([]);
+  const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
+  const [tags, setTags] = useState<Facet[]>([]);
+  const [sectors, setSectors] = useState<Facet[]>([]);
+  const [orgs, setOrgs] = useState<Facet[]>([]);
+  const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
+  const [regions, setRegions] = useState<Facet[]>([]);
+  const [countries, setCountries] = useState<Facet[]>([]);
+  const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
+  const [yearsCoverage, setYearsCoverage] = useState<Facet[]>([]);
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+
+  const resetFilter = () => {
+    setSearchFilter({
+      offset: 0,
+      limit: 9,
+      sort: "score desc, metadata_modified desc",
+      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+    });
+    setCurrentPage(0);
+  };
+
   const [visibility, setVisibility] = useState("All");
   const [contributor, setContributor] = useState("All");
   const { data: orgsForUser } = api.organization.listForUser.useQuery();
   const contributors: any = [];
   const datasetsPerPage = 20;
-  const offset = (page - 1) * datasetsPerPage;
+  const [userOrganizationsList, setUserOrganizationsList] = useState<
+    (Organization & {
+      groups: Array<{
+        id: string;
+        name: string;
+      }>;
+    } & {
+      capacity: "admin" | "editor" | "member";
+    })[]
+  >();
+
+  const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
+    offset: 0,
+    limit: 9,
+    sort: "score desc, metadata_modified desc",
+    includePrivate: true,
+    includeDrafts: true,
+    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
+    orgs: orgsForUser?.map((org) => org.id),
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    isLoading,
+    data: { datasets, count: datasetCount, facets } = {
+      datasets: [],
+      facets: {} as any,
+    },
+  } = api.dataset.search.useQuery(searchFilter);
+
+  const onChange: SearchPageOnChange = (data) => {
+    setSearchFilter((oldValue) => {
+      const updatedValue: any = { ...oldValue, offset: 0 };
+      data.forEach((x) => (updatedValue[x.key] = x.value));
+      return updatedValue;
+    });
+    setCurrentPage(0);
+  };
+
+  useEffect(() => {
+    if (orgsForUser)
+      setSearchFilter((_value) => ({
+        ..._value,
+        orgs: orgsForUser?.map((org) => org.name),
+      }));
+  }, [orgsForUser]);
+
+  useEffect(() => {
+    for (const key in facets) {
+      switch (key) {
+        case "organization": {
+          if (!orgs.length)
+            setOrgs(
+              facets[key].items?.filter((item: any) =>
+                orgsForUser?.map((org) => org.name)?.includes(item?.name)
+              )
+            );
+          break;
+        }
+        case "tags": {
+          if (!tags.length) setTags(facets[key].items);
+          break;
+        }
+        case "geographies": {
+          if (!countries.length) setCountries(facets[key].items);
+          break;
+        }
+        case "regions": {
+          if (!regions.length) setRegions(facets[key].items);
+          break;
+        }
+        case "res_format": {
+          if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
+          break;
+        }
+        case "modes": {
+          if (!modes.length) setModes(facets[key].items);
+          break;
+        }
+        case "services": {
+          if (!services.length) setServices(facets[key].items);
+          break;
+        }
+        case "frequency": {
+          if (!updateFrequencies.length)
+            setUpdateFrequencies(facets[key].items);
+          break;
+        }
+        case "sectors": {
+          if (!sectors.length) setSectors(facets[key].items);
+          break;
+        }
+        case "metadata_created": {
+          const countByYear = new Map<string, number>();
+          const LAST_MONTH_KEY = "Last month";
+          const setYearsCoverage = (map: Map<string, number>) => {
+            const data = Array.from(map.keys()).map((k) => {
+              return {
+                name: k,
+                display_name: k,
+                count: map.get(k) || 0,
+              };
+            });
+            const [lastMonthFacet] = data.splice(
+              data.findIndex((x) =>
+                x.display_name.toLowerCase().includes("last")
+              ),
+              1
+            );
+
+            data.sort(
+              (a, b) => Number(a.display_name) - Number(b.display_name)
+            );
+            data.splice(1, 0, lastMonthFacet!);
+            setMetadataCreatedDates(data);
+          };
+
+          facets[key].items.forEach((x: any) => {
+            const dateConverted = new Date(x.name);
+            const today = new Date();
+            let _key;
+            // this is checking if the dataset was created at December of last year and today is January making the dataset be in last month filter
+            if (
+              today.getFullYear() - dateConverted.getFullYear() === 1 &&
+              today.getMonth() === 0 &&
+              dateConverted.getMonth() === 11
+            ) {
+              _key = LAST_MONTH_KEY;
+            } else {
+              _key =
+                dateConverted.getFullYear() === today.getFullYear() &&
+                dateConverted.getMonth() === today.getMonth() - 1
+                  ? LAST_MONTH_KEY
+                  : x.name.slice(0, 4);
+            }
+
+            let count = countByYear.get(_key);
+            if (!count) {
+              countByYear.set(_key, x.count);
+            } else {
+              countByYear.set(_key, count + x.count);
+            }
+          });
+          countByYear.set(
+            new Date().getFullYear().toString(),
+            (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
+              (countByYear.get(LAST_MONTH_KEY) ?? 0)
+          );
+
+          if (!countByYear.get(LAST_MONTH_KEY)) {
+            countByYear.set(LAST_MONTH_KEY, 0);
+          }
+
+          setYearsCoverage(countByYear);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+  }, [facets, orgsForUser]);
+
   /*const organizations = orgsForUser?.map((org, x) => {
     const { data: orgData } = api.organization.get.useQuery({
       name: org?.name ?? "",
@@ -37,21 +224,19 @@ export default () => {
     });
     return orgData;
   });*/
-  const options: SearchDatasetType = {
+  /* const options: SearchDatasetType = {
     offset: offset,
     limit: datasetsPerPage,
     includePrivate: true,
     includeDrafts: true,
     orgs: orgsForUser?.map((o) => o?.name) || [],
-  };
+  };*/
 
-  const { data, isLoading } = api.dataset.search.useQuery(options);
+  // const { data, isLoading } = api.dataset.search.useQuery(options);
 
-  const datasets = data?.datasets;
+  const totalDatasets = datasetCount ?? 0;
 
-  const totalDatasets = data?.count ?? 0;
-
-  const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
+  const totalPages = Math.ceil(totalDatasets ?? 0 / datasetsPerPage);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
@@ -119,24 +304,27 @@ export default () => {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        disabled={page === 1}
-                        onClick={() => setPage(page - 1)}
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(currentPage - 1)}
                       />
                     </PaginationItem>
                     {Array.from({ length: totalPages }).map((_, x) => (
                       <PaginationItem
                         key={`page-${x}`}
-                        onClick={() => setPage(x + 1)}
+                        onClick={() => setCurrentPage(x + 1)}
                       >
-                        <PaginationLink href="#" isActive={x + 1 === page}>
+                        <PaginationLink
+                          href="#"
+                          isActive={x + 1 === currentPage}
+                        >
                           {x + 1}
                         </PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem>
                       <PaginationNext
-                        disabled={page === totalDatasets}
-                        onClick={() => setPage(page + 1)}
+                        disabled={currentPage === totalDatasets}
+                        onClick={() => setCurrentPage(currentPage + 1)}
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -147,7 +335,20 @@ export default () => {
         </section>
       </div>
       <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3  sm:min-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
-        <DatasetsFilterMocked />
+        <DatasetsFilter
+          resetFilter={resetFilter}
+          datasetCount={datasetCount || 0}
+          onChange={onChange}
+          searchFilter={searchFilter}
+          defaultStartValue={searchFilter.startYear}
+          defaultEndValue={searchFilter.endYear}
+          tags={tags}
+          orgs={orgs}
+          resourcesFormats={resourcesFormats}
+          regions={regions}
+          countries={countries}
+          metadataCreatedDates={metadataCreatedDates}
+        />
       </div>
     </div>
   );
