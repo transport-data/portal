@@ -9,6 +9,7 @@ import {
 } from "@schema/dataset.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { Activity } from "@portaljs/ckan";
 
 //We need to use this cause the way the combobox to input related_datasets is setup
 type DatasetCreateEditType = Omit<
@@ -32,40 +33,36 @@ export const searchDatasets = async ({
 
   let queryParams: string[] = [];
 
-
-
-    const buildOrFq = (key: string, values: string[]) =>
-      `${key}:(${values.join(" OR ")})`;
+  const buildOrFq = (key: string, values: string[]) =>
+    `${key}:(${values.join(" OR ")})`;
 
   if (input?.offset) {
     queryParams.push(`start=${input.offset}`);
   }
 
+  if (input.orgs?.length) {
+    queryParams.push(`fq=${buildOrFq("organization", input.orgs)}`);
+  }
 
-    if (input.orgs?.length) {
-      queryParams.push(`fq=${buildOrFq("organization", input.orgs)}`);
-    }
-
-    if (input?.offset) {
-        queryParams.push(`start=${input.offset}`)
-    }
+  if (input?.offset) {
+    queryParams.push(`start=${input.offset}`);
+  }
 
   if (input?.sort) {
     queryParams.push(`sort=${input?.sort}`);
+  }
+
+  if (input?.include_private) {
+    queryParams.push(`include_private=${input?.include_private}`);
   }
 
   if (input?.include_drafts) {
     queryParams.push(`include_drafts=${input?.include_drafts}`);
   }
 
-
-    if (input?.include_drafts) {
-        queryParams.push(`include_drafts=${input?.include_drafts}`)
-    }
-
-    const action = `${baseAction}?${queryParams.join("&")}`
-    const datasets:CkanResponse<{results:Dataset[], count:number}> = await CkanRequest.get(action, { ckanUrl, apiKey})
-
+  const action = `${baseAction}?${queryParams.join("&")}`;
+  const datasets: CkanResponse<{ results: Dataset[]; count: number }> =
+    await CkanRequest.get(action, { ckanUrl, apiKey });
 
   return datasets.result;
 };
@@ -166,4 +163,26 @@ export const licensesList = async ({ apiKey }: { apiKey: string }) => {
     }
   );
   return licenses.result;
+};
+
+export const listDatasetActivities = async ({
+  apiKey,
+  ids,
+}: {
+  apiKey: string;
+  ids: Array<string>;
+}) => {
+  const activities = await Promise.all(
+    ids.map(async (id) => {
+      const response = await CkanRequest.post<CkanResponse<Activity[]>>(
+        `package_activity_list`,
+        {
+          apiKey: apiKey,
+          json: { id },
+        }
+      );
+      return response.result;
+    })
+  );
+  return activities.flat();
 };

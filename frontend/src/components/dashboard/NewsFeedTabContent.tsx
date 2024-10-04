@@ -54,7 +54,7 @@ export default () => {
   }, [filter, searchText]);
 
   const { data: activities, isLoading } =
-    api.user.listDashboardActivities.useQuery();
+    api.user.listUserActivities.useQuery();
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({

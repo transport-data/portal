@@ -1,5 +1,6 @@
-import { User } from "@portaljs/ckan";
-import { EyeOff, Globe, Building, Database } from "lucide-react";
+import { api } from "@utils/api";
+import { EyeOff, Globe, Building, Database, User } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export interface DashboardNewsfeedCardProps {
   id: string;
@@ -7,7 +8,6 @@ export interface DashboardNewsfeedCardProps {
   user_id: string;
   object_id?: string;
   activity_type?: string;
-  user_data?: User;
   data?: {
     group?: {
       title?: string;
@@ -19,10 +19,19 @@ export interface DashboardNewsfeedCardProps {
       private?: boolean;
       state?: string;
     };
+    actor?: string;
   };
 }
 
 export default (activity: DashboardNewsfeedCardProps) => {
+  const { data: sessionData } = useSession();
+  const user_id = sessionData?.user?.id;
+
+  const { data: user, isLoading } = api.user.getUsersByIds.useQuery({
+    ids: [activity.user_id],
+  });
+  const userData = user?.at(0);
+
   const activitySegments = activity.activity_type?.split(" ");
   const activityType = activitySegments ? activitySegments[0] : "changed";
   const activityTarget = activitySegments
@@ -49,14 +58,19 @@ export default (activity: DashboardNewsfeedCardProps) => {
     //  TODO: what other activity types are there?
   }
 
-  const fullText = `You ${actionText} ${activityTarget}`;
-
+  let actor = "You";
   let linkHref = "";
   let linkTitle: string | undefined = "";
   switch (activityTarget) {
     case "dataset":
       linkHref = `datasets/${activity.data?.package?.name}/resources`;
       linkTitle = activity.data?.package?.title;
+      actor =
+        activity.user_id == user_id
+          ? "You"
+          : activity.data?.actor
+          ? activity.data?.actor
+          : "You";
       break;
     case "organization":
       linkTitle = activity.data?.group?.title;
@@ -67,6 +81,7 @@ export default (activity: DashboardNewsfeedCardProps) => {
       linkHref = "/dashboard/topics";
       break;
   }
+  const fullText = `${actionText} ${activityTarget}`;
 
   if (activityType == "deleted") {
     //  Unset href if entity was deleted
@@ -76,14 +91,17 @@ export default (activity: DashboardNewsfeedCardProps) => {
     <div key={activity.id}>
       <div className="mt-5 flex flex-row items-start">
         <div className="mr-3 rounded-full">
-          {activityTarget === "dataset" ? (
-            <Database size={20} color={color} />
+          {userData && userData.image_display_url ? (
+            <img
+              src={userData.image_display_url}
+              alt="Profile picture of user"
+            />
           ) : (
-            <Building size={20} color={color} />
+            <User />
           )}
         </div>
         <p className="text-sm">
-          {fullText}{" "}
+          <span className="font-semibold">{actor}</span> {fullText}{" "}
           {linkHref ? (
             <a className="font-semibold" href={linkHref}>
               {linkTitle}
@@ -101,15 +119,32 @@ export default (activity: DashboardNewsfeedCardProps) => {
         </p>
       </div>
       <div className="my-3">
-        {activityTarget === "dataset" && activity.data?.package?.private ? (
-          <span className="mx-8 flex items-center gap-1 text-xs">
-            <EyeOff size={14} /> private
-          </span>
-        ) : (
-          <span className="mx-8 flex items-center gap-1 text-xs">
-            <Globe size={14} /> public
-          </span>
-        )}
+        <div className="mx-8 flex items-center gap-1 text-xs">
+          {activityTarget === "dataset" ? (
+            <span className="flex items-center gap-1">
+              <Database size={20} color={color} />
+            </span>
+          ) : (
+            <span className="flex items-center gap-1">
+              <Building size={20} color={color} />
+            </span>
+          )}
+
+          {activityTarget === "dataset" && (
+            <>
+              <span className="hidden xl:block">•</span>
+              {activity.data?.package?.private ? (
+                <span className="flex items-center gap-1">
+                  <EyeOff size={14} /> private
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Globe size={14} /> public
+                </span>
+              )}
+            </>
+          )}
+        </div>
       </div>
       <hr></hr>
     </div>
