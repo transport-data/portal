@@ -2,14 +2,14 @@
 
 ## CKAN metadata schema -> TDCI metadata sctructure
 
-The TDC CKAN extension uses the metadata schema defined in the (metadata schema documentation)[../metadata-schema].
+The TDC CKAN extension uses the metadata schema defined in the [metadata schema documentation](../metadata-schema).
 
 In order to see some examples of datasets metadata using this metadata schema, check out:
 
 https://ckan.tdc.dev.datopian.com/api/action/package_search
 
 > [!tip]
-> Note that an individual's dataset metadata can be fetched with the [package_show endpoint](https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_show).
+> Note that an individual dataset's metadata can be fetched with the [package_show endpoint](https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_show).
 
 ### Mapping
 
