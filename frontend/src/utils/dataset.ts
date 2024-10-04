@@ -205,6 +205,7 @@ export async function searchDatasets<T = Dataset>({
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
   console.log(endpoint)
+
   const response = await CkanRequest.get<any>(endpoint, {
     headers: { Authorization: apiKey },
   });

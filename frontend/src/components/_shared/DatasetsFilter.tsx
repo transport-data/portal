@@ -102,9 +102,11 @@ export default ({
       : searchFilter.startYear && !searchFilter.endYear
       ? `After ${searchFilter.startYear}`
       : searchFilter.startYear && searchFilter.endYear
-      ? searchFilter.startYear.toString().slice(0, 4) +
-        " to " +
-        searchFilter.endYear?.toString().slice(0, 4)
+      ? searchFilter.startYear === searchFilter.endYear
+        ? searchFilter.startYear.toString().slice(0, 4)
+        : searchFilter.startYear.toString().slice(0, 4) +
+          " to " +
+          searchFilter.endYear?.toString().slice(0, 4)
       : "All";
 
   return (
@@ -459,7 +461,7 @@ export default ({
                   value={endYear ? dayjs(endYear.toString()) : undefined}
                   onChange={(x) => setEndYear(x?.year())}
                   minDate={
-                    startYear ? dayjs((startYear! + 1).toString()) : undefined
+                    startYear ? dayjs((startYear!).toString()) : undefined
                   }
                   openTo="year"
                   views={["year"]}
