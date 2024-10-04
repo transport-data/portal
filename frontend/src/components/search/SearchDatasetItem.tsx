@@ -47,16 +47,21 @@ export default function SearchDatasetItem({
               <ClipboardIcon width={14} />
               Updated on {formatDate(metadata_modified ?? "")}
             </div>
-            <span className="hidden sm:block">•</span>
-            <div className="flex gap-[4px]">
-              <GlobeAltIcon width={14} />
-              {regions?.map((r, idx) => (
-                <span key={`group-${r}`}>
-                  {groups?.find((g) => g.name === r)?.display_name}
-                  {idx < regions.length - 1 && ","}
-                </span>
-              ))}
-            </div>
+
+            {regions && regions.length && (
+              <>
+                <span className="hidden sm:block">•</span>
+                <div className="flex gap-[4px]">
+                  <GlobeAltIcon width={14} />
+                  {regions?.map((r, idx) => (
+                    <span key={`group-${r}`}>
+                      {groups?.find((g) => g.name === r)?.display_name}
+                      {idx < regions.length - 1 && ","}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Link>

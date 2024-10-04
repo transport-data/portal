@@ -37,17 +37,16 @@ export default function SearchBar() {
   const [showAllFacets, setShowAllFacets] = useState<boolean>(false);
   const [query, setQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const [facetName, setFacetName] = useState("");
+  const [storedSearches, setStoredSearches] =
+    useState<Array<RecentSearchProps>>();
   const [facetValue, setFacetValue] = useState<FacetValueProps>({
     display_name: "",
     name: "",
   });
-  const [facetName, setFacetName] = useState("");
 
-  const [storedSearches, setStoredSearches] =
-    useState<Array<RecentSearchProps>>();
-
-  const { data, isLoading } = api.dataset.search.useQuery({
-    limit: query?.length > 1 ? 10 : 0,
+  const { data } = api.dataset.search.useQuery({
+    limit: query?.length > 1 ? 5 : 0,
     query: query,
     sort: "score desc, metadata_modified desc",
     ...(facetValue.name
@@ -58,6 +57,7 @@ export default function SearchBar() {
               : [facetValue.name],
         }
       : {}),
+
     facetsFields: `["regions", "sectors", "modes", "services", "indicator", "temporal_coverage_start", "temporal_coverage_end"]`,
   });
 
@@ -96,7 +96,6 @@ export default function SearchBar() {
             index === self.findIndex((o) => o.name === obj.name)
         ),
     },
-
     sectors: {
       field: "sector",
       description: "road, rail, aviation, water transportation",
@@ -182,18 +181,19 @@ export default function SearchBar() {
       ...(facetValue.name ? { [facetName]: value } : {}),
       query: inputValue,
     };
-    const queryParams = new URLSearchParams(queryObject);
-
-    storeRecentSearch(queryObject);
+    if (inputValue) storeRecentSearch(queryObject);
 
     setShowCommandList(false);
 
-    router.push(`/search?${queryParams.toString()}`);
+    router.push({
+      pathname: "/search",
+      query: queryObject,
+    });
+
+    return false;
   };
 
   const storeRecentSearch = (search: RecentSearchProps) => {
-    console.log(search);
-
     const _storedSearches: Array<RecentSearchProps> = [
       ...(storedSearches ?? []),
     ].filter((item) => JSON.stringify(item) !== JSON.stringify(search));
@@ -213,16 +213,25 @@ export default function SearchBar() {
       display_name: string;
       count: number;
     }[]
-  )?.filter(
-    (indicator) =>
-      isTyping &&
-      indicator.display_name
-        ?.toLocaleLowerCase()
-        .includes(query?.toLocaleLowerCase())
-  );
+  )
+    ?.filter(
+      (indicator) =>
+        isTyping &&
+        indicator.display_name
+          ?.toLocaleLowerCase()
+          .includes(query?.toLocaleLowerCase())
+    )
+    .sort((a: any, b: any) => a.name - b.name);
 
   return (
-    <form onSubmit={(event) => handleSubmit()} className="">
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        handleSubmit();
+        return false;
+      }}
+      className=""
+    >
       <Command className="relative" shouldFilter={false} ref={commandRef}>
         <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] bg-popover text-popover-foreground">
           {/* badge with selected filter */}
@@ -246,7 +255,6 @@ export default function SearchBar() {
                 event.preventDefault();
                 handleSubmit();
               }
-              return false;
             }}
             value={inputValue}
           />
@@ -262,7 +270,7 @@ export default function SearchBar() {
           )}
           {/* submit search */}
           <Button
-            type="submit"
+            onClick={() => handleSubmit()}
             className="absolute right-[10px] top-[10px] flex gap-[8px]"
           >
             <SearchIcon width={15} />
@@ -303,7 +311,7 @@ export default function SearchBar() {
                         heading={<CommandListHeader title="Datasets" />}
                         className="block"
                       >
-                        {data?.datasets?.slice(0, 5)?.map((dataset, index) => (
+                        {data?.datasets?.map((dataset, index) => (
                           <SearchDatasetItem {...dataset} />
                         ))}
                       </CommandGroup>
@@ -318,9 +326,9 @@ export default function SearchBar() {
                             key={`indicator-${x}`}
                             text={indicator.display_name}
                             onSelect={() => {
-                              /*storeRecentSearch({
+                              storeRecentSearch({
                                 indicator: indicator,
-                              });*/
+                              });
                             }}
                             href={`/search?indicator=${indicator.name}`}
                             icon={
@@ -368,14 +376,13 @@ export default function SearchBar() {
                               const icon = recent.indicator ? (
                                 <VariableIcon
                                   width={20}
-                                  className="text-gray-500"
+                                  className="min-w-[20px] text-gray-500"
                                 />
                               ) : null;
 
                               const context = recent.indicator
                                 ? "Indicator"
                                 : "";
-                              console.log(recent);
 
                               return (
                                 <SearchFacetItem
@@ -396,31 +403,6 @@ export default function SearchBar() {
                   </>
                 )
               }
-
-              {/*(query?.length > 1 || facetValue) && data?.datasets.length && (
-                <>
-                  <CommandGroup
-                    heading={<CommandListHeader title="Indicators" />}
-                  >
-                    <SearchFacetItem
-                      text={"passanger activity"}
-                      icon={
-                        <VariableIcon width={20} className="text-gray-500" />
-                      }
-                      context={"Indicator"}
-                    />
-                    <SearchFacetItem
-                      text={"vehicle fleet"}
-                      icon={
-                        <VariableIcon width={20} className="text-gray-500" />
-                      }
-                      context={"Indicator"}
-                    />
-                  </CommandGroup>
-
-           
-                </>
-              )*/}
             </>
           )}
         </CommandList>

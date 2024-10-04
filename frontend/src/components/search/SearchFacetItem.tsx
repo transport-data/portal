@@ -27,10 +27,15 @@ export default function SearchFacetItem({
   const ItemContent = () => (
     <>
       {showIcon &&
-        (icon || <MagnifyingGlassIcon width={20} className="text-gray-500" />)}
+        (icon || (
+          <MagnifyingGlassIcon
+            width={20}
+            className="min-w-[20px] text-gray-500"
+          />
+        ))}
       {showBadge && badge && <FacetBadge name={badge} />}
       <span>{text}</span>
-      {context && <span className="text-gray-400">- {context}</span>}
+      {context && <span className="min-w-fit text-gray-400">- {context}</span>}
     </>
   );
 
