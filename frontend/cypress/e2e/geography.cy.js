@@ -24,6 +24,7 @@ describe("Show geography page the country list", () => {
 
   it("Should create and edit org", () => {
     cy.visit(`/geography`);
+    cy.wait(10000)
     cy.get("#Brazil").scrollIntoView().click();
     cy.url().should("contains", "/search?country=bra");
   });
