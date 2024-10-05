@@ -1,7 +1,6 @@
 import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
 import DashboardDatasetCard from "@components/_shared/DashboardDatasetCard";
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
-import DatasetsFilterMocked from "@components/_shared/DatasetsFilterMocked";
 import UserAvatar from "@components/_shared/UserAvatar";
 import {
   Pagination,
@@ -12,10 +11,10 @@ import {
   PaginationPrevious,
 } from "@components/ui/pagination";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { DocumentReportIcon, EyeOffIcon, GlobeAltIcon } from "@lib/icons";
 import { SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
-import { Organization } from "@schema/organization.schema";
 import { api } from "@utils/api";
 import { useEffect, useState } from "react";
 
@@ -31,14 +30,14 @@ export default () => {
   const [regions, setRegions] = useState<Facet[]>([]);
   const [countries, setCountries] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
-  const [yearsCoverage, setYearsCoverage] = useState<Facet[]>([]);
-  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
-  const [visibility, setVisibility] = useState("All");
-  const [contributor, setContributor] = useState("All");
+  const [visibility, setVisibility] = useState("*");
+  const [contributor, setContributor] = useState("*");
+  const [currentPage, setCurrentPage] = useState(1);
   const { data: orgsForUser } = api.organization.listForUser.useQuery();
 
   const datasetsPerPage = 9;
-  const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
+
+  const defaultSearchFilterProps: SearchDatasetType = {
     offset: 0,
     limit: datasetsPerPage,
     sort: "score desc, metadata_modified desc",
@@ -46,9 +45,12 @@ export default () => {
     includeDrafts: true,
     facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
     orgs: orgsForUser?.map((org) => org.id),
-  });
+  };
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchFilter, setSearchFilter] = useState<SearchDatasetType>(
+    defaultSearchFilterProps
+  );
+
   const {
     isLoading,
     data: { datasets, count: datasetCount, facets } = {
@@ -58,13 +60,7 @@ export default () => {
   } = api.dataset.search.useQuery(searchFilter);
 
   const resetFilter = () => {
-    setSearchFilter({
-      offset: 0,
-      limit: datasetsPerPage,
-      orgs: orgsForUser?.map((org) => org.name),
-      sort: "score desc, metadata_modified desc",
-      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
-    });
+    setSearchFilter(defaultSearchFilterProps);
     setCurrentPage(1);
   };
 
@@ -312,7 +308,9 @@ export default () => {
           ) : (
             <>
               {datasets?.length > 0 ? (
-                datasets?.map((x) => <DashboardDatasetCard {...(x as any)} />)
+                datasets?.map((x) => (
+                  <DashboardDatasetCard {...(x as Dataset)} />
+                ))
               ) : (
                 <div className="text-[14px]">No datasets found...</div>
               )}
