@@ -4,13 +4,7 @@ import Layout from "@/components/_shared/Layout";
 import { Dataset as DatasetType } from "@portaljs/ckan";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
-import {
-  Building2Icon,
-  ChevronLeftIcon,
-  DownloadIcon,
-  ArrowDownToLineIcon,
-  Landmark,
-} from "lucide-react";
+import { ChevronLeftIcon, ArrowDownToLineIcon, Landmark } from "lucide-react";
 import { CalendarIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,18 +14,11 @@ import { Overview } from "@components/dataset/individualPage/Overview";
 import { DatasetPreview } from "@components/dataset/individualPage/DatasetPreview";
 import { Metadata } from "@components/dataset/individualPage/Metadata";
 import { Downloads } from "@components/dataset/individualPage/Downloads";
-import { Badge } from "@components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
 import useMatomoTracker from "@lib/useMatomoTracker";
 import { api } from "@utils/api";
 import { DefaultTooltip } from "@components/ui/tooltip";
 import Link from "next/link";
+import { useDatasetViewEvent } from "@utils/ga";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -83,7 +70,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export default function DatasetPage({
   dataset,
 }: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
-  useMatomoTracker();
+  // useMatomoTracker();
+  useDatasetViewEvent({
+    datasetTitle: dataset.title,
+    datasetId: dataset.id,
+    datasetName: dataset.name,
+  });
+
   const tabs = [
     {
       id: "overview",
@@ -116,7 +109,7 @@ export default function DatasetPage({
       label: `${dataset.organization?.title || dataset.organizatio?.name}`,
     },
   ];
-  const matomo = api.matomo.getVisitorStats.useQuery();
+  // const matomo = api.matomo.getVisitorStats.useQuery();
   return (
     <>
       <Head>
@@ -160,21 +153,28 @@ export default function DatasetPage({
                   contentClassName="max-w-[180px]"
                   content={
                     <div className="flex flex-col">
-                      <span className="text-semibold text-sm">TDC Harmonized</span>
+                      <span className="text-semibold text-sm">
+                        TDC Harmonized
+                      </span>
                       <div className="text-xs">
-                      Data have been validated, and derived from multiple
-                      sources by TDC. For more information,{" "}
-                      <Link className="underline" 
-                        target="_blank"
-                        href={"https://google.com"}>
-                        click here
-                      </Link></div>
+                        Data have been validated, and derived from multiple
+                        sources by TDC. For more information,{" "}
+                        <Link
+                          className="underline"
+                          target="_blank"
+                          href={"https://google.com"}
+                        >
+                          click here
+                        </Link>
+                      </div>
                     </div>
                   }
                 >
-                  <button className="mt-4 flex w-fit gap-1 rounded-[6px] px-[10px] py-[2px] text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 
-                    text-yellow-800 bg-yellow-100">
-                      TDC Harmonized
+                  <button
+                    className="mt-4 flex w-fit gap-1 rounded-[6px] bg-yellow-100 px-[10px] py-[2px] text-xs font-medium text-yellow-800 transition-colors focus:outline-none focus:ring-2 
+                    focus:ring-ring focus:ring-offset-2"
+                  >
+                    TDC Harmonized
                   </button>
                 </DefaultTooltip>
                 <div className="mt-4 text-justify text-base font-normal leading-normal text-gray-500">
