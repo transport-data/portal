@@ -11,6 +11,7 @@ export const getGroup = async ({
 }) => {
   let action = "group_show";
   action += `?id=${id}`;
+  action += `&include_datasets=true`;
   const groups = await CkanRequest.get<CkanResponse<Group>>(action, {
     apiKey,
   });

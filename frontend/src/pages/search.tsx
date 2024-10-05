@@ -36,6 +36,8 @@ export type SearchPageOnChange = (
 
 export default function DatasetSearch({
   query,
+  topic,
+  tdc_category,
   sector,
   mode,
   service,
@@ -63,7 +65,8 @@ export default function DatasetSearch({
       offset: 0,
       limit: 9,
       sort: "score desc, metadata_modified desc",
-      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+      //removing "sectors" cause its causing 500
+      facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
     });
     setCurrentPage(0);
   };
@@ -77,12 +80,16 @@ export default function DatasetSearch({
     services: service ? [service as string] : undefined,
     sectors: sector ? [sector as string] : undefined,
     fuel: fuel as string | undefined,
+    groups: topic ? [topic as string] : undefined,
+    tdc_category: tdc_category as string | undefined,
     regions: region ? [region as string] : undefined,
     countries: country ? [country as string] : undefined,
     query: query as string,
     sort: "score desc, metadata_modified desc",
-    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+    //removing "sectors" cause its causing 500
+    facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
   });
+  console.log('SEARCH FILTER', searchFilter)
 
   const [currentPage, setCurrentPage] = useState(0);
   const {
