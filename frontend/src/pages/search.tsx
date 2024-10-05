@@ -89,7 +89,6 @@ export default function DatasetSearch({
     //leaving sectors in is causing a 500 on search
     facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "sectors", "geographies", "organization", "res_format", "metadata_created"]`,
   });
-  console.log('SEARCH FILTER', searchFilter)
 
   const [currentPage, setCurrentPage] = useState(0);
   const {

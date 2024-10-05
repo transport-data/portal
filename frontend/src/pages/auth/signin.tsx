@@ -35,7 +35,6 @@ export default function LoginPage({
   old_signin?: boolean;
 }) {
   if (old_signin && csrfToken) {
-    console.log("OLD SIGNIN", old_signin);
     return <OldLoginPage csrfToken={csrfToken} />;
   }
   return (

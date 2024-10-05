@@ -46,7 +46,6 @@ export const datasetRouter = createTRPCRouter({
         temporal_coverage_start: input.temporal_coverage_start.toISOString().split('T')[0] ?? '',
         temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
       };
-      console.log('INPUT', _dataset)
       const dataset = await createDataset({ apiKey, input: _dataset });
       return dataset;
     }),
