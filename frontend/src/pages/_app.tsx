@@ -10,6 +10,10 @@ import NotificationContainer from "@components/_shared/NotificationContainer";
 import { DefaultSeo } from "next-seo";
 
 import { Inter } from "next/font/google";
+import { env } from "@env.mjs";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { pageview } from "@utils/ga";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +21,18 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      pageview({ url, analyticsID: env.NEXT_PUBLIC_GA_MEASUREMENT_ID });
+    };
+    router.events.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router.events]);
+
   return (
     <ThemeProvider
       disableTransitionOnChange
@@ -27,7 +43,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         defaultTitle="Transport Data Commons"
         titleTemplate="%s - Transport Data Commons"
       />
-      <Script
+      {/*<Script
         strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
@@ -42,7 +58,26 @@ const MyApp: AppType<{ session: Session | null }> = ({
     g.async=true; g.src='https://cdn.matomo.cloud/tdcdataportalvercelapp.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
   })();`,
         }}
+      />*/}
+
+      <Script
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
       />
+      <Script
+        id="gtag-init"
+        strategy="lazyOnload"
+        dangerouslySetInnerHTML={{
+          __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', '${env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+        `,
+        }}
+      />
+
       <NotificationContainer />
       <SessionProvider session={session}>
         <div className={inter.className}>
