@@ -24,8 +24,9 @@ interface FacetValueProps {
 interface RecentSearchProps {
   facetName?: string;
   facetValue?: string;
-  query?: string;
+  text?: string;
   indicator?: any;
+  query: any;
 }
 
 export default function SearchBar() {
@@ -63,13 +64,14 @@ export default function SearchBar() {
 
   const facets: any = {
     regions: {
-      field: "in",
+      name: "in",
+      queryParam: "region",
       description: "a region, country or a city",
       options: data?.facets?.regions?.items,
       isMultiple: true,
     },
     startYear: {
-      field: "after",
+      name: "after",
       description: "referencing data after an year",
       options: (data?.facets?.temporal_coverage_start?.items as any[])
         ?.map((d: any) => ({
@@ -83,7 +85,7 @@ export default function SearchBar() {
         ),
     },
     endYear: {
-      field: "before",
+      name: "before",
       description: "referencing data before an year",
       options: (data?.facets?.temporal_coverage_end?.items as any[])
         ?.map((d: any) => ({
@@ -97,19 +99,19 @@ export default function SearchBar() {
         ),
     },
     sectors: {
-      field: "sector",
+      name: "sector",
       description: "road, rail, aviation, water transportation",
       options: data?.facets?.sectors?.items,
       isMultiple: true,
     },
     modes: {
-      field: "mode",
+      name: "mode",
       description: "car, 2W, 3W, multi-modal etc.",
       options: data?.facets?.modes?.items,
       isMultiple: true,
     },
     services: {
-      field: "service",
+      name: "service",
       description: "passenger or freight",
       options: data?.facets?.services?.items,
       isMultiple: true,
@@ -173,15 +175,23 @@ export default function SearchBar() {
   };
 
   const handleSubmit = () => {
+    const paramName =
+      facets[facetName]?.queryParam || facets[facetName]?.name || facetName;
     const value = facets[facetName]?.isMultiple
       ? [facetValue.name]
       : facetValue.name;
 
     const queryObject = {
-      ...(facetValue.name ? { [facetName]: value } : {}),
+      ...(facetValue.name ? { [paramName]: value } : {}),
       query: inputValue,
     };
-    if (inputValue) storeRecentSearch(queryObject);
+    if (inputValue)
+      storeRecentSearch({
+        text: inputValue,
+        facetName: facets[facetName]?.name,
+        facetValue: facetValue.display_name,
+        query: queryObject,
+      });
 
     setShowCommandList(false);
 
@@ -233,20 +243,26 @@ export default function SearchBar() {
       className=""
     >
       <Command className="relative" shouldFilter={false} ref={commandRef}>
-        <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] bg-popover text-popover-foreground">
+        <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] bg-popover pl-4 text-popover-foreground">
+          {!facetValue?.name && facetName ? (
+            <span className="mr-[10px]">{facets[facetName]?.name}:</span>
+          ) : (
+            ""
+          )}
           {/* badge with selected filter */}
           {facetValue?.name && (
             <Badge
               variant="muted"
-              className="ml-[16px] min-w-fit border border-gray-200 bg-gray-100 px-[6px] py-[2px]"
+              className="mr-[16px] min-w-fit border border-gray-200 bg-gray-100 px-[6px] py-[2px]"
             >
-              {facets[facetName]?.field}: {facetValue?.display_name}
+              {facets[facetName]?.name}: {facetValue?.display_name}
             </Badge>
           )}
           {/* search input*/}
+
           <CommandInput
             ref={inputRef}
-            className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
+            className="w-full grow rounded-[12px] border-0 py-[18px] pl-0 pr-[150px] focus:border-0 focus:ring-0 "
             onFocus={() => setShowCommandList(true)}
             placeholder="Find statistics, forecasts & studies"
             onInput={(e) => handleTyping((e.target as HTMLInputElement).value)}
@@ -292,7 +308,7 @@ export default function SearchBar() {
               {facets[facetName]?.options?.map((item: any, i: number) => (
                 <SearchFacetItem
                   key={`${item}-${i}`}
-                  badge={`${facets[facetName].field}: ${item.display_name}`}
+                  badge={`${facets[facetName].name}: ${item.display_name}`}
                   text={""}
                   onSelect={() => handleFacetValueChange(item)}
                 />
@@ -328,6 +344,9 @@ export default function SearchBar() {
                             onSelect={() => {
                               storeRecentSearch({
                                 indicator: indicator,
+                                query: {
+                                  indicator: indicator.name,
+                                },
                               });
                             }}
                             href={`/search?indicator=${indicator.name}`}
@@ -364,13 +383,10 @@ export default function SearchBar() {
                             }
                           >
                             {storedSearches.map((recent) => {
+                              console.log(recent);
                               const badge =
                                 recent.facetValue && recent.facetName
-                                  ? `${facets[recent.facetName]?.field}: ${
-                                      facets[recent.facetName]?.options?.find(
-                                        (o: any) => o.name === recent.facetValue
-                                      )?.display_name
-                                    }`
+                                  ? `${recent.facetName}: ${recent.facetValue}`
                                   : "";
 
                               const icon = recent.indicator ? (
@@ -384,13 +400,23 @@ export default function SearchBar() {
                                 ? "Indicator"
                                 : "";
 
+                              const text =
+                                recent.indicator?.display_name || recent.text;
+
+                              const params = recent.query;
+
+                              console.log(params);
+
                               return (
                                 <SearchFacetItem
                                   badge={badge}
-                                  text={
-                                    recent.indicator?.display_name ||
-                                    recent.query
-                                  }
+                                  onSelect={() => {
+                                    router.push({
+                                      pathname: "/search",
+                                      query: params,
+                                    });
+                                  }}
+                                  text={text}
                                   icon={icon}
                                   context={context}
                                 />

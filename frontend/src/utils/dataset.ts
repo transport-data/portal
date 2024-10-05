@@ -1,5 +1,4 @@
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { env } from "@env.mjs";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
@@ -17,8 +16,10 @@ type DatasetCreateEditType = Omit<
 };
 
 export async function searchDatasets<T = Dataset>({
+  apiKey,
   options,
 }: {
+  apiKey?: string;
   options: SearchDatasetType;
 }): Promise<{
   datasets: Array<T>;
@@ -204,7 +205,9 @@ export async function searchDatasets<T = Dataset>({
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
   console.log(endpoint)
-  const response = await CkanRequest.get<any>(endpoint);
+  const response = await CkanRequest.get<any>(endpoint, {
+    headers: { Authorization: apiKey },
+  });
 
   return {
     datasets: response.result.results,
