@@ -9,6 +9,7 @@ This page allows users to list and filter datasets from the organizations they b
 On the left side of the screen, users can filter datasets by status:
 
 - **Public Datasets**: Visible to everyone.
+- **Private Datasets**: Restricted from public access. Visible for organization members.
 - **Draft Datasets**: Not yet published.
 
 Users can also filter by contributors, showing only datasets created or edited by the selected contributor.

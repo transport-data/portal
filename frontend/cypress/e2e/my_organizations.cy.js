@@ -6,6 +6,8 @@ const datasetTitle = `${uuid()}${datasetSuffix}`;
 const datasetName = `${uuid()}${datasetSuffix}`;
 const draftDatasetTitle = `${uuid()}${datasetSuffix} Draft`;
 const draftDatasetName = `${uuid()}${datasetSuffix}_draft`;
+const privateDatasetTitle = `${uuid()}${datasetSuffix} Private`;
+const privateDatasetName = `${uuid()}${datasetSuffix}_private`;
 const notes = `${uuid()}${datasetSuffix}`;
 const tags = ["tag1", "tag2", "tag3"];
 const geographies = ["cpv"];
@@ -72,6 +74,24 @@ describe("Should Create a Dataset for Signed in User", () => {
       frequency: frequency,
       state:'draft'
     });
+    //private dataset
+    cy.createDatasetViaAPI({
+      name: privateDatasetName,
+      title: privateDatasetTitle,
+      tag_string: tags,
+      owner_org: org,
+      notes: notes,
+      geographies: geographies,
+      tdc_category: tdc_category,
+      temporal_coverage_start: temporal_coverage_start,
+      temporal_coverage_end: temporal_coverage_end,
+      is_archived: false,
+      sectors: sectors,
+      modes: modes,
+      services: services,
+      frequency: frequency,
+      private:true
+    });
   } )
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
@@ -96,7 +116,16 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.visit("/dashboard/datasets/my-organization");
     cy.get(".selectable-items-list").contains("Public").scrollIntoView().click();
     cy.get('div').contains('h2', draftDatasetTitle).should('not.exist')
+    cy.get('div').contains('h2', privateDatasetTitle).should('not.exist')
     cy.get('div').contains('h2', datasetTitle).should('exist')
+  });
+
+  it("Should filter Private datasets ", () => {
+    cy.visit("/dashboard/datasets/my-organization");
+    cy.get(".selectable-items-list").contains("Private").scrollIntoView().click();
+    cy.get('div').contains('h2', draftDatasetTitle).should('not.exist')
+    cy.get('div').contains('h2', privateDatasetTitle).should('exist')
+    cy.get('div').contains('h2', datasetTitle).should('not.exist')
   });
 
   it("Should filter Draft datasets ", () => {
@@ -104,12 +133,14 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.get(".selectable-items-list").contains("Draft").scrollIntoView().click();
     cy.get('div').contains('h2', draftDatasetTitle).should('exist')
     cy.get('div').contains('h2', datasetTitle).should('not.exist')
+    cy.get('div').contains('h2', privateDatasetTitle).should('not.exist')
   });
 
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);
     cy.deleteDatasetAPI(draftDatasetName);
+    cy.deleteDatasetAPI(privateDatasetName);
     cy.deleteOrganizationAPI(org);
     cy.deleteUserApi(ckanUserName);
   });

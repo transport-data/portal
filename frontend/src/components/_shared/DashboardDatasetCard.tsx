@@ -5,15 +5,21 @@ import {
   PencilIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
+
 import { formatDate } from "@lib/utils";
 import { capitalize } from "remeda";
 import UserAvatar from "./UserAvatar";
-import { EyeOffIcon, GlobeAltIcon, RegionIcon } from "@lib/icons";
+import {
+  DocumentSearchIcon,
+  EyeOffIcon,
+  GlobeAltIcon,
+  RegionIcon,
+} from "@lib/icons";
 import Link from "next/link";
 import { api } from "@utils/api";
 import { Button } from "@components/ui/button";
 import { Skeleton } from "@components/ui/skeleton";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
   Array.from({ length }).map((_, x) => (
@@ -108,7 +114,11 @@ export default function DashboardDatasetCard(props: Dataset) {
 
         <div className="flex flex-wrap gap-2">
           {(tags || [])?.map((k) => (
-            <Badge variant={"purple"} className="bg-[#E5EDFF] text-[#42389D]">
+            <Badge
+              key={k.name}
+              variant={"purple"}
+              className="bg-[#E5EDFF] text-[#42389D]"
+            >
               {capitalize(k.display_name ?? "")}
             </Badge>
           ))}
@@ -119,7 +129,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             <Badge
               variant={"success"}
               className="capitalize"
-              icon={<EyeOffIcon />}
+              icon={<DocumentSearchIcon />}
             >
               Draft
             </Badge>
@@ -127,7 +137,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             <Badge
               variant={"warning"}
               className="capitalize"
-              icon={<GlobeAltIcon />}
+              icon={<EyeOffIcon />}
             >
               Private
             </Badge>
@@ -211,6 +221,7 @@ export default function DashboardDatasetCard(props: Dataset) {
                       <a
                         className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-700 text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800"
                         href="#"
+                        key={`contributor-${contributor.id}`}
                       >
                         {contributors.length - 4}
                       </a>
@@ -218,6 +229,7 @@ export default function DashboardDatasetCard(props: Dataset) {
                       <UserAvatar
                         image={contributor.image_display_url}
                         name={contributor.display_name ?? ""}
+                        key={`contributor-${contributor.id}`}
                       />
                     ) : (
                       <></>

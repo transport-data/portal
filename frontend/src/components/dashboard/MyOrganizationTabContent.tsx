@@ -12,7 +12,12 @@ import {
 } from "@components/ui/pagination";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
-import { DocumentReportIcon, EyeOffIcon, GlobeAltIcon } from "@lib/icons";
+import {
+  DocumentReportIcon,
+  DocumentSearchIcon,
+  EyeOffIcon,
+  GlobeAltIcon,
+} from "@lib/icons";
 import { SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
@@ -223,30 +228,77 @@ export default () => {
               icon: <GlobeAltIcon />,
               isSelected: false,
               text: "Public",
-              value: "active",
+              value: "public",
             },
             {
               icon: <EyeOffIcon />,
+              isSelected: false,
+              text: "Private",
+              value: "private",
+            },
+            {
+              icon: <DocumentSearchIcon />,
               isSelected: false,
               text: "Drafts",
               value: "draft",
             },
           ]}
-          onSelectedItem={(v) => {
+          onSelectedItem={(selected) => {
             setSearchFilter((_value) => ({
               ..._value,
-              ...{
-                advancedQueries: [
-                  ...(_value.advancedQueries ?? []).filter(
-                    (aq) => aq.key !== "state"
-                  ),
-                  ...(v === "*" ? [] : [{ key: "state", values: [v] }]),
-                ],
-              },
+              ...(selected === "public"
+                ? {
+                    includePrivate: false,
+                    includeDrafts: false,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state" and "private"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state" && aq.key !== "private"
+                      ),
+                      ...[{ key: "private", values: ["(false)"] }],
+                    ],
+                  }
+                : selected === "private"
+                ? {
+                    includePrivate: true,
+                    includeDrafts: false,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state" and "private"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state" && aq.key !== "private"
+                      ),
+                      ...[{ key: "private", values: ["(true)"] }],
+                    ],
+                  }
+                : selected === "draft"
+                ? {
+                    includeDrafts: true,
+                    includePrivate: false,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state" and "private"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state" && aq.key !== "private"
+                      ),
+                      ...[
+                        { key: "state", values: ["draft"] },
+                        { key: "private", values: ["(false)"] },
+                      ],
+                    ],
+                  }
+                : {
+                    includeDrafts: true,
+                    includePrivate: true,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state" and "private"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state" && aq.key !== "private"
+                      ),
+                    ],
+                  }),
               offset: 0,
             }));
             setCurrentPage(1);
-            setVisibility(v);
+            setVisibility(selected);
           }}
           selected={visibility}
           title="Categories"
@@ -313,7 +365,7 @@ export default () => {
             <>
               {datasets?.length > 0 ? (
                 datasets?.map((x) => (
-                  <DashboardDatasetCard {...(x as Dataset)} />
+                  <DashboardDatasetCard key={x.id} {...(x as Dataset)} />
                 ))
               ) : (
                 <div className="text-[14px]">No datasets found...</div>
