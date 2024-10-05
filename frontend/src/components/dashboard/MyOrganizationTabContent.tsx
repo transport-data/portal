@@ -37,19 +37,14 @@ export default () => {
 
   const datasetsPerPage = 9;
 
-  const defaultSearchFilterProps: SearchDatasetType = {
+  const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
     limit: datasetsPerPage,
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
     facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
-    orgs: orgsForUser?.map((org) => org.id),
-  };
-
-  const [searchFilter, setSearchFilter] = useState<SearchDatasetType>(
-    defaultSearchFilterProps
-  );
+  });
 
   const {
     isLoading,
@@ -60,7 +55,16 @@ export default () => {
   } = api.dataset.search.useQuery(searchFilter);
 
   const resetFilter = () => {
-    setSearchFilter(defaultSearchFilterProps);
+    setSearchFilter({
+      offset: 0,
+      limit: datasetsPerPage,
+      sort: "score desc, metadata_modified desc",
+      includePrivate: true,
+      includeDrafts: true,
+      orgs: orgsForUser?.map((org) => org.name),
+    });
+    setVisibility("*");
+    setContributor("*");
     setCurrentPage(1);
   };
 
