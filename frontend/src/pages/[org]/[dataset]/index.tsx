@@ -71,7 +71,11 @@ export default function DatasetPage({
   dataset,
 }: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
   // useMatomoTracker();
-  useDatasetViewEvent({ datasetTitle: dataset.title, datasetId: dataset.id });
+  useDatasetViewEvent({
+    datasetTitle: dataset.title,
+    datasetId: dataset.id,
+    datasetName: dataset.name,
+  });
 
   const tabs = [
     {

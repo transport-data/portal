@@ -135,7 +135,13 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                 <div className="ml-4 flex-shrink-0">
                   <a
                     href={r.url}
-                    onClick={() => datasetDownloadEvent({datasetTitle: dataset.title, datasetId: dataset.id})}
+                    onClick={() =>
+                      datasetDownloadEvent({
+                        datasetTitle: dataset.title,
+                        datasetId: dataset.id,
+                        datasetName: dataset.name,
+                      })
+                    }
                     className="font-medium text-gray-500 hover:text-accent"
                   >
                     <ArrowDownToLineIcon className="h-5 w-5" />

@@ -27,27 +27,27 @@ export const event = ({ action, category, label, value }) => {
   }
 };
 
-export const datasetViewEvent = ({ datasetTitle, datasetId }) => {
+export const datasetViewEvent = ({ datasetTitle, datasetId, datasetName }) => {
   event({
     action: "dataset_view",
     category: "Dataset",
-    label: `${datasetId}|${datasetTitle}`,
+    label: `${datasetId}|${datasetTitle}|${datasetName}`,
     value: 1,
   });
 };
 
-export const useDatasetViewEvent = ({ datasetTitle, datasetId }) => {
+export const useDatasetViewEvent = ({ datasetTitle, datasetId, datasetName }) => {
   useEffect(() => {
-    datasetViewEvent({ datasetTitle, datasetId });
+    datasetViewEvent({ datasetTitle, datasetId, datasetName });
   }, []);
 };
 
-export const datasetDownloadEvent = ({ datasetTitle, datasetId }) => {
+export const datasetDownloadEvent = ({ datasetTitle, datasetId, datasetName }) => {
   // TODO: would it be worth it to track resourceId as well?
   event({
     action: "dataset_download",
     category: "Dataset",
-    label: `${datasetId}|${datasetTitle}`,
+    label: `${datasetId}|${datasetTitle}|${datasetName}`,
     value: 1,
   });
 };
