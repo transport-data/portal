@@ -49,10 +49,11 @@ import { IndicatorsField } from "./IndicatorField";
 import { UnitsField } from "./UnitsField";
 import { SourcesForm } from "./SourcesForm";
 import { CommentsForm } from "./CommentsForm";
+import { RTEForm } from "@components/ui/formRte";
 
 export function MetadataForm() {
-  const { control, setValue, getValues, watch } =
-    useFormContext<DatasetFormType>();
+  const formObj = useFormContext<DatasetFormType>();
+  const { control, setValue, getValues, watch } = formObj;
   const geographies = api.group.tree.useQuery({
     type: "geography",
   });
@@ -166,6 +167,18 @@ export function MetadataForm() {
           <RelatedDatasetsField />
         </>
       )}
+      {watch("tdc_category") === "tdc_harmonized" && (
+        <>
+          <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
+            Introduction and key takeaways
+          </div>
+          <RTEForm
+            name="introduction_text"
+            placeholder="Write a overview description of this dataset"
+            formObj={formObj}
+          />
+        </>
+      )}
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
         Units
       </div>
@@ -211,6 +224,7 @@ export function MetadataForm() {
                         <CommandItem
                           value={language.code}
                           key={language.code}
+                          keywords={[language.name]}
                           onSelect={() => {
                             setValue("language", language.code);
                           }}
@@ -417,6 +431,7 @@ export function MetadataForm() {
                                   <CommandItem
                                     value={c.name}
                                     key={c.name}
+                                    keywords={[c.title ?? c.name]}
                                     onSelect={() => {
                                       match(field.value.includes(c.name))
                                         .with(true, () => {
@@ -538,6 +553,7 @@ export function MetadataForm() {
                             {sectors.map((s) => (
                               <CommandItem
                                 value={s.value}
+                                keywords={[s.label]}
                                 key={s.value}
                                 onSelect={() => {
                                   match(field.value.includes(s.value))
@@ -656,6 +672,7 @@ export function MetadataForm() {
                             {services.map((s) => (
                               <CommandItem
                                 value={s.value}
+                                keywords={[s.label]}
                                 key={s.value}
                                 onSelect={() => {
                                   match(field.value.includes(s.value))
@@ -775,6 +792,7 @@ export function MetadataForm() {
                             {modes.map((m) => (
                               <CommandItem
                                 value={m.value}
+                                keywords={[m.label]}
                                 key={m.value}
                                 onSelect={() => {
                                   match(field.value.includes(m.value))
