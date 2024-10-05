@@ -27,10 +27,7 @@ const tdc_category =
 
 describe("Searchbar component", () => {
 
-	beforeEach(() => {
-		cy.login(ckanUserName, ckanUserPassword);
-	});
-    
+	
   before(function () {
     cy.createOrganizationViaAPI({ title: org, name: sample_org });
     cy.createDatasetViaAPI({
@@ -50,6 +47,10 @@ describe("Searchbar component", () => {
       frequency: frequency,
     });
   });
+
+  beforeEach(() => {
+		cy.login(ckanUserName, ckanUserPassword);
+	});
 
   it("Should search the dataset by name and go to dataset page", () => {
     
@@ -94,6 +95,32 @@ describe("Searchbar component", () => {
 		parent.click();
 		cy.get("div").should("contain", datasetTitle);
 
+  });
+
+
+  it("Should store a search and redirect to search page after with search params", () => {
+    
+		cy.visit(`/`);
+
+		const input = cy.get('input[placeholder="Find statistics, forecasts & studies"]');
+
+		input.focus().click();
+
+		cy.wait(500);
+
+		cy.get(`[data-value="in:a region, country or a city"]`).click();
+		cy.get(`[data-value="in: Asia"]`).click();
+
+		input.type( 'Recent Search Test', { delay: 0 });
+
+    cy.get('button').contains('Search').click();
+
+    cy.visit(`/`);
+
+		cy.get('input[placeholder="Find statistics, forecasts & studies"]').focus().click();
+    const recentSearches = cy.get('.recent-searches');
+
+    recentSearches.should("contain", "Recent Search Test");
   });
 
 

@@ -242,7 +242,11 @@ export default function SearchBar() {
       }}
       className=""
     >
-      <Command className="relative" shouldFilter={false} ref={commandRef}>
+      <Command
+        className="search-bar relative"
+        shouldFilter={false}
+        ref={commandRef}
+      >
         <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] bg-popover pl-4 text-popover-foreground">
           {!facetValue?.name && facetName ? (
             <span className="mr-[10px]">{facets[facetName]?.name}:</span>
@@ -378,6 +382,7 @@ export default function SearchBar() {
 
                         {storedSearches && storedSearches.length > 0 && (
                           <CommandGroup
+                            className="recent-searches"
                             heading={
                               <CommandListHeader title="Recent searches" />
                             }
