@@ -65,8 +65,8 @@ export default function DatasetSearch({
       offset: 0,
       limit: 9,
       sort: "score desc, metadata_modified desc",
-      //removing "sectors" cause its causing 500
-      facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+      //leaving sectors in is causing a 500 on search
+      facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "sectors", "geographies", "organization", "res_format", "metadata_created"]`,
     });
     setCurrentPage(0);
   };
@@ -86,8 +86,8 @@ export default function DatasetSearch({
     countries: country ? [country as string] : undefined,
     query: query as string,
     sort: "score desc, metadata_modified desc",
-    //removing "sectors" cause its causing 500
-    facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+    //leaving sectors in is causing a 500 on search
+    facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "sectors", "geographies", "organization", "res_format", "metadata_created"]`,
   });
   console.log('SEARCH FILTER', searchFilter)
 
