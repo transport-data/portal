@@ -135,7 +135,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             </Badge>
           ) : isPrivate ? (
             <Badge
-              variant={"warning"}
+              variant={"success"}
               className="capitalize"
               icon={<EyeOffIcon />}
             >
