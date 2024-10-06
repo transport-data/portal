@@ -219,7 +219,7 @@ function TopicCard({ group }: { group: Group }) {
         <ul className="flex flex-col gap-[12px]">
           {groupDetails ? (
             <>
-              {groupDetails.packages?.map((item) => (
+              {groupDetails.packages?.slice(0, 5).map((item) => (
                 <Link
                   href={`/@${item.organization?.name}/${item.name}`}
                   key={`group-${item.name}`}
