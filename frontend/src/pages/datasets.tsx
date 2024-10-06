@@ -172,6 +172,7 @@ export default function DatasetsPage({
                     )}
                   </ul>
                   <Link
+                    id="show_all_tdc_harmonized"
                     className="text-sm font-medium text-accent"
                     href="/search?tdc_category=tdc_harmonized"
                   >
@@ -234,6 +235,7 @@ function TopicCard({ group }: { group: Group }) {
         </ul>
         {groupDetails ? (
           <Link
+            id={`show_all_${groupDetails.name}`}
             className="text-sm font-medium text-accent"
             href={`/search?topic=${groupDetails?.name}`}
           >
