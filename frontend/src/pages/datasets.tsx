@@ -38,6 +38,7 @@ export async function getStaticProps() {
     await Promise.all(
       topics.map((topic) => helpers.group.get.prefetch({ id: topic.id }))
     ),
+    await helpers.ga.getVisitorStats.prefetch()
   ]);
   return {
     props: {
@@ -64,6 +65,7 @@ export default function DatasetsPage({
     limit: 10,
     tdc_category: "tdc_harmonized",
   });
+  const { data: gaData } = api.ga.getVisitorStats.useQuery()
   return (
     <>
       <Head>
@@ -89,6 +91,50 @@ export default function DatasetsPage({
           </div>
           <div className="pb-[96px] pt-[80px]">
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
+                {gaData && (
+                  <Image
+                    src="/images/icons/group-mostviewed.png"
+                    width={48}
+                    height={48}
+                    alt="TDC Most Viewed Logo"
+                  />
+                )}
+                <div className="flex flex-col gap-4">
+                  {gaData ? (
+                    <span className="block text-lg font-semibold leading-tight text-gray-900">
+                      Most Viewed
+                    </span>
+                  ) : (
+                    <Skeleton className="h-4 w-24" />
+                  )}
+                  <ul className="flex flex-col gap-[12px]">
+                    {gaData ? (
+                      <>
+                        {gaData.map((item) => (
+                          <Link
+                            href={`/@${item.organization?.name}/${item.name}`}
+                            key={`group-${item.name}`}
+                            className="text-sm font-medium text-gray-500"
+                          >
+                            {item.title ?? item.name}
+                          </Link>
+                        ))}
+                      </>
+                    ) : (
+                      [0, 1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-4 w-12" />
+                      ))
+                    )}
+                  </ul>
+                  <Link
+                    className="text-sm font-medium text-accent"
+                    href="/search"
+                  >
+                    Show all
+                  </Link>
+                </div>
+              </div>
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
                 {tdcHarmonizedDatasets && (
                   <Image
