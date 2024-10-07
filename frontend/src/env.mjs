@@ -29,7 +29,6 @@ export const env = createEnv({
     MATOMO_SITE_ID: z.string(),
     GITHUB_CLIENT_ID:z.string(),
     GITHUB_CLIENT_SECRET:z.string(),
-    FRONTEND_AUTH_SECRET: z.string(),
     GA_PRIVATE_KEY: z.string(),
     GA_PRIVATE_KEY_ID: z.string(),
     GA_PROPERTY_ID: z.string(),
