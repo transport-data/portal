@@ -2,7 +2,7 @@
 
 This page allows users to list and filter datasets from the organizations they belong to.
 
-![Dashboard / My Organizations](my-orgs.png)
+![Dashboard / My Organizations](image.png)
 
 ## Filtering by Status and Contributors
 
