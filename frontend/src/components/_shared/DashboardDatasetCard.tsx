@@ -94,7 +94,7 @@ export default function DashboardDatasetCard(props: Dataset) {
             <Button
               variant="default"
               size="pill"
-              className=" right-0 ml-2 px-2 py-0.5 text-sm"
+              className=" right-0 ml-2 px-2.5 py-0.5 text-sm"
               asChild
             >
               <Link href={`/dashboard/datasets/${name}/edit`}>

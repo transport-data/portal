@@ -70,7 +70,7 @@ export default function MyDatasetsTabContent() {
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
-      orgs: orgsForUser?.map((org) => org.name),
+      orgs: orgs?.map((org) => org.name),
 
       advancedQueries: [
         { key: "creator_user_id", values: [`${session?.user.id}`] },
@@ -316,7 +316,7 @@ export default function MyDatasetsTabContent() {
           />
         </div>
       </div>
-      <div className="order-3 w-full sm:order-2 lg:max-w-[556px] xl:max-w-[700px]">
+      <div className="order-3 w-full sm:order-2 md:max-w-[556px] xl:max-w-[700px]">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
         <section className="flex flex-col gap-4">
           {isLoading ? (
@@ -342,7 +342,7 @@ export default function MyDatasetsTabContent() {
                             ...oldV,
                             offset: (currentPage - 1) * datasetsPerPage,
                           }));
-                          setCurrentPage(currentPage - 1);
+                          setCurrentPage((oldV) => oldV - 1);
                         }}
                       />
                     </PaginationItem>
@@ -373,7 +373,7 @@ export default function MyDatasetsTabContent() {
                             ...oldV,
                             offset: (currentPage + 1) * datasetsPerPage,
                           }));
-                          setCurrentPage(currentPage + 1);
+                          setCurrentPage((oldV) => oldV + 1);
                         }}
                       />
                     </PaginationItem>
@@ -384,7 +384,7 @@ export default function MyDatasetsTabContent() {
           )}
         </section>
       </div>
-      <div className="order-2 hidden space-y-2.5 border-b-[1px] pt-3 sm:order-3  sm:min-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
+      <div className="order-2 hidden w-full space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
         <DatasetsFilter
           resetFilter={resetFilter}
           datasetCount={datasetCount || 0}
