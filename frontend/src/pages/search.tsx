@@ -86,7 +86,7 @@ export default function DatasetSearch({
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
     limit: 9,
-    endYear: before ? Number(after) : undefined,
+    endYear: before ? Number(before) : undefined,
     startYear: after ? Number(after) : undefined,
     modes: mode ? [mode as string] : undefined,
     services: service ? [service as string] : undefined,
@@ -295,17 +295,19 @@ export default function DatasetSearch({
       }
     }
 
-    if (searchFilter.startYear) {
+    if (searchFilter.startYear && !foundData) {
       foundData = true;
       setFacetDisplayName("after");
       setFacetName("startYear");
+      setFacetDisplayValue(searchFilter.startYear.toString());
       setFacetValue(searchFilter.startYear.toString());
     }
 
-    if (searchFilter.endYear) {
+    if (searchFilter.endYear && !foundData) {
       foundData = true;
       setFacetDisplayName("before");
       setFacetName("endYear");
+      setFacetDisplayValue(searchFilter.endYear.toString());
       setFacetValue(searchFilter.endYear.toString());
     }
 
