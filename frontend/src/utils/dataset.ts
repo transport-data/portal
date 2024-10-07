@@ -19,7 +19,7 @@ export async function searchDatasets<T = Dataset>({
   apiKey,
   options,
 }: {
-  apiKey: string;
+  apiKey?: string;
   options: SearchDatasetType;
 }): Promise<{
   datasets: Array<T>;

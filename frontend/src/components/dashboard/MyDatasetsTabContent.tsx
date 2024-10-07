@@ -42,8 +42,6 @@ export default () => {
 
   const { data, isLoading } = api.dataset.search.useQuery(options);
 
-  const datasets = data?.datasets;
-
   const totalDatasets = data?.count ?? 0;
 
   const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
@@ -84,7 +82,7 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {datasets
+              {data?.datasets
                 ?.filter((item) =>
                   visibility === "Drafts"
                     ? item.state === "draft"
