@@ -1,6 +1,5 @@
 import { appRouter } from "@/server/api/root";
 import Heading from "@components/_shared/Heading";
-import SearchBarMocked from "@components/search/SearchBarMocked";
 import { Skeleton } from "@components/ui/skeleton";
 import { Group } from "@portaljs/ckan";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -10,10 +9,9 @@ import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { listOrganizations } from "@utils/organization";
-import { createServerSideHelpers } from "@trpc/react-query/server";
 import superjson from "superjson";
 import Layout from "../components/_shared/Layout";
+import SearchBar from "@components/search/SearchBar";
 
 export async function getStaticProps() {
   const helpers = createServerSideHelpers({
