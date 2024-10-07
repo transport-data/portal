@@ -239,6 +239,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                           {data.map((t) => (
                             <CommandItem
                               value={t.name}
+                              keywords={[t.title ?? t.name]}
                               key={t.name}
                               onSelect={() => {
                                 match(field.value.includes(t.name))

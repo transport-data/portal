@@ -74,7 +74,7 @@ export const userRouter = createTRPCRouter({
           {
             apiKey: user.apikey,
             json: {
-              groupd_id: input.group_id,
+              group_id: input.group_id,
               role: input.role,
               email: input.user,
             },

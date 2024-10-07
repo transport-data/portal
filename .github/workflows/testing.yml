@@ -65,6 +65,7 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
+          install-command: npm install
           build: npm run build
           start: npm run start
           wait-on: 'http://127.0.0.1:3000'
