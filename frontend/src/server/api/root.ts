@@ -8,6 +8,7 @@ import { datapackageRouter } from "./routers/datapackage";
 import { uploadsRouter } from "./routers/uploads";
 import { matomoRouter } from "./routers/matomo";
 import { tagsRouter } from "./routers/tags";
+import { googleAnalyticsRouter } from "./routers/ga";
 
 /**
  * This is the primary router for your server.
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   uploads: uploadsRouter,
   datapackage: datapackageRouter,
   matomo: matomoRouter,
+  ga: googleAnalyticsRouter,
   tags: tagsRouter
 });
 
