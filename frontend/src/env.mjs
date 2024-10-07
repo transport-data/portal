@@ -27,12 +27,9 @@ export const env = createEnv({
     MATOMO_AUTH_KEY: z.string(),
     MATOMO_URL: z.string(),
     MATOMO_SITE_ID: z.string(),
-
     GITHUB_CLIENT_ID:z.string(),
     GITHUB_CLIENT_SECRET:z.string(),
-
     FRONTEND_AUTH_SECRET: z.string()
-
   },
 
   /**
@@ -44,6 +41,7 @@ export const env = createEnv({
     NEXT_PUBLIC_R2_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_CKAN_URL: z.string().url(),
     NEXT_PUBLIC_PUBLIC_PORTAL_URL: z.string().url().optional(),
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string()
   },
 
   /**
@@ -67,11 +65,12 @@ export const env = createEnv({
     MATOMO_SITE_ID: process.env.MATOMO_SITE_ID,
     GITHUB_CLIENT_ID:process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET:process.env.GITHUB_CLIENT_SECRET,
-    FRONTEND_AUTH_SECRET:process.env.FRONTEND_AUTH_SECRET
+    FRONTEND_AUTH_SECRET:process.env.FRONTEND_AUTH_SECRET,
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
    * This is especially useful for Docker builds.
    */
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
-});
+})
