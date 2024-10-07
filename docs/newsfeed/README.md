@@ -1,6 +1,6 @@
 # Newsfeed Page
 
-The newsfeed page shows the activity regarding organizations that an user is a member of a follower and also the datasets that belong to these organizations
+The newsfeed page shows the activity regarding organizations that a user is a member of, or follower and also the datasets that belong to these organizations
 
 ![NewsFeed Page](page.png)
 
