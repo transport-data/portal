@@ -78,7 +78,7 @@ export default function DatasetSearch({
       offset: 0,
       limit: 9,
       sort: "score desc, metadata_modified desc",
-      facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
+      facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
     });
     setCurrentPage(0);
   };
@@ -97,7 +97,7 @@ export default function DatasetSearch({
     countries: country ? [country as string] : undefined,
     query: query as string,
     sort: "score desc, metadata_modified desc",
-    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
+    facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
   });
 
   const [currentPage, setCurrentPage] = useState(0);
