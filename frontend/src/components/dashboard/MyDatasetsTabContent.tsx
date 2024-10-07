@@ -199,12 +199,12 @@ export default function MyDatasetsTabContent() {
   }, [facets, orgsForUser]);
 
   useEffect(() => {
-    if (orgsForUser)
+    if (orgs.length)
       setSearchFilter((_value) => ({
         ..._value,
-        orgs: orgsForUser?.map((org) => org.name),
+        orgs: orgs?.map((org) => org.name),
       }));
-  }, [orgsForUser]);
+  }, [orgs]);
 
   const totalDatasets = datasetCount ?? 0;
   const totalPages = Math.ceil(totalDatasets / datasetsPerPage);

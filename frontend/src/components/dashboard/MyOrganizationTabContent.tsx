@@ -48,6 +48,8 @@ export default () => {
     facetsFields: `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
   });
 
+  console.log(searchFilter);
+
   const {
     isLoading,
     data: { datasets, count: datasetCount, facets } = {
@@ -80,12 +82,12 @@ export default () => {
   };
 
   useEffect(() => {
-    if (orgsForUser)
+    if (orgs.length)
       setSearchFilter((_value) => ({
         ..._value,
-        orgs: orgsForUser?.map((org) => org.name),
+        orgs: orgs?.map((org) => org.name),
       }));
-  }, [orgsForUser]);
+  }, [orgs]);
 
   useEffect(() => {
     for (const key in facets) {
@@ -197,6 +199,8 @@ export default () => {
 
   const totalDatasets = datasetCount ?? 0;
   const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
+
+  console.log(orgs);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
