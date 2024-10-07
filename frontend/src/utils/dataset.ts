@@ -1,5 +1,6 @@
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 
@@ -315,4 +316,26 @@ export const licensesList = async ({ apiKey }: { apiKey: string }) => {
     }
   );
   return licenses.result;
+};
+
+export const listDatasetActivities = async ({
+  apiKey,
+  ids,
+}: {
+  apiKey: string;
+  ids: Array<string>;
+}) => {
+  const activities = await Promise.all(
+    ids.map(async (id) => {
+      const response = await CkanRequest.post<CkanResponse<Activity[]>>(
+        `package_activity_list`,
+        {
+          apiKey: apiKey,
+          json: { id },
+        }
+      );
+      return response.result;
+    })
+  );
+  return activities.flat();
 };
