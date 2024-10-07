@@ -135,7 +135,7 @@ describe("List and Search Datasets", () => {
   });
 });
 
-const ownerOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const ownerOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_owner_org`;
 const topic1 = `topic_${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const topic2 = `topic_2_${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const dataset = `${uuid()}${datasetSuffix}`;

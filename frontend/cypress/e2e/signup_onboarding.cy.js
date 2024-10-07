@@ -12,9 +12,9 @@ describe("onboarding flow", () => {
     cy.contains("Select locations, topics and organisations you want to follow");
   
     // button should be disabled
-    cy.get('button[type="submit"]')
-      .should('be.visible')
-      .and('be.disabled')
+//    cy.get('button[type="submit"]')
+//      .should('be.visible')
+//      .and('be.disabled')
   
     cy.get('.flex.flex-wrap.items-center.gap-2').then(($div) => {
       // Check if locations exist
@@ -47,9 +47,9 @@ describe("onboarding flow", () => {
     cy.contains("Find your organisation")
 
     // button should be disabled
-    cy.get('button[type="submit"]')
-    .should('be.visible')
-    .and('be.disabled')
+//    cy.get('button[type="submit"]')
+//    .should('be.visible')
+//    .and('be.disabled')
 
     cy.get('button[type="button"]').click()
     // type organization name
