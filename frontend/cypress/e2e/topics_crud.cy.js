@@ -7,6 +7,7 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const parentTopic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const topic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_org`;
 const sample_topic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}b`;
 
 describe("Create and edit topics", () => {
@@ -48,7 +49,7 @@ describe("Create and edit topics", () => {
   });
 });
 
-describe("List and Search Topic", () => {
+describe("List and Search Topic (Dashboard)", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -79,3 +80,63 @@ describe("List and Search Topic", () => {
   });
 });
 
+const publicTopic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_public`;
+const publicTopic2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_public_2`;
+const datasetName = `${uuid()}_dataset`
+const datasetName2 = `${uuid()}_dataset_2`
+const datasetName3 = `${uuid()}_dataset_3`
+
+describe("List topics (Public)", () => {
+  before(() => {
+    cy.createOrganizationViaAPI({ title: org, name: org });
+    cy.createTopicAPI(publicTopic, publicTopic);
+    cy.createTopicAPI(publicTopic2, publicTopic2);
+    cy.createDatasetViaAPI({
+      name: datasetName,
+      title: 'Dataset belonging to topic 1',
+      owner_org: org,
+      is_archived: false,
+      notes: 'x',
+      tdc_category: 'public',
+      topics: [publicTopic],
+    });
+    cy.createDatasetViaAPI({
+      name: datasetName2,
+      title: 'Dataset belonging to topic 2',
+      owner_org: org,
+      notes: 'x',
+      tdc_category: 'public',
+      is_archived: false,
+      topics: [publicTopic2],
+    });
+    cy.createDatasetViaAPI({
+      name: datasetName3,
+      title: 'TDC Harmonized Dataset',
+      owner_org: org,
+      notes: 'x',
+      tdc_category: 'tdc_harmonized',
+      is_archived: false,
+      topics: [],
+    });
+  });
+  it("Should search and list topics", () => {
+    //create an org so that it can be searched
+    cy.visit("/datasets");
+    cy.contains(publicTopic).should("exist");
+    cy.contains(publicTopic2).should("exist");
+    cy.contains('TDC Harmonized Dataset').should("exist");
+    cy.contains('Dataset belonging to topic 1').should("exist");
+    cy.contains('Dataset belonging to topic 2').should("exist");
+    cy.get(`#show_all_${publicTopic}`).click({ force: true });
+    cy.wait(2000)
+    cy.contains('Dataset belonging to topic 1').should("exist");
+    cy.contains('Dataset belonging to topic 2').should("not.exist");
+  });
+  after(() => {
+    cy.deleteDatasetViaAPI(datasetName);
+    cy.deleteDatasetViaAPI(datasetName2);
+    cy.deleteOrganizationAPI(org);
+    cy.deleteGroupAPI(publicTopic);
+    cy.deleteGroupAPI(publicTopic2);
+  });
+  })

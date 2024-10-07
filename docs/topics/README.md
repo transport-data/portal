@@ -35,3 +35,9 @@ You can search for Topics based on their name, title and description.
 ![Search Topics](search.png)
 
 Clicking on a Topics will redirect you to Edit Topic Page.
+
+## Topics page
+
+If you go to the `/datasets` page you will see a grid with all the topics and 5 sample datasets, besides that you will also have a list of datasets which are TDC Harmonized and the most popular datasets with data retrieved from Google Analytics
+
+![List topics public](list_public.png)
