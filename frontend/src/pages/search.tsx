@@ -539,7 +539,7 @@ export default function DatasetSearch({
                         datasets.map((item, i) => (
                           <DatasetSearchItem
                             frequencies={updateFrequencies}
-                            key={`dataset-result-${i}`}
+                            key={`dataset-result-${item.id}`}
                             {...item}
                           />
                         ))
@@ -572,9 +572,9 @@ export default function DatasetSearch({
                       </PaginationItem>
                       {pages.map((x, i) =>
                         i > currentPage + 2 || i < currentPage - 2 ? (
-                          <></>
+                          null
                         ) : (
-                          <PaginationItem>
+                          <PaginationItem key={`pagination-item-${i}`}>
                             <button
                               disabled={currentPage === i}
                               onClick={() => {
