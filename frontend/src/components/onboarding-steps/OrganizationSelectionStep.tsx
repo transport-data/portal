@@ -27,7 +27,7 @@ export default ({
     query === ""
       ? orgs
       : orgs.filter((org: any) => {
-          return org.name.toLowerCase().includes(query.toLowerCase());
+          return org.display_name.toLowerCase().includes(query.toLowerCase());
         });
   return (
     <div className="space-y-5">
@@ -64,7 +64,7 @@ export default ({
                   onBlur={() => {
                     setQuery("");
                   }}
-                  displayValue={(org: any) => org?.name}
+                  displayValue={(org: any) => org?.display_name}
                 />
                 <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none data-[open]:rotate-180">
                   <ChevronDown size={14} />
@@ -81,7 +81,7 @@ export default ({
                         <div className="flex items-center gap-3.5">
                           <Building size={14} />
                           <span className="block truncate group-data-[selected]:font-semibold">
-                            {org.name}
+                            {org.display_name}
                           </span>
                         </div>
                       </ComboboxOption>
