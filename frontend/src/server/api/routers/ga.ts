@@ -70,8 +70,9 @@ export const googleAnalyticsRouter = createTRPCRouter({
         })
         .filter((x): x is NonNullable<typeof x> => x !== null) ?? [];
     rowsProcessed = rowsProcessed.sort((a, b) => b.activeUsers - a.activeUsers);
-    const mostViewedDatasets = await Promise.all(
-      rowsProcessed.slice(0, 5).map(async (row) => {
+    console.log('ROWS PROCESSED', rowsProcessed)
+    let mostViewedDatasets = await Promise.all(
+      rowsProcessed.map(async (row) => {
         try {
           const d = await getDataset({ id: row.datasetId, apiKey: "" });
           return d.result;
@@ -81,9 +82,17 @@ export const googleAnalyticsRouter = createTRPCRouter({
         }
       })
     );
+    //remove duplicate dataset.name
+    mostViewedDatasets = mostViewedDatasets.filter(
+      (dataset, index, self) =>
+        index ===
+        self.findIndex(
+          (t) => t && dataset && t.name === dataset.name
+        )
+    );
     return mostViewedDatasets.filter(
       (x): x is NonNullable<typeof x> => x !== null
-    );
+    ).slice(0, 5);
   }),
 });
 
