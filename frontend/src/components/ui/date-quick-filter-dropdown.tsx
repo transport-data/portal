@@ -50,9 +50,11 @@ export default function DateQuickFilterDropdown({
       : searchFilter.startYear && !searchFilter.endYear
       ? `after ${searchFilter.startYear}`
       : searchFilter.startYear && searchFilter.endYear
-      ? searchFilter.startYear.toString().slice(0, 4) +
-        " - " +
-        searchFilter.endYear?.toString().slice(0, 4)
+      ? searchFilter.startYear === searchFilter.endYear
+        ? searchFilter.startYear.toString().slice(0, 4)
+        : searchFilter.startYear.toString().slice(0, 4) +
+          " - " +
+          searchFilter.endYear?.toString().slice(0, 4)
       : "All";
 
   return (
@@ -115,9 +117,7 @@ export default function DateQuickFilterDropdown({
                 label="To"
                 value={endYear ? dayjs(endYear.toString()) : undefined}
                 onChange={(x) => setEndYear(x?.year())}
-                minDate={
-                  startYear ? dayjs((startYear! + 1).toString()) : undefined
-                }
+                minDate={startYear ? dayjs(startYear!.toString()) : undefined}
                 openTo="year"
                 views={["year"]}
                 yearsOrder="desc"
