@@ -5,8 +5,9 @@ import Layout from "../components/_shared/Layout";
 
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 
+import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
 import DatasetSearchItem from "@components/search/DatasetSearchItem";
-import SearchBar from "@components/search/SearchBar";
+import SearchBar from "@components/search/SimpleSearchBar";
 import {
   Pagination,
   PaginationContent,
@@ -16,14 +17,28 @@ import { Transition } from "@headlessui/react";
 import { cn } from "@lib/utils";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
+import { listGroups } from "@utils/group";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
 import React from "react";
-import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
+import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
 
-export function getServerSideProps({ query }: any) {
+export async function getServerSideProps({ query, session }: any) {
+  const regions: Facet[] = [];
+  const countries: Facet[] = [];
+
+  const geographies = await listGroups({
+    type: "geography",
+    apiKey: session?.user.apikey ?? "",
+  });
+
+  geographies.forEach((x: any) =>
+    x.geography_type === "country"
+      ? countries.push({ count: 0, display_name: x.title, name: x.name })
+      : regions.push({ count: 0, display_name: x.title, name: x.name })
+  );
+
   return {
-    props: query,
+    props: { ...query, countries, regions },
   };
 }
 
@@ -39,10 +54,11 @@ export default function DatasetSearch({
   topic,
   tdc_category,
   sector,
+  countries,
+  regions,
   mode,
   service,
   region,
-  fuel,
   before,
   after,
   country,
@@ -54,10 +70,7 @@ export default function DatasetSearch({
   const [sectors, setSectors] = useState<Facet[]>([]);
   const [orgs, setOrgs] = useState<Facet[]>([]);
   const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
-  const [regions, setRegions] = useState<Facet[]>([]);
-  const [countries, setCountries] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
-  const [yearsCoverage, setYearsCoverage] = useState<Facet[]>([]);
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
 
   const resetFilter = () => {
@@ -65,8 +78,7 @@ export default function DatasetSearch({
       offset: 0,
       limit: 9,
       sort: "score desc, metadata_modified desc",
-      //leaving sectors in is causing a 500 on search
-      facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "sectors", "geographies", "organization", "res_format", "metadata_created"]`,
+      facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
     });
     setCurrentPage(0);
   };
@@ -74,20 +86,18 @@ export default function DatasetSearch({
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
     limit: 9,
-    endYear: before ? Number(after) : undefined,
+    endYear: before ? Number(before) : undefined,
     startYear: after ? Number(after) : undefined,
     modes: mode ? [mode as string] : undefined,
     services: service ? [service as string] : undefined,
     sectors: sector ? [sector as string] : undefined,
-    fuel: fuel as string | undefined,
     groups: topic ? [topic as string] : undefined,
     tdc_category: tdc_category as string | undefined,
     regions: region ? [region as string] : undefined,
     countries: country ? [country as string] : undefined,
     query: query as string,
     sort: "score desc, metadata_modified desc",
-    //leaving sectors in is causing a 500 on search
-    facetsFields: `["tags", "groups", "services", "modes", "frequency","regions", "sectors", "geographies", "organization", "res_format", "metadata_created"]`,
+    facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
   });
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -99,8 +109,10 @@ export default function DatasetSearch({
     },
   } = api.dataset.search.useQuery(searchFilter);
 
-
-  api.dataset.search.useQuery({...searchFilter, offset: (currentPage + 1) * 9});
+  api.dataset.search.useQuery({
+    ...searchFilter,
+    offset: (currentPage + 1) * 9,
+  });
 
   useEffect(() => {
     for (const key in facets) {
@@ -111,14 +123,6 @@ export default function DatasetSearch({
         }
         case "tags": {
           if (!tags.length) setTags(facets[key].items);
-          break;
-        }
-        case "geographies": {
-          if (!countries.length) setCountries(facets[key].items);
-          break;
-        }
-        case "regions": {
-          if (!regions.length) setRegions(facets[key].items);
           break;
         }
         case "res_format": {
@@ -139,7 +143,13 @@ export default function DatasetSearch({
           break;
         }
         case "sectors": {
-          if (!sectors.length) setSectors(facets[key].items);
+          if (!sectors.length)
+            setSectors(
+              facets[key].items.filter(
+                (x: Facet) =>
+                  x.display_name.toLowerCase() !== "water_transportation"
+              )
+            );
           break;
         }
         case "metadata_created": {
@@ -168,20 +178,20 @@ export default function DatasetSearch({
           };
 
           facets[key].items.forEach((x: any) => {
-            const dateConverted = new Date(x.name);
+            const datasetDate = new Date(x.name);
             const today = new Date();
             let _key;
             // this is checking if the dataset was created at December of last year and today is January making the dataset be in last month filter
             if (
-              today.getFullYear() - dateConverted.getFullYear() === 1 &&
+              today.getFullYear() - datasetDate.getFullYear() === 1 &&
               today.getMonth() === 0 &&
-              dateConverted.getMonth() === 11
+              datasetDate.getMonth() === 11
             ) {
               _key = LAST_MONTH_KEY;
             } else {
               _key =
-                dateConverted.getFullYear() === today.getFullYear() &&
-                dateConverted.getMonth() === today.getMonth() - 1
+                datasetDate.getFullYear() === today.getFullYear() &&
+                datasetDate.getMonth() === today.getMonth() - 1
                   ? LAST_MONTH_KEY
                   : x.name.slice(0, 4);
             }
@@ -224,6 +234,102 @@ export default function DatasetSearch({
 
   const pages = new Array(Math.ceil((datasetCount || 0) / 9)).fill(0);
 
+  const [facetDisplayName, setFacetDisplayName] = useState<
+    string | undefined
+  >();
+  const [facetValue, setFacetValue] = useState<string | undefined>();
+  const [facetDisplayValue, setFacetDisplayValue] = useState<
+    string | undefined
+  >();
+  const [facetName, setFacetName] = useState<
+    keyof SearchDatasetType | undefined
+  >();
+
+  useEffect(() => {
+    let foundData = false;
+    if (searchFilter.sectors?.length && !foundData) {
+      const x = sectors.find((x) => x.name === searchFilter.sectors!.at(0));
+      if (x) {
+        foundData = true;
+        setFacetDisplayName("sector");
+        setFacetName("sectors");
+        setFacetDisplayValue(x.display_name);
+        setFacetValue(searchFilter.sectors.at(0));
+      }
+    }
+
+    if (searchFilter.modes?.length && !foundData) {
+      const x = modes.find((x) => x.name === searchFilter.modes!.at(0));
+      if (x) {
+        foundData = true;
+        setFacetDisplayName("mode");
+        setFacetName("modes");
+        setFacetDisplayValue(x.display_name);
+        setFacetValue(searchFilter.modes.at(0));
+      }
+    }
+
+    if (searchFilter.regions?.length && !foundData) {
+      const x = regions.find(
+        (x: Facet) => x.name === searchFilter.regions!.at(0)
+      );
+      if (x) {
+        foundData = true;
+        setFacetName("regions");
+        setFacetDisplayName("region");
+        setFacetDisplayValue(x.display_name);
+        setFacetValue(searchFilter.regions.at(0));
+      }
+    }
+
+    if (searchFilter.countries?.length && !foundData) {
+      const x = countries.find(
+        (x: Facet) => x.name === searchFilter.countries!.at(0)
+      );
+      if (x) {
+        foundData = true;
+        setFacetName("countries");
+        setFacetDisplayName("country");
+        setFacetDisplayValue(x.display_name);
+        setFacetValue(searchFilter.countries.at(0));
+      }
+    }
+
+    if (searchFilter.startYear && !foundData) {
+      foundData = true;
+      setFacetDisplayName("after");
+      setFacetName("startYear");
+      setFacetDisplayValue(searchFilter.startYear.toString());
+      setFacetValue(searchFilter.startYear.toString());
+    }
+
+    if (searchFilter.endYear && !foundData) {
+      foundData = true;
+      setFacetDisplayName("before");
+      setFacetName("endYear");
+      setFacetDisplayValue(searchFilter.endYear.toString());
+      setFacetValue(searchFilter.endYear.toString());
+    }
+
+    if (searchFilter.services?.length && !foundData) {
+      const x = services.find((x) => x.name === searchFilter.services!.at(0));
+      if (x) {
+        foundData = true;
+        setFacetDisplayName("service");
+        setFacetName("services");
+        setFacetDisplayValue(x.display_name);
+        setFacetValue(searchFilter.services.at(0));
+      }
+    }
+
+    if (!foundData) {
+      setFacetDisplayName(undefined);
+      setFacetName(undefined);
+      setFacetDisplayValue(undefined);
+      setFacetValue(undefined);
+    }
+  }, [searchFilter]);
+
   return (
     <>
       <Head>
@@ -238,40 +344,10 @@ export default function DatasetSearch({
               onChange={onChange}
               hideDatasetSuggestion
               query={searchFilter.query || ""}
-              facetName={
-                (searchFilter.sectors
-                  ? "sector"
-                  : searchFilter.modes
-                  ? "mode"
-                  : searchFilter.regions?.at(0)
-                  ? "region"
-                  : searchFilter.startYear
-                  ? "after"
-                  : searchFilter.fuel
-                  ? "fuel"
-                  : searchFilter.endYear
-                  ? "before"
-                  : searchFilter.services
-                  ? "service"
-                  : undefined) as keyof SearchDatasetType
-              }
-              facetValue={
-                searchFilter.sectors
-                  ? searchFilter.sectors.at(0)
-                  : searchFilter.modes
-                  ? searchFilter.modes.at(0)
-                  : searchFilter.regions?.at(0)
-                  ? searchFilter.regions.at(0)
-                  : searchFilter.startYear
-                  ? searchFilter.startYear.toString()
-                  : searchFilter.fuel
-                  ? searchFilter.fuel
-                  : searchFilter.endYear
-                  ? searchFilter.endYear.toString()
-                  : searchFilter.services
-                  ? searchFilter.services.at(0)
-                  : undefined
-              }
+              facetDisplayName={facetDisplayName}
+              facetName={facetName}
+              facetDisplayValue={facetDisplayValue}
+              facetValue={facetValue}
             />
           </div>
           <div className="mt-8">
@@ -452,6 +528,9 @@ export default function DatasetSearch({
                       />
                     </div>
                   </div>
+                  <p className="mt-4 text-sm text-[#6B7280]">
+                    Showing all {datasetCount} results
+                  </p>
                   <section className="mt-8">
                     <div className="flex flex-col gap-8">
                       {isLoading ? (
@@ -462,7 +541,7 @@ export default function DatasetSearch({
                         datasets.map((item, i) => (
                           <DatasetSearchItem
                             frequencies={updateFrequencies}
-                            key={`dataset-result-${i}`}
+                            key={`dataset-result-${item.id}`}
                             {...item}
                           />
                         ))
@@ -495,9 +574,9 @@ export default function DatasetSearch({
                       </PaginationItem>
                       {pages.map((x, i) =>
                         i > currentPage + 2 || i < currentPage - 2 ? (
-                          <></>
+                          null
                         ) : (
-                          <PaginationItem>
+                          <PaginationItem key={`pagination-item-${i}`}>
                             <button
                               disabled={currentPage === i}
                               onClick={() => {

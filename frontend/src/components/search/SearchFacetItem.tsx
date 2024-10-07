@@ -10,6 +10,7 @@ export default function SearchFacetItem({
   context,
   showIcon = true,
   showBadge = true,
+  href,
   onSelect,
 }: {
   badge?: string;
@@ -18,6 +19,7 @@ export default function SearchFacetItem({
   context?: string;
   showIcon?: boolean;
   showBadge?: boolean;
+  href?: string;
   onSelect?: Function;
 }) {
   //const Element = onSelect ?
@@ -25,25 +27,34 @@ export default function SearchFacetItem({
   const ItemContent = () => (
     <>
       {showIcon &&
-        (icon || <MagnifyingGlassIcon width={20} className="text-gray-500" />)}
+        (icon || (
+          <MagnifyingGlassIcon
+            width={20}
+            className="min-w-[20px] text-gray-500"
+          />
+        ))}
       {showBadge && badge && <FacetBadge name={badge} />}
       <span>{text}</span>
-      {context && <span className="text-gray-400">- {context}</span>}
+      {context && <span className="min-w-fit text-gray-400">- {context}</span>}
     </>
   );
 
-  return onSelect ? (
+  return href ? (
     <CommandItem
       className="flex items-center gap-2 text-gray-700"
-      onSelect={() => onSelect()}
+      asChild
+      onSelect={() => (onSelect ? onSelect() : null)}
     >
-      <ItemContent />
-    </CommandItem>
-  ) : (
-    <CommandItem className="flex items-center gap-2 text-gray-700" asChild>
-      <Link href={"/search"}>
+      <Link href={href ?? "/search"}>
         <ItemContent />
       </Link>
+    </CommandItem>
+  ) : (
+    <CommandItem
+      className="flex items-center gap-2 text-gray-700"
+      onSelect={() => (onSelect ? onSelect() : null)}
+    >
+      <ItemContent />
     </CommandItem>
   );
 }

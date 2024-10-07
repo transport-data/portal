@@ -1,24 +1,17 @@
+import { appRouter } from "@/server/api/root";
+import Heading from "@components/_shared/Heading";
+import { Skeleton } from "@components/ui/skeleton";
+import { Group } from "@portaljs/ckan";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { api } from "@utils/api";
+import { listGroups } from "@utils/group";
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { unstable_serialize } from "swr";
-import Layout from "../components/_shared/Layout";
-import { Group, PackageSearchOptions } from "@portaljs/ckan";
-import { CKAN } from "@portaljs/ckan";
-import { env } from "@env.mjs";
-import Heading from "@components/_shared/Heading";
-import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
-import { listGroups } from "@utils/group";
-import { listOrganizations } from "@utils/organization";
-import SearchBarMocked from "@components/search/SearchBarMocked";
-import { appRouter } from "@/server/api/root";
-import { createServerSideHelpers } from "@trpc/react-query/server";
 import superjson from "superjson";
-import { api } from "@utils/api";
-import { Skeleton } from "@components/ui/skeleton";
+import Layout from "../components/_shared/Layout";
+import SearchBar from "@components/search/SearchBar";
 
 export async function getStaticProps() {
   const helpers = createServerSideHelpers({
@@ -38,7 +31,7 @@ export async function getStaticProps() {
     await Promise.all(
       topics.map((topic) => helpers.group.get.prefetch({ id: topic.id }))
     ),
-    await helpers.ga.getVisitorStats.prefetch()
+    await helpers.ga.getVisitorStats.prefetch(),
   ]);
   return {
     props: {
@@ -65,7 +58,7 @@ export default function DatasetsPage({
     limit: 10,
     tdc_category: "tdc_harmonized",
   });
-  const { data: gaData } = api.ga.getVisitorStats.useQuery()
+  const { data: gaData } = api.ga.getVisitorStats.useQuery();
   return (
     <>
       <Head>
@@ -82,7 +75,7 @@ export default function DatasetsPage({
               and 120+ countries.
             </p>
             <div className="mt-8 ">
-              <SearchBarMocked />
+              <SearchBar />
             </div>
             <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
               You can also browse the topics below to find what you are looking
@@ -111,7 +104,7 @@ export default function DatasetsPage({
                   <ul className="flex flex-col gap-[12px]">
                     {gaData ? (
                       <>
-                        {gaData.map((item) => (
+                        {gaData.map((item: any) => (
                           <Link
                             href={`/@${item.organization?.name}/${item.name}`}
                             key={`group-${item.name}`}
