@@ -22,7 +22,6 @@ export async function getStaticProps() {
   const topics = await listGroups({
     type: "topic",
     showCoordinates: false,
-    apiKey: ''
   });
   await Promise.all([
     helpers.dataset.search.prefetch({
