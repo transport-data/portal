@@ -116,6 +116,10 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("fuel", [options.fuel]));
   }
 
+  if (options.tdc_category) {
+    fqAr.push(buildOrFq("tdc_category", [options.tdc_category]));
+  }
+
   if (options.query) {
     fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }
@@ -204,7 +208,6 @@ export async function searchDatasets<T = Dataset>({
 
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
-  console.log(endpoint)
   const response = await CkanRequest.get<any>(endpoint, {
     headers: { Authorization: apiKey },
   });

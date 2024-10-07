@@ -17,7 +17,7 @@ export const datasetRouter = createTRPCRouter({
     .input(SearchDatasetSchema)
     .query(async ({ input, ctx }) => {
       const user = ctx.session?.user;
-      const apiKey = user?.apikey;
+      const apiKey = user?.apikey ?? '';
       const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),

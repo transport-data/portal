@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { unstable_serialize } from "swr";
 import Layout from "../components/_shared/Layout";
-import { PackageSearchOptions } from "@portaljs/ckan";
+import { Group, PackageSearchOptions } from "@portaljs/ckan";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
 import Heading from "@components/_shared/Heading";
@@ -13,298 +13,58 @@ import Image from "next/image";
 import Link from "next/link";
 import { listGroups } from "@utils/group";
 import { listOrganizations } from "@utils/organization";
+import { appRouter } from "@/server/api/root";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import superjson from "superjson";
+import { api } from "@utils/api";
+import { Skeleton } from "@components/ui/skeleton";
 
 export async function getStaticProps() {
-  const backend_url = env.NEXT_PUBLIC_CKAN_URL;
-  const ckan = new CKAN(backend_url);
-  const search_result = await ckan.packageSearch({
-    offset: 0,
-    limit: 5,
-    tags: [],
-    groups: [],
-    orgs: [],
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { session: null },
+    transformer: superjson,
   });
-  const groups = await listGroups({
+  const topics = await listGroups({
     type: "topic",
     showCoordinates: false,
   });
-  const tags = await ckan.getAllTags();
-  const orgs = await listOrganizations({
-    input: {
-      includeUsers: false,
-      detailed: true,
-    },
-  });
+  await Promise.all([
+    helpers.dataset.search.prefetch({
+      limit: 10,
+      tdc_category: "tdc_harmonized",
+    }),
+    await Promise.all(
+      topics.map((topic) => helpers.group.get.prefetch({ id: topic.id }))
+    ),
+    await helpers.ga.getVisitorStats.prefetch(),
+  ]);
   return {
     props: {
-      fallback: {
-        [unstable_serialize([
-          "package_search",
-          { offset: 0, limit: 5, tags: [], groups: [], orgs: [] },
-        ])]: search_result,
-      },
-      groups,
-      tags,
-      orgs,
+      topics,
+      trpcState: helpers.dehydrate(),
     },
   };
 }
 
 export default function DatasetsPage({
-  fallback,
-  groups,
-  tags,
-  orgs,
+  topics,
+  trpcState,
 }: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
-  const router = useRouter();
-  const { q } = router.query;
-  const [options, setOptions] = useState<PackageSearchOptions>({
-    offset: 0,
-    limit: 5,
-    tags: [],
-    groups: [],
-    orgs: [],
-    query: q as string,
+  const { data: listOfTopics } = api.group.list.useQuery(
+    {
+      type: "topic",
+      showGeographyShapes: false,
+    },
+    {
+      initialData: topics,
+    }
+  );
+  const { data: tdcHarmonizedDatasets } = api.dataset.search.useQuery({
+    limit: 10,
+    tdc_category: "tdc_harmonized",
   });
-
-  const _groups = [
-    {
-      title: "Most viewed",
-      iconUrl: "/images/icons/group-mostviewd.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-
-    {
-      title: "TDC Harmonised",
-      iconUrl: "/images/icons/group-hamornised.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "Aviation",
-      iconUrl: "/images/icons/group-aviation.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "Most viewed",
-      iconUrl: "/images/icons/group-default.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "TDC Harmonised",
-      iconUrl: "/images/icons/group-default.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "Aviation",
-      iconUrl: "/images/icons/group-aviation.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "Most viewed",
-      iconUrl: "/images/icons/group-default.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "TDC Harmonised",
-      iconUrl: "/images/icons/group-default.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-    {
-      title: "Aviation",
-      iconUrl: "/images/icons/group-aviation.png",
-      datasets: [
-        {
-          title: "Vehicle Registration Data",
-          url: "/#",
-        },
-        {
-          title: "Urban Mobility",
-          url: "/#",
-        },
-        {
-          title: "Road Safety Data",
-          url: "/#",
-        },
-        {
-          title: "Fuel Economy Data",
-          url: "/#",
-        },
-        {
-          title: "Road Network Data",
-          url: "/#",
-        },
-      ],
-    },
-  ];
-
+  const { data: gaData } = api.ga.getVisitorStats.useQuery();
   return (
     <>
       <Head>
@@ -330,42 +90,160 @@ export default function DatasetsPage({
           </div>
           <div className="pb-[96px] pt-[80px]">
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {_groups.map((group, i) => (
-                <div
-                  key={`group-${i}`}
-                  className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]"
-                >
+              <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
+                {gaData && (
                   <Image
-                    src={group.iconUrl}
+                    src="/images/icons/group-mostviewed.png"
                     width={48}
                     height={48}
-                    alt={group.title}
+                    alt="TDC Most Viewed Logo"
                   />
-                  <div className="flex flex-col gap-4">
+                )}
+                <div className="flex flex-col gap-4">
+                  {gaData ? (
                     <span className="block text-lg font-semibold leading-tight text-gray-900">
-                      {group.title}
+                      Most Viewed
                     </span>
-                    <ul className="flex flex-col gap-[12px]">
-                      {group.datasets.map((item, x) => (
-                        <Link
-                          href={item.url}
-                          key={`group-${i}-${x}`}
-                          className="text-sm font-medium text-gray-500"
-                        >
-                          {item.title}
-                        </Link>
-                      ))}
-                    </ul>
-                    <Link className="text-sm font-medium text-accent" href="#">
-                      Show all
-                    </Link>
-                  </div>
+                  ) : (
+                    <Skeleton className="h-4 w-24" />
+                  )}
+                  <ul className="flex flex-col gap-[12px]">
+                    {gaData ? (
+                      <>
+                        {gaData.map((item: any) => (
+                          <Link
+                            href={`/@${item.organization?.name}/${item.name}`}
+                            key={`group-${item.name}`}
+                            className="text-sm font-medium text-gray-500"
+                          >
+                            {item.title ?? item.name}
+                          </Link>
+                        ))}
+                      </>
+                    ) : (
+                      [0, 1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-4 w-12" />
+                      ))
+                    )}
+                  </ul>
+                  <Link
+                    className="text-sm font-medium text-accent"
+                    href="/search"
+                  >
+                    Show all
+                  </Link>
                 </div>
+              </div>
+              <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
+                {tdcHarmonizedDatasets && (
+                  <Image
+                    src="/images/icons/group-hamornised.png"
+                    width={48}
+                    height={48}
+                    alt="TDC Harmonized Logo"
+                  />
+                )}
+                <div className="flex flex-col gap-4">
+                  {tdcHarmonizedDatasets ? (
+                    <span className="block text-lg font-semibold leading-tight text-gray-900">
+                      TDC Harmonized
+                    </span>
+                  ) : (
+                    <Skeleton className="h-4 w-24" />
+                  )}
+                  <ul className="flex flex-col gap-[12px]">
+                    {tdcHarmonizedDatasets ? (
+                      <>
+                        {tdcHarmonizedDatasets.datasets.map((item) => (
+                          <Link
+                            href={`/@${item.organization?.name}/${item.name}`}
+                            key={`group-${item.name}`}
+                            className="text-sm font-medium text-gray-500"
+                          >
+                            {item.title ?? item.name}
+                          </Link>
+                        ))}
+                      </>
+                    ) : (
+                      [0, 1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-4 w-12" />
+                      ))
+                    )}
+                  </ul>
+                  <Link
+                    id="show_all_tdc_harmonized"
+                    className="text-sm font-medium text-accent"
+                    href="/search?tdc_category=tdc_harmonized"
+                  >
+                    Show all
+                  </Link>
+                </div>
+              </div>
+              {listOfTopics?.map((group) => (
+                <TopicCard key={group.id} group={group} />
               ))}
             </div>
           </div>
         </div>
       </Layout>
     </>
+  );
+}
+
+function TopicCard({ group }: { group: Group }) {
+  const { data: groupDetails, isLoading } = api.group.get.useQuery(
+    { id: group.id },
+    {
+      initialData: { ...group, groups: [], packages: [] },
+    }
+  );
+  return (
+    <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
+      {groupDetails && groupDetails.image_display_url && (
+        <Image
+          src={groupDetails.image_display_url}
+          width={48}
+          height={48}
+          alt={groupDetails.title}
+        />
+      )}
+      <div className="flex flex-col gap-4">
+        {groupDetails ? (
+          <span className="block text-lg font-semibold leading-tight text-gray-900">
+            {groupDetails.title}
+          </span>
+        ) : (
+          <Skeleton className="h-4 w-24" />
+        )}
+        <ul className="flex flex-col gap-[12px]">
+          {groupDetails ? (
+            <>
+              {groupDetails.packages?.slice(0, 5).map((item) => (
+                <Link
+                  href={`/@${item.organization?.name}/${item.name}`}
+                  key={`group-${item.name}`}
+                  className="text-sm font-medium text-gray-500"
+                >
+                  {item.title ?? item.name}
+                </Link>
+              ))}
+            </>
+          ) : (
+            [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-4 w-12" />)
+          )}
+        </ul>
+        {groupDetails ? (
+          <Link
+            id={`show_all_${groupDetails.name}`}
+            className="text-sm font-medium text-accent"
+            href={`/search?topic=${groupDetails?.name}`}
+          >
+            Show all
+          </Link>
+        ) : (
+          <Skeleton className="h-4 w-12" />
+        )}
+      </div>
+    </div>
   );
 }
