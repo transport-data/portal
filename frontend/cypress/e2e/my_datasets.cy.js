@@ -31,9 +31,10 @@ const ckanUserSuffix = uuid();
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 
+
 describe("Should Create a Dataset for Signed in User", () => {
   before( ()=>{
-    cy.createOrganizationAPI(org);
+    cy.createOrganizationViaAPI({ title: org, name: org });
     //create public dataset
     cy.createDatasetViaAPI({
       name: datasetName,
