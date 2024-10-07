@@ -101,6 +101,7 @@ export const SearchDatasetSchema = z.object({
   type: z.array(z.string()).optional(),
   private: z.boolean().optional(),
   includeDrafts: z.boolean().optional(),
+  contributors: z.array( z.string() ).optional()
 });
 
 export type DatasetSchemaType = {

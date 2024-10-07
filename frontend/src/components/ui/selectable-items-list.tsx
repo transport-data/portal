@@ -7,26 +7,33 @@ export const SelectableItemsList = ({
   selected,
   onSelectedItem,
 }: {
-  items: { value: string; icon: React.ReactNode; isSelected: boolean }[];
+  items: {
+    text?: string;
+    value: string;
+    icon: React.ReactNode;
+    isSelected: boolean;
+  }[];
   title: string;
   selected?: string;
   onSelectedItem: (selectedItem: string) => void;
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="selectable-items-list space-y-6">
       <h1 className="text-sm font-semibold">{title}</h1>
-      <div className="flex flex-row flex-wrap items-center gap-3 whitespace-nowrap sm:flex-col sm:flex-nowrap sm:items-start">
+      <div className="flex flex-row flex-wrap items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap sm:flex-col  sm:flex-nowrap sm:items-start">
         {items.map((x, i) => (
           <div
             key={`selectable-${i}`}
             onClick={() => onSelectedItem(x.value)}
             className={classNames(
-              "flex cursor-pointer items-center gap-2 text-sm",
-              selected === x.value ? "text-[#111928]" : "text-[#6B7280]"
+              "flex max-w-full cursor-pointer items-center gap-2  text-sm text-sm",
+              selected === x.value
+                ? "font-medium text-[#111928]"
+                : "text-[#6B7280]"
             )}
           >
             <span>{x.icon}</span>
-            <span>{x.value}</span>
+            <span className=" text-ellipsis">{x.text || x.value}</span>
           </div>
         ))}
       </div>

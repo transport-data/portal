@@ -7,20 +7,22 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function UserAvatar({
-  user,
+  image,
+  name,
   className,
 }: {
-  user: User;
+  image?: string;
+  name: string;
   className?: string;
 }) {
   return (
     <Avatar
       className={cn("h-6 w-6 border-2 border-white", className)}
-      title={user?.display_name}
+      title={name}
     >
-      <AvatarImage src={user?.image_url} alt={user?.display_name} />
+      <AvatarImage src={image} alt={name} />
       <AvatarFallback className="bg-gray-300">
-        {user?.display_name
+        {name
           ?.trim()
           .split(" ")
           .map((word) => word[0])
