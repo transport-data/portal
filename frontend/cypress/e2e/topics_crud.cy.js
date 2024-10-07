@@ -135,6 +135,7 @@ describe("List topics (Public)", () => {
   after(() => {
     cy.deleteDatasetViaAPI(datasetName);
     cy.deleteDatasetViaAPI(datasetName2);
+    cy.deleteDatasetViaAPI(datasetName3);
     cy.deleteOrganizationAPI(org);
     cy.deleteGroupAPI(publicTopic);
     cy.deleteGroupAPI(publicTopic2);
