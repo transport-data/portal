@@ -1,23 +1,17 @@
+import { appRouter } from "@/server/api/root";
+import Heading from "@components/_shared/Heading";
+import { Skeleton } from "@components/ui/skeleton";
+import { Group } from "@portaljs/ckan";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { api } from "@utils/api";
+import { listGroups } from "@utils/group";
 import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { unstable_serialize } from "swr";
-import Layout from "../components/_shared/Layout";
-import { Group, PackageSearchOptions } from "@portaljs/ckan";
-import { CKAN } from "@portaljs/ckan";
-import { env } from "@env.mjs";
-import Heading from "@components/_shared/Heading";
-import SearchBar from "@components/search/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
-import { listGroups } from "@utils/group";
-import { listOrganizations } from "@utils/organization";
-import { appRouter } from "@/server/api/root";
-import { createServerSideHelpers } from "@trpc/react-query/server";
 import superjson from "superjson";
-import { api } from "@utils/api";
-import { Skeleton } from "@components/ui/skeleton";
+import Layout from "../components/_shared/Layout";
+import SearchBar from "@components/search/SearchBar";
 
 export async function getStaticProps() {
   const helpers = createServerSideHelpers({
