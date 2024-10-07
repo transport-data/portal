@@ -22,7 +22,7 @@ describe("Show geography page the country list", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("Should create and edit org", () => {
+  it("Should click on Brazil group and redirect to search page.", () => {
     cy.visit(`/geography`);
     cy.wait(10000)
     cy.get("#Brazil").scrollIntoView().click();
