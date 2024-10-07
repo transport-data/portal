@@ -9,7 +9,7 @@ export const pageview = ({
   url: string;
   analyticsID: string;
 }) => {
-  if (typeof window.gtag !== undefined) {
+  if (typeof window.gtag !== "undefined") {
     window.gtag("config", analyticsID, {
       page_path: url,
       debug_mode: true,

@@ -198,6 +198,9 @@ function TopicCard({ group }: { group: Group }) {
       initialData: { ...group, groups: [], packages: [] },
     }
   );
+  if (!isLoading && groupDetails.packages?.length === 0) {
+    return null
+  }
   return (
     <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
       {groupDetails && groupDetails.image_display_url && (
