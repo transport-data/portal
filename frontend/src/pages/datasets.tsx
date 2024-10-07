@@ -13,7 +13,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { listGroups } from "@utils/group";
 import { listOrganizations } from "@utils/organization";
-import SearchBarMocked from "@components/search/SearchBarMocked";
 import { appRouter } from "@/server/api/root";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import superjson from "superjson";
@@ -38,7 +37,7 @@ export async function getStaticProps() {
     await Promise.all(
       topics.map((topic) => helpers.group.get.prefetch({ id: topic.id }))
     ),
-    await helpers.ga.getVisitorStats.prefetch()
+    await helpers.ga.getVisitorStats.prefetch(),
   ]);
   return {
     props: {
@@ -65,7 +64,7 @@ export default function DatasetsPage({
     limit: 10,
     tdc_category: "tdc_harmonized",
   });
-  const { data: gaData } = api.ga.getVisitorStats.useQuery()
+  const { data: gaData } = api.ga.getVisitorStats.useQuery();
   return (
     <>
       <Head>
@@ -82,7 +81,7 @@ export default function DatasetsPage({
               and 120+ countries.
             </p>
             <div className="mt-8 ">
-              <SearchBarMocked />
+              <SearchBar />
             </div>
             <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
               You can also browse the topics below to find what you are looking
@@ -111,7 +110,7 @@ export default function DatasetsPage({
                   <ul className="flex flex-col gap-[12px]">
                     {gaData ? (
                       <>
-                        {gaData.map((item) => (
+                        {gaData.map((item: any) => (
                           <Link
                             href={`/@${item.organization?.name}/${item.name}`}
                             key={`group-${item.name}`}
@@ -198,6 +197,9 @@ function TopicCard({ group }: { group: Group }) {
       initialData: { ...group, groups: [], packages: [] },
     }
   );
+  if (!isLoading && groupDetails.packages?.length === 0) {
+    return null
+  }
   return (
     <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
       {groupDetails && groupDetails.image_display_url && (

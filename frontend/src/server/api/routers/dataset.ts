@@ -20,6 +20,8 @@ export const datasetRouter = createTRPCRouter({
       const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
+
+  
   get: protectedProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -39,6 +41,7 @@ export const datasetRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
+    //convert the date to string YYYY-MM-DD
       const _dataset = {
         ...input,
         related_datasets: input.related_datasets.map((d) => d.name),

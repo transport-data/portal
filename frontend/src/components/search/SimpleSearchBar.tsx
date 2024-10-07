@@ -1,26 +1,23 @@
-import { Button } from "@components/ui/button";
-import { SearchIcon } from "lucide-react";
 import {
   Command,
-  CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Button } from "@components/ui/button";
+import { SearchIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import CommandListHeader from "./SearchDropdownHeader";
 import SearchNarrow from "./SearchFacets";
 
+import { Badge } from "@components/ui/badge";
 import datasets from "@data/datasets.json";
+import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { SearchDatasetType } from "@schema/dataset.schema";
 import SearchDatasetItem from "./SearchDatasetItem";
 import SearchFacetItem from "./SearchFacetItem";
-import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { SearchbarFormType, SearchbarSchema } from "@schema/searchbar.schema";
-import { useForm } from "react-hook-form";
-import { Badge } from "@components/ui/badge";
-import { useRouter } from "next/router";
+import { SearchPageOnChange } from "@pages/search";
+import React from "react";
 
 const facets: any = {
   in: {
@@ -60,33 +57,38 @@ const facets: any = {
   },
 };
 
-export default function SearchBar() {
+export default function SearchBar({
+  facetName,
+  facetDisplayName,
+  facetValue,
+  facetDisplayValue,
+  hideDatasetSuggestion,
+  onChange,
+  query,
+}: {
+  onChange: SearchPageOnChange;
+  query?: string;
+  hideDatasetSuggestion?: boolean;
+  facetValue?: string;
+  facetDisplayName?: string,
+  facetName?: keyof SearchDatasetType;
+  facetDisplayValue?: string;
+}) {
   const commandRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const queryInputRef = useRef<HTMLInputElement>(null);
   const [showCommandList, setShowCommandList] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showAllFacets, setShowAllFacets] = useState<boolean>(false);
-  const router = useRouter();
-
-  const form = useForm<SearchbarFormType>();
-  const {
-    handleSubmit,
-    setValue,
-    register,
-    watch,
-    reset,
-    getValues,
-    setFocus,
-  } = form;
+  const [internalQuery, setInternalQuery] = useState<any>(query);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isInput = event.target instanceof HTMLInputElement;
       if (
         commandRef.current &&
         !commandRef.current.contains(event.target as Node)
       ) {
-        reset();
-        setShowCommandList(false);
+        if (!hideDatasetSuggestion) setShowCommandList(false);
       }
     };
 
@@ -98,42 +100,41 @@ export default function SearchBar() {
 
   const handleNarrowSelect = (facet: any) => {
     if (facet) {
-      setValue("facetName", facet);
-      setFocus("query");
+      onChange([{ value: facet, key: facetName! }]);
+      queryInputRef.current?.focus();
     }
   };
 
   const handleTyping = (value: string) => {
-    setValue("query", value);
+    setInternalQuery(value);
     setIsTyping(value.length > 0);
   };
 
+  useEffect(() => {
+    if (!internalQuery || !query) setInternalQuery(query);
+  }, [query]);
+
   const handleCancelSearch = () => {
-    reset();
+    setInternalQuery("");
+    const changes: any = [];
+    if (facetName) changes.push({ value: undefined, key: facetName });
+    changes.push({ value: undefined, key: "query" });
+    onChange(changes);
     setTimeout(() => {
-      setFocus("query");
+      queryInputRef.current?.focus();
     }, 150);
   };
 
-  const facetValue = watch("facetValue");
-  const facetName = watch("facetName");
-  const query = watch("query");
-
   return (
     <form
-      onSubmit={(event) =>
-        void handleSubmit(async (data) => {
-          const { facetName, facetValue, query } = getValues();
-          const queryParams = new URLSearchParams({
-            [facetName]: facetValue,
-            query,
-          }).toString();
+      onSubmit={(event) => {
+        event.preventDefault();
+        const changes: any = [];
+        changes.push({ value: internalQuery, key: "query" });
+        onChange(changes);
 
-          router.push(`/datasets?${queryParams}`);
-          return false;
-        })(event)
-      }
-      className=""
+        return false;
+      }}
     >
       <Command className="relative" shouldFilter={true} ref={commandRef}>
         <div className="relative flex w-full items-center rounded-[12px] border border-[#D1D5DB] bg-popover text-popover-foreground">
@@ -142,16 +143,24 @@ export default function SearchBar() {
               variant="muted"
               className="ml-[16px] min-w-fit border border-gray-200 bg-gray-100 px-[6px] py-[2px]"
             >
-              {facetName}: {facetValue}
+              {facetDisplayName}: {facetDisplayValue}
             </Badge>
           )}
           <CommandInput
+            id="search-input-test-id"
+            ref={queryInputRef}
+            onKeyDown={(x) => {
+              if (x.key.toLowerCase() === "enter") {
+                buttonRef.current?.click();
+              }
+            }}
             className="w-full grow rounded-[12px] border-0 py-[18px] pl-4 pr-[150px] focus:border-0 focus:ring-0 "
-            onFocus={() => setShowCommandList(true)}
+            onFocus={() => {
+              if (!hideDatasetSuggestion) setShowCommandList(true);
+            }}
             placeholder="Find statistics, forecasts & studies"
             onInput={(e) => handleTyping((e.target as HTMLInputElement).value)}
-            value={query}
-            {...register("query")}
+            value={internalQuery}
           />
           {(isTyping || facetName || facetValue) && (
             <span
@@ -163,6 +172,8 @@ export default function SearchBar() {
             </span>
           )}
           <Button
+            ref={buttonRef}
+            id="search-button"
             type="submit"
             className="absolute right-[10px] top-[10px] flex gap-[8px]"
           >
@@ -175,7 +186,7 @@ export default function SearchBar() {
             showCommandList ? "block" : "hidden"
           }`}
         >
-          {facets[facetName]?.options?.length && !facetValue ? (
+          {facetName && facets[facetName]?.options?.length && !facetValue ? (
             <CommandGroup
               heading={<CommandListHeader title="Narrow your search" />}
             >
@@ -185,8 +196,10 @@ export default function SearchBar() {
                   badge={`${facetName}: ${item}`}
                   text={""}
                   onSelect={() => {
-                    setValue("facetValue", item);
-                    setFocus("query");
+                    onChange([
+                      { value: item, key: facetName },
+                      { value: internalQuery, key: "query" },
+                    ]);
                   }}
                 />
               ))}
@@ -230,7 +243,7 @@ export default function SearchBar() {
                     heading={<CommandListHeader title="Datasets" />}
                   >
                     {datasets.slice(0, 2).map((dataset, index) => (
-                      <SearchDatasetItem {...dataset} key={index} />
+                      <SearchDatasetItem {...dataset as any} key={index} />
                     ))}
                   </CommandGroup>
 

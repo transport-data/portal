@@ -7,8 +7,7 @@ import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 
 import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
 import DatasetSearchItem from "@components/search/DatasetSearchItem";
-import SearchBar from "@components/search/SearchBar";
-import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
+import SearchBar from "@components/search/SimpleSearchBar";
 import {
   Pagination,
   PaginationContent,
@@ -21,6 +20,7 @@ import { api } from "@utils/api";
 import { listGroups } from "@utils/group";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
+import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
 
 export async function getServerSideProps({ query, session }: any) {
   const regions: Facet[] = [];

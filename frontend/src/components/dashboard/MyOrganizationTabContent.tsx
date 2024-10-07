@@ -102,7 +102,7 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {datasets
+              {data?.datasets
                 ?.filter((item) =>
                   visibility === "Drafts"
                     ? item.state === "draft"
