@@ -121,13 +121,33 @@ export const inviteUser = async ({
   message: string;
   apiKey?: string;
 }) => {
-  const response: CkanResponse<string> = await CkanRequest.post(`invite_user_to_tdc`, {
-    apiKey: apiKey,
-    json: { 
-      emails: emails,
-      message: message
-    },
-  });
+  const response: CkanResponse<string> = await CkanRequest.post(
+    `invite_user_to_tdc`,
+    {
+      apiKey: apiKey,
+      json: {
+        emails: emails,
+        message: message,
+      },
+    }
+  );
 
   return response;
+};
+
+export const getUserFollowee = async ({
+  id,
+  apiKey,
+}: {
+  id: string;
+  apiKey: string;
+}) => {
+  const followee: CkanResponse<any> = await CkanRequest.get(
+    `followee_list?id=${id}`,
+    {
+      apiKey: apiKey,
+    }
+  );
+
+  return followee.result;
 };

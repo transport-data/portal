@@ -1,4 +1,4 @@
-import { ErrorAlert } from "@components/_shared/Alerts";
+import { ErrorAlert, SuccessAlert } from "@components/_shared/Alerts";
 import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
@@ -53,19 +53,34 @@ export default function LoginPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
   const form = useForm<OnboardingFormType>();
   const { handleSubmit, watch } = form;
+  const [followedGroups, setFollowedGroups] = useState([]);
+
+  const { data: userFollowee, isLoading } = api.user.getFollowee.useQuery();
   const onBoardUser = api.user.onboard.useMutation({
     onSuccess: async () => {
+      setLoading(false);
+      if (stepNumber === 0) {
+        setSuccessMessage("Successfully followed Groups");
+      } else if (stepNumber === 1) {
+        setSuccessMessage("Request Submitted Successfully");
+      } else {
+        setSuccessMessage("Successfully sent Invites");
+      }
       toast({
-        description: "Successfully Onboarded user",
+        description: "Successfully Onboarded User",
       });
       form.reset();
       setErrorMessage(null);
-      await router.push("/dashboard/newsfeed");
+      if (stepNumber === 2) {
+        await router.push("/dashboard/newsfeed");
+      }
+      setStep(stepNumber + 1);
     },
     onError: (error) => {
       setLoading(false);
@@ -122,12 +137,52 @@ export default function LoginPage({
   );
 
   useEffect(() => {
+    if (userFollowee && !isLoading) {
+      const selectedLocations = locationData
+        ? locationData.map((loc) => ({
+            id: loc.id,
+            name: loc.display_name,
+            selected: userFollowee.some(
+              (followee: any) =>
+                followee.type === "group" &&
+                followee.dict.type === "geography" &&
+                followee.dict.id === loc.id
+            ),
+          }))
+        : [];
+      const selectedOrganizations = organizationsData
+        ? organizationsData.map((org) => ({
+            id: org.id,
+            name: org.display_name,
+            selected: userFollowee.some(
+              (followee: any) =>
+                followee.type === "organization" && followee.dict.id === org.id
+            ),
+          }))
+        : [];
+      const selectedTopics = topicsData
+        ? topicsData.map((topic) => ({
+            id: topic.id,
+            name: topic.display_name,
+            selected: userFollowee.some(
+              (followee: any) =>
+                followee.type === "group" &&
+                followee.dict.type === "topic" &&
+                followee.dict.id === topic.id
+            ),
+          }))
+        : [];
+      setLocations(selectedLocations);
+      setOrganizations(selectedOrganizations);
+      setTopics(selectedTopics);
+    }
+  }, [userFollowee, isLoading]);
+
+  useEffect(() => {
     if (stepNumber === 0) {
-      const isAnySelected =
-        topics.some((topic) => topic.selected) ||
-        locations.some((location) => location.selected) ||
-        organizations.some((org) => org.selected);
-      setDisableButton(!isAnySelected);
+      if (followedGroups) {
+        setDisableButton(false);
+      }
     } else if (stepNumber === 1) {
       setSubtitleText("Prepare to share data");
       setParagraphText(
@@ -172,6 +227,9 @@ export default function LoginPage({
       setParagraphText(
         "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
+      setDisableButton(
+        !(watch("newUsersEmailsToInvite") && watch("messageToInviteNewUsers"))
+      );
     } else {
       setDisableButton(false);
     }
@@ -183,44 +241,20 @@ export default function LoginPage({
     watch("newOrganizationDescription"),
     watch("newOrganizationDataDescription"),
     watch("isNewOrganizationSelected"),
-    topics,
-    locations,
-    organizations,
+    watch("newUsersEmailsToInvite"),
+    watch("messageToInviteNewUsers"),
     stepNumber,
+    followedGroups,
   ]);
 
-  const groupFollowPreferences = async () => {
-    const groupIds: string[] = [];
-    //add selected topics, locations and organization
-    topics.forEach((topic) => {
-      if (topic.selected) {
-        groupIds.push(topic.id);
-      }
-    });
-    locations.forEach((loc) => {
-      if (loc.selected) {
-        groupIds.push(loc.id);
-      }
-    });
-    organizations.forEach((org) => {
-      if (org.selected) {
-        groupIds.push(org.id);
-      }
-    });
-    form.setValue("followingGroups", groupIds);
-  };
-
-  const nextStep = async (data: any) => {
+  const nextStep = async () => {
     if (stepNumber === 0) {
-      form.setValue("isInterestSubmitted", true);
-      groupFollowPreferences();
-    } else if (stepNumber === 1) {
-      form.setValue("isOrganizationSubmitted", true);
-    } else if (stepNumber === 2) {
-      setLoading(true);
-      onBoardUser.mutate(data);
+      form.setValue("followingGroups", followedGroups);
     }
-    setStep(stepNumber + 1);
+    form.setValue("onBoardingStep", stepNumber);
+    setLoading(true);
+    const data = form.getValues();
+    onBoardUser.mutate(data);
   };
 
   const skipStep = async () => {
@@ -235,13 +269,15 @@ export default function LoginPage({
     setStep(stepNumber + 1);
   };
 
-  return (
+  return isLoading ? (
+    <Spinner className="text-slate-900" />
+  ) : (
     <>
       <NextSeo title="Onboarding" />
       <SingInLayout subtitleText={subtitleText} paragraphText={paragraphText}>
         <form
           onSubmit={handleSubmit((data) => {
-            nextStep(data);
+            nextStep();
           })}
           className="w-full bg-white px-28 py-28"
         >
@@ -328,6 +364,7 @@ export default function LoginPage({
               setTopics={setTopics}
               organizations={organizations}
               setOrganizations={setOrganizations}
+              setFollowedGroups={setFollowedGroups}
             />
           ) : stepNumber === 1 ? (
             <OrganizationSelectionStep orgs={organizationsData} form={form} />
@@ -374,6 +411,7 @@ export default function LoginPage({
               </span>
             </p>
             {errorMessage && <ErrorAlert text={errorMessage} />}
+            {successMessage && <SuccessAlert text={successMessage} />}
           </div>
         </form>
       </SingInLayout>

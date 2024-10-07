@@ -27,6 +27,7 @@ import {
   listUsers,
   patchUser,
   inviteUser,
+  getUserFollowee,
 } from "@utils/user";
 import { followGroups } from "@utils/group";
 import { z } from "zod";
@@ -207,16 +208,13 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      // if interests tab is not skipped.
-      if (input.isInterestSubmitted && input.followingGroups) {
+
+      if (input.onBoardingStep === 0 && input.followingGroups) {
         await followGroups({
           apiKey: apiKey,
-          ids: input.followingGroups,
+          followedGroups: input.followingGroups,
         });
-      }
-      // if organization selection tab is not skipped
-      if (input.isOrganizationSubmitted) {
-        // if request new organization is selected.
+      } else if (input.onBoardingStep === 1) {
         if (
           input.isNewOrganizationSelected &&
           input.newOrganizationName &&
@@ -240,8 +238,11 @@ export const userRouter = createTRPCRouter({
             message: input.messageToParticipateOfTheOrg,
           });
         }
-      }
-      if (input.newUsersEmailsToInvite && input.messageToInviteNewUsers) {
+      } else if (
+        input.onBoardingStep === 2 &&
+        input.newUsersEmailsToInvite &&
+        input.messageToInviteNewUsers
+      ) {
         await inviteUser({
           apiKey: apiKey,
           emails: input.newUsersEmailsToInvite,
@@ -249,4 +250,10 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
+  getFollowee: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const apiKey = user.apikey;
+    const followee = await getUserFollowee({ id: user.id, apiKey });
+    return followee;
+  }),
 });

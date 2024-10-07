@@ -5,15 +5,17 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-  Fragment
+  Fragment,
 } from "react";
 
 export const TagsButtonsSelectionGroup = ({
   data,
   setData,
+  setFollowedGroups,
 }: {
-  data: { name: string; selected: boolean }[];
+  data: { id: string; name: string; selected: boolean }[];
   setData: Dispatch<SetStateAction<{ name: string; selected: boolean }[]>>;
+  setFollowedGroups: any;
 }) => {
   const invalidIndex = 999999999999999999999999999999999999999999;
   const divRef = useRef<HTMLDivElement>();
@@ -58,6 +60,17 @@ export const TagsButtonsSelectionGroup = ({
             onClick={() => {
               x.selected = !x.selected;
               setData([...data]);
+              setFollowedGroups((prevArray: any) => {
+                let itemFound = false;
+                const updatedArray = prevArray.map((item: any) => {
+                  if (item.id === x.id) {
+                    itemFound = true;
+                    return { ...item, selected: x.selected };
+                  }
+                  return item;
+                });
+                return itemFound ? updatedArray : [...prevArray, x];
+              });
             }}
             className={
               "cursor-pointer rounded-2xl border px-3 py-2 text-xs text-[#006064] hover:opacity-60 " +
