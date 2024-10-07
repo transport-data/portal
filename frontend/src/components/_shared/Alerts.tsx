@@ -28,17 +28,12 @@ export function ErrorAlert({
 export function SuccessAlert({
   text,
   title = "Success",
+  onClose,
 }: {
   text: string;
   title?: string;
+  onClose: () => void;
 }) {
-  const [isVisible, setIsVisible] = useState(true);
-
-  const handleClose = () => {
-    setIsVisible(false);
-  };
-
-  if (!isVisible) return null;
   return (
     <div className="rounded-md bg-green-50 p-4">
       <div className="flex">
@@ -56,7 +51,7 @@ export function SuccessAlert({
         </div>
         <div className="ml-auto flex-shrink-0">
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="text-green-400 hover:text-green-600"
           >
             <XCircleIcon className="h-5 w-5" aria-hidden="true" />

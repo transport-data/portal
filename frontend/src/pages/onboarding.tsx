@@ -53,7 +53,8 @@ export default function LoginPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
@@ -65,6 +66,7 @@ export default function LoginPage({
   const onBoardUser = api.user.onboard.useMutation({
     onSuccess: async () => {
       setLoading(false);
+      setShowSuccessAlert(true);
       if (stepNumber === 0) {
         setSuccessMessage("Successfully followed Groups");
       } else if (stepNumber === 1) {
@@ -72,6 +74,7 @@ export default function LoginPage({
       } else {
         setSuccessMessage("Successfully sent Invites");
       }
+      setTimeout(() => setShowSuccessAlert(false), 3000);
       toast({
         description: "Successfully Onboarded User",
       });
@@ -411,7 +414,12 @@ export default function LoginPage({
               </span>
             </p>
             {errorMessage && <ErrorAlert text={errorMessage} />}
-            {successMessage && <SuccessAlert text={successMessage} />}
+            {showSuccessAlert && (
+              <SuccessAlert
+                text={successMessage}
+                onClose={() => setShowSuccessAlert(false)} // Close alert on demand
+              />
+            )}
           </div>
         </form>
       </SingInLayout>
