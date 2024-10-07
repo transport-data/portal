@@ -46,7 +46,7 @@ export default function SearchBar() {
     name: "",
   });
 
-  const { data } = api.dataset.search.useQuery({
+  const { data, isLoading } = api.dataset.search.useQuery({
     limit: query?.length > 1 ? 5 : 0,
     query: query,
     sort: "score desc, metadata_modified desc",
@@ -135,10 +135,9 @@ export default function SearchBar() {
   }, []);
   //get stored searches
   useEffect(() => {
-    if (typeof window !== "undefined")
-      setStoredSearches(
-        JSON.parse(localStorage?.getItem("tdcRecentSearches") ?? "[]")
-      );
+    setStoredSearches(
+      JSON.parse(localStorage?.getItem("tdcRecentSearches") ?? "[]")
+    );
   }, []);
 
   useEffect(() => {
