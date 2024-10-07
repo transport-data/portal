@@ -23,7 +23,7 @@ export default function AboutUsPage({}) {
           <div className="m-auto mb-[16px] flex w-fit flex-col items-center justify-center rounded-[8px] bg-gray-100 p-2 text-gray-500">
             <PhoneIcon width={38} />
           </div>
-          <h1 className="mb-2 text-[20px] text-xl font-bold leading-[30px] text-gray-900">
+          <h1 className="mb-2 text-xl font-bold leading-[30px] text-gray-900">
             Conctact Us
           </h1>
           <p className="mb-2 text-gray-500">
@@ -35,26 +35,28 @@ export default function AboutUsPage({}) {
           </p>
           <Link
             className="text-base font-semibold"
-            href="email:contact@transport-data.org"
+            href="mailto:contact@transport-data.org"
           >
             contact@transport-data.org
           </Link>
         </section>
         <section className="container mb-[96px] mt-10 text-center">
-          <h1 className="mb-2 text-[18px] text-xl font-bold leading-[28px] text-gray-900">
+          <h1 className="mb-2 text-xl font-bold leading-[28px] text-gray-900">
             Data-Related Issues
           </h1>
           <p className="mb-2 text-gray-500">
             If you have questions, suggestions, or encounter issues related to
-            our data, <br></br>we encourage you to use our GitHub Issues Board .
+            our data, <br></br>we encourage you to use our GitHub Discussions
+            Page.
             <br></br>
             This helps us respond faster and track all data-related feedback
             effectively.<br></br>
             <Link
               className="mt-2 inline-block text-base font-semibold text-gray-900"
-              href="https://github.com/orgs/transport-data/projects/4/views/1"
+              href="https://github.com/orgs/transport-data/discussions"
+              target="_blank"
             >
-              🔗 GitHub Issues Board
+              🔗 GitHub Discussions Page
             </Link>
           </p>
           <p className="text-gray-500">

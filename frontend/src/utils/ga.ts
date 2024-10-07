@@ -9,7 +9,7 @@ export const pageview = ({
   url: string;
   analyticsID: string;
 }) => {
-  if (typeof window.gtag !== undefined) {
+  if (typeof window.gtag !== "undefined") {
     window.gtag("config", analyticsID, {
       page_path: url,
       debug_mode: true,
@@ -36,13 +36,23 @@ export const datasetViewEvent = ({ datasetTitle, datasetId, datasetName }) => {
   });
 };
 
-export const useDatasetViewEvent = ({ datasetTitle, datasetId, datasetName }) => {
+export const useDatasetViewEvent = ({
+  datasetTitle,
+  datasetId,
+  datasetName,
+}) => {
   useEffect(() => {
-    datasetViewEvent({ datasetTitle, datasetId, datasetName });
+    setTimeout(() => {
+      datasetViewEvent({ datasetTitle, datasetId, datasetName });
+    }, 2000);
   }, []);
 };
 
-export const datasetDownloadEvent = ({ datasetTitle, datasetId, datasetName }) => {
+export const datasetDownloadEvent = ({
+  datasetTitle,
+  datasetId,
+  datasetName,
+}) => {
   // TODO: would it be worth it to track resourceId as well?
   event({
     action: "dataset_download",
