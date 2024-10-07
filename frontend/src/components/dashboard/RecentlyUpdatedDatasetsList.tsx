@@ -47,7 +47,7 @@ export default function RecentlyUpdatedDatasetsList({
           },
         }}
       >
-        {datasets?.map((dataset) => (
+        {data?.datasets?.map((dataset) => (
           <SwiperSlide key={dataset.id}>
             <DatasetCard dataset={dataset as any} publicUrl={publicUrl} />
           </SwiperSlide>

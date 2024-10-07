@@ -25,8 +25,6 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
     datasetSearch as SearchDatasetType
   );
 
-  const datasets = data?.datasets;
-
   const utils = api.useContext();
   const deleteDatasets = api.dataset.delete.useMutation({
     onSuccess: async () => {
@@ -35,20 +33,20 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
   });
 
   useLayoutEffect(() => {
-    if (datasets) {
+    if (data?.datasets) {
       const isIndeterminate =
         selectedDatasets.length > 0 &&
-        selectedDatasets.length < datasets.length;
-      setChecked(selectedDatasets.length === datasets.length);
+        selectedDatasets.length < data?.datasets.length;
+      setChecked(selectedDatasets.length === data?.datasets.length);
       setIndeterminate(isIndeterminate);
       if (checkbox.current) checkbox.current.indeterminate = isIndeterminate;
     }
-  }, [selectedDatasets, datasets]);
+  }, [selectedDatasets, data?.datasets]);
 
   function toggleAll() {
-    if (datasets) {
+    if (data?.datasets) {
       setSelectedDatasets(
-        checked || indeterminate ? [] : (datasets as Array<any>)
+        checked || indeterminate ? [] : (data?.datasets as Array<any>)
       );
       setChecked(!checked && !indeterminate);
       setIndeterminate(false);
@@ -138,9 +136,9 @@ export const DatasetTable: React.FC<{ publicUrl: string }> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
-                  {datasets && (
+                  {data?.datasets && (
                     <>
-                      {datasets.map((dataset) => (
+                      {data?.datasets.map((dataset) => (
                         <tr
                           key={dataset.name}
                           className={

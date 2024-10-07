@@ -10,6 +10,10 @@ import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { listGroups } from "@utils/group";
+import { listOrganizations } from "@utils/organization";
+import { appRouter } from "@/server/api/root";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import superjson from "superjson";
 import Layout from "../components/_shared/Layout";
 
@@ -31,7 +35,7 @@ export async function getStaticProps() {
     await Promise.all(
       topics.map((topic) => helpers.group.get.prefetch({ id: topic.id }))
     ),
-    await helpers.ga.getVisitorStats.prefetch()
+    await helpers.ga.getVisitorStats.prefetch(),
   ]);
   return {
     props: {
@@ -58,7 +62,7 @@ export default function DatasetsPage({
     limit: 10,
     tdc_category: "tdc_harmonized",
   });
-  const { data: gaData } = api.ga.getVisitorStats.useQuery()
+  const { data: gaData } = api.ga.getVisitorStats.useQuery();
   return (
     <>
       <Head>
@@ -75,7 +79,7 @@ export default function DatasetsPage({
               and 120+ countries.
             </p>
             <div className="mt-8 ">
-              <SearchBarMocked />
+              <SearchBar />
             </div>
             <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
               You can also browse the topics below to find what you are looking

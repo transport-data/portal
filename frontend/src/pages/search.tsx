@@ -6,7 +6,7 @@ import Layout from "../components/_shared/Layout";
 import QuickFilterDropdown from "@components/ui/quick-filter-dropdown";
 
 import DatasetSearchItem from "@components/search/DatasetSearchItem";
-import SearchBar from "@components/search/SearchBar";
+import SearchBar from "@components/search/SimpleSearchBar";
 import {
   Pagination,
   PaginationContent,
@@ -99,8 +99,10 @@ export default function DatasetSearch({
     },
   } = api.dataset.search.useQuery(searchFilter);
 
-
-  api.dataset.search.useQuery({...searchFilter, offset: (currentPage + 1) * 9});
+  api.dataset.search.useQuery({
+    ...searchFilter,
+    offset: (currentPage + 1) * 9,
+  });
 
   useEffect(() => {
     for (const key in facets) {
