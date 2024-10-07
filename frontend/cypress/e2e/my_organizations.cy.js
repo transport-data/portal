@@ -92,7 +92,8 @@ describe("Should Create a Dataset for Signed in User", () => {
       frequency: frequency,
       private:true
     });
-  } )
+  });
+  
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
