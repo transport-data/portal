@@ -2,6 +2,7 @@ import { Badge } from "@components/ui/badge";
 import {
   CheckCircleIcon,
   CircleStackIcon,
+  PencilIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
@@ -34,6 +35,7 @@ export default function DashboardDatasetCard(props: Dataset) {
     frequency,
     state,
     geographies,
+    private: isPrivate,
     contributors,
     organization,
     groups,
@@ -89,7 +91,7 @@ export default function DashboardDatasetCard(props: Dataset) {
               className="px-2.5 py-0.5 text-sm"
               asChild
             >
-              <Link href={`/dashboard/datasets/${name}/edit`}>Edit</Link>
+              <Link href={`/dashboard/datasets/${name}/edit`}><PencilIcon className="w-3 h-3 mr-1" /> Edit</Link>
             </Button>
           </div>
           {tdc_category === "tdc_formatted" && (
@@ -119,7 +121,15 @@ export default function DashboardDatasetCard(props: Dataset) {
             >
               Draft
             </Badge>
-          ) : state === "active" ? (
+          ) : isPrivate ? (
+            <Badge
+              variant={"warning"}
+              className="capitalize"
+              icon={<GlobeAltIcon />}
+            >
+              Private
+            </Badge>
+          ) : (
             <Badge
               variant={"success"}
               className="capitalize"
@@ -127,8 +137,6 @@ export default function DashboardDatasetCard(props: Dataset) {
             >
               Public
             </Badge>
-          ) : (
-            <></>
           )}
 
           <span className="hidden xl:block">•</span>

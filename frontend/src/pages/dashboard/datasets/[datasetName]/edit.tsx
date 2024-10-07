@@ -96,7 +96,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
           data.title ?? data.name
         } dataset`,
       });
-      await router.push("/dashboard/newsfeed");
+      await router.push("/dashboard/datasets");
     },
     onError: (error) => {
       setErrorMessage(error.message);
@@ -186,7 +186,6 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       })
       .otherwise(() => false);
 
-  console.log("FORM ERRORS", form.formState.errors);
   return (
     <>
       <NextSeo title="Edit dataset" />

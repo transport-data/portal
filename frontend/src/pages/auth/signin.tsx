@@ -12,8 +12,7 @@ import { ErrorAlert } from "@components/_shared/Alerts";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { old_signin } = context.query;
-  if (old_signin && old_signin === "true") {
-    console.log("OLD SIGNIN");
+  if (old_signin && (old_signin as string).toLowerCase() === "true") {
     return {
       props: {
         csrfToken: await getCsrfToken(context),
@@ -36,7 +35,6 @@ export default function LoginPage({
   old_signin?: boolean;
 }) {
   if (old_signin && csrfToken) {
-    console.log("OLD SIGNIN", old_signin);
     return <OldLoginPage csrfToken={csrfToken} />;
   }
   return (
