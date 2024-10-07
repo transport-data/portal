@@ -25,7 +25,7 @@ export const listGroups = async ({
   limit,
   sort,
 }: {
-  apiKey: string;
+  apiKey?: string;
   limit?: number;
   type: "topic" | "geography";
   sort?: string;
