@@ -1,9 +1,11 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
-const uuid = () => Math.random().toString(36).slice(2) + "-test";
+
+const uuid = () => crypto.randomUUID();
 
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const sample_org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetTitle = `${uuid()}${datasetSuffix}`;
 const datasetName = `${uuid()}${datasetSuffix}`;
 const draftDatasetTitle = `${uuid()}${datasetSuffix} Draft`;
@@ -34,13 +36,13 @@ const ckanUserSuffix = uuid();
 
 describe("Should Create a Dataset for Signed in User", () => {
   before( ()=>{
-    cy.createOrganizationViaAPI({ title: org, name: org });
+    cy.createOrganizationViaAPI({ title: org, name: sample_org });
     //create public dataset
     cy.createDatasetViaAPI({
       name: datasetName,
       title: datasetTitle,
       tag_string: tags,
-      owner_org: org,
+      owner_org: sample_org,
       notes: notes,
       geographies: geographies,
       tdc_category: tdc_category,
@@ -57,7 +59,7 @@ describe("Should Create a Dataset for Signed in User", () => {
       name: draftDatasetName,
       title: draftDatasetTitle,
       tag_string: tags,
-      owner_org: org,
+      owner_org: sample_org,
       notes: notes,
       geographies: geographies,
       tdc_category: tdc_category,
@@ -75,7 +77,7 @@ describe("Should Create a Dataset for Signed in User", () => {
       name: privateDatasetName,
       title: privateDatasetTitle,
       tag_string: tags,
-      owner_org: org,
+      owner_org: sample_org,
       notes: notes,
       geographies: geographies,
       tdc_category: tdc_category,
@@ -138,6 +140,6 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.deleteDatasetAPI(datasetName);
     cy.deleteDatasetAPI(draftDatasetName);
     cy.deleteDatasetAPI(privateDatasetName);
-    cy.deleteOrganizationAPI(org);
+    cy.deleteOrganizationAPI(sample_org);
   });
 })
