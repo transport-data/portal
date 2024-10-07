@@ -1,3 +1,5 @@
+const ckanUserName = Cypress.env("CKAN_USERNAME");
+const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
@@ -28,8 +30,7 @@ const temporal_coverage_start = new Date(1990, 1, 1).toISOString();
 const temporal_coverage_end = new Date(2005, 1, 1).toISOString();
 
 const ckanUserSuffix = uuid();
-const ckanUserName = Cypress.env("CKAN_USERNAME");
-const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
+
 
 describe("Should Create a Dataset for Signed in User", () => {
   before( ()=>{
