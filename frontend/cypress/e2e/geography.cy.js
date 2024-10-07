@@ -22,9 +22,9 @@ describe("Show geography page the country list", () => {
     cy.viewport(1920, 2160);
   });
 
-  it("Should click on Brazil group and redirect to search page.", () => {
+  it("Should click on Argentina group and redirect to search page.", () => {
     cy.visit(`/geography`);
-    cy.get("#Brazil", { timeout: 60000 }).click({ force: true });
-    cy.url({ timeout: 60000 }).should("contains", "/search?country=bra");
+    cy.get("#Argentina", { timeout: 60000 }).click({ force: true });
+    cy.url({ timeout: 60000 }).should("contains", "/search?country=arg");
   });
 });
