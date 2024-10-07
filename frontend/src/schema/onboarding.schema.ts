@@ -18,8 +18,6 @@ export const OnboardingSchema = z.object({
   newOrganizationDescription: z.string().optional(),
   newOrganizationDataDescription: z.string().optional(),
   isNewOrganizationSelected: z.boolean().default(false),
-  isInterestSubmitted: z.boolean().default(false),
-  isOrganizationSubmitted: z.boolean().default(false),
   onBoardingStep: z.number().default(0),
 });
 

@@ -261,11 +261,7 @@ export default function LoginPage({
   };
 
   const skipStep = async () => {
-    if (stepNumber === 0) {
-      form.setValue("isInterestSubmitted", false);
-    } else if (stepNumber === 1) {
-      form.setValue("isOrganizationSubmitted", false);
-    } else if (stepNumber === 2) {
+    if (stepNumber === 2) {
       setLoading(true);
       router.push("/dashboard/newsfeed");
     }
@@ -273,7 +269,9 @@ export default function LoginPage({
   };
 
   return isLoading ? (
-    <Spinner className="text-slate-900" />
+    <div className="flex h-screen items-center justify-center">
+      <Spinner className="text-slate-900" />
+    </div>
   ) : (
     <>
       <NextSeo title="Onboarding" />
