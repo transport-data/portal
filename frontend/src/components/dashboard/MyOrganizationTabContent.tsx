@@ -200,7 +200,7 @@ export default () => {
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
-      <div className="order-1 space-y-12 lg:min-w-[150px]">
+      <div className="order-1 space-y-12 lg:max-w-[150px]">
         <SelectableItemsList
           items={[
             {
@@ -345,7 +345,7 @@ export default () => {
           />
         </div>
       </div>
-      <div className="order-3 w-fit w-full sm:order-2">
+      <div className="order-3 w-full sm:order-2 lg:max-w-[556px] xl:max-w-[700px]">
         <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
         <section className="flex flex-col gap-4">
           {isLoading ? (
@@ -361,7 +361,7 @@ export default () => {
               )}
 
               {totalPages > 1 && (
-                <Pagination className="mt-8 justify-start">
+                <Pagination className="mt-8 justify-start overflow-auto">
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
@@ -394,9 +394,10 @@ export default () => {
                         </PaginationLink>
                       </PaginationItem>
                     ))}
+
                     <PaginationItem>
                       <PaginationNext
-                        disabled={currentPage === totalDatasets}
+                        disabled={currentPage === totalPages}
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
