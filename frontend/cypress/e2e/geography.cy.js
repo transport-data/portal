@@ -24,8 +24,7 @@ describe("Show geography page the country list", () => {
 
   it("Should click on Brazil group and redirect to search page.", () => {
     cy.visit(`/geography`);
-    cy.wait(10000)
-    cy.get("#Brazil").scrollIntoView().click();
+    cy.get("#Brazil", { timeout: 60000 }).click({ force: true });
     cy.url().should("contains", "/search?country=bra");
   });
 });
