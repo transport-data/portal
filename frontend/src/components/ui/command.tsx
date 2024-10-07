@@ -12,7 +12,6 @@ const Command = React.forwardRef<
 >(({ className, filter, ...props }, ref) => {
   const filterDefault = (value: string, search: string, keywords?: string[]) => {
     const extendValue = (value + ' ' + (keywords?.join(' ') ?? '')).trim()
-    console.log(extendValue, search)
     if (extendValue.toLowerCase().includes(search.toLowerCase())) return 1;
     return 0;
   };

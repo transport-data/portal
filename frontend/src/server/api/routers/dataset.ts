@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ListboxLabel } from "@headlessui/react";
 import { DatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
 import {
@@ -13,11 +13,11 @@ import {
 import { z } from "zod";
 
 export const datasetRouter = createTRPCRouter({
-  search: protectedProcedure
+  search: publicProcedure
     .input(SearchDatasetSchema)
     .query(async ({ input, ctx }) => {
-      const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const user = ctx.session?.user;
+      const apiKey = user?.apikey ?? '';
       const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
@@ -46,7 +46,6 @@ export const datasetRouter = createTRPCRouter({
         temporal_coverage_start: input.temporal_coverage_start.toISOString().split('T')[0] ?? '',
         temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
       };
-      console.log('INPUT', _dataset)
       const dataset = await createDataset({ apiKey, input: _dataset });
       return dataset;
     }),
