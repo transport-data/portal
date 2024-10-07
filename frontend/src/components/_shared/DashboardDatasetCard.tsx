@@ -227,6 +227,7 @@ export default function DashboardDatasetCard(props: Dataset) {
                       </a>
                     ) : i < 4 ? (
                       <UserAvatar
+                        className="text-[8px]"
                         image={contributor.image_display_url}
                         name={contributor.display_name ?? ""}
                         key={`contributor-${contributor.id}`}

@@ -16,8 +16,6 @@ import {
   GlobeAltIcon,
 } from "@lib/icons";
 import { api } from "@utils/api";
-import { Skeleton } from "@components/ui/skeleton";
-import DatasetsFilterMocked from "@components/_shared/DatasetsFilterMocked";
 import {
   Pagination,
   PaginationContent,
@@ -31,20 +29,15 @@ import { SearchPageOnChange } from "@pages/search";
 
 export default function MyDatasetsTabContent() {
   const { data: session } = useSession();
-
   const [contributors, setContributors] = useState<Facet[]>([]);
-  const [modes, setModes] = useState<Facet[]>([]);
-  const [services, setServices] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
   const [tags, setTags] = useState<Facet[]>([]);
-  const [sectors, setSectors] = useState<Facet[]>([]);
   const [orgs, setOrgs] = useState<Facet[]>([]);
   const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
   const [regions, setRegions] = useState<Facet[]>([]);
   const [countries, setCountries] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
   const [visibility, setVisibility] = useState("*");
-  const [contributor, setContributor] = useState("*");
   const [currentPage, setCurrentPage] = useState(1);
   const { data: orgsForUser } = api.organization.listForUser.useQuery();
   const datasetsPerPage = 9;
@@ -56,7 +49,7 @@ export default function MyDatasetsTabContent() {
     includePrivate: true,
     includeDrafts: true,
     private: true,
-    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
+    facetsFields: `["tags","frequency","regions", "geographies", "organization", "res_format", "metadata_created"]`,
     advancedQueries: [
       { key: "creator_user_id", values: [`${session?.user.id}`] },
     ],
@@ -84,7 +77,6 @@ export default function MyDatasetsTabContent() {
       ],
     });
     setVisibility("*");
-    setContributor("*");
     setCurrentPage(1);
   };
 
@@ -129,21 +121,10 @@ export default function MyDatasetsTabContent() {
           if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
           break;
         }
-        case "modes": {
-          if (!modes.length) setModes(facets[key].items);
-          break;
-        }
-        case "services": {
-          if (!services.length) setServices(facets[key].items);
-          break;
-        }
+
         case "frequency": {
           if (!updateFrequencies.length)
             setUpdateFrequencies(facets[key].items);
-          break;
-        }
-        case "sectors": {
-          if (!sectors.length) setSectors(facets[key].items);
           break;
         }
         case "metadata_created": {

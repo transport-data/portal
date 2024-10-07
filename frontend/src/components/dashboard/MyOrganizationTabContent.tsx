@@ -25,11 +25,8 @@ import { useEffect, useState } from "react";
 
 export default () => {
   const [contributors, setContributors] = useState<Facet[]>([]);
-  const [modes, setModes] = useState<Facet[]>([]);
-  const [services, setServices] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
   const [tags, setTags] = useState<Facet[]>([]);
-  const [sectors, setSectors] = useState<Facet[]>([]);
   const [orgs, setOrgs] = useState<Facet[]>([]);
   const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
   const [regions, setRegions] = useState<Facet[]>([]);
@@ -48,7 +45,7 @@ export default () => {
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
-    facetsFields: `["tags", "groups", "services", "modes", "sectors","frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
+    facetsFields: `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
   });
 
   const {
@@ -122,21 +119,9 @@ export default () => {
           if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
           break;
         }
-        case "modes": {
-          if (!modes.length) setModes(facets[key].items);
-          break;
-        }
-        case "services": {
-          if (!services.length) setServices(facets[key].items);
-          break;
-        }
         case "frequency": {
           if (!updateFrequencies.length)
             setUpdateFrequencies(facets[key].items);
-          break;
-        }
-        case "sectors": {
-          if (!sectors.length) setSectors(facets[key].items);
           break;
         }
         case "metadata_created": {
@@ -313,7 +298,11 @@ export default () => {
             },
             ...(contributors?.length ? contributors : [])?.map((c: any) => ({
               icon: (
-                <UserAvatar image={c.display_image} name={c.display_name} />
+                <UserAvatar
+                  className="text-[8px]"
+                  image={c.display_image}
+                  name={c.display_name}
+                />
               ),
               text: c.display_name as string,
               value: c.name as string,
