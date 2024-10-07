@@ -19,7 +19,7 @@ export async function searchDatasets<T = Dataset>({
   apiKey,
   options,
 }: {
-  apiKey: string;
+  apiKey?: string;
   options: SearchDatasetType;
 }): Promise<{
   datasets: Array<T>;
@@ -205,8 +205,13 @@ export async function searchDatasets<T = Dataset>({
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
 
+  const headers: any = {}
+  if (apiKey) {
+      headers["Authorization"] = apiKey
+  }
+
   const response = await CkanRequest.get<any>(endpoint, {
-    headers: { Authorization: apiKey },
+    headers,
   });
 
   return {
