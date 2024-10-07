@@ -10,12 +10,18 @@ import {
   GlobeAltIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
-import { chunkArray } from "@lib/utils";
-import { Dataset } from "@portaljs/ckan";
 
 import _datasets from "@data/datasets.json";
 import { Tooltip } from "flowbite-react";
 import Link from "next/link";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { RegionIcon } from "@lib/icons";
+import { formatDate } from "@lib/utils";
+
+const tdcCategory: any = {
+  tdc_harmonized: "TDC Harmonized",
+  tdc_formatted: "TDC Formatted",
+};
 
 export default function DatasetsSection({
   datasets,
@@ -33,8 +39,9 @@ export default function DatasetsSection({
       </div>
 
       <div className="grid-3-separated mt-16 grid grid-cols-1 gap-[32px] md:grid-cols-2 lg:grid-cols-3 lg:gap-x-[64px]">
-        {_datasets.map((dataset, i) => {
-          const [firstTag, secondTag, ...restTags] = dataset.tags;
+        {datasets.map((dataset, i) => {
+          const [firstTag, secondTag, ...restTags] = dataset.tags || [];
+          const regionsLength = dataset.regions?.length ?? 0;
           return (
             <div key={`recent-${i}`} className="">
               <div className="dataset-card flex flex-col gap-4">
@@ -43,9 +50,11 @@ export default function DatasetsSection({
                   className="max-w-[192px] bg-[#1F2A37] "
                   content={
                     <div className="flex flex-col gap-1.5">
-                      <h4 className="text-sm">{dataset.state}</h4>
+                      <h4 className="text-sm">
+                        {tdcCategory[dataset.tdc_category]}
+                      </h4>
                       <p className="text-xs text-[#9CA3AF]">
-                        {dataset.state === "TDC Harmonised" ? (
+                        {dataset.tdc_category === "tdc_harmonized" && (
                           <>
                             Data have been validated, and derived from multiple
                             sources by TDC. For more information,{" "}
@@ -57,7 +66,9 @@ export default function DatasetsSection({
                               click here
                             </Link>
                           </>
-                        ) : (
+                        )}
+
+                        {dataset.tdc_category === "tdc_formatted" && (
                           <>
                             Data is SDMX-compliant. For more information,{" "}
                             <Link
@@ -73,20 +84,20 @@ export default function DatasetsSection({
                     </div>
                   }
                 >
-                  {dataset.state === "TDC Harmonised" && (
+                  {dataset.tdc_category === "tdc_harmonized" && (
                     <Badge
                       icon={<ShieldCheckIcon width={14} />}
                       variant="warning"
                     >
-                      {dataset.state}
+                      TDC Harmonized
                     </Badge>
                   )}
-                  {dataset.state === "TDC Formatted" && (
+                  {dataset.tdc_category === "tdc_formatted" && (
                     <Badge
                       icon={<CheckCircleIcon width={14} />}
                       variant="success"
                     >
-                      {dataset.state}
+                      TDC Formatted
                     </Badge>
                   )}
                 </Tooltip>
@@ -97,8 +108,12 @@ export default function DatasetsSection({
                 </h4>
                 {/*Tags*/}
                 <div className="flex flex-wrap gap-2">
-                  {firstTag && <Badge variant="info">{firstTag}</Badge>}
-                  {secondTag && <Badge variant="info">{secondTag}</Badge>}
+                  {firstTag && (
+                    <Badge variant="info">{firstTag.display_name}</Badge>
+                  )}
+                  {secondTag && (
+                    <Badge variant="info">{secondTag.display_name}</Badge>
+                  )}
                   {restTags.length > 0 && (
                     <Badge variant="info-outline">
                       +{restTags.length} more
@@ -107,24 +122,44 @@ export default function DatasetsSection({
                 </div>
                 {/*Description*/}
                 <p className=" line-clamp-4 overflow-hidden text-ellipsis text-gray-500">
-                  {dataset.description}
+                  {dataset.notes}
                 </p>
                 {/*Other Metadatas*/}
                 <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
                   <div className="flex gap-[4px]">
                     <BuildingLibraryIcon width={14} />
-                    {dataset.organization}
+                    {dataset.organization?.display_name}
                   </div>
-                  <span className="hidden sm:block">•</span>
-                  <div className="flex gap-[4px]">
-                    <ClipboardIcon width={14} />
-                    Updated on 23 March, 2023
-                  </div>
-                  <span className="hidden sm:block">•</span>
-                  <div className="flex gap-[4px]">
-                    <GlobeAltIcon width={14} />
-                    {dataset.region}
-                  </div>
+
+                  {dataset.metadata_modified && (
+                    <>
+                      <span className="hidden sm:block">•</span>
+                      <div className="flex gap-[4px]">
+                        <ClipboardIcon width={14} />
+                        {formatDate(dataset.metadata_modified ?? "")}
+                      </div>
+                    </>
+                  )}
+
+                  {dataset.regions && regionsLength > 0 && (
+                    <>
+                      <span className="hidden sm:block">•</span>
+                      <div className="flex gap-[4px]">
+                        <RegionIcon />
+                        {dataset.regions?.map((r, idx) => {
+                          return (
+                            <span key={`group-${r}`}>
+                              {
+                                dataset.groups?.find((g) => g.name === r)
+                                  ?.display_name
+                              }
+                              {idx < regionsLength - 1 && ","}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
                 {/*CTA*/}
                 <Button
@@ -142,10 +177,11 @@ export default function DatasetsSection({
 
       <div className="mt-[64px]">
         <Button
+          asChild
           variant="ghost"
           className="flex w-full border border-[#E5E7EB] hover:bg-slate-50"
         >
-          Show more...
+          <Link href="/datasets">Show more...</Link>
         </Button>
       </div>
     </div>

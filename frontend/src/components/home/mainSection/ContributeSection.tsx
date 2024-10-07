@@ -2,6 +2,7 @@ import Heading from "@components/_shared/Heading";
 import { Button } from "@components/ui/button";
 import { ArrowRightIcon, CheckIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ContributeSection() {
   return (
@@ -70,12 +71,14 @@ export default function ContributeSection() {
           </div>
           <hr className="h-[1px] border-gray-200" />
           <div className="flex gap-4">
-            <Button className="flex gap-2">
-              Add data
-              <ArrowRightIcon width={20} />
+            <Button asChild className="flex gap-2">
+              <Link href="/dashboard/datasets/create">
+                Add data
+                <ArrowRightIcon width={20} />
+              </Link>
             </Button>
             <Button className="border border-gray-200" variant="ghost">
-                Learn more
+              <Link href="/data-provider">Learn more</Link>
             </Button>
           </div>
         </div>

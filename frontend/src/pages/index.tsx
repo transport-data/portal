@@ -1,4 +1,4 @@
-import type { InferGetServerSidePropsType } from "next";
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import Hero from "../components/home/heroSection/Hero";
 import { StatsProps } from "../components/home/heroSection/Stats";
@@ -10,40 +10,32 @@ import ContributeSection from "@components/home/mainSection/ContributeSection";
 import FaqsSection from "@components/home/mainSection/FaqsSection";
 import TestimonialsSection from "@components/home/mainSection/TestimonialsSection";
 import NewsLetterSignUpSection from "@components/_shared/NewsletterSection";
+import { api } from "@utils/api";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { getSession } from "next-auth/react";
+import { searchDatasets } from "@utils/dataset";
 
-export async function getStaticProps() {
+export const getServerSideProps: GetServerSideProps<any> = async (context) => {
+  const session = await getSession(context);
+
   const backend_url = env.NEXT_PUBLIC_CKAN_URL;
   const ckan = new CKAN(backend_url);
-  const datasets = await ckan.packageSearch({
-    offset: 0,
-    limit: 5,
-    tags: [],
-    groups: [],
-    orgs: [],
+  const { datasets } = await searchDatasets({
+    apiKey: session?.user.apikey ?? "",
+    options: {
+      limit: 6,
+      sort: "score desc, metadata_modified desc",
+    },
   });
-  const groups = await ckan.getGroupsWithDetails();
-  const orgs = await ckan.getOrgsWithDetails();
-  const stats: StatsProps = {
-    datasetCount: datasets.count,
-    groupCount: groups.length,
-    orgCount: orgs.length,
-  };
+
   return {
     props: {
-      datasets: datasets.datasets,
-      groups,
-      orgs,
-      stats,
+      datasets,
     },
   };
-}
+};
 
-export default function Home({
-  datasets,
-  groups,
-  orgs,
-  stats,
-}: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
+export default function Home({ datasets }: { datasets: Dataset[] }) {
   return (
     <>
       <Head>
