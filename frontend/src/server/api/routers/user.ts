@@ -193,12 +193,12 @@ export const userRouter = createTRPCRouter({
     const input: SearchDatasetType = {
       offset: 0,
       limit: 1000,
-      include_private: true,
-      include_drafts: true,
+      includePrivate: true,
+      includeDrafts: true,
       orgs: organizations?.map((org) => org?.name) || [],
     };
-    const userDatasets = await searchDatasets({ apiKey, input });
-    const ids = userDatasets?.results?.map((item) => item.id);
+    const userDatasets = await searchDatasets({ apiKey, options: input });
+    const ids = userDatasets?.datasets?.map((item) => item.id);
     const datasetActivities = await listDatasetActivities({ apiKey, ids });
     const userActivities = await CkanRequest.get<CkanResponse<Activity[]>>(
       `dashboard_activity_list`,

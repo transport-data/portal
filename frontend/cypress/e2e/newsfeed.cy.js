@@ -5,7 +5,7 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 
-describe("onboarding flow", () => {
+describe("newsfeed tests", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
