@@ -26,6 +26,8 @@ import {
 } from "@components/ui/pagination";
 import React from "react";
 import { SearchPageOnChange } from "@pages/search";
+import { cn } from "@lib/utils";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 
 export default function MyDatasetsTabContent() {
   const { data: session } = useSession();
@@ -38,7 +40,7 @@ export default function MyDatasetsTabContent() {
   const [countries, setCountries] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
   const [visibility, setVisibility] = useState("*");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const { data: orgsForUser } = api.organization.listForUser.useQuery();
   const datasetsPerPage = 9;
 
@@ -63,6 +65,10 @@ export default function MyDatasetsTabContent() {
     },
   } = api.dataset.search.useQuery(searchFilter);
 
+  const pages = new Array(
+    Math.ceil((datasetCount || 0) / datasetsPerPage)
+  ).fill(0);
+
   const resetFilter = () => {
     setSearchFilter({
       offset: 0,
@@ -77,7 +83,7 @@ export default function MyDatasetsTabContent() {
       ],
     });
     setVisibility("*");
-    setCurrentPage(1);
+    setCurrentPage(0);
   };
 
   const onChange: SearchPageOnChange = (data) => {
@@ -86,7 +92,7 @@ export default function MyDatasetsTabContent() {
       data.forEach((x) => (updatedValue[x.key] = x.value));
       return updatedValue;
     });
-    setCurrentPage(1);
+    setCurrentPage(0);
   };
 
   useEffect(() => {
@@ -293,7 +299,7 @@ export default function MyDatasetsTabContent() {
                   }),
               offset: 0,
             }));
-            setCurrentPage(1);
+            setCurrentPage(0);
             setVisibility(selected);
           }}
           selected={visibility}
@@ -331,12 +337,18 @@ export default function MyDatasetsTabContent() {
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
-              {totalPages > 1 && (
-                <Pagination className="mt-8 justify-start overflow-auto">
+              {pages.length ? (
+                <Pagination className="mx-0 mt-8 justify-start">
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious
-                        disabled={currentPage === 1}
+                      <button
+                        disabled={currentPage === 0}
+                        aria-label="Go to previous page"
+                        className={cn(
+                          "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                          "rounded-s-lg px-2",
+                          currentPage === 0 ? "cursor-not-allowed" : ""
+                        )}
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
@@ -344,30 +356,36 @@ export default function MyDatasetsTabContent() {
                           }));
                           setCurrentPage((oldV) => oldV - 1);
                         }}
-                      />
-                    </PaginationItem>
-                    {Array.from({ length: totalPages }).map((_, x) => (
-                      <PaginationItem
-                        key={`page-${x}`}
-                        onClick={() => {
-                          setSearchFilter((oldV) => ({
-                            ...oldV,
-                            offset: x * datasetsPerPage,
-                          }));
-                          setCurrentPage(x + 1);
-                        }}
                       >
-                        <PaginationLink
-                          href="#"
-                          isActive={x + 1 === currentPage}
-                        >
-                          {x + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                        <ChevronLeftIcon className="h-4 w-4" />
+                      </button>
+                    </PaginationItem>
+                    {pages.map((x, i) =>
+                      i > currentPage + 2 || i < currentPage - 2 ? null : (
+                        <PaginationItem key={`pagination-item-${i}`}>
+                          <button
+                            disabled={currentPage === i}
+                            onClick={() => {
+                              setSearchFilter((oldV) => ({
+                                ...oldV,
+                                offset: i * datasetsPerPage,
+                              }));
+                              setCurrentPage(i);
+                            }}
+                            className={cn(
+                              `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
+                              currentPage === i ? "cursor-auto bg-gray-100" : ""
+                            )}
+                          >
+                            {i + 1}
+                          </button>
+                        </PaginationItem>
+                      )
+                    )}
                     <PaginationItem>
-                      <PaginationNext
-                        disabled={currentPage === totalPages}
+                      <button
+                        disabled={currentPage === pages.length - 1}
+                        aria-label="Go to next page"
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
@@ -375,10 +393,21 @@ export default function MyDatasetsTabContent() {
                           }));
                           setCurrentPage((oldV) => oldV + 1);
                         }}
-                      />
+                        className={cn(
+                          "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                          "rounded-e-lg px-2",
+                          currentPage === pages.length - 1
+                            ? "cursor-not-allowed"
+                            : ""
+                        )}
+                      >
+                        <ChevronRightIcon className="h-4 w-4" />
+                      </button>
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
+              ) : (
+                <></>
               )}
             </>
           )}
