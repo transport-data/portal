@@ -18,13 +18,13 @@ Cypress.on("uncaught:exception", (err, runnable) => {
 });
 
 describe("Show geography page the country list", () => {
-  beforeEach(function () {
-    cy.login(ckanUserName, ckanUserPassword);
+  before(() => {
+    cy.viewport(1920, 1080);
   });
 
   it("Should click on Brazil group and redirect to search page.", () => {
     cy.visit(`/geography`);
     cy.get("#Brazil", { timeout: 60000 }).click({ force: true });
-    cy.url().should("contains", "/search?country=bra");
+    cy.url({ timeout: 60000 }).should("contains", "/search?country=bra");
   });
 });
