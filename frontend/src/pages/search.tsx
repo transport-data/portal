@@ -51,6 +51,8 @@ export type SearchPageOnChange = (
 
 export default function DatasetSearch({
   query,
+  topic,
+  tdc_category,
   sector,
   countries,
   regions,
@@ -89,6 +91,8 @@ export default function DatasetSearch({
     modes: mode ? [mode as string] : undefined,
     services: service ? [service as string] : undefined,
     sectors: sector ? [sector as string] : undefined,
+    groups: topic ? [topic as string] : undefined,
+    tdc_category: tdc_category as string | undefined,
     regions: region ? [region as string] : undefined,
     countries: country ? [country as string] : undefined,
     query: query as string,

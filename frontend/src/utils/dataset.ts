@@ -116,6 +116,10 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("fuel", [options.fuel]));
   }
 
+  if (options.tdc_category) {
+    fqAr.push(buildOrFq("tdc_category", [options.tdc_category]));
+  }
+
   if (options.query) {
     fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }

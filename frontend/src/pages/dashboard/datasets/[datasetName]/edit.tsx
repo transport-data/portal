@@ -186,7 +186,6 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       })
       .otherwise(() => false);
 
-  console.log("FORM ERRORS", form.formState.errors);
   return (
     <>
       <NextSeo title="Edit dataset" />
