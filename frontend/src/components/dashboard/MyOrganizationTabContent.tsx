@@ -48,8 +48,6 @@ export default () => {
     facetsFields: `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
   });
 
-  console.log(searchFilter);
-
   const {
     isLoading,
     data: { datasets, count: datasetCount, facets } = {
@@ -199,8 +197,6 @@ export default () => {
 
   const totalDatasets = datasetCount ?? 0;
   const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
-
-  console.log(orgs);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
