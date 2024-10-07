@@ -118,8 +118,12 @@ export default function SearchBar() {
     },
   };
 
-  /* handle click outside the search container to close command list */
   useEffect(() => {
+    //get stored tdc-recent-searches stored locally
+    setStoredSearches(
+      JSON.parse(localStorage?.getItem("tdcRecentSearches") ?? "[]")
+    );
+    /* handle click outside the search container to close command list */
     const handleClickOutside = (event: MouseEvent) => {
       if (
         commandRef.current &&
@@ -133,18 +137,11 @@ export default function SearchBar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  //get stored searches
-  useEffect(() => {
-    setStoredSearches(
-      JSON.parse(localStorage?.getItem("tdcRecentSearches") ?? "[]")
-    );
-  }, []);
 
   useEffect(() => {
     const setQueryValue = setTimeout(() => {
       setQuery(inputValue);
     }, 400);
-
     return () => clearTimeout(setQueryValue);
   }, [inputValue]);
 
