@@ -48,9 +48,6 @@ describe("Searchbar component", () => {
     });
   });
 
-  beforeEach(() => {
-		cy.login(ckanUserName, ckanUserPassword);
-	});
 
   it("Should search the dataset by name and go to dataset page", () => {
     
