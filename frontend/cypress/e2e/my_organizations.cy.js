@@ -41,7 +41,7 @@ describe("Should Create a Dataset for Signed in User", () => {
 
   it("Should list created Dataset", () => {
     cy.visit("/dashboard/datasets/my-organization");
-    cy.get('.dataset-card').contains('h2', datasetTitle).should('exist')
+    cy.get('div').contains('h2', datasetTitle).should('exist')
   });
 
   after(() => {

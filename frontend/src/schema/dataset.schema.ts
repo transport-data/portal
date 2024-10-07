@@ -1,18 +1,6 @@
 import z from "zod";
 const emptyStringToUndefined = z.literal('').transform(() => undefined)
 
-export const SearchDatasetSchema = z.object({
-  query: z.string().default("").optional(),
-  limit: z.number().default(1000),
-  offset: z.number().default(0),
-  groups: z.array(z.string()).default([]).optional(),
-  orgs: z.array(z.string()).default([]).optional(),
-  tags: z.array(z.string()).default([]).optional(),
-  sort: z.string().optional(),
-  include_private: z.boolean().optional(),
-  include_drafts: z.boolean().optional(),
-});
-
 export const ResourceSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -36,7 +24,7 @@ export const DatasetSchema = z.object({
   title: z.string(),
   notes: z.string().min(1, { message: "Description is required" }),
   overview_text: z.string().optional().nullable(),
-  owner_org: z.string({ message: "Organization is required" }),
+  owner_org: z.string({ description: "Organization is required" }),
   topics: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),
   tags: z.array(z.object({
@@ -59,6 +47,7 @@ export const DatasetSchema = z.object({
   language: z.string().optional(),
   frequency: z.string().optional(),
   tdc_category: z.string(),
+  introduction_text: z.string().optional().nullable(),
   modes: z.array(z.string()).default([]),
   services: z.array(z.string()).default([]),
   sectors: z.array(z.string()).default([]),
@@ -68,8 +57,8 @@ export const DatasetSchema = z.object({
   license_id: z.string().optional(),
   private: z.boolean().default(true),
   indicators: z.array(z.string()).default([]),
-  dimensioning: z.string(),
   units: z.array(z.string()).default([]),
+  dimensioning: z.string().optional().or(emptyStringToUndefined),
   url: z.string().url().optional().or(emptyStringToUndefined),
   data_provider: z.string().optional().or(emptyStringToUndefined),
   data_access: z.string().optional().or(emptyStringToUndefined),
@@ -78,6 +67,40 @@ export const DatasetSchema = z.object({
     title: z.string()
   })),
   resources: z.array(ResourceSchema),
+});
+export const SearchDatasetSchema = z.object({
+  advancedQueries: z
+    .array(
+      z.object({
+        values: z.array(z.string()),
+        key: z.string()
+      })
+    )
+    .optional(),
+  query: z.string().nullable().optional(),
+  modes: z.array(z.string()).optional(),
+  services: z.array(z.string()).optional(),
+  sectors: z.array(z.string()).optional(),
+  regions: z.array(z.string()).optional(),
+  countries: z.array(z.string()).optional(),
+  fuel: z.string().optional(),
+  tdc_category: z.string().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+  groups: z.array(z.string()).optional(),
+  orgs: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  sort: z.string().optional(),
+  facetsFields: z.string().nullable().optional(),
+  includePrivate: z.boolean().optional(),
+  showArchived: z.boolean().optional(),
+  startYear: z.number().optional(),
+  endYear: z.number().optional(),
+  publicationDates: z.array(z.string()).optional(),
+  resFormat: z.array(z.string()).optional(),
+  type: z.array(z.string()).optional(),
+  private: z.boolean().optional(),
+  includeDrafts: z.boolean().optional(),
 });
 
 export type DatasetSchemaType = {

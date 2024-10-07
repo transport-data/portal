@@ -30,28 +30,30 @@ export function DeleteDatasetButton({
   const options: SearchDatasetType = {
     offset: 0,
     limit: 20,
-    include_private: true,
-    include_drafts: true,
-    query: `creator_user_id:${session?.user.id}`,
+    includePrivate: true,
+    includeDrafts: true,
+    advancedQueries: [
+      { key: "creator_user_id", values: [`${session?.user.id}`] },
+    ],
   };
   const [open, setOpen] = useState(false);
   const deleteDataset = api.dataset.delete.useMutation({
     onSuccess: async () => {
       toast({
         description: "Succesfully deleted dataset",
-      })
+      });
       onSuccess();
       await utils.dataset.search.invalidate(options);
-      setOpen(false)
+      setOpen(false);
     },
     onError: (e) => {
-      setOpen(false)
+      setOpen(false);
       toast({
         title: "Failed to delete dataset",
         description: e.message,
         variant: "danger",
-      })
-    }
+      });
+    },
   });
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -62,7 +64,8 @@ export function DeleteDatasetButton({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. It will permanently remove the dataset.
+            This action cannot be undone. It will permanently remove the
+            dataset.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -71,7 +74,7 @@ export function DeleteDatasetButton({
             <LoaderButton
               loading={deleteDataset.isLoading}
               onClick={() => deleteDataset.mutate({ ids: [datasetId] })}
-              className="bg-red-600 hover:bg-red-400 text-white"
+              className="bg-red-600 text-white hover:bg-red-400"
               id="confirmDelete"
               variant="danger"
             >

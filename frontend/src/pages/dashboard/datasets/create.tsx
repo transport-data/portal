@@ -60,7 +60,7 @@ const CreateDatasetDashboard: NextPage = () => {
           data.title ?? data.name
         } dataset`,
       });
-      await router.push("/dashboard/newsfeed");
+      await router.push("/dashboard/datasets");
     },
     onError: (error) => {
       setErrorMessage(error.message);

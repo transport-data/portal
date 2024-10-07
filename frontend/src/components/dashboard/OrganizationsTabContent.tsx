@@ -13,7 +13,6 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 
 export default () => {
   const { data: sessionData } = useSession();
-  console.log(sessionData)
   const isSysAdmin = sessionData?.user?.sysadmin == true;    
 
   const [searchText, setSearchText] = useState("");

@@ -65,6 +65,7 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
+          install-command: npm install
           build: npm run build
           start: npm run start
           wait-on: 'http://127.0.0.1:3000'
@@ -80,6 +81,12 @@ jobs:
       - name: Print Error Logs
         if: failure()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Frontend screenshots
+          path: ./frontend/cypress/screenshots
+          if-no-files-found: ignore
       - name: Tear down containers
         if: failure() || success()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans

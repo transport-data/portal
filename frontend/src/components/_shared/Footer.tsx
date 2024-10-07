@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
       { name: "About Us", href: "/about-us" },
       { name: "Partners", href: "/partners" },
       { name: "Events", href: "/events" },
-      { name: "Contact", href: "#" },
+      { name: "Contact", href: "/contact" },
     ],
     legal: [
       { name: "Privacy and Policy", href: "#" },
@@ -83,7 +83,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-gray-50 py-[64px]">
+    <footer className="border-t border-gray-100 bg-gray-50 py-[64px]">
       <div className="container flex flex-col gap-[48px]">
         <div className="flex flex-col gap-x-16 lg:flex-row">
           <div className="lg:w-[384px]">

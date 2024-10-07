@@ -46,7 +46,7 @@ function Badge({ className, variant, icon, children, ...props }: BadgeProps) {
       )}
       {...props}
     >
-      {icon}
+      {icon || <></>}
       {children}
     </div>
   );

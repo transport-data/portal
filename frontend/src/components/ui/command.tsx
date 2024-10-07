@@ -9,13 +9,21 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive
-    ref={ref}
-    className={cn("flex h-full w-full flex-col ", className)}
-    {...props}
-  />
-));
+>(({ className, filter, ...props }, ref) => {
+  const filterDefault = (value: string, search: string, keywords?: string[]) => {
+    const extendValue = (value + ' ' + (keywords?.join(' ') ?? '')).trim()
+    if (extendValue.toLowerCase().includes(search.toLowerCase())) return 1;
+    return 0;
+  };
+  return (
+    <CommandPrimitive
+      ref={ref}
+      filter={filter ?? filterDefault}
+      className={cn("flex h-full w-full flex-col ", className)}
+      {...props}
+    />
+  );
+});
 Command.displayName = CommandPrimitive.displayName;
 
 interface CommandDialogProps extends DialogProps {}
@@ -114,7 +122,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative hover:bg-accent hover:text-accent-foreground  flex cursor-pointer select-none items-center rounded-sm px-4 py-[8.5px] text-sm outline-none data-[disabled=true]:pointer-events-none  data-[disabled=true]:opacity-50",
+      "relative flex cursor-pointer  select-none items-center rounded-sm px-4 py-[8.5px] text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled=true]:pointer-events-none  data-[disabled=true]:opacity-50",
       className
     )}
     {...props}

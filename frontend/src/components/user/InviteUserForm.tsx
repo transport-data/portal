@@ -62,10 +62,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
 
   const usersOptions =
     users
-      ?.filter(
-        (x) =>
-          !x.sysadmin && !orgUsers?.some((a) => !a.sysadmin && a.id === x.id)
-      )
+      ?.filter((x) => !orgUsers?.some((a) => a.id === x.id))
       .map((user) => ({
         value: user.id,
         label: `${user.display_name} - ${user.email}`,
@@ -105,7 +102,11 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
         } the ${
           typeof response === "string"
             ? response
-            : response?.display_name ?? response?.name ?? response?.id
+            : usersOptions.find((u) => formObj.getValues("user") === u.value)
+                ?.label ??
+              response?.display_name ??
+              response?.name ??
+              response?.id
         } user`,
       });
       formObj.reset();
