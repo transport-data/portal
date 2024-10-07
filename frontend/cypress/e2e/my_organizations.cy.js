@@ -34,11 +34,7 @@ const ckanUserSuffix = uuid();
 
 describe("Should Create a Dataset for Signed in User", () => {
   before( ()=>{
-    
-    //cy.createUserApi( ckanUserName, ckanUserEmail, ckanUserPassword );
     cy.createOrganizationViaAPI({ title: org, name: org });
-    //cy.createOrganizationMemberAPI(org,ckanUserName);
-
     //create public dataset
     cy.createDatasetViaAPI({
       name: datasetName,
@@ -143,6 +139,5 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.deleteDatasetAPI(draftDatasetName);
     cy.deleteDatasetAPI(privateDatasetName);
     cy.deleteOrganizationAPI(org);
-    //cy.deleteUserApi(ckanUserName);
   });
 })
