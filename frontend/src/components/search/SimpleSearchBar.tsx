@@ -34,11 +34,11 @@ const facets: any = {
     ],
   },
   /*after: {
-      description: "referencing data after a date",
-    },
-    before: {
-      description: "referencing data before a date",
-    },*/
+    description: "referencing data after a date",
+  },
+  before: {
+    description: "referencing data before a date",
+  },*/
   sector: {
     description: "road, rail, aviation, water transportation",
     options: ["road", "rail", "aviation", "water transportation"],
@@ -59,7 +59,9 @@ const facets: any = {
 
 export default function SearchBar({
   facetName,
+  facetDisplayName,
   facetValue,
+  facetDisplayValue,
   hideDatasetSuggestion,
   onChange,
   query,
@@ -68,7 +70,9 @@ export default function SearchBar({
   query?: string;
   hideDatasetSuggestion?: boolean;
   facetValue?: string;
+  facetDisplayName?: string,
   facetName?: keyof SearchDatasetType;
+  facetDisplayValue?: string;
 }) {
   const commandRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -98,7 +102,6 @@ export default function SearchBar({
     if (facet) {
       onChange([{ value: facet, key: facetName! }]);
       queryInputRef.current?.focus();
-      // setFocus("query");
     }
   };
 
@@ -108,7 +111,7 @@ export default function SearchBar({
   };
 
   useEffect(() => {
-    if (!internalQuery) setInternalQuery(query);
+    if (!internalQuery || !query) setInternalQuery(query);
   }, [query]);
 
   const handleCancelSearch = () => {
@@ -119,7 +122,6 @@ export default function SearchBar({
     onChange(changes);
     setTimeout(() => {
       queryInputRef.current?.focus();
-      // setFocus("query");
     }, 150);
   };
 
@@ -128,22 +130,9 @@ export default function SearchBar({
       onSubmit={(event) => {
         event.preventDefault();
         const changes: any = [];
-        if (facetValue && facetName)
-          changes.push({ value: facetValue, key: facetName });
         changes.push({ value: internalQuery, key: "query" });
         onChange(changes);
 
-        // if (onSubmit) {
-        //   onSubmit(getValues());
-        //   return;
-        // }
-        // const { facetName, facetValue, query } = getValues();
-        // const queryParams = new URLSearchParams({
-        //   [facetName]: facetValue,
-        //   query,
-        // }).toString();
-
-        // router.push(`/datasets?${queryParams}`);
         return false;
       }}
     >
@@ -154,7 +143,7 @@ export default function SearchBar({
               variant="muted"
               className="ml-[16px] min-w-fit border border-gray-200 bg-gray-100 px-[6px] py-[2px]"
             >
-              {facetName}: {facetValue}
+              {facetDisplayName}: {facetDisplayValue}
             </Badge>
           )}
           <CommandInput
@@ -216,7 +205,80 @@ export default function SearchBar({
               ))}
             </CommandGroup>
           ) : (
-            <></>
+            <>
+              {!isTyping && (
+                <>
+                  {!facetValue && (
+                    <SearchNarrow
+                      facets={facets}
+                      headerAction={() => setShowAllFacets(!showAllFacets)}
+                      showAll={showAllFacets}
+                      onSelect={(facet: any) => handleNarrowSelect(facet)}
+                    />
+                  )}
+                  {!facetValue && (
+                    <CommandGroup
+                      heading={<CommandListHeader title="Recent searches" />}
+                    >
+                      <SearchFacetItem
+                        text={"passanger activity"}
+                        icon={
+                          <VariableIcon width={20} className="text-gray-500" />
+                        }
+                        context={"Indicator"}
+                      />
+                      <SearchFacetItem
+                        badge={"in: Asia"}
+                        text={"passenger transport activity"}
+                      />
+                      <SearchFacetItem text={"heavy duty vehicles"} />
+                      <SearchFacetItem text={"passenger vehicles"} />
+                    </CommandGroup>
+                  )}
+                </>
+              )}
+              {(isTyping || facetValue) && (
+                <>
+                  <CommandGroup
+                    heading={<CommandListHeader title="Datasets" />}
+                  >
+                    {datasets.slice(0, 2).map((dataset, index) => (
+                      <SearchDatasetItem {...dataset as any} key={index} />
+                    ))}
+                  </CommandGroup>
+
+                  <CommandGroup
+                    heading={<CommandListHeader title="Indicators" />}
+                  >
+                    <SearchFacetItem
+                      text={"passanger activity"}
+                      icon={
+                        <VariableIcon width={20} className="text-gray-500" />
+                      }
+                      context={"Indicator"}
+                    />
+                    <SearchFacetItem
+                      text={"vehicle fleet"}
+                      icon={
+                        <VariableIcon width={20} className="text-gray-500" />
+                      }
+                      context={"Indicator"}
+                    />
+                  </CommandGroup>
+
+                  {!facetValue && (
+                    <CommandGroup
+                      heading={<CommandListHeader title="Others" />}
+                    >
+                      <SearchFacetItem text={"vehicle fleet France"} />
+                      <SearchFacetItem text={"vehicle registration Thailand"} />
+                      <SearchFacetItem text={"heavy duty vehicles"} />
+                      <SearchFacetItem text={"passenger vehicles"} />
+                    </CommandGroup>
+                  )}
+                </>
+              )}
+            </>
           )}
         </CommandList>
       </Command>

@@ -1,6 +1,6 @@
-import { type CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { GroupFormType, type Group, GroupTree } from "@schema/group.schema";
+import { type CkanResponse } from "@schema/ckan.schema";
+import { GroupFormType, GroupTree, type Group } from "@schema/group.schema";
 
 export const getGroup = async ({
   apiKey,
@@ -22,9 +22,13 @@ export const listGroups = async ({
   apiKey,
   type,
   showCoordinates,
+  limit,
+  sort,
 }: {
   apiKey?: string;
+  limit?: number;
   type: "topic" | "geography";
+  sort?: string;
   showCoordinates?: boolean;
 }) => {
   // TODO: implement pagination and other parameters
@@ -37,9 +41,23 @@ export const listGroups = async ({
     action += `&include_shapes=${true}`;
   }
 
+  if (sort) {
+    action += `&sort=${true}`;
+  }
+
+  if (limit) {
+    action += `&limit=${limit}`;
+  }
+
   const groups = await CkanRequest.get<
     CkanResponse<
-      Group[] & { geography_shape?: { type: string; coordinates: [] } }
+      Array<
+        Group & {
+          geography_type?: string;
+          geography_shape?: GeoJSON.GeoJSON;
+          iso2?: string;
+        }
+      >
     >
   >(action, {
     apiKey: apiKey ?? "",
@@ -131,4 +149,3 @@ export const followGroups = async ({
   );
   return { groups: groups.map((group) => group.result) };
 };
-

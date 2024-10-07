@@ -19,14 +19,17 @@ import { listGroups } from "@utils/group";
 import { listOrganizations } from "@utils/organization";
 import { api } from "@utils/api";
 import { toast } from "@/components/ui/use-toast";
+import React from "react";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
-
+  const apiKey = (context as any).session?.apiKey || "";
   const topicsData = await listGroups({
     type: "topic",
+    apiKey,
   });
   const locationData = await listGroups({
+    apiKey,
     type: "geography",
   });
   const organizationsData = await listOrganizations({

@@ -23,6 +23,7 @@ export const groupRouter = createTRPCRouter({
     .input(
       z.object({
         showGeographyShapes: z.boolean().optional(),
+        sort: z.string().optional(),
         type: z.enum(["topic", "geography"]).optional().default("topic"),
       })
     )
@@ -33,6 +34,7 @@ export const groupRouter = createTRPCRouter({
         apiKey,
         type: input.type,
         showCoordinates: input.showGeographyShapes,
+        sort: input.sort,
       });
       return groups;
     }),
