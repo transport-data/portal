@@ -198,7 +198,7 @@ function TopicCard({ group }: { group: Group }) {
       initialData: { ...group, groups: [], packages: [] },
     }
   );
-  if (!isLoading && groupDetails.packages.length === 0) {
+  if (!isLoading && groupDetails.packages?.length === 0) {
     return null
   }
   return (
