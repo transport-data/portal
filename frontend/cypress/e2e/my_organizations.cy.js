@@ -28,16 +28,15 @@ const temporal_coverage_start = new Date(1990, 1, 1).toISOString();
 const temporal_coverage_end = new Date(2005, 1, 1).toISOString();
 
 const ckanUserSuffix = uuid();
-const ckanUserName =  `user_${ckanUserSuffix}`;
-const ckanUserEmail =  `user_${ckanUserSuffix}@email.com`;
+const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 
 describe("Should Create a Dataset for Signed in User", () => {
   before( ()=>{
     
-    cy.createUserApi( ckanUserName, ckanUserEmail, ckanUserPassword );
+    //cy.createUserApi( ckanUserName, ckanUserEmail, ckanUserPassword );
     cy.createOrganizationViaAPI({ title: org, name: org });
-    cy.createOrganizationMemberAPI(org,ckanUserName);
+    //cy.createOrganizationMemberAPI(org,ckanUserName);
 
     //create public dataset
     cy.createDatasetViaAPI({
@@ -143,6 +142,6 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.deleteDatasetAPI(draftDatasetName);
     cy.deleteDatasetAPI(privateDatasetName);
     cy.deleteOrganizationAPI(org);
-    cy.deleteUserApi(ckanUserName);
+    //cy.deleteUserApi(ckanUserName);
   });
 })
