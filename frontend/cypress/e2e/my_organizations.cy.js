@@ -142,6 +142,6 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.deleteDatasetAPI(draftDatasetName);
     cy.deleteDatasetAPI(privateDatasetName);
     cy.deleteOrganizationAPI(org);
-    cy.deleteUserApi(ckanUserName);
+   // cy.deleteUserApi(ckanUserName);
   });
 })
