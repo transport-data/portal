@@ -19,7 +19,7 @@ Cypress.on("uncaught:exception", (err, runnable) => {
 
 describe("Show geography page the country list", () => {
   before(() => {
-    cy.viewport(1920, 1080);
+    cy.viewport(1920, 2160);
   });
 
   it("Should click on Brazil group and redirect to search page.", () => {

@@ -332,6 +332,7 @@ const LetterCard = ({
     <div className="flex flex-col gap-3">
       {countries.map((word) => (
         <Link
+          key={`word-card-${word.name}`}
           id={word.title}
           href={`/search?country=${word.name}`}
           className="cursor-pointer break-words text-[#6B7280] hover:underline"
