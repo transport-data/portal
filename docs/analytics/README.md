@@ -7,7 +7,7 @@ This application supports analytics with Google Analytics.
 Besides the default events tracked by Google Analytics (e.g. `page_view`, `click`, etc), this application also implements two custom events:
 
 - `dataset_view` - Trigerred whenever a dataset page is accessed. 
-- ``
+- `dataset_download` - Trigerred whenever a dataset's resource is downloaded.
 
 The label for these custom events follows the `{dataset-id}|{dataset-title}|{dataset-name}` pattern, example: `7a0374f2-099c-49e7-b30b-9a49293af15f|My dataset|my-dataset`.
 
