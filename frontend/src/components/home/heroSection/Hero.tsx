@@ -5,14 +5,19 @@ import Video from "./Video";
 import InfoCards from "./InfoCards";
 import PartnersCarousel from "@components/_shared/PartnersCarousel";
 
-export default function Hero() {
+export type HeroAsset = {
+  path?: string;
+  type?: "mp4" | "image" | "youtube";
+};
+
+export default function Hero({ asset }: { asset: HeroAsset }) {
   return (
     <section className="pb-[96px] pt-[64px]">
       <div className="container flex flex-col gap-[72px]">
         <div className="flex items-center gap-x-16 xl:items-start">
           <div className="w-full">
             <Link
-              href="#"
+              href="/data-provider"
               className="flex w-fit items-center rounded-[14px] bg-[#F3F4F6] p-1.5"
             >
               <span className="block min-w-fit rounded-[10px] bg-accent px-[12px] py-[2px] text-[12px] font-medium leading-[18px] text-white">
@@ -35,8 +40,21 @@ export default function Hero() {
               <SearchBar />
             </div>
           </div>
-          <div className="hidden min-w-[420px] lg:block xl:min-w-[540px]">
-            <Video />
+          <div className="m-auto hidden min-w-[420px] lg:block xl:min-w-[540px]">
+            {asset.type === "mp4" && <Video path={asset.type} />}
+            {asset.type === "youtube" && (
+              <iframe
+                className="h-[405px] w-full"
+                src={asset.path}
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              ></iframe>
+            )}
+            {asset.type === "image" && (
+              <img src={asset.path} className="h-[405px] w-full" />
+            )}
           </div>
         </div>
         <InfoCards />

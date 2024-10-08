@@ -37,14 +37,13 @@ export default function DatasetsSection({
           transportation trends globally
         </p>
       </div>
-
       <div className="grid-3-separated mt-16 grid grid-cols-1 gap-[32px] md:grid-cols-2 lg:grid-cols-3 lg:gap-x-[64px]">
         {datasets.map((dataset, i) => {
           const [firstTag, secondTag, ...restTags] = dataset.tags || [];
           const regionsLength = dataset.regions?.length ?? 0;
           return (
             <div key={`recent-${i}`} className="">
-              <div className="dataset-card flex flex-col gap-4">
+              <div className="dataset-card flex h-full flex-col gap-4">
                 <Tooltip
                   placement="bottom"
                   className="max-w-[192px] bg-[#1F2A37] "
@@ -103,9 +102,11 @@ export default function DatasetsSection({
                 </Tooltip>
 
                 {/*Title*/}
-                <h4 className="text-2xl font-bold leading-tight">
-                  {dataset.title}
-                </h4>
+                <Link href={`@${dataset.organization?.name}/${dataset.name}`}>
+                  <h4 className="text-2xl font-bold leading-tight">
+                    {dataset.title}
+                  </h4>
+                </Link>
                 {/*Tags*/}
                 <div className="flex flex-wrap gap-2">
                   {firstTag && (
@@ -121,22 +122,27 @@ export default function DatasetsSection({
                   )}
                 </div>
                 {/*Description*/}
-                <p className=" line-clamp-4 overflow-hidden text-ellipsis text-gray-500">
-                  {dataset.notes}
-                </p>
+                <div
+                  className=" line-clamp-4 overflow-hidden text-ellipsis text-gray-500"
+                  dangerouslySetInnerHTML={{
+                    __html: dataset.notes ?? "<span></span>",
+                  }}
+                ></div>
                 {/*Other Metadatas*/}
-                <div className="flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row">
-                  <div className="flex gap-[4px]">
+                <div className="mt-auto flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-[4px]">
                     <BuildingLibraryIcon width={14} />
-                    {dataset.organization?.display_name}
+                    <span>{dataset.organization?.title}</span>
                   </div>
 
                   {dataset.metadata_modified && (
                     <>
                       <span className="hidden sm:block">•</span>
-                      <div className="flex gap-[4px]">
+                      <div className="flex items-center gap-[4px]">
                         <ClipboardIcon width={14} />
-                        {formatDate(dataset.metadata_modified ?? "")}
+                        <span>
+                          {formatDate(dataset.metadata_modified ?? "")}
+                        </span>
                       </div>
                     </>
                   )}
@@ -144,19 +150,21 @@ export default function DatasetsSection({
                   {dataset.regions && regionsLength > 0 && (
                     <>
                       <span className="hidden sm:block">•</span>
-                      <div className="flex gap-[4px]">
+                      <div className="flex items-center gap-[4px]">
                         <RegionIcon />
-                        {dataset.regions?.map((r, idx) => {
-                          return (
-                            <span key={`group-${r}`}>
-                              {
-                                dataset.groups?.find((g) => g.name === r)
-                                  ?.display_name
-                              }
-                              {idx < regionsLength - 1 && ","}
-                            </span>
-                          );
-                        })}
+                        <div>
+                          {dataset.regions?.map((r, idx) => {
+                            return (
+                              <span key={`group-${r}`}>
+                                {
+                                  dataset.groups?.find((g) => g.name === r)
+                                    ?.display_name
+                                }
+                                {idx < regionsLength - 1 && ", "}
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
                     </>
                   )}
@@ -165,9 +173,12 @@ export default function DatasetsSection({
                 <Button
                   className="flex w-fit items-center gap-2 border border border-[#E5E7EB] hover:bg-slate-50"
                   variant="ghost"
+                  asChild
                 >
-                  Show Dataset
-                  <ArrowRightIcon width={20} />
+                  <Link href={`@${dataset.organization?.name}/${dataset.name}`}>
+                    Show Dataset
+                    <ArrowRightIcon width={20} />
+                  </Link>
                 </Button>
               </div>
             </div>

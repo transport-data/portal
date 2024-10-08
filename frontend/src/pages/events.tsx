@@ -30,6 +30,9 @@ export default function EventsPage({
   const [highlighted, ...rest] = upcoming;
   const otherEvents = rest?.splice(0, 2);
   const otherEventsSize = otherEvents.length;
+
+  console.log(upcoming);
+
   return (
     <>
       <Head>
