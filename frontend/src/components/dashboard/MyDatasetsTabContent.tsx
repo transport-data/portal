@@ -329,7 +329,7 @@ export default function MyDatasetsTabContent() {
               )}
 
               {pages.length ? (
-                <Pagination className="mx-0 mt-8 justify-start">
+                <Pagination className="mx-0 my-8 justify-start">
                   <PaginationContent>
                     <PaginationItem>
                       <button
