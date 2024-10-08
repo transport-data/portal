@@ -83,7 +83,7 @@ export default function DatasetsPage({
             </p>
           </div>
           <div className="pb-[96px] pt-[80px]">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid auto-rows-fr grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
                 {gaData && (
                   <Image
@@ -93,33 +93,35 @@ export default function DatasetsPage({
                     alt="TDC Most Viewed Logo"
                   />
                 )}
-                <div className="flex flex-col gap-4">
-                  {gaData ? (
-                    <span className="block text-lg font-semibold leading-tight text-gray-900">
-                      Most Viewed
-                    </span>
-                  ) : (
-                    <Skeleton className="h-4 w-24" />
-                  )}
-                  <ul className="flex flex-col gap-[12px]">
+                <div className="flex h-full flex-col justify-between">
+                  <div className="flex flex-col gap-4">
                     {gaData ? (
-                      <>
-                        {gaData.map((item: any) => (
-                          <Link
-                            href={`/@${item.organization?.name}/${item.name}`}
-                            key={`group-${item.name}`}
-                            className="text-sm font-medium text-gray-500"
-                          >
-                            {item.title ?? item.name}
-                          </Link>
-                        ))}
-                      </>
+                      <span className="block text-lg font-semibold leading-tight text-gray-900">
+                        Most Viewed
+                      </span>
                     ) : (
-                      [0, 1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-4 w-12" />
-                      ))
+                      <Skeleton className="h-4 w-24" />
                     )}
-                  </ul>
+                    <ul className="flex flex-col gap-[12px]">
+                      {gaData ? (
+                        <>
+                          {gaData.map((item: any) => (
+                            <Link
+                              href={`/@${item.organization?.name}/${item.name}`}
+                              key={`group-${item.name}`}
+                              className="text-sm font-medium text-gray-500"
+                            >
+                              {item.title ?? item.name}
+                            </Link>
+                          ))}
+                        </>
+                      ) : (
+                        [0, 1, 2, 3].map((i) => (
+                          <Skeleton key={i} className="h-4 w-12" />
+                        ))
+                      )}
+                    </ul>
+                  </div>
                   <Link
                     className="text-sm font-medium text-accent"
                     href="/search"
@@ -137,33 +139,35 @@ export default function DatasetsPage({
                     alt="TDC Harmonized Logo"
                   />
                 )}
-                <div className="flex flex-col gap-4">
-                  {tdcHarmonizedDatasets ? (
-                    <span className="block text-lg font-semibold leading-tight text-gray-900">
-                      TDC Harmonized
-                    </span>
-                  ) : (
-                    <Skeleton className="h-4 w-24" />
-                  )}
-                  <ul className="flex flex-col gap-[12px]">
+                <div className="flex h-full flex-col justify-between">
+                  <div className="flex flex-col gap-4">
                     {tdcHarmonizedDatasets ? (
-                      <>
-                        {tdcHarmonizedDatasets.datasets.map((item) => (
-                          <Link
-                            href={`/@${item.organization?.name}/${item.name}`}
-                            key={`group-${item.name}`}
-                            className="text-sm font-medium text-gray-500"
-                          >
-                            {item.title ?? item.name}
-                          </Link>
-                        ))}
-                      </>
+                      <span className="block text-lg font-semibold leading-tight text-gray-900">
+                        TDC Harmonized
+                      </span>
                     ) : (
-                      [0, 1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-4 w-12" />
-                      ))
+                      <Skeleton className="h-4 w-24" />
                     )}
-                  </ul>
+                    <ul className="flex flex-col gap-[12px]">
+                      {tdcHarmonizedDatasets ? (
+                        <>
+                          {tdcHarmonizedDatasets.datasets.map((item) => (
+                            <Link
+                              href={`/@${item.organization?.name}/${item.name}`}
+                              key={`group-${item.name}`}
+                              className="text-sm font-medium text-gray-500"
+                            >
+                              {item.title ?? item.name}
+                            </Link>
+                          ))}
+                        </>
+                      ) : (
+                        [0, 1, 2, 3].map((i) => (
+                          <Skeleton key={i} className="h-4 w-12" />
+                        ))
+                      )}
+                    </ul>
+                  </div>
                   <Link
                     id="show_all_tdc_harmonized"
                     className="text-sm font-medium text-accent"
@@ -192,7 +196,7 @@ function TopicCard({ group }: { group: Group }) {
     }
   );
   if (!isLoading && groupDetails.packages?.length === 0) {
-    return null
+    return null;
   }
   return (
     <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
@@ -204,31 +208,33 @@ function TopicCard({ group }: { group: Group }) {
           alt={groupDetails.title}
         />
       )}
-      <div className="flex flex-col gap-4">
-        {groupDetails ? (
-          <span className="block text-lg font-semibold leading-tight text-gray-900">
-            {groupDetails.title}
-          </span>
-        ) : (
-          <Skeleton className="h-4 w-24" />
-        )}
-        <ul className="flex flex-col gap-[12px]">
+      <div className="flex h-full flex-col justify-between">
+        <div className="flex flex-col gap-4">
           {groupDetails ? (
-            <>
-              {groupDetails.packages?.slice(0, 5).map((item) => (
-                <Link
-                  href={`/@${item.organization?.name}/${item.name}`}
-                  key={`group-${item.name}`}
-                  className="text-sm font-medium text-gray-500"
-                >
-                  {item.title ?? item.name}
-                </Link>
-              ))}
-            </>
+            <span className="block text-lg font-semibold leading-tight text-gray-900">
+              {groupDetails.title}
+            </span>
           ) : (
-            [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-4 w-12" />)
+            <Skeleton className="h-4 w-24" />
           )}
-        </ul>
+          <ul className="flex flex-col gap-[12px]">
+            {groupDetails ? (
+              <>
+                {groupDetails.packages?.slice(0, 5).map((item) => (
+                  <Link
+                    href={`/@${item.organization?.name}/${item.name}`}
+                    key={`group-${item.name}`}
+                    className="text-sm font-medium text-gray-500"
+                  >
+                    {item.title ?? item.name}
+                  </Link>
+                ))}
+              </>
+            ) : (
+              [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-4 w-12" />)
+            )}
+          </ul>
+        </div>
         {groupDetails ? (
           <Link
             id={`show_all_${groupDetails.name}`}
