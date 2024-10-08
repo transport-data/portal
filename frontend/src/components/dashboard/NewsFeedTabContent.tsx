@@ -46,7 +46,7 @@ export default () => {
     "All",
     "Organizations",
     "Datasets",
-    "Datasets Approvals",
+    /*"Datasets Approvals"*/,
   ];
   const [searchText, setSearchText] = useState("");
   const [filter, setFilter] = useState("All");
