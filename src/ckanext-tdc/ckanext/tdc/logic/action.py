@@ -600,7 +600,7 @@ def request_organization_owner(context, data_dict):
         'id': org_id,
         'include_users': True,
     }
-    org_dict = get_action('organization_show')({}, data_dict)
+    org_dict = get_action('organization_show')({"ignore_auth": True}, data_dict)
     # find admin users of the org
     to_emails = []
     for user in org_dict.get("users"):
