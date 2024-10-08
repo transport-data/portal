@@ -1,4 +1,4 @@
-import { ErrorAlert } from "@components/_shared/Alerts";
+import { ErrorAlert, SuccessAlert } from "@components/_shared/Alerts";
 import { SingInLayout } from "@components/_shared/SignInLayout";
 import Spinner from "@components/_shared/Spinner";
 import { Button } from "@components/ui/button";
@@ -19,14 +19,17 @@ import { listGroups } from "@utils/group";
 import { listOrganizations } from "@utils/organization";
 import { api } from "@utils/api";
 import { toast } from "@/components/ui/use-toast";
+import React from "react";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
-
+  const apiKey = (context as any).session?.apiKey || "";
   const topicsData = await listGroups({
     type: "topic",
+    apiKey,
   });
   const locationData = await listGroups({
+    apiKey,
     type: "geography",
   });
   const organizationsData = await listOrganizations({
@@ -53,19 +56,37 @@ export default function LoginPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
   const form = useForm<OnboardingFormType>();
   const { handleSubmit, watch } = form;
+  const [followedGroups, setFollowedGroups] = useState([]);
+
+  const { data: userFollowee, isLoading } = api.user.getFollowee.useQuery();
   const onBoardUser = api.user.onboard.useMutation({
     onSuccess: async () => {
+      setLoading(false);
+      setShowSuccessAlert(true);
+      if (stepNumber === 0) {
+        setSuccessMessage("Successfully followed Groups");
+      } else if (stepNumber === 1) {
+        setSuccessMessage("Request Submitted Successfully");
+      } else {
+        setSuccessMessage("Successfully sent Invites");
+      }
+      setTimeout(() => setShowSuccessAlert(false), 3000);
       toast({
-        description: "Successfully Onboarded user",
+        description: "Successfully Onboarded User",
       });
       form.reset();
       setErrorMessage(null);
-      await router.push("/dashboard/newsfeed");
+      if (stepNumber === 2) {
+        await router.push("/dashboard/newsfeed");
+      }
+      setStep(stepNumber + 1);
     },
     onError: (error) => {
       setLoading(false);
@@ -122,12 +143,52 @@ export default function LoginPage({
   );
 
   useEffect(() => {
+    if (userFollowee && !isLoading) {
+      const selectedLocations = locationData
+        ? locationData.map((loc) => ({
+            id: loc.id,
+            name: loc.display_name,
+            selected: userFollowee.some(
+              (followee: any) =>
+                followee.type === "group" &&
+                followee.dict.type === "geography" &&
+                followee.dict.id === loc.id
+            ),
+          }))
+        : [];
+      const selectedOrganizations = organizationsData
+        ? organizationsData.map((org) => ({
+            id: org.id,
+            name: org.display_name,
+            selected: userFollowee.some(
+              (followee: any) =>
+                followee.type === "organization" && followee.dict.id === org.id
+            ),
+          }))
+        : [];
+      const selectedTopics = topicsData
+        ? topicsData.map((topic) => ({
+            id: topic.id,
+            name: topic.display_name,
+            selected: userFollowee.some(
+              (followee: any) =>
+                followee.type === "group" &&
+                followee.dict.type === "topic" &&
+                followee.dict.id === topic.id
+            ),
+          }))
+        : [];
+      setLocations(selectedLocations);
+      setOrganizations(selectedOrganizations);
+      setTopics(selectedTopics);
+    }
+  }, [userFollowee, isLoading]);
+
+  useEffect(() => {
     if (stepNumber === 0) {
-      const isAnySelected =
-        topics.some((topic) => topic.selected) ||
-        locations.some((location) => location.selected) ||
-        organizations.some((org) => org.selected);
-      setDisableButton(!isAnySelected);
+      if (followedGroups) {
+        setDisableButton(false);
+      }
     } else if (stepNumber === 1) {
       setSubtitleText("Prepare to share data");
       setParagraphText(
@@ -172,6 +233,9 @@ export default function LoginPage({
       setParagraphText(
         "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
+      setDisableButton(
+        !(watch("newUsersEmailsToInvite") && watch("messageToInviteNewUsers"))
+      );
     } else {
       setDisableButton(false);
     }
@@ -183,65 +247,41 @@ export default function LoginPage({
     watch("newOrganizationDescription"),
     watch("newOrganizationDataDescription"),
     watch("isNewOrganizationSelected"),
-    topics,
-    locations,
-    organizations,
+    watch("newUsersEmailsToInvite"),
+    watch("messageToInviteNewUsers"),
     stepNumber,
+    followedGroups,
   ]);
 
-  const groupFollowPreferences = async () => {
-    const groupIds: string[] = [];
-    //add selected topics, locations and organization
-    topics.forEach((topic) => {
-      if (topic.selected) {
-        groupIds.push(topic.id);
-      }
-    });
-    locations.forEach((loc) => {
-      if (loc.selected) {
-        groupIds.push(loc.id);
-      }
-    });
-    organizations.forEach((org) => {
-      if (org.selected) {
-        groupIds.push(org.id);
-      }
-    });
-    form.setValue("followingGroups", groupIds);
-  };
-
-  const nextStep = async (data: any) => {
+  const nextStep = async () => {
     if (stepNumber === 0) {
-      form.setValue("isInterestSubmitted", true);
-      groupFollowPreferences();
-    } else if (stepNumber === 1) {
-      form.setValue("isOrganizationSubmitted", true);
-    } else if (stepNumber === 2) {
-      setLoading(true);
-      onBoardUser.mutate(data);
+      form.setValue("followingGroups", followedGroups);
     }
-    setStep(stepNumber + 1);
+    form.setValue("onBoardingStep", stepNumber);
+    setLoading(true);
+    const data = form.getValues();
+    onBoardUser.mutate(data);
   };
 
   const skipStep = async () => {
-    if (stepNumber === 0) {
-      form.setValue("isInterestSubmitted", false);
-    } else if (stepNumber === 1) {
-      form.setValue("isOrganizationSubmitted", false);
-    } else if (stepNumber === 2) {
+    if (stepNumber === 2) {
       setLoading(true);
       router.push("/dashboard/newsfeed");
     }
     setStep(stepNumber + 1);
   };
 
-  return (
+  return isLoading ? (
+    <div className="flex h-screen items-center justify-center">
+      <Spinner className="text-slate-900" />
+    </div>
+  ) : (
     <>
       <NextSeo title="Onboarding" />
       <SingInLayout subtitleText={subtitleText} paragraphText={paragraphText}>
         <form
           onSubmit={handleSubmit((data) => {
-            nextStep(data);
+            nextStep();
           })}
           className="w-full bg-white px-28 py-28"
         >
@@ -287,9 +327,9 @@ export default function LoginPage({
                           <path
                             d="M5.75 8L7.25 9.5L10.25 6.5M14.75 8C14.75 8.88642 14.5754 9.76417 14.2362 10.5831C13.897 11.4021 13.3998 12.1462 12.773 12.773C12.1462 13.3998 11.4021 13.897 10.5831 14.2362C9.76417 14.5754 8.88642 14.75 8 14.75C7.11358 14.75 6.23583 14.5754 5.41689 14.2362C4.59794 13.897 3.85382 13.3998 3.22703 12.773C2.60023 12.1462 2.10303 11.4021 1.76381 10.5831C1.42459 9.76417 1.25 8.88642 1.25 8C1.25 6.20979 1.96116 4.4929 3.22703 3.22703C4.4929 1.96116 6.20979 1.25 8 1.25C9.79021 1.25 11.5071 1.96116 12.773 3.22703C14.0388 4.4929 14.75 6.20979 14.75 8Z"
                             stroke="#006064"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
                       ) : (
@@ -328,6 +368,7 @@ export default function LoginPage({
               setTopics={setTopics}
               organizations={organizations}
               setOrganizations={setOrganizations}
+              setFollowedGroups={setFollowedGroups}
             />
           ) : stepNumber === 1 ? (
             <OrganizationSelectionStep orgs={organizationsData} form={form} />
@@ -374,6 +415,12 @@ export default function LoginPage({
               </span>
             </p>
             {errorMessage && <ErrorAlert text={errorMessage} />}
+            {showSuccessAlert && (
+              <SuccessAlert
+                text={successMessage}
+                onClose={() => setShowSuccessAlert(false)} // Close alert on demand
+              />
+            )}
           </div>
         </form>
       </SingInLayout>

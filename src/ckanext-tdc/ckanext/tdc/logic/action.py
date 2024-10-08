@@ -569,7 +569,12 @@ def invite_user_to_tdc(context, data_dict):
         raise ValueError("Missing Parameters.")
 
     for email in to_emails:
-        send_email("user_invite", email, from_user, message=message)
+        send_email("user_invite",
+                   email,
+                   from_user,
+                   site_url=tk.config.get('ckan.frontend_portal_url', None),
+                   message=message
+                   )
 
     return "Invited User Successfully"
 

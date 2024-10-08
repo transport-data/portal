@@ -34,6 +34,7 @@ export default ({
   countries,
   onChange,
   metadataCreatedDates,
+  defaultValue,
 }: {
   tags: Facet[];
   resetFilter: () => void;
@@ -47,6 +48,7 @@ export default ({
   regions: Facet[];
   countries: Facet[];
   onChange: SearchPageOnChange;
+  defaultValue?: string;
 }) => {
   const [tabs, setTabs] = useState([
     { name: "All", current: false },
@@ -102,9 +104,11 @@ export default ({
       : searchFilter.startYear && !searchFilter.endYear
       ? `After ${searchFilter.startYear}`
       : searchFilter.startYear && searchFilter.endYear
-      ? searchFilter.startYear.toString().slice(0, 4) +
-        " to " +
-        searchFilter.endYear?.toString().slice(0, 4)
+      ? searchFilter.startYear === searchFilter.endYear
+        ? searchFilter.startYear.toString().slice(0, 4)
+        : searchFilter.startYear.toString().slice(0, 4) +
+          " to " +
+          searchFilter.endYear?.toString().slice(0, 4)
       : "All";
 
   return (
@@ -133,7 +137,12 @@ export default ({
         </span>
       </div>
 
-      <Accordion type="single" collapsible className="w-full text-[#6B7280]">
+      <Accordion
+        type="single"
+        collapsible
+        className="w-full text-[#6B7280]"
+        defaultValue={defaultValue}
+      >
         <AccordionItem value="keyword">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Keyword</span>
@@ -458,9 +467,7 @@ export default ({
                   label="To"
                   value={endYear ? dayjs(endYear.toString()) : undefined}
                   onChange={(x) => setEndYear(x?.year())}
-                  minDate={
-                    startYear ? dayjs((startYear! + 1).toString()) : undefined
-                  }
+                  minDate={startYear ? dayjs(startYear!.toString()) : undefined}
                   openTo="year"
                   views={["year"]}
                   yearsOrder="desc"

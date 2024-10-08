@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { GroupSchema } from "@schema/group.schema";
 import {
   createGroup,
@@ -11,40 +11,42 @@ import {
 import { z } from "zod";
 
 export const groupRouter = createTRPCRouter({
-  get: protectedProcedure
+  get: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const user = ctx.session?.user;
+      const apiKey = user?.apikey ?? '';
       const groups = await getGroup({ apiKey, id: input.id });
       return groups;
     }),
-  list: protectedProcedure
+  list: publicProcedure
     .input(
       z.object({
         showGeographyShapes: z.boolean().optional(),
+        sort: z.string().optional(),
         type: z.enum(["topic", "geography"]).optional().default("topic"),
       })
     )
     .query(async ({ ctx, input }) => {
-      const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const user = ctx.session?.user;
+      const apiKey = user?.apikey ?? '';
       const groups = await listGroups({
         apiKey,
         type: input.type,
         showCoordinates: input.showGeographyShapes,
+        sort: input.sort,
       });
       return groups;
     }),
-  tree: protectedProcedure
+  tree: publicProcedure
     .input(
       z.object({
         type: z.enum(["topic", "geography"]).optional().default("topic"),
       })
     )
     .query(async ({ ctx, input }) => {
-      const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const user = ctx.session?.user;
+      const apiKey = user?.apikey ?? '';
       const groups = await groupTree({
         apiKey,
         type: input.type,

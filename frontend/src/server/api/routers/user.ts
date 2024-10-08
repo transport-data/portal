@@ -18,6 +18,7 @@ import {
   addOrganizationMember,
   requestOrganizationOwner,
   requestNewOrganization,
+  listUserOrganizations,
 } from "@utils/organization";
 import {
   createUser,
@@ -27,7 +28,10 @@ import {
   listUsers,
   patchUser,
   inviteUser,
+  getUserFollowee,
 } from "@utils/user";
+import { searchDatasets, listDatasetActivities } from "@utils/dataset";
+import { SearchDatasetType } from "@schema/dataset.schema";
 import { followGroups } from "@utils/group";
 import { z } from "zod";
 
@@ -180,6 +184,36 @@ export const userRouter = createTRPCRouter({
 
     return activities.result;
   }),
+  listUserActivities: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const apiKey = user.apikey;
+    const organizations = await listUserOrganizations({
+      id: user.id,
+      apiKey,
+    });
+    const input: SearchDatasetType = {
+      offset: 0,
+      limit: 1000,
+      includePrivate: true,
+      includeDrafts: true,
+      orgs: organizations?.map((org) => org?.name) || [],
+    };
+    const userDatasets = await searchDatasets({ apiKey, options: input });
+    const ids = userDatasets?.datasets?.map((item) => item.id);
+    const datasetActivities = await listDatasetActivities({ apiKey, ids });
+    const userActivities = await CkanRequest.get<CkanResponse<Activity[]>>(
+      `dashboard_activity_list`,
+      {
+        apiKey: ctx.session.user.apikey,
+      }
+    );
+    const combinedActivities = datasetActivities.concat(
+      userActivities.result.filter(
+        (item2) => !datasetActivities.some((item1) => item1.id === item2.id)
+      )
+    );
+    return combinedActivities;
+  }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
     const apiKey = user.apikey;
@@ -207,16 +241,13 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      // if interests tab is not skipped.
-      if (input.isInterestSubmitted && input.followingGroups) {
+
+      if (input.onBoardingStep === 0 && input.followingGroups) {
         await followGroups({
           apiKey: apiKey,
-          ids: input.followingGroups,
+          followedGroups: input.followingGroups,
         });
-      }
-      // if organization selection tab is not skipped
-      if (input.isOrganizationSubmitted) {
-        // if request new organization is selected.
+      } else if (input.onBoardingStep === 1) {
         if (
           input.isNewOrganizationSelected &&
           input.newOrganizationName &&
@@ -240,8 +271,11 @@ export const userRouter = createTRPCRouter({
             message: input.messageToParticipateOfTheOrg,
           });
         }
-      }
-      if (input.newUsersEmailsToInvite && input.messageToInviteNewUsers) {
+      } else if (
+        input.onBoardingStep === 2 &&
+        input.newUsersEmailsToInvite &&
+        input.messageToInviteNewUsers
+      ) {
         await inviteUser({
           apiKey: apiKey,
           emails: input.newUsersEmailsToInvite,
@@ -249,4 +283,10 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
+  getFollowee: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const apiKey = user.apikey;
+    const followee = await getUserFollowee({ id: user.id, apiKey });
+    return followee;
+  }),
 });

@@ -1,5 +1,6 @@
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
 
@@ -19,7 +20,7 @@ export async function searchDatasets<T = Dataset>({
   apiKey,
   options,
 }: {
-  apiKey: string;
+  apiKey?: string;
   options: SearchDatasetType;
 }): Promise<{
   datasets: Array<T>;
@@ -116,6 +117,10 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("fuel", [options.fuel]));
   }
 
+  if (options.tdc_category) {
+    fqAr.push(buildOrFq("tdc_category", [options.tdc_category]));
+  }
+
   if (options.query) {
     fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }
@@ -204,8 +209,14 @@ export async function searchDatasets<T = Dataset>({
 
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
+
+  const headers: any = {}
+  if (apiKey) {
+      headers["Authorization"] = apiKey
+  }
+
   const response = await CkanRequest.get<any>(endpoint, {
-    headers: { Authorization: apiKey },
+    headers,
   });
 
   return {
@@ -311,4 +322,26 @@ export const licensesList = async ({ apiKey }: { apiKey: string }) => {
     }
   );
   return licenses.result;
+};
+
+export const listDatasetActivities = async ({
+  apiKey,
+  ids,
+}: {
+  apiKey: string;
+  ids: Array<string>;
+}) => {
+  const activities = await Promise.all(
+    ids.map(async (id) => {
+      const response = await CkanRequest.post<CkanResponse<Activity[]>>(
+        `package_activity_list`,
+        {
+          apiKey: apiKey,
+          json: { id },
+        }
+      );
+      return response.result;
+    })
+  );
+  return activities.flat();
 };

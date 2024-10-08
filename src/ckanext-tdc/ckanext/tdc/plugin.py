@@ -1,5 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.types import Schema
 
 import ckanext.tdc.logic.action as action
 import ckanext.tdc.cli as cli
@@ -17,6 +18,7 @@ class TdcPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IClick, inherit=True)
     plugins.implements(plugins.IAuthFunctions, inherit=True)
+    plugins.implements(plugins.IValidators)
 
     # IConfigurer
 
@@ -24,6 +26,15 @@ class TdcPlugin(plugins.SingletonPlugin):
         toolkit.add_template_directory(config_, "templates")
         toolkit.add_public_directory(config_, "public")
         toolkit.add_resource("fanstatic", "tdc")
+
+    def get_validators(self):
+        # we require this to so the frontend can specify an id and make resource uploads work
+        # resource uploads are done directly in the browser so we need the id to upload to the right location
+        # usually we could update the create_package_schema to remove the validator but for some reason that didnt work
+        def empty_if_not_sysadmin(key, data, errors, context):
+            return
+
+        return {"empty_if_not_sysadmin": empty_if_not_sysadmin}
 
     # IActions
 
@@ -80,3 +91,13 @@ class TdcPlugin(plugins.SingletonPlugin):
 
     def get_auth_functions(self):
         return auth.get_auth_functions()
+
+    def is_fallback(self):
+        # Return True to register this plugin as the default handler for
+        # package types not handled by any other IDatasetForm plugin.
+        return True
+
+    def package_types(self) -> list[str]:
+        # This plugin doesn't handle any special package types, it just
+        # registers itself as the default (above).
+        return []

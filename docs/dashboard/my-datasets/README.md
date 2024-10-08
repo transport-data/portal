@@ -13,6 +13,7 @@ Once signed in, data publishers can view all datasets they’ve created by navig
 The API automatically filters datasets by the signed-in user's ID, ensuring only their datasets are displayed. These include:
 
 - **Public Datasets**: Visible to everyone.
+- **Private Datasets**: Restricted from public access. Visible for organization members.
 - **Draft Datasets**: Datasets that are not yet published.
 
 Users can filter datasets by state using the visibility filters in the left panel.

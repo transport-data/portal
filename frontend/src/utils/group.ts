@@ -1,6 +1,7 @@
-import { type CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { GroupFormType, type Group, GroupTree } from "@schema/group.schema";
+import { FollowGroupSchema } from "@schema/onboarding.schema";
+import { type CkanResponse } from "@schema/ckan.schema";
 
 export const getGroup = async ({
   apiKey,
@@ -11,6 +12,7 @@ export const getGroup = async ({
 }) => {
   let action = "group_show";
   action += `?id=${id}`;
+  action += `&include_datasets=true`;
   const groups = await CkanRequest.get<CkanResponse<Group>>(action, {
     apiKey,
   });
@@ -21,9 +23,13 @@ export const listGroups = async ({
   apiKey,
   type,
   showCoordinates,
+  limit,
+  sort,
 }: {
   apiKey?: string;
+  limit?: number;
   type: "topic" | "geography";
+  sort?: string;
   showCoordinates?: boolean;
 }) => {
   // TODO: implement pagination and other parameters
@@ -36,9 +42,23 @@ export const listGroups = async ({
     action += `&include_shapes=${true}`;
   }
 
+  if (sort) {
+    action += `&sort=${true}`;
+  }
+
+  if (limit) {
+    action += `&limit=${limit}`;
+  }
+
   const groups = await CkanRequest.get<
     CkanResponse<
-      Group[] & { geography_shape?: { type: string; coordinates: [] } }
+      Array<
+        Group & {
+          geography_type?: string;
+          geography_shape?: GeoJSON.GeoJSON;
+          iso2?: string;
+        }
+      >
     >
   >(action, {
     apiKey: apiKey ?? "",
@@ -114,20 +134,27 @@ export const deleteGroups = async ({
 
 export const followGroups = async ({
   apiKey,
-  ids,
+  followedGroups,
 }: {
   apiKey: string;
-  ids: Array<string>;
+  followedGroups: any;
 }) => {
   const groups: CkanResponse<Group>[] = await Promise.all(
-    ids.map(
-      async (id) =>
+    followedGroups.map(async (group: any) => {
+      if (group.selected) {
+        const id = group.id;
         await CkanRequest.post(`follow_group`, {
           apiKey: apiKey,
           json: { id },
-        })
-    )
+        });
+      } else {
+        const id = group.id;
+        await CkanRequest.post(`unfollow_group`, {
+          apiKey: apiKey,
+          json: { id },
+        });
+      }
+    })
   );
-  return { groups: groups.map((group) => group.result) };
+  return groups;
 };
-

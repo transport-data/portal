@@ -8,6 +8,7 @@ export default ({
   setTopics,
   organizations,
   setOrganizations,
+  setFollowedGroups,
 }: {
   locations: any;
   setLocations: any;
@@ -15,6 +16,7 @@ export default ({
   setTopics: any;
   organizations: any;
   setOrganizations: any;
+  setFollowedGroups: any;
 }) => {
   return (
     <>
@@ -24,13 +26,22 @@ export default ({
       <div>
         <div className="space-y-5">
           <TextDivisor text="Locations" />
-          <TagsButtonsSelectionGroup data={locations} setData={setLocations} />
+          <TagsButtonsSelectionGroup
+            data={locations}
+            setData={setLocations}
+            setFollowedGroups={setFollowedGroups}
+          />
           <TextDivisor text="Topics" />
-          <TagsButtonsSelectionGroup data={topics} setData={setTopics} />
+          <TagsButtonsSelectionGroup
+            data={topics}
+            setData={setTopics}
+            setFollowedGroups={setFollowedGroups}
+          />
           <TextDivisor text="Organisations" />
           <TagsButtonsSelectionGroup
             data={organizations}
             setData={setOrganizations}
+            setFollowedGroups={setFollowedGroups}
           />
         </div>
       </div>
