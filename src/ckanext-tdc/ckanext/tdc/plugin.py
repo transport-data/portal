@@ -18,7 +18,7 @@ class TdcPlugin(toolkit.DefaultDatasetForm, plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IClick, inherit=True)
     plugins.implements(plugins.IAuthFunctions, inherit=True)
-    plugins.implements(plugins.IDatasetForm)
+    plugins.implements(plugins.IDatasetForm, inherit=True)
 
     # IDatasetForm
 
