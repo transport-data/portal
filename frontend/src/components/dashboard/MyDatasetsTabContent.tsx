@@ -76,8 +76,6 @@ export default function MyDatasetsTabContent() {
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
-      orgs: orgs?.map((org) => org.name),
-
       advancedQueries: [
         { key: "creator_user_id", values: [`${session?.user.id}`] },
       ],
@@ -204,17 +202,6 @@ export default function MyDatasetsTabContent() {
     }
   }, [facets, orgsForUser]);
 
-  useEffect(() => {
-    if (orgs.length)
-      setSearchFilter((_value) => ({
-        ..._value,
-        orgs: orgs?.map((org) => org.name),
-      }));
-  }, [orgs]);
-
-  const totalDatasets = datasetCount ?? 0;
-  const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
-
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
       <div className="order-1 space-y-12 lg:max-w-[150px]">
@@ -331,14 +318,18 @@ export default function MyDatasetsTabContent() {
             <>
               {datasets?.length > 0 ? (
                 datasets?.map((x) => (
-                  <DashboardDatasetCard key={x.id} {...(x as Dataset)} />
+                  <DashboardDatasetCard
+                    key={x.id}
+                    {...(x as Dataset)}
+                    canEdit={true}
+                  />
                 ))
               ) : (
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
               {pages.length ? (
-                <Pagination className="mx-0 mt-8 justify-start">
+                <Pagination className="mx-0 my-8 justify-start">
                   <PaginationContent>
                     <PaginationItem>
                       <button

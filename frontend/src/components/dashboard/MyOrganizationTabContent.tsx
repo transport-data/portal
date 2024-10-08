@@ -57,7 +57,13 @@ export default () => {
       datasets: [],
       facets: {} as any,
     },
-  } = api.dataset.search.useQuery(searchFilter);
+  } = api.dataset.search.useQuery({
+    ...searchFilter,
+    orgs:
+      searchFilter.orgs?.length === 0
+        ? orgs.map((o) => o.name)
+        : searchFilter.orgs,
+  });
 
   const pages = new Array(
     Math.ceil((datasetCount || 0) / datasetsPerPage)
@@ -70,7 +76,7 @@ export default () => {
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
-      orgs: orgs?.map((org) => org.name),
+      orgs: [],
     });
     setVisibility("*");
     setContributor("*");
@@ -90,7 +96,7 @@ export default () => {
     if (orgs.length)
       setSearchFilter((_value) => ({
         ..._value,
-        orgs: orgs?.map((org) => org.name),
+        orgs: [],
       }));
   }, [orgs]);
 
@@ -360,15 +366,26 @@ export default () => {
           ) : (
             <>
               {datasets?.length > 0 ? (
-                datasets?.map((x) => (
-                  <DashboardDatasetCard key={x.id} {...(x as Dataset)} />
-                ))
+                datasets?.map((x) => {
+                  const org = orgsForUser?.find(
+                    (org) => org.name === x.organization?.name
+                  );
+                  const role = org?.capacity;
+                  const canEdit = role === "admin" || role === "editor";
+                  return (
+                    <DashboardDatasetCard
+                      key={x.id}
+                      {...(x as Dataset)}
+                      canEdit={canEdit}
+                    />
+                  );
+                })
               ) : (
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
               {pages.length ? (
-                <Pagination className="mx-0 mt-8 justify-start">
+                <Pagination className="mx-0 my-8 justify-start">
                   <PaginationContent>
                     <PaginationItem>
                       <button
