@@ -6,8 +6,8 @@ import InfoCards from "./InfoCards";
 import PartnersCarousel from "@components/_shared/PartnersCarousel";
 
 export type HeroAsset = {
-  path?: string;
-  type?: "mp4" | "image" | "youtube";
+  path: string;
+  type: "mp4" | "image" | "youtube";
 };
 
 export default function Hero({ asset }: { asset: HeroAsset }) {

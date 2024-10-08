@@ -5,7 +5,7 @@ export default function Video({
   path,
   heightInPx,
 }: {
-  path: string;
+  path?: string;
   heightInPx?: string;
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
