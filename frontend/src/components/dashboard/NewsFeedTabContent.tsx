@@ -54,7 +54,7 @@ export default () => {
   }, [filter, searchText]);
 
   const { data: activities, isLoading } =
-    api.user.listUserActivities.useQuery();
+    api.user.listDashboardActivities.useQuery();
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
@@ -184,11 +184,11 @@ export default () => {
                 isSelected: false,
                 value: "Datasets",
               },
-              {
-                icon: <CircleCheck size={14} />,
-                isSelected: false,
-                value: "Datasets Approvals",
-              },
+              // {
+              //   icon: <CircleCheck size={14} />,
+              //   isSelected: false,
+              //   value: "Datasets Approvals",
+              // },
             ]}
             onSelectedItem={(option) => setFilter(option)}
             selected={filter}

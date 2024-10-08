@@ -8,31 +8,28 @@ import { env } from "@env.mjs";
 import { type User } from "@interfaces/ckan/user.interface";
 import { type Activity, type Dataset } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
+import { OnboardingSchema } from "@schema/onboarding.schema";
 import {
   CKANUserSchema,
   UserInviteSchema,
   UserSchema,
 } from "@schema/user.schema";
-import { OnboardingSchema } from "@schema/onboarding.schema";
+import { followGroups } from "@utils/group";
 import {
   addOrganizationMember,
-  requestOrganizationOwner,
   requestNewOrganization,
-  listUserOrganizations,
+  requestOrganizationOwner
 } from "@utils/organization";
 import {
   createUser,
   deleteUsers,
   generateUserApiKey,
+  getUserFollowee,
   getUsersById,
+  inviteUser,
   listUsers,
   patchUser,
-  inviteUser,
-  getUserFollowee,
 } from "@utils/user";
-import { searchDatasets, listDatasetActivities } from "@utils/dataset";
-import { SearchDatasetType } from "@schema/dataset.schema";
-import { followGroups } from "@utils/group";
 import { z } from "zod";
 
 // TODO: extract business logic to utils/user.ts
@@ -183,36 +180,6 @@ export const userRouter = createTRPCRouter({
     );
 
     return activities.result;
-  }),
-  listUserActivities: protectedProcedure.query(async ({ ctx }) => {
-    const user = ctx.session.user;
-    const apiKey = user.apikey;
-    const organizations = await listUserOrganizations({
-      id: user.id,
-      apiKey,
-    });
-    const input: SearchDatasetType = {
-      offset: 0,
-      limit: 1000,
-      includePrivate: true,
-      includeDrafts: true,
-      orgs: organizations?.map((org) => org?.name) || [],
-    };
-    const userDatasets = await searchDatasets({ apiKey, options: input });
-    const ids = userDatasets?.datasets?.map((item) => item.id);
-    const datasetActivities = await listDatasetActivities({ apiKey, ids });
-    const userActivities = await CkanRequest.get<CkanResponse<Activity[]>>(
-      `dashboard_activity_list`,
-      {
-        apiKey: ctx.session.user.apikey,
-      }
-    );
-    const combinedActivities = datasetActivities.concat(
-      userActivities.result.filter(
-        (item2) => !datasetActivities.some((item1) => item1.id === item2.id)
-      )
-    );
-    return combinedActivities;
   }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
