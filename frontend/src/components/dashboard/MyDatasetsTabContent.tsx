@@ -318,7 +318,11 @@ export default function MyDatasetsTabContent() {
             <>
               {datasets?.length > 0 ? (
                 datasets?.map((x) => (
-                  <DashboardDatasetCard key={x.id} {...(x as Dataset)} />
+                  <DashboardDatasetCard
+                    key={x.id}
+                    {...(x as Dataset)}
+                    canEdit={true}
+                  />
                 ))
               ) : (
                 <div className="text-[14px]">No datasets found...</div>
