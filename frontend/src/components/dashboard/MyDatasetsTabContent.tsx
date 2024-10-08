@@ -328,7 +328,7 @@ export default function MyDatasetsTabContent() {
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
-              {pages.length ? (
+              {pages.length > datasetsPerPage ? (
                 <Pagination className="mx-0 my-8 justify-start">
                   <PaginationContent>
                     <PaginationItem>

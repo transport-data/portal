@@ -42,7 +42,12 @@ export interface NewsFeedCardProps {
   activity_type: string;
 }
 export default () => {
-  const filterOptions = ["All", "Organizations", "Dataset", "Dataset Approval"];
+  const filterOptions = [
+    "All",
+    "Organizations",
+    "Datasets",
+    "Datasets Approvals",
+  ];
   const [searchText, setSearchText] = useState("");
   const [filter, setFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("latest");
@@ -56,14 +61,47 @@ export default () => {
   const { data: activities, isLoading } =
     api.user.listDashboardActivities.useQuery();
 
+  const preprocessedActivities = activities?.map((activity: any) => {
+    const activitySegments = activity.activity_type?.split(" ");
+    const activityType = activitySegments ? activitySegments[0] : "changed";
+    const activityTarget = activitySegments
+      ? activitySegments[1] === "package"
+        ? "dataset"
+        : activitySegments[1]
+      : "entity";
+
+    // Add synonyms for activity type and target
+    const mappedActivityType =
+      activityType === "changed" ? "updated" : activityType;
+    const mappedActivityTarget =
+      activityTarget === "dataset" ? "package" : activityTarget;
+
+    return {
+      ...activity,
+      "data.group.title": activity.data?.group?.title || "",
+      "data.group.name": activity.data?.group?.name || "",
+      "data.package.name": activity.data?.package?.name || "",
+      "data.package.title": activity.data?.package?.title || "",
+      "data.actor": activity.data?.actor || "",
+      activity_type_synonym: `${activityType} ${activityTarget} ${mappedActivityType} ${mappedActivityTarget}`,
+    };
+  });
+
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
-      fields: ["activity_type"],
+      fields: [
+        "activity_type_synonym",
+        "data.group.title",
+        "data.group.name",
+        "data.package.name",
+        "data.package.title",
+        "data.actor",
+      ],
       storeFields: ["id", "timestamp", "user_id", "activity_type", "data"],
     });
-    search.addAll(activities || []);
+    search.addAll(preprocessedActivities || []);
     return search;
-  }, [activities]);
+  }, [preprocessedActivities]);
 
   const searchResults = useMemo(() => {
     const filteredActivites = activities?.filter((item) =>
