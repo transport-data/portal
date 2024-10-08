@@ -12,32 +12,13 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class TdcPlugin(toolkit.DefaultDatasetForm, plugins.SingletonPlugin):
+class TdcPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IClick, inherit=True)
     plugins.implements(plugins.IAuthFunctions, inherit=True)
-    plugins.implements(plugins.IDatasetForm, inherit=True)
-
-    # IDatasetForm
-
-    def create_package_schema(self) -> Schema:
-        # let's grab the default schema in our plugin
-        schema: Schema = super(TdcPlugin, self).create_package_schema()
-        # our custom field
-        schema.update(
-            {
-                "id": [
-                    toolkit.get_validator("ignore_missing"),
-                    toolkit.get_validator("uuid_validator"),
-                    toolkit.get_validator("package_id_does_not_exist"),
-                    toolkit.get_validator("unicode_safe"),
-                ],
-            }
-        )
-
-        return schema
+    plugins.implements(plugins.IValidators)
 
     # IConfigurer
 
@@ -45,6 +26,12 @@ class TdcPlugin(toolkit.DefaultDatasetForm, plugins.SingletonPlugin):
         toolkit.add_template_directory(config_, "templates")
         toolkit.add_public_directory(config_, "public")
         toolkit.add_resource("fanstatic", "tdc")
+
+    def get_validators(self):
+        def empty_if_not_sysadmin(key, data, errors, context):
+            return
+
+        return {"empty_if_not_sysadmin": empty_if_not_sysadmin}
 
     # IActions
 
@@ -68,6 +55,7 @@ class TdcPlugin(toolkit.DefaultDatasetForm, plugins.SingletonPlugin):
     def before_dataset_index(self, data_dict):
         # This is a fix so that solr stores a list
         # instead of a string for multivalued fields
+        # usually we could update the create_package_schema but for some reason that didnt work
         multi_value_extra_fields = [
             "topics",
             "geographies",
@@ -111,4 +99,3 @@ class TdcPlugin(toolkit.DefaultDatasetForm, plugins.SingletonPlugin):
         # This plugin doesn't handle any special package types, it just
         # registers itself as the default (above).
         return []
-
