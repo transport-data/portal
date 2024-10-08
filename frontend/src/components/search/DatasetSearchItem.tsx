@@ -18,6 +18,7 @@ export default function DatasetSearchItem({
   metadata_modified,
   frequencies,
   frequency,
+  regionOrCountry,
   title,
   organization,
   id,
@@ -136,12 +137,17 @@ export default function DatasetSearchItem({
             ) : (
               <></>
             )}
-
-            <div className="hidden sm:block">•</div>
-            <div className="flex gap-[4px]">
-              <GlobeAltIcon width={14} />
-              Europe
-            </div>
+            {regionOrCountry ? (
+              <>
+                <div className="hidden sm:block">•</div>
+                <div className="flex gap-[4px]">
+                  <GlobeAltIcon width={14} />
+                  {regionOrCountry}
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
         <Tooltip
@@ -161,18 +167,22 @@ export default function DatasetSearchItem({
                   <>
                     Data have been validated, and derived from multiple sources
                     by TDC. For more information,{" "}
-                    <Link className="underline" 
+                    <Link
+                      className="underline"
                       target="_blank"
-                      href={"https://google.com"}>
+                      href={"https://google.com"}
+                    >
                       click here
                     </Link>
                   </>
                 ) : tdc_category === "tdc_formatted" ? (
                   <>
                     Data is SDMX-compliant. For more information,{" "}
-                    <Link className="underline" 
+                    <Link
+                      className="underline"
                       target="_blank"
-                      href={"https://google.com"}>
+                      href={"https://google.com"}
+                    >
                       click here
                     </Link>
                   </>

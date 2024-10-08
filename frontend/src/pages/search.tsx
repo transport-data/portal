@@ -428,7 +428,7 @@ export default function DatasetSearch({
                               showAdvancedFilter
                                 ? "after:start-[2px] xl:after:-start-2"
                                 : "after:start-[2px]",
-                              "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+                              "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"
                             )}
                           ></div>
                           <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -486,7 +486,7 @@ export default function DatasetSearch({
                           <div
                             className={cn(
                               "after:start-[2px]",
-                              "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+                              "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"
                             )}
                           ></div>
                           <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -543,6 +543,15 @@ export default function DatasetSearch({
                             frequencies={updateFrequencies}
                             key={`dataset-result-${item.id}`}
                             {...item}
+                            regionOrCountry={
+                              item.geographies?.length
+                                ? item.groups?.find(
+                                    (x) => x.name === item.geographies?.at(0)
+                                  )?.title
+                                : item.groups?.find(
+                                    (x) => x.name === item.regions?.at(0)
+                                  )?.title
+                            }
                           />
                         ))
                       )}
@@ -573,9 +582,7 @@ export default function DatasetSearch({
                         </button>
                       </PaginationItem>
                       {pages.map((x, i) =>
-                        i > currentPage + 2 || i < currentPage - 2 ? (
-                          null
-                        ) : (
+                        i > currentPage + 2 || i < currentPage - 2 ? null : (
                           <PaginationItem key={`pagination-item-${i}`}>
                             <button
                               disabled={currentPage === i}
