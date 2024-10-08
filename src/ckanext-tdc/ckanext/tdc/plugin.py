@@ -28,6 +28,9 @@ class TdcPlugin(plugins.SingletonPlugin):
         toolkit.add_resource("fanstatic", "tdc")
 
     def get_validators(self):
+        # we require this to so the frontend can specify an id and make resource uploads work
+        # resource uploads are done directly in the browser so we need the id to upload to the right location
+        # usually we could update the create_package_schema to remove the validator but for some reason that didnt work
         def empty_if_not_sysadmin(key, data, errors, context):
             return
 
@@ -55,7 +58,6 @@ class TdcPlugin(plugins.SingletonPlugin):
     def before_dataset_index(self, data_dict):
         # This is a fix so that solr stores a list
         # instead of a string for multivalued fields
-        # usually we could update the create_package_schema but for some reason that didnt work
         multi_value_extra_fields = [
             "topics",
             "geographies",
