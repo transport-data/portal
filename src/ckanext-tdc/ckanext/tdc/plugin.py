@@ -1,5 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.types import Schema
 
 import ckanext.tdc.logic.action as action
 import ckanext.tdc.cli as cli
@@ -11,12 +12,32 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class TdcPlugin(plugins.SingletonPlugin):
+class TdcPlugin(toolkit.DefaultDatasetForm, plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IClick, inherit=True)
     plugins.implements(plugins.IAuthFunctions, inherit=True)
+    plugins.implements(plugins.IDatasetForm)
+
+    # IDatasetForm
+
+    def create_package_schema(self) -> Schema:
+        # let's grab the default schema in our plugin
+        schema: Schema = super(TdcPlugin, self).create_package_schema()
+        # our custom field
+        schema.update(
+            {
+                "id": [
+                    toolkit.get_validator("ignore_missing"),
+                    toolkit.get_validator("uuid_validator"),
+                    toolkit.get_validator("package_id_does_not_exist"),
+                    toolkit.get_validator("unicode_safe"),
+                ],
+            }
+        )
+
+        return schema
 
     # IConfigurer
 
@@ -80,3 +101,14 @@ class TdcPlugin(plugins.SingletonPlugin):
 
     def get_auth_functions(self):
         return auth.get_auth_functions()
+
+    def is_fallback(self):
+        # Return True to register this plugin as the default handler for
+        # package types not handled by any other IDatasetForm plugin.
+        return True
+
+    def package_types(self) -> list[str]:
+        # This plugin doesn't handle any special package types, it just
+        # registers itself as the default (above).
+        return []
+
