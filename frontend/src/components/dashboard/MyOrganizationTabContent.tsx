@@ -42,9 +42,11 @@ export default () => {
 
   const datasetsPerPage = 9;
 
+  const hasOrganizations = orgsForUser?.length;
+
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
-    limit: datasetsPerPage,
+    limit: hasOrganizations ? datasetsPerPage : 0,
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
@@ -53,7 +55,7 @@ export default () => {
 
   const {
     isLoading,
-    data: { datasets, count: datasetCount, facets } = {
+    data: { datasets, count, facets } = {
       datasets: [],
       facets: {} as any,
     },
@@ -65,6 +67,8 @@ export default () => {
         : searchFilter.orgs,
   });
 
+  const datasetCount = hasOrganizations ? count : 0;
+
   const pages = new Array(
     Math.ceil((datasetCount || 0) / datasetsPerPage)
   ).fill(0);
@@ -72,7 +76,7 @@ export default () => {
   const resetFilter = () => {
     setSearchFilter({
       offset: 0,
-      limit: datasetsPerPage,
+      limit: hasOrganizations ? datasetsPerPage : 0,
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
@@ -344,7 +348,7 @@ export default () => {
         <div className="space-y-2.5 lg:hidden">
           <DatasetsFilter
             resetFilter={resetFilter}
-            datasetCount={datasetCount || 0}
+            datasetCount={datasetCount ?? 0}
             onChange={onChange}
             searchFilter={searchFilter}
             defaultStartValue={searchFilter.startYear}
@@ -384,7 +388,7 @@ export default () => {
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
-              {pages.length ? (
+              {pages.length > datasetsPerPage ? (
                 <Pagination className="mx-0 my-8 justify-start">
                   <PaginationContent>
                     <PaginationItem>
@@ -463,7 +467,7 @@ export default () => {
       <div className="order-2 hidden w-full space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
         <DatasetsFilter
           resetFilter={resetFilter}
-          datasetCount={datasetCount || 0}
+          datasetCount={datasetCount ?? 0}
           onChange={onChange}
           searchFilter={searchFilter}
           defaultStartValue={searchFilter.startYear}
