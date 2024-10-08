@@ -21,6 +21,10 @@ import { Button } from "@components/ui/button";
 import { Skeleton } from "@components/ui/skeleton";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 
+type DatasetCardProps = Dataset & {
+  canEdit?: boolean;
+};
+
 export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
   Array.from({ length }).map((_, x) => (
     <div key={x} className="flex w-full cursor-pointer gap-6">
@@ -31,7 +35,7 @@ export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
     </div>
   ));
 
-export default function DashboardDatasetCard(props: Dataset) {
+export default function DashboardDatasetCard(props: DatasetCardProps) {
   const {
     name,
     tdc_category,
@@ -46,6 +50,7 @@ export default function DashboardDatasetCard(props: Dataset) {
     organization,
     groups,
     regions,
+    canEdit,
   } = props;
 
   const badgeVariant =
@@ -91,16 +96,18 @@ export default function DashboardDatasetCard(props: Dataset) {
             <h2 className="inline text-lg font-bold">
               <Link href={`/@${organization?.name}/${name}`}>{title}</Link>
             </h2>
-            <Button
-              variant="default"
-              size="pill"
-              className=" right-0 ml-2 px-2.5 py-0.5 text-sm"
-              asChild
-            >
-              <Link href={`/dashboard/datasets/${name}/edit`}>
-                <PencilIcon className="mr-1 h-3 w-3" /> Edit
-              </Link>
-            </Button>
+            {canEdit && (
+              <Button
+                variant="default"
+                size="pill"
+                className=" right-0 ml-2 px-2.5 py-0.5 text-sm"
+                asChild
+              >
+                <Link href={`/dashboard/datasets/${name}/edit`}>
+                  <PencilIcon className="mr-1 h-3 w-3" /> Edit
+                </Link>
+              </Button>
+            )}
           </div>
           {tdc_category === "tdc_formatted" && (
             <Badge variant={"success"} className="text-[#03543F]">

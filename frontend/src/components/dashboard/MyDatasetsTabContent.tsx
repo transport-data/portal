@@ -76,8 +76,6 @@ export default function MyDatasetsTabContent() {
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
-      orgs: orgs?.map((org) => org.name),
-
       advancedQueries: [
         { key: "creator_user_id", values: [`${session?.user.id}`] },
       ],
@@ -203,17 +201,6 @@ export default function MyDatasetsTabContent() {
       }
     }
   }, [facets, orgsForUser]);
-
-  useEffect(() => {
-    if (orgs.length)
-      setSearchFilter((_value) => ({
-        ..._value,
-        orgs: orgs?.map((org) => org.name),
-      }));
-  }, [orgs]);
-
-  const totalDatasets = datasetCount ?? 0;
-  const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">

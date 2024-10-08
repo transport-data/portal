@@ -57,7 +57,13 @@ export default () => {
       datasets: [],
       facets: {} as any,
     },
-  } = api.dataset.search.useQuery(searchFilter);
+  } = api.dataset.search.useQuery({
+    ...searchFilter,
+    orgs:
+      searchFilter.orgs?.length === 0
+        ? orgs.map((o) => o.name)
+        : searchFilter.orgs,
+  });
 
   const pages = new Array(
     Math.ceil((datasetCount || 0) / datasetsPerPage)
@@ -360,9 +366,20 @@ export default () => {
           ) : (
             <>
               {datasets?.length > 0 ? (
-                datasets?.map((x) => (
-                  <DashboardDatasetCard key={x.id} {...(x as Dataset)} />
-                ))
+                datasets?.map((x) => {
+                  const org = orgsForUser?.find(
+                    (org) => org.name === x.organization?.name
+                  );
+                  const role = org?.capacity;
+                  const canEdit = role === "admin" || role === "editor";
+                  return (
+                    <DashboardDatasetCard
+                      key={x.id}
+                      {...(x as Dataset)}
+                      canEdit={canEdit}
+                    />
+                  );
+                })
               ) : (
                 <div className="text-[14px]">No datasets found...</div>
               )}
@@ -445,6 +462,7 @@ export default () => {
       </div>
       <div className="order-2 hidden w-full space-y-2.5 border-b-[1px] pt-3 sm:order-3 sm:max-w-[340px] sm:border-b-0 sm:border-l-[1px] sm:pl-3 lg:block">
         <DatasetsFilter
+          defaultValue="org"
           resetFilter={resetFilter}
           datasetCount={datasetCount || 0}
           onChange={onChange}
