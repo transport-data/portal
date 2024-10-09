@@ -11,7 +11,7 @@ import Spinner from "@components/_shared/Spinner";
 import { ErrorAlert } from "@components/_shared/Alerts";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { old_signin } = context.query;
+  const { old_signin, callbackUrl } = context.query;
   if (old_signin && (old_signin as string).toLowerCase() === "true") {
     return {
       props: {
@@ -23,6 +23,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       empty: null,
+      callbackUrl,
     },
   };
 }
@@ -30,9 +31,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 export default function LoginPage({
   csrfToken,
   old_signin,
+  callbackUrl,
 }: {
   csrfToken?: string;
   old_signin?: boolean;
+  callbackUrl?: string;
 }) {
   if (old_signin && csrfToken) {
     return <OldLoginPage csrfToken={csrfToken} />;
@@ -52,7 +55,7 @@ export default function LoginPage({
               <a
                 onClick={() =>
                   signIn("github", {
-                    callbackUrl: "/dashboard/newsfeed",
+                    callbackUrl: callbackUrl || "/dashboard/newsfeed",
                   })
                 }
                 className="col-span-12 flex w-full cursor-pointer items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
