@@ -1,24 +1,44 @@
 # Newsfeed Page
 
-The newsfeed page shows the activity regarding organizations that a user is a member of, or follower and also the datasets that belong to these organizations
+The newsfeed page shows the activities regarding organizations that a user is a member of, or follower and also the datasets that belong to these organizations
 
 ![NewsFeed Page](page.png)
 
-User can search by activity type/name, Dataset name and title, Organization name and title, and actor.
+## Searching
+
+User can search by dataset name and title, organization name and title, or actor.
 
 ![Search](search.png)
 
-User can filter activities based on four categories:
+## Filtering
+
+following two filters types are available to the user:
+
+### Filter by category
+
+User can filter activities based on three categories:
 
 - All
 - Organizations
 - Datasets
-- Dataset Approvals
 
-`Note:` For now Datasets and Dataset Approvals are doing the exact same thing (filtering on Datasets) because the Dataset Approval flow is not implemented yet. //TODO remove this in future.
+`Note:` Dataset Approvals category will be included in the future.
 
-![Filter](filter.png)
+![Filter By category](filter_category.png)
 
-User can sort by latest and oldest activities.
+### Filter by action
+
+User can filter activities based on four actions:
+
+- All
+- created
+- deleted
+- updated
+
+![Filter By Action](filter_action.png)
+
+## Sorting
+
+User can sort by latest or oldest activities.
 
 ![Sort](sort.png)

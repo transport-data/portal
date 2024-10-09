@@ -1,5 +1,5 @@
 import Guidelines from "@components/_shared/Guidelines";
-import SimpleSearchInput from "@components/ui/simple-search-input";
+import NewsFeedSearchFilters from "@components/search/NewsfeedSearchFilters";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { api } from "@utils/api";
 import { useState, useMemo, useEffect } from "react";
@@ -12,14 +12,15 @@ import {
   PaginationPrevious,
 } from "@components/ui/pagination";
 import MiniSearch from "minisearch";
-import { Building, Database, CircleCheck } from "lucide-react";
+import { Building, Database } from "lucide-react";
 import { DocumentReportIcon } from "@lib/icons";
 import DashboardNewsFeedCard from "./DashboardNewsFeedCard";
 import { format } from "date-fns";
 import { DashboardNewsfeedCardProps } from "./DashboardNewsFeedCard";
+import { Activity } from "@portaljs/ckan";
 
-const groupByDate = (activities: any) => {
-  return activities.reduce((groups: any, activity: any) => {
+const groupByDate = (activities: Activity[]) => {
+  return activities.reduce((groups: any, activity: Activity) => {
     if (activity?.timestamp) {
       const formattedDate = format(
         new Date(activity?.timestamp),
@@ -42,40 +43,28 @@ export interface NewsFeedCardProps {
   activity_type: string;
 }
 export default () => {
-  const filterOptions = [
+  const categoryFilterOptions = [
     "All",
     "Organizations",
     "Datasets",
-    /*"Datasets Approvals"*/,
+    /*"Datasets Approvals"*/
   ];
+  const actionsFilterOptions = ["All", "created", "deleted", "updated"];
   const [searchText, setSearchText] = useState("");
-  const [filter, setFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [actionsFilter, setActionsFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filter, searchText]);
+  }, [categoryFilter, actionsFilter, searchText]);
 
   const { data: activities, isLoading } =
     api.user.listDashboardActivities.useQuery();
 
   const preprocessedActivities = activities?.map((activity: any) => {
-    const activitySegments = activity.activity_type?.split(" ");
-    const activityType = activitySegments ? activitySegments[0] : "changed";
-    const activityTarget = activitySegments
-      ? activitySegments[1] === "package"
-        ? "dataset"
-        : activitySegments[1]
-      : "entity";
-
-    // Add synonyms for activity type and target
-    const mappedActivityType =
-      activityType === "changed" ? "updated" : activityType;
-    const mappedActivityTarget =
-      activityTarget === "dataset" ? "package" : activityTarget;
-
     return {
       ...activity,
       "data.group.title": activity.data?.group?.title || "",
@@ -83,14 +72,12 @@ export default () => {
       "data.package.name": activity.data?.package?.name || "",
       "data.package.title": activity.data?.package?.title || "",
       "data.actor": activity.data?.actor || "",
-      activity_type_synonym: `${activityType} ${activityTarget} ${mappedActivityType} ${mappedActivityTarget}`,
     };
   });
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
       fields: [
-        "activity_type_synonym",
         "data.group.title",
         "data.group.name",
         "data.package.name",
@@ -104,15 +91,30 @@ export default () => {
   }, [preprocessedActivities]);
 
   const searchResults = useMemo(() => {
-    const filteredActivites = activities?.filter((item) =>
-      filter === "Organizations"
-        ? item.activity_type?.includes("organization")
-        : filter === "Datasets" || filter === "Datasets Approvals"
-        ? item.activity_type?.includes("package")
-        : true
-    );
+    const filteredActivites =
+      categoryFilter === "All"
+        ? activities
+        : activities?.filter((item) =>
+            categoryFilter === "Organizations"
+              ? item.activity_type?.includes("organization")
+              : categoryFilter === "Datasets"
+              ? item.activity_type?.includes("package")
+              : true
+          );
+    const actionFilteredActivities =
+      actionsFilter === "All"
+        ? filteredActivites
+        : filteredActivites?.filter((item) =>
+            actionsFilter === "deleted"
+              ? item.activity_type?.includes("deleted")
+              : actionsFilter === "updated"
+              ? item.activity_type?.includes("changed")
+              : actionsFilter === "created"
+              ? item.activity_type?.includes("new")
+              : true
+          );
     if (!searchText) {
-      return filteredActivites;
+      return actionFilteredActivities;
     }
 
     return miniSearch.search(searchText, { prefix: true }).map((result) => {
@@ -121,7 +123,7 @@ export default () => {
       );
       return searchedActivities as NewsFeedCardProps;
     });
-  }, [searchText, activities, miniSearch, filter]);
+  }, [searchText, activities, miniSearch, categoryFilter, actionsFilter]);
 
   const sortedResults = useMemo(() => {
     if (sortOrder === "latest") {
@@ -155,54 +157,17 @@ export default () => {
 
   return (
     <div>
-      <div className="grid grid-cols-12 gap-2 xl:max-h-[36px] ">
-        <div className="col-span-12 xl:col-span-6">
-          <SimpleSearchInput onTextInput={(x) => setSearchText(x)} />
-        </div>
-        <div className="col-span-12 xl:col-span-2">
-          <div
-            className="flex  
-            h-[36px]
-            items-center
-            rounded-lg
-            rounded-e-lg
-            border
-            border-s
-            border-gray-300 border-l-gray-300
-            border-s-gray-100 bg-white
-          text-black shadow-sm
-           focus-within:ring-[1px] focus-within:ring-[#111928]"
-          >
-            <span className="z-10 inline-flex flex-shrink-0 items-end rounded-xl  pl-3 text-center text-sm font-medium text-[#6B7280] dark:bg-gray-700 dark:text-white ">
-              Sort by:
-            </span>
-            <select
-              id="states"
-              className="remove-input-ring block w-full rounded-lg rounded-e-lg border-0 bg-white p-0 pl-[3px]
-            text-sm text-gray-900 ring-0 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 "
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="latest" selected={sortOrder === "latest"}>
-                Latest activity
-              </option>
-              <option value="oldest" selected={sortOrder === "oldest"}>
-                Oldest activity
-              </option>
-            </select>
-          </div>
-        </div>
-        <div className="col-span-12 xl:col-span-2">
-          <select
-            id="filter"
-            name="filter"
-            className="block w-full rounded-md border-0 py-2 pl-3 pr-10 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-[#111928]"
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            {filterOptions &&
-              filterOptions.map((item) => <option value={item}>{item}</option>)}
-          </select>
-        </div>
-      </div>
+      <NewsFeedSearchFilters
+        setSearchText={setSearchText}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        categoryFilterOptions={categoryFilterOptions}
+        actionsFilter={actionsFilter}
+        setActionsFilter={setActionsFilter}
+        actionsFilterOptions={actionsFilterOptions}
+      />
       <div className="mt-6 flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
         <div className="space-y-6">
           <SelectableItemsList
@@ -228,8 +193,8 @@ export default () => {
               //   value: "Datasets Approvals",
               // },
             ]}
-            onSelectedItem={(option) => setFilter(option)}
-            selected={filter}
+            onSelectedItem={(option) => setCategoryFilter(option)}
+            selected={categoryFilter}
             title="Categories"
           />
           <div className="lg:hidden">
