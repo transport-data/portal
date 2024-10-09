@@ -100,6 +100,7 @@ export default () => {
     if (orgs.length)
       setSearchFilter((_value) => ({
         ..._value,
+        limit: datasetsPerPage,
         orgs: [],
       }));
   }, [orgs]);
