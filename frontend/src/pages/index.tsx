@@ -15,9 +15,9 @@ import fs from "fs";
 import path from "path";
 import { Testimonial } from "@interfaces/testimonial.interface";
 import { Faq } from "@interfaces/faq.interface";
+import { api } from "@utils/api";
 
-export const getServerSideProps: GetServerSideProps<any> = async (context) => {
-  const session = await getSession(context);
+export const getStaticProps = async () => {
   const mddb = await clientPromise;
   let tdcConfig = {
     hero: {
@@ -34,14 +34,6 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
     console.log(err);
   }
 
-  //fetch datasets
-  const { datasets } = await searchDatasets({
-    apiKey: session?.user.apikey ?? "",
-    options: {
-      limit: 6,
-      sort: "metadata_modified desc",
-    },
-  });
   //fetch testimonials
   const testimonialsFiles = await mddb.getFiles({
     folder: "testimonials",
@@ -79,7 +71,6 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
   return {
     props: {
       tdcConfig,
-      datasets,
       testimonials,
       faqs,
     },
@@ -88,15 +79,19 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
 
 export default function Home({
   tdcConfig,
-  datasets,
   testimonials,
   faqs,
 }: {
   tdcConfig: any;
-  datasets: Dataset[];
   testimonials: Testimonial[];
   faqs: Faq[];
 }) {
+  //fetch datasets
+  const { data, isLoading } = api.dataset.search.useQuery({
+    limit: 6,
+    sort: "metadata_modified desc",
+  });
+
   return (
     <>
       <Head>
@@ -106,7 +101,10 @@ export default function Home({
       </Head>
       <Layout>
         <Hero asset={tdcConfig.hero} />
-        <DatasetsSection datasets={datasets} />
+        <DatasetsSection
+          datasets={data?.datasets ?? []}
+          isLoading={isLoading}
+        />
         <ContributeSection />
         <TestimonialsSection testimonials={testimonials} />
         <FaqsSection faqs={faqs} />
