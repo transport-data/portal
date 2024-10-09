@@ -30,7 +30,7 @@ export default function PartnersPage(): JSX.Element {
             </p>
             <Link
               className="flex items-center gap-[6px] text-base font-medium text-accent"
-              href="#"
+              href="/contact"
             >
               Become a partner
               <ArrowLongRightIcon width={20} />
@@ -55,11 +55,14 @@ export default function PartnersPage(): JSX.Element {
                   <Button
                     className="flex items-center gap-[8px] border border-gray-200 text-xs font-medium hover:bg-gray-100
 "
+                    asChild
                     variant="ghost"
                     size="sm"
                   >
-                    <ArrowTopRightOnSquareIcon width={16} />
-                    Visit website
+                    <Link href={item.url} target="_blank">
+                      <ArrowTopRightOnSquareIcon width={16} />
+                      Visit website
+                    </Link>
                   </Button>
                 </div>
               );
