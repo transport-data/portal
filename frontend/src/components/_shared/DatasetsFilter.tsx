@@ -10,14 +10,7 @@ import SimpleSearchInput from "@components/ui/simple-search-input";
 import { Checkboxes, SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
-import { useEffect, useState } from "react";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
-import { cn } from "@lib/utils";
-import React from "react";
+import { useState } from "react";
 
 export type Facet = { name: string; display_name: string; count: number };
 
@@ -57,10 +50,6 @@ export default ({
   ]);
 
   const [searchedGeographyText, setSearchedGeographyText] = useState("");
-  const [startYear, setStartYear] = useState<number | undefined>(
-    defaultStartValue
-  );
-  const [endYear, setEndYear] = useState<number | undefined>(defaultEndValue);
 
   const totalOfFiltersApplied =
     (searchFilter.tags?.length ?? 0) +
@@ -92,24 +81,6 @@ export default ({
       searchFilter.countries?.length === countries.length &&
       searchFilter.regions?.length === regions.length;
   }
-
-  useEffect(() => {
-    if (defaultStartValue !== startYear) setStartYear(defaultStartValue);
-    if (defaultEndValue !== endYear) setEndYear(defaultEndValue);
-  }, [defaultStartValue, defaultEndValue]);
-
-  const selectedText =
-    !searchFilter.startYear && searchFilter.endYear
-      ? `Before ${searchFilter.endYear}`
-      : searchFilter.startYear && !searchFilter.endYear
-      ? `After ${searchFilter.startYear}`
-      : searchFilter.startYear && searchFilter.endYear
-      ? searchFilter.startYear === searchFilter.endYear
-        ? searchFilter.startYear.toString().slice(0, 4)
-        : searchFilter.startYear.toString().slice(0, 4) +
-          " to " +
-          searchFilter.endYear?.toString().slice(0, 4)
-      : "All";
 
   return (
     <>
@@ -409,93 +380,6 @@ export default ({
                 />
               )}
             </div>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="yearsCovered">
-          <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
-            <span className="flex w-full">Years covered</span>
-            <span className="hide mr-2 text-sm">{selectedText}</span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="mt-[12px] flex justify-between">
-              <div
-                className={cn(
-                  "text-xs",
-                  !searchFilter.startYear || !searchFilter.endYear
-                    ? "invisible"
-                    : ""
-                )}
-              >
-                Applied filter: {searchFilter.startYear}
-                <span> — </span>
-                {searchFilter.endYear}
-              </div>
-              <button
-                className="font-semibold text-[#006064]"
-                onClick={() => {
-                  setStartYear(undefined);
-                  setEndYear(undefined);
-                  onChange([
-                    { value: undefined, key: "startYear" },
-                    { value: undefined, key: "endYear" },
-                  ]);
-                }}
-              >
-                Clear filter
-              </button>
-            </div>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <div className="mb-3 mt-[12px] flex items-center gap-2">
-                <DatePicker
-                  label="From"
-                  value={startYear ? dayjs(startYear.toString()) : undefined}
-                  onChange={(x) => {
-                    setStartYear(x?.year());
-                    if (!x?.year()) {
-                      setEndYear(undefined);
-                    } else {
-                      setEndYear(x.year() + 1);
-                    }
-                  }}
-                  openTo="year"
-                  views={["year"]}
-                  yearsOrder="desc"
-                  sx={{ maxWidth: 150 }}
-                />
-                <span>—</span>
-                <DatePicker
-                  label="To"
-                  value={endYear ? dayjs(endYear.toString()) : undefined}
-                  onChange={(x) => setEndYear(x?.year())}
-                  minDate={startYear ? dayjs(startYear!.toString()) : undefined}
-                  openTo="year"
-                  views={["year"]}
-                  yearsOrder="desc"
-                  sx={{
-                    maxWidth: 150,
-                  }}
-                />
-                <button
-                  id="years-covered-search-button"
-                  disabled={!endYear || !startYear}
-                  className={cn(
-                    "ml-auto cursor-pointer text-[#006064]",
-                    !endYear || !startYear
-                      ? "cursor-not-allowed opacity-60"
-                      : ""
-                  )}
-                  onClick={() =>
-                    onChange([
-                      { key: "startYear", value: startYear },
-                      { key: "endYear", value: endYear },
-                    ])
-                  }
-                >
-                  Search
-                </button>
-              </div>
-              <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll"></div>
-            </LocalizationProvider>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="format">
