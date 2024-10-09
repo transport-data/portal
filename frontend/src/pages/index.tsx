@@ -26,14 +26,14 @@ export const getServerSideProps: GetServerSideProps<any> = async (context) => {
     },
   };
   //fetch tdc hero asset
-  /* try {
+  try {
     const tdcConfigPath = path.join(process.cwd(), "public", "tdc-config.json");
     const tdcConfigContent = fs.readFileSync(tdcConfigPath, "utf8");
     tdcConfig = tdcConfigContent ? JSON.parse(tdcConfigContent) : {};
   } catch (err) {
     console.log(err);
   }
-*/
+
   //fetch datasets
   const { datasets } = await searchDatasets({
     apiKey: session?.user.apikey ?? "",
