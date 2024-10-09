@@ -33,7 +33,7 @@ ckan -c ckan.ini list-default-geographies
 
 The following geographies are created by default when `create-default-geographies` is run:
 
-| Code  | Title                                                | Type           | M49 code | Region        |
+| Code  | Title                                                | Type           | M49 code | Region        |      |
 | ----- | ---------------------------------------------------- | -------------- | -------- | ------------- | ---- |
 | ame_s | South America                                        | region         | 5        |               |      |
 | ame_n | North America                                        | region         | 3        |               |      |
