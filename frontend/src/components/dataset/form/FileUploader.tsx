@@ -160,7 +160,7 @@ export function FileUploader({
               ) : (
                 <ArrowUpTrayIcon className="h-4 w-4" />
               )}
-              Upload files
+              Upload more files
             </label>
           </Button>
         )}
