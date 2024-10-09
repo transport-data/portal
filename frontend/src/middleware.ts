@@ -9,20 +9,21 @@ export async  function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname === "/dashboard") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard/newsfeed";
-    return NextResponse.rewrite(url);
+    return NextResponse.redirect(new URL("/dashboard/newsfeed", req.url));
   }
 
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
     const signInUrl = new URL('/auth/signin', req.url);
-    signInUrl.searchParams.set('callbackUrl', req.url); // Append the current URL for redirect after login
-    return NextResponse.redirect(signInUrl); // Redirect to sign-in page
+    signInUrl.searchParams.set('callbackUrl', req.url);
+    return NextResponse.redirect(signInUrl);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher:protectedRoutes.map((route)=>`${route}/:path*`)
+  matcher:protectedRoutes.flatMap((route) => [
+    route,             
+    `${route}/:path*`,  
+  ])
 };
