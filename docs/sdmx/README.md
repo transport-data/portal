@@ -42,9 +42,9 @@ For that, use the CKAN API, documented at: https://docs.ckan.org/en/2.11/api/
 
 The two main endpoints for fetching datasets metadata are:
 
-- (`package_search`)[https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_search]
+- [`package_search`](https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_search)
     - Search for CKAN datasets, optionally based on filters
-- (`package_show`)[https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_show]
+- [`package_show`](https://docs.ckan.org/en/2.11/api/#ckan.logic.action.get.package_show)
     - Pass an `?id=` parameter to the URL and retrieve the metadata for a single dataset
 
 The result for a dataset's metadata will look like the following:
