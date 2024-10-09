@@ -24,7 +24,7 @@ export default function AboutUsPage({}) {
             <PhoneIcon width={38} />
           </div>
           <h1 className="mb-2 text-xl font-bold leading-[30px] text-gray-900">
-            Conctact Us
+            Contact Us
           </h1>
           <p className="mb-2 text-gray-500">
             Thank you for your interest in Transport Data Commons!
