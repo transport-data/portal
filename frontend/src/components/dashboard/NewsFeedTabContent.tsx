@@ -46,7 +46,7 @@ export default () => {
     "All",
     "Organizations",
     "Datasets",
-    "Datasets Approvals",
+    /*"Datasets Approvals"*/,
   ];
   const [searchText, setSearchText] = useState("");
   const [filter, setFilter] = useState("All");
@@ -59,7 +59,7 @@ export default () => {
   }, [filter, searchText]);
 
   const { data: activities, isLoading } =
-    api.user.listUserActivities.useQuery();
+    api.user.listDashboardActivities.useQuery();
 
   const preprocessedActivities = activities?.map((activity: any) => {
     const activitySegments = activity.activity_type?.split(" ");
@@ -222,11 +222,11 @@ export default () => {
                 isSelected: false,
                 value: "Datasets",
               },
-              {
-                icon: <CircleCheck size={14} />,
-                isSelected: false,
-                value: "Datasets Approvals",
-              },
+              // {
+              //   icon: <CircleCheck size={14} />,
+              //   isSelected: false,
+              //   value: "Datasets Approvals",
+              // },
             ]}
             onSelectedItem={(option) => setFilter(option)}
             selected={filter}

@@ -17,14 +17,15 @@ from ckan.lib.base import render
 import ckan.logic as logic
 from jinja2 import Environment, FileSystemLoader
 from ckanext.tdc.conversions import converters
-
-template_dir = 'src_extensions/ckanext-tdc/ckanext/tdc/templates/emails/'
-env = Environment(loader=FileSystemLoader(template_dir))
+import os.path as path
+log = logging.getLogger(__name__)
 
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
 
-log = logging.getLogger(__name__)
+cwd = path.abspath(path.dirname(__file__))
+template_dir = path.join(cwd, '../templates/emails/')
+env = Environment(loader=FileSystemLoader(template_dir))
 
 
 def _fix_topics_field(data_dict):
@@ -600,7 +601,7 @@ def request_organization_owner(context, data_dict):
         'id': org_id,
         'include_users': True,
     }
-    org_dict = get_action('organization_show')({}, data_dict)
+    org_dict = get_action('organization_show')({"ignore_auth": True}, data_dict)
     # find admin users of the org
     to_emails = []
     for user in org_dict.get("users"):
