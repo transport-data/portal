@@ -1,6 +1,8 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
+const protectedRoutes = ['/dashboard'];
+
 export async  function middleware(req: NextRequest) {
 
   const token = await getToken  ({ req });
@@ -12,7 +14,7 @@ export async  function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  if (!token && pathname.startsWith('/dashboard')) {
+  if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
     const signInUrl = new URL('/auth/signin', req.url);
     signInUrl.searchParams.set('callbackUrl', req.url); // Append the current URL for redirect after login
     return NextResponse.redirect(signInUrl); // Redirect to sign-in page
@@ -22,5 +24,5 @@ export async  function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'], // Apply this middleware to all /dashboard routes
+  matcher:protectedRoutes.map((route)=>`${route}/:path*`)
 };
