@@ -7,10 +7,15 @@ import {
 import { Label } from "@components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import SimpleSearchInput from "@components/ui/simple-search-input";
+import { cn } from "@lib/utils";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Checkboxes, SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
-import { useState } from "react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
 export type Facet = { name: string; display_name: string; count: number };
 
@@ -18,6 +23,7 @@ export default ({
   tags,
   orgs,
   resourcesFormats,
+  hideYearsCoverage,
   datasetCount,
   searchFilter,
   resetFilter,
@@ -34,6 +40,7 @@ export default ({
   searchFilter: SearchDatasetType;
   orgs: Facet[];
   defaultStartValue?: number;
+  hideYearsCoverage?: boolean;
   defaultEndValue?: number;
   metadataCreatedDates: Facet[];
   datasetCount: number;
@@ -48,6 +55,29 @@ export default ({
     { name: "Regions", current: true },
     { name: "Countries", current: false },
   ]);
+
+  const [startYear, setStartYear] = useState<number | undefined>(
+    defaultStartValue
+  );
+  const [endYear, setEndYear] = useState<number | undefined>(defaultEndValue);
+
+  useEffect(() => {
+    if (defaultStartValue !== startYear) setStartYear(defaultStartValue);
+    if (defaultEndValue !== endYear) setEndYear(defaultEndValue);
+  }, [defaultStartValue, defaultEndValue]);
+
+  const selectedText =
+    !searchFilter.startYear && searchFilter.endYear
+      ? `Before ${searchFilter.endYear}`
+      : searchFilter.startYear && !searchFilter.endYear
+      ? `After ${searchFilter.startYear}`
+      : searchFilter.startYear && searchFilter.endYear
+      ? searchFilter.startYear === searchFilter.endYear
+        ? searchFilter.startYear.toString().slice(0, 4)
+        : searchFilter.startYear.toString().slice(0, 4) +
+          " to " +
+          searchFilter.endYear?.toString().slice(0, 4)
+      : "All";
 
   const [searchedGeographyText, setSearchedGeographyText] = useState("");
 
@@ -139,6 +169,98 @@ export default ({
             />
           </AccordionContent>
         </AccordionItem>
+        {!hideYearsCoverage && (
+          <AccordionItem value="yearsCovered">
+            <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
+              <span className="flex w-full">Years covered</span>
+              <span className="hide mr-2 text-sm">{selectedText}</span>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="mt-[12px] flex justify-between">
+                <div
+                  className={cn(
+                    "text-xs",
+                    !searchFilter.startYear || !searchFilter.endYear
+                      ? "invisible"
+                      : ""
+                  )}
+                >
+                  Applied filter: {searchFilter.startYear}
+                  <span> — </span>
+                  {searchFilter.endYear}
+                </div>
+                <button
+                  className="font-semibold text-[#006064]"
+                  onClick={() => {
+                    setStartYear(undefined);
+                    setEndYear(undefined);
+                    onChange([
+                      { value: undefined, key: "startYear" },
+                      { value: undefined, key: "endYear" },
+                    ]);
+                  }}
+                >
+                  Clear filter
+                </button>
+              </div>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <div className="mb-3 mt-[12px] flex items-center gap-2">
+                  <DatePicker
+                    label="From"
+                    value={startYear ? dayjs(startYear.toString()) : undefined}
+                    onChange={(x) => {
+                      setStartYear(x?.year());
+                      if (!x?.year()) {
+                        setEndYear(undefined);
+                      } else {
+                        setEndYear(x.year() + 1);
+                      }
+                    }}
+                    openTo="year"
+                    views={["year"]}
+                    yearsOrder="desc"
+                    sx={{ maxWidth: 150 }}
+                  />
+                  <span>—</span>
+                  <DatePicker
+                    label="To"
+                    value={endYear ? dayjs(endYear.toString()) : undefined}
+                    onChange={(x) => setEndYear(x?.year())}
+                    minDate={
+                      startYear ? dayjs(startYear!.toString()) : undefined
+                    }
+                    openTo="year"
+                    views={["year"]}
+                    yearsOrder="desc"
+                    sx={{
+                      maxWidth: 150,
+                    }}
+                  />
+                  <button
+                    id="years-covered-search-button"
+                    disabled={!endYear || !startYear}
+                    className={cn(
+                      "ml-auto cursor-pointer text-[#006064]",
+                      !endYear || !startYear
+                        ? "cursor-not-allowed opacity-60"
+                        : ""
+                    )}
+                    onClick={() =>
+                      onChange([
+                        { key: "startYear", value: startYear },
+                        { key: "endYear", value: endYear },
+                      ])
+                    }
+                  >
+                    Search
+                  </button>
+                </div>
+                <div className="customized-scroll flex max-h-[324px] flex-col gap-3 overflow-y-scroll"></div>
+              </LocalizationProvider>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
         <AccordionItem value="location">
           <AccordionTrigger className="group justify-start border-b-[1px] border-[#F3F4F6] py-6 text-[#6B7280] hover:no-underline [&[data-state=open]>span.hide]:hidden [&[data-state=open]]:text-[#111928]">
             <span className="flex w-full">Location</span>

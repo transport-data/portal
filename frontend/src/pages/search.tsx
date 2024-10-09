@@ -648,6 +648,7 @@ export default function DatasetSearch({
                   )}
                 >
                   <DatasetsFilter
+                    hideYearsCoverage
                     resetFilter={resetFilter}
                     datasetCount={datasetCount || 0}
                     onChange={onChange}
