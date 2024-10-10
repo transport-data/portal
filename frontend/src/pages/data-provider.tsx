@@ -38,7 +38,7 @@ export default function DataProviderPage({
   );
 }
 
-export const getServerSideProps: GetServerSideProps<any> = async () => {
+export const getStaticProps = async () => {
   const mddb = await clientPromise;
 
   //fetch faqs
