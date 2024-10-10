@@ -31,8 +31,6 @@ export default (activity: DashboardNewsfeedCardProps) => {
     ids: [activity.user_id],
   });
   const userData = user?.at(0);
-  console.log(activity)
-  console.log(userData)
 
   const activitySegments = activity.activity_type?.split(" ");
   const activityType = activitySegments ? activitySegments[0] : "changed";
