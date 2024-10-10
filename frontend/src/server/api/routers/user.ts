@@ -155,7 +155,7 @@ export const userRouter = createTRPCRouter({
     }),
   listDashboardActivities: protectedProcedure.query(async ({ ctx }) => {
     const activities = await CkanRequest.get<CkanResponse<Activity[]>>(
-      `dashboard_activity_list`,
+      `tdc_dashboard_activity_list`,
       {
         apiKey: ctx.session.user.apikey,
       }

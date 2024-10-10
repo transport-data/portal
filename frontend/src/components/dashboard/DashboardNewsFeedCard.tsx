@@ -69,8 +69,8 @@ export default (activity: DashboardNewsfeedCardProps) => {
         activity.user_id == user_id
           ? "You"
           : activity.data?.actor
-          ? activity.data?.actor
-          : "You";
+            ? activity.data?.actor
+            : "You";
       break;
     case "organization":
       linkTitle = activity.data?.group?.title;
@@ -89,61 +89,64 @@ export default (activity: DashboardNewsfeedCardProps) => {
   }
   return (
     <div key={activity.id}>
-      <div className="mt-5 flex flex-row items-start">
-        <div className="mr-3 rounded-full">
+      <div className="my-5 flex flex-row items-start">
+        <div className="mr-3 h-12 w-12 overflow-hidden rounded-full bg-gray-100">
           {userData && userData.image_display_url ? (
             <img
               src={userData.image_display_url}
               alt="Profile picture of user"
+              className="h-12 w-12 object-cover"
             />
           ) : (
-            <User />
+            <User className="mx-auto h-12 h-12" />
           )}
         </div>
-        <p className="text-sm">
-          <span className="font-semibold">{actor}</span> {fullText}{" "}
-          {linkHref ? (
-            <a className="font-semibold" href={linkHref}>
-              {linkTitle}
-            </a>
-          ) : (
-            <span className="font-semibold">{linkTitle}</span>
-          )}{" "}
-          <span className="text-xs">
-            {`at ${new Date(activity.timestamp).toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            })}`}
-          </span>
-        </p>
-      </div>
-      <div className="my-3">
-        <div className="mx-8 flex items-center gap-1 text-xs">
-          {activityTarget === "dataset" ? (
-            <span className="flex items-center gap-1">
-              <Database size={20} color={color} />
+        <div>
+          <p className="text-base">
+            <span className="font-medium text-gray-900">{actor}</span> <span className="text-gray-500">{fullText}</span>{" "}
+            {linkHref ? (
+              <a className="font-medium text-gray-900" href={linkHref}>
+                {linkTitle}
+              </a>
+            ) : (
+              <span className="font-medium text-gray-900">{linkTitle}</span>
+            )}{" "}
+            <span className="text-xs text-gray-500">
+              {`at ${new Date(activity.timestamp).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              })}`}
             </span>
-          ) : (
-            <span className="flex items-center gap-1">
-              <Building size={20} color={color} />
-            </span>
-          )}
-
-          {activityTarget === "dataset" && (
-            <>
-              <span className="hidden xl:block">•</span>
-              {activity.data?.package?.private ? (
+          </p>
+          <div className="my-1">
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              {activityTarget === "dataset" ? (
                 <span className="flex items-center gap-1">
-                  <EyeOff size={14} /> private
+                  <Database size={12} color={color} />
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
-                  <Globe size={14} /> public
+                  <Building size={12} color={color} />
                 </span>
               )}
-            </>
-          )}
+
+              {activityTarget === "dataset" && (
+                <>
+                  <span className="hidden xl:block">•</span>
+                  {activity.data?.package?.private ? (
+                    <span className="flex items-center gap-1">
+                      <EyeOff size={12} /> private
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <Globe size={12} /> public
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <hr></hr>
