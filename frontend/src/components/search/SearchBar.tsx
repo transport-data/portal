@@ -384,7 +384,6 @@ export default function SearchBar() {
                             }
                           >
                             {storedSearches.map((recent) => {
-                              console.log(recent);
                               const badge =
                                 recent.facetValue && recent.facetName
                                   ? `${recent.facetName}: ${recent.facetValue}`
@@ -405,8 +404,6 @@ export default function SearchBar() {
                                 recent.indicator?.display_name || recent.text;
 
                               const params = recent.query;
-
-                              console.log(params);
 
                               return (
                                 <SearchFacetItem

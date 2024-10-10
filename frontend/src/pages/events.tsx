@@ -2,12 +2,8 @@ import Layout from "@components/_shared/Layout";
 import Head from "next/head";
 import clientPromise from "@lib/mddb.mjs";
 import fs from "fs";
-
 import NewsLetterSection from "@components/_shared/NewsletterSection";
 import Heading from "@components/_shared/Heading";
-import { Badge } from "@components/ui/badge";
-import { ClockIcon } from "@heroicons/react/20/solid";
-import { formatDatePeriod } from "@lib/utils";
 import EventCard from "@components/events/EventCard";
 
 export type EventsProps = {
@@ -29,7 +25,6 @@ export default function EventsPage({
 }) {
   const [highlighted, ...rest] = upcoming;
   const otherEvents = rest?.splice(0, 2);
-  const otherEventsSize = otherEvents.length;
   return (
     <>
       <Head>
@@ -45,31 +40,33 @@ export default function EventsPage({
           >
             Upcoming Events
           </Heading>
-          {upcoming.length > 1 ? (
+          {upcoming.length > 0 ? (
             <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2">
               <div className="py-[20px]">
                 {highlighted && <EventCard {...highlighted} />}
               </div>
-              <div className="border-gray-200 pb-[20px] md:border-l md:py-[20px] ">
-                {otherEvents.map((event, i) => {
-                  return (
-                    <div
-                      className={`border-gray-200  md:pl-[20px] ${
-                        i < otherEventsSize - 1
-                          ? "pb-[20px] md:border-b"
-                          : "pt-[20px]"
-                      }`}
-                    >
-                      <EventCard
-                        key={`event-${i}`}
-                        {...event}
-                        showImage={false}
-                        className={`rounded-none `}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+              {otherEvents.length > 0 && (
+                <div className="border-gray-200 pb-[20px] md:border-l md:py-[20px] ">
+                  {otherEvents.map((event, i) => {
+                    return (
+                      <div
+                        className={`border-gray-200  md:pl-[20px] ${
+                          i < otherEvents.length - 1
+                            ? "pb-[20px] md:border-b"
+                            : "pt-[20px]"
+                        }`}
+                      >
+                        <EventCard
+                          key={`event-${i}`}
+                          {...event}
+                          showImage={false}
+                          className={`rounded-none `}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             <div className="mt-8">No upcoming events available</div>

@@ -6,45 +6,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
 import { useState } from "react";
+import { MddbFile } from "mddb/dist/src/lib/schema";
+import { Faq } from "@interfaces/faq.interface";
+import Markdown from "react-markdown";
+import remarkFrontmatter from "remark-frontmatter";
+import Link from "next/link";
 
-interface FaqsProps {
-  title: string;
-  content: string;
-}
-
-export default function FaqsSection() {
-  const faqs: Array<FaqsProps> = [
-    {
-      title: "About the Transport Data Commons",
-      content:
-        "Excepteur et aliqua sunt nisi minim proident ut nulla. Aute laborum occaecat in nisi. Elit incididunt velit nostrud qui sunt velit amet commodo nulla sit id.",
-    },
-    {
-      title: "How does TDC define transport data?",
-      content:
-        "Excepteur et aliqua sunt nisi minim proident ut nulla. Aute laborum occaecat in nisi. Elit incididunt velit nostrud qui sunt velit amet commodo nulla sit id.",
-    },
-    {
-      title: "Learn how the TDC team supports responsible data sharing?",
-      content:
-        "Excepteur et aliqua sunt nisi minim proident ut nulla. Aute laborum occaecat in nisi. Elit incididunt velit nostrud qui sunt velit amet commodo nulla sit id.",
-    },
-    {
-      title: "Is TDC open source? How can I use TDC data?",
-      content:
-        "Excepteur et aliqua sunt nisi minim proident ut nulla. Aute laborum occaecat in nisi. Elit incididunt velit nostrud qui sunt velit amet commodo nulla sit id.",
-    },
-  ];
+export default function FaqsSection({ faqs }: { faqs: Faq[] }) {
   const [openItem, setOpenItem] = useState<string>("item-0");
-
   return (
     <div className="container py-[96px]">
       <div className="mx-auto text-center lg:max-w-[640px]">
         <Heading>Frequently asked questions</Heading>
       </div>
-
       <Accordion
         type="single"
         collapsible
@@ -52,7 +27,7 @@ export default function FaqsSection() {
         onValueChange={(item) => setOpenItem(item)}
         value={openItem}
       >
-        {faqs.map((faq, i) => {
+        {faqs?.map((faq, i) => {
           const isActive = openItem === `item-${i}`;
           return (
             <AccordionItem value={`item-${i}`} key={`item-${i}`}>
@@ -70,7 +45,9 @@ export default function FaqsSection() {
                   i >= faqs.length - 1 ? "border-t" : "border-b "
                 } border-gray-200 py-[20px] text-base font-normal text-gray-500`}
               >
-                {faq.content}
+                <Markdown remarkPlugins={[remarkFrontmatter]}>
+                  {faq.source}
+                </Markdown>
               </AccordionContent>
             </AccordionItem>
           );
@@ -79,10 +56,11 @@ export default function FaqsSection() {
 
       <div className="mt-[10px]">
         <Button
+          asChild
           variant="ghost"
           className="mx-auto flex w-fit border border-[#E5E7EB] hover:bg-slate-50"
         >
-          Show more...
+          <Link href="/faq">Show more...</Link>
         </Button>
       </div>
     </div>

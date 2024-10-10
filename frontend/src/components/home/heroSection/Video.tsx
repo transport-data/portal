@@ -1,7 +1,13 @@
 import { PlayIcon } from "@heroicons/react/20/solid";
 import { useRef, useState } from "react";
 
-export default function Video({ heightInPx }: { heightInPx?: string }) {
+export default function Video({
+  path,
+  heightInPx,
+}: {
+  path?: string;
+  heightInPx?: string;
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const handlePlay = () => {
@@ -14,13 +20,13 @@ export default function Video({ heightInPx }: { heightInPx?: string }) {
     <>
       <video
         ref={videoRef}
-        className={`h-[${heightInPx ?? "405px"}] w-full ${
-          isPlaying ? "" : "hidden"
+        className={`h-[${heightInPx ?? "405px"}] m-auto w-full ${
+          isPlaying ? "block" : "hidden"
         } `}
         controls
         onEnded={() => setIsPlaying(false)}
       >
-        <source src="your-video-url.mp4" type="video/mp4" />
+        <source src={path} type="video/mp4" />
       </video>
       {!isPlaying && (
         <div
