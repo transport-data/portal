@@ -55,6 +55,7 @@ def get_un_regions():
 
 
 TDC_REGIONS = {
+        1: {"title": "Worldwide", "name": "worldwide"},
         5: {"title": "South America", "name": "ame_s"},
         3: {"title": "North America", "name": "ame_n"},
         2: {"title": "Africa", "name": "afr"},
@@ -191,6 +192,9 @@ def get_default_tdc_geographies():
 
             new_country = create_country(country, _country_region_code)
             geographies.append(new_country)
+
+    geographies.append(create_region(1))
+
     return geographies
 
 
