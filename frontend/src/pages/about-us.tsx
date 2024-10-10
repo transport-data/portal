@@ -63,6 +63,16 @@ export const getStaticProps = async () => {
   const eventsFiles = await mddb.getFiles({
     folder: "events",
   });
+  const events = eventsFiles.map((file) => {
+    let source = fs.readFileSync(file.file_path, { encoding: "utf-8" });
+    return {
+      ...file.metadata,
+      source,
+    } as EventsProps;
+  });
+
+  const now = new Date();
+
   return {
     props: {
       people: peopleFiles.map((file) => {
@@ -74,13 +84,13 @@ export const getStaticProps = async () => {
           source,
         } as PersonProps;
       }),
-      events: eventsFiles.slice(0, 2).map((file) => {
-        let source = fs.readFileSync(file.file_path, { encoding: "utf-8" });
-        return {
-          ...file.metadata,
-          source,
-        } as EventsProps;
-      }),
+      events: events
+        .filter((event) => new Date(event.from ?? "") > now)
+        .sort(
+          (a, b) =>
+            new Date(a.from ?? "").getTime() - new Date(b.from ?? "").getTime()
+        )
+        .slice(0, 2),
     },
   };
 };

@@ -12,7 +12,7 @@ export default function HeroSection() {
             About Transport Data Commons Initiative
           </Heading>
           <Link
-            href="#"
+            href="/partners"
             className="flex items-center gap-1 text-lg font-medium leading-none text-accent"
           >
             Full list of participating organizations{" "}
