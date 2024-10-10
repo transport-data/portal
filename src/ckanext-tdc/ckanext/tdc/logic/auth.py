@@ -2,6 +2,10 @@ import ckan.authz as authz
 from ckan.common import _
 
 
+def group_show(context, data_dict):
+    return {'success': True}
+
+
 def group_create(context, data_dict):
     user = context['user']
     user = authz.get_user_id_for_username(user, allow_none=True)
@@ -20,4 +24,5 @@ def organization_create(context, data_dict):
 
 def get_auth_functions():
     return {"group_create": group_create,
-            "organization_create": organization_create}
+            "organization_create": organization_create,
+            "group_show": group_show}
