@@ -2,12 +2,8 @@ import Layout from "@components/_shared/Layout";
 import Head from "next/head";
 import clientPromise from "@lib/mddb.mjs";
 import fs from "fs";
-
 import NewsLetterSection from "@components/_shared/NewsletterSection";
 import Heading from "@components/_shared/Heading";
-import { Badge } from "@components/ui/badge";
-import { ClockIcon } from "@heroicons/react/20/solid";
-import { formatDatePeriod } from "@lib/utils";
 import EventCard from "@components/events/EventCard";
 
 export type EventsProps = {

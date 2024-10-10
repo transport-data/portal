@@ -8,40 +8,10 @@ import Head from "next/head";
 import Layout from "../components/_shared/Layout";
 import clientPromise from "@lib/mddb.mjs";
 import fs from "fs";
-import path from "path";
 import { Faq } from "@interfaces/faq.interface";
-import { GetServerSideProps } from "next";
-
-export default function DataProviderPage({
-  faqs,
-}: {
-  faqs: Faq[];
-}): JSX.Element {
-  return (
-    <>
-      <Head>
-        <title>Transport Data Commons</title>
-        <meta name="description" content="Transport Data Commons" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Layout backgroundEffect effectSize="10%">
-        <div className="container [&>*]:bg-transparent">
-          <Hero />
-          <HowDatasetWorks />
-          <AddDataSection />
-          <HowToAddData />
-          <FaqsSection faqs={faqs} />
-          <NewsLetterSignUpSection />
-        </div>
-      </Layout>
-    </>
-  );
-}
 
 export const getStaticProps = async () => {
   const mddb = await clientPromise;
-
-  //fetch faqs
   const faqsFiles = await mddb.getFiles({
     folder: "faq",
   });
@@ -70,3 +40,29 @@ export const getStaticProps = async () => {
     },
   };
 };
+
+export default function DataProviderPage({
+  faqs,
+}: {
+  faqs: Faq[];
+}): JSX.Element {
+  return (
+    <>
+      <Head>
+        <title>Transport Data Commons</title>
+        <meta name="description" content="Transport Data Commons" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Layout backgroundEffect effectSize="10%">
+        <div className="container [&>*]:bg-transparent">
+          <Hero />
+          <HowDatasetWorks />
+          <AddDataSection />
+          <HowToAddData />
+          <FaqsSection faqs={faqs} />
+          <NewsLetterSignUpSection />
+        </div>
+      </Layout>
+    </>
+  );
+}
