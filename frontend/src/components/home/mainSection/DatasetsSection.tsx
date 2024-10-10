@@ -49,7 +49,7 @@ export default function DatasetsSection({
           </>
         ) : (
           datasets.map((dataset, i) => {
-            const [firstTag, secondTag, ...restTags] = dataset.tags || [];
+            const [firstTag, secondTag, ...restTags] = dataset.topics || [];
             const regionsLength = dataset.regions?.length ?? 0;
             return (
               <div key={`recent-${i}`} className="">
@@ -70,7 +70,7 @@ export default function DatasetsSection({
                               <Link
                                 className="underline"
                                 target="_blank"
-                                href={"https://google.com"}
+                                href={"#"}
                               >
                                 click here
                               </Link>
@@ -83,7 +83,7 @@ export default function DatasetsSection({
                               <Link
                                 target="_blank"
                                 className="underline"
-                                href={"https://google.com"}
+                                href={"#"}
                               >
                                 click here
                               </Link>
@@ -119,12 +119,8 @@ export default function DatasetsSection({
                   </Link>
                   {/*Tags*/}
                   <div className="flex flex-wrap gap-2">
-                    {firstTag && (
-                      <Badge variant="info">{firstTag.display_name}</Badge>
-                    )}
-                    {secondTag && (
-                      <Badge variant="info">{secondTag.display_name}</Badge>
-                    )}
+                    {firstTag && <Badge variant="info">{firstTag}</Badge>}
+                    {secondTag && <Badge variant="info">{secondTag}</Badge>}
                     {restTags.length > 0 && (
                       <Badge variant="info-outline">
                         +{restTags.length} more
