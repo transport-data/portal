@@ -14,6 +14,7 @@ import { env } from "@env.mjs";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { pageview } from "@utils/ga";
+import PageLoading from "@components/_shared/PageLoading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -84,6 +85,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
           <Component {...pageProps} />
         </div>
       </SessionProvider>
+      <PageLoading />
     </ThemeProvider>
   );
 };

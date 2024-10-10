@@ -1,8 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
+import { Skeleton } from "@components/ui/skeleton";
 import { Disclosure } from "@headlessui/react";
-import { ArrowRightOnRectangleIcon, BellIcon } from "@heroicons/react/20/solid";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightEndOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { BellIcon } from "@lib/icons";
+import { Bell, BellDotIcon, LogOutIcon } from "lucide-react";
+
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -35,7 +42,7 @@ export default function Header({
 }: {
   backgroundColor?: string;
 }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   return (
     <Disclosure
@@ -100,40 +107,51 @@ export default function Header({
           </div>
 
           <div className="hidden sm:ml-6 sm:items-center lg:flex">
-            {session?.user ? (
+            {status === "loading" ? (
               <div className="flex items-center gap-4">
-                <BellIcon width={24} className="text-gray-500" />
-                <Avatar className="h-[32px] w-[32px]">
-                  <AvatarImage
-                    src={session.user.image || ""}
-                    alt={session.user.name || ""}
-                  />
-                  <AvatarFallback className="bg-gray-300">
-                    {session.user.name
-                      ?.trim()
-                      .split(" ")
-                      .map((word) => word[0])
-                      .filter(Boolean)
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <Skeleton className="h-[20px] w-[20px]"></Skeleton>
+                <Skeleton className="h-[32px] w-[32px] rounded-full"></Skeleton>
+                <Skeleton className="h-[20px] w-[20px]"></Skeleton>
+              </div>
+            ) : session?.user ? (
+              <div className="flex items-center gap-[12px]">
+                <BellIcon width={22} className="text-gray-500" />
+
+                <Link href="/dashboard">
+                  <Avatar className="h-[32px] w-[32px]">
+                    <AvatarImage
+                      src={session.user.image || ""}
+                      alt={session.user.name || ""}
+                    />
+                    <AvatarFallback className="bg-gray-300">
+                      {session.user.name
+                        ?.trim()
+                        .split(" ")
+                        .map((word) => word[0])
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
                 <Button
                   variant="ghost"
                   className="relative px-0 text-gray-500"
-                  onClick={() => signOut({
-                    callbackUrl: '/',
-                    redirect: true,
-                  })}
+                  onClick={() =>
+                    signOut({
+                      callbackUrl: "/",
+                      redirect: true,
+                    })
+                  }
                 >
-                  <ArrowRightOnRectangleIcon width={16} />
+                  <ArrowRightEndOnRectangleIcon width={20} />
                 </Button>
               </div>
             ) : (
               <>
                 <Button variant="ghost" className="relative" asChild>
-                  <Link href="/auth/signin">Log In</Link>
+                  <Link href="/auth/signin?callbackUrl=/dashboard">Log In</Link>
                 </Button>
                 <Button>
                   <Link href="/auth/signup">Sign up</Link>
@@ -164,7 +182,7 @@ export default function Header({
           {navigation.map((nav, i) => (
             <Disclosure.Button
               key={`nav-menu-${i}`}
-              as="a"
+              as={Link}
               href={nav.href}
               className="block  py-2 pl-3 pr-4 text-base font-medium text-gray-900"
             >
