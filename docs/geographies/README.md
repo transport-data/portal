@@ -1,3 +1,15 @@
+# Geography page
+
+The Geography page presents a map that is colored based on the number of datasets in each country. A darker green color indicates the country with the highest number of datasets. 
+
+When the cursor is placed over a country, the number of datasets related to that country is displayed. To initiate a search for datasets related to a specific country, simply click on the country in question. This will redirect you to the search page, where the country will already be filtered.
+
+![Geography Page](map.png)
+
+At the bottom of the map, you will find a list of countries that you can click to be redirected to the datasets search page, where the filters will already be set to the country you clicked.
+
+![Countries List](countries-list.png)
+
 # Geographies
 
 Geographies are custom CKAN groups that can be either `regions` or `countries`. You can learn more about the `geography` entity at [the metadata schema docs](../metadata-schema#entities).
