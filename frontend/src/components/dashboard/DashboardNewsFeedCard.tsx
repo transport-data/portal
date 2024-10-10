@@ -31,6 +31,8 @@ export default (activity: DashboardNewsfeedCardProps) => {
     ids: [activity.user_id],
   });
   const userData = user?.at(0);
+  console.log(activity)
+  console.log(userData)
 
   const activitySegments = activity.activity_type?.split(" ");
   const activityType = activitySegments ? activitySegments[0] : "changed";
@@ -58,7 +60,19 @@ export default (activity: DashboardNewsfeedCardProps) => {
     //  TODO: what other activity types are there?
   }
 
-  let actor = "You";
+  let actor = ""
+  if (activity.user_id == user_id) {
+      actor = "You"
+  } else if (activity?.data?.actor) {
+      actor = activity.data.actor
+  } else if (userData?.fullname) {
+      actor = userData.fullname
+  } else if (userData?.display_name) {
+      actor = userData.display_name
+  } else if (userData?.name) {
+      actor = userData.name
+  }
+
   let linkHref = "";
   let linkTitle: string | undefined = "";
   switch (activityTarget) {
