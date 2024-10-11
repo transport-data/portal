@@ -17,7 +17,6 @@ export async function getStaticProps() {
   const groups = (
     await listGroups({
       type: "geography",
-      showCoordinates: true,
       limit: 350,
     })
   ).filter((country) => {
@@ -44,46 +43,49 @@ export async function getStaticProps() {
   };
 }
 
+const flagsCache = new Map();
+
 export default function DatasetsPage({
   groups,
   countriesByLetterObj,
 }: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
-  const countriesFlagsByName = new Map<string, string>();
   const router = useRouter();
 
   useEffect(() => {
-    // This is caching the flags to the frontend stop to make requests to the server to get each flag
-    Promise.all(
-      groups.map((country) =>
-        fetch(
-          country.image_display_url ||
-            country.image_url ||
-            `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
-        )
-          .catch(() =>
-            fetch(`https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`)
-          )
-          .then((x) => x.blob())
-          .then(
-            (blob) =>
-              new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () =>
-                  resolve({
-                    blob: reader.result as any,
-                    countryName: country.name.toLowerCase(),
-                  });
-                reader.onerror = () =>
-                  reject(new Error("Error reading the blob"));
-                reader.readAsDataURL(blob);
-              })
-          )
-      ) as Promise<{ countryName: string; blob: string }>[]
-    ).then((x) =>
-      x.forEach(({ countryName, blob }) =>
-        countriesFlagsByName.set(countryName, blob)
-      )
-    );
+    const getCountryFlag = (country: (typeof groups)[0]) => {
+      const cachedImage = flagsCache.get(country.iso2);
+
+      if (cachedImage && !cachedImage.isLoading) {
+        return cachedImage;
+      }
+
+      flagsCache.set(country.iso2, {
+        isLoading: true,
+        url: "",
+      });
+
+      fetch(
+        // Using the flagscdn because it responds faster than S3
+        `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png` ??
+          country.image_display_url,
+      ).then(async (r) => {
+        const blob = await r.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          flagsCache.set(country.iso2, {
+            isLoading: false,
+            url: reader.result as string,
+          });
+          const imgEl: any = document.getElementById(
+            `country-popup-flag-${country.iso2}`,
+          );
+          if (imgEl) {
+            imgEl.src = reader.result;
+          }
+        };
+        reader.readAsDataURL(blob);
+      });
+    };
 
     const map = new maplibregl.Map({
       style: style,
@@ -114,7 +116,7 @@ export default function DatasetsPage({
         const colors = interpolateColors(
           hexToRgb("#B2EBF2"),
           hexToRgb("#006064"),
-          10
+          10,
         );
 
         let index = 0;
@@ -136,61 +138,73 @@ export default function DatasetsPage({
         data: countriesWithDashedLines as any,
       });
 
-      groups.forEach((x, index) => {
-        if (x.geography_shape) {
-          const lineLayerId = x.id + `--${index}`;
-          const fillColor = getFillColor(x.package_count);
-          map.addSource(x.id, {
-            type: "geojson",
-            data: x.geography_shape,
-          });
+      const groupBatchesSize = 50;
+      const groupBatchesCount = Math.ceil(groups.length / groupBatchesSize) + 1;
+      const groupBatches = new Array(groupBatchesCount);
+      let i;
+      for (i = 0; i < groupBatchesCount; i++) {
+        groupBatches[i] = groups.slice(
+          i * groupBatchesSize,
+          (i + 1) * groupBatchesSize,
+        );
+      }
 
-          map.addLayer({
-            id: x.id,
-            type: "fill",
-            source: x.id,
-            paint: {
-              "fill-color": fillColor,
-              "fill-outline-color": "white",
-            },
-          });
+      groupBatches.forEach((groupsWoGeo) => {
+        listGroups({
+          type: "geography",
+          showCoordinates: true,
+          groupIds: groupsWoGeo.map((g: any) => g.name),
+        }).then((groups) => {
+          groups.forEach((x: any, index: number) => {
+            if (x.geography_shape) {
+              const lineLayerId = x.id + `--${index}`;
+              const fillColor = getFillColor(x.package_count);
+              map.addSource(x.id, {
+                type: "geojson",
+                data: x.geography_shape,
+              });
 
-          map.addLayer({
-            id: lineLayerId,
-            type: "line",
-            source: x.id,
-            paint: {
-              "line-width": 2,
-              "line-color": "white",
-            },
-          });
+              map.addLayer({
+                id: x.id,
+                type: "fill",
+                source: x.id,
+                paint: {
+                  "fill-color": fillColor,
+                  "fill-outline-color": "white",
+                },
+              });
 
-          map.on("click", x.id, () => {
-            router.push(`/search?country=${x.name.toLowerCase()}`);
-          });
+              map.addLayer({
+                id: lineLayerId,
+                type: "line",
+                source: x.id,
+                paint: {
+                  "line-width": 2,
+                  "line-color": "white",
+                },
+              });
 
-          map.on("mouseenter", x.id, () => {
-            map.setPaintProperty(lineLayerId, "line-color", fillColor);
-            map.getCanvas().style.cursor = "pointer";
-          });
+              map.on("click", x.id, () => {
+                router.push(`/search?country=${x.name.toLowerCase()}`);
+              });
 
-          map.on("mousemove", x.id, (e) => {
-            if (popup._container) {
-              popup._container.style.minWidth = "194px";
-              popup._container.style.cursor = "pointer";
-              popup._container.style.width = "194px";
-              popup._container.style.height = "171px";
-              popup._container.style.minHeight = "171px";
-            }
+              map.on("mouseenter", x.id, (e) => {
+                map.setPaintProperty(lineLayerId, "line-color", fillColor);
+                map.getCanvas().style.cursor = "pointer";
+                if (popup._container) {
+                  popup._container.style.minWidth = "194px";
+                  popup._container.style.cursor = "pointer";
+                  popup._container.style.width = "194px";
+                  popup._container.style.height = "171px";
+                  popup._container.style.minHeight = "171px";
+                }
 
-            popup
-              .setLngLat(e.lngLat)
-              .setHTML(
-                `
+                popup
+                  .setLngLat(e.lngLat)
+                  .setHTML(
+                    `
               <div>
-              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" src="${countriesFlagsByName.get(
-                x.name
-              )}"></img>
+              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" id="country-popup-flag-${x.iso2}" src="${getCountryFlag(x)?.url ?? "/assets/loading.webp"}"></img>
 
               <div class="country-title" style="color: white'; font-size: 14px">${
                 x.title
@@ -201,22 +215,24 @@ export default function DatasetsPage({
                 </div>
 
                 <div style="color: white; font-size: 30px">${formatNumber(
-                  x.package_count
+                  x.package_count,
                 )}</div>
                 <div style="color: #9CA3AF; font-size: 16px">${
                   x.package_count > 1 ? "Datasets" : "Dataset"
                 }</div>
-              `
-              )
-              .addTo(map);
-          });
+              `,
+                  )
+                  .addTo(map);
+              });
 
-          map.on("mouseleave", x.id, () => {
-            map.setPaintProperty(lineLayerId, "line-color", "white");
-            map.getCanvas().style.cursor = "";
-            popup.remove();
+              map.on("mouseleave", x.id, () => {
+                map.setPaintProperty(lineLayerId, "line-color", "white");
+                map.getCanvas().style.cursor = "";
+                popup.remove();
+              });
+            }
           });
-        }
+        });
       });
 
       map.addLayer({
@@ -254,7 +270,7 @@ export default function DatasetsPage({
               className="flex max-h-[523px] min-h-[523px] sm:max-h-[823px] sm:min-h-[823px]"
               id="map"
             >
-              <div className="customized-scroll absolute top-[650px] z-10 max-h-[157px] max-w-60 overflow-y-scroll rounded border-black bg-transparent p-2">
+              <div className="customized-scroll max-w-60 absolute top-[650px] z-10 max-h-[157px] overflow-y-scroll rounded border-black bg-transparent p-2">
                 <p>
                   The United Nations Geospatial Data, or Geodata, is a worldwide
                   geospatial dataset of the United Nations.
