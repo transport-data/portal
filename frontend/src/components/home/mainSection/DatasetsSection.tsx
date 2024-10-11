@@ -135,7 +135,7 @@ export default function DatasetsSection({
                     }}
                   ></div>
                   {/*Other Metadatas*/}
-                  <div className="mt-auto flex flex-col gap-[8px] text-xs font-medium text-gray-500 sm:flex-row sm:items-center">
+                  <div className="mt-auto flex flex-col gap-[8px] text-xs font-medium text-gray-500 ">
                     <div className="flex items-center gap-[4px]">
                       <BuildingLibraryIcon width={14} />
                       <span>{dataset.organization?.title}</span>
@@ -143,7 +143,6 @@ export default function DatasetsSection({
 
                     {dataset.metadata_modified && (
                       <>
-                        <span className="hidden sm:block">•</span>
                         <div className="flex items-center gap-[4px]">
                           <ClipboardIcon width={14} />
                           <span>
@@ -155,7 +154,6 @@ export default function DatasetsSection({
 
                     {dataset.regions && regionsLength > 0 && (
                       <>
-                        <span className="hidden sm:block">•</span>
                         <div className="flex items-center gap-[4px]">
                           <RegionIcon />
                           <div>
