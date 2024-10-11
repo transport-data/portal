@@ -299,12 +299,12 @@ export default function SearchBar({
             Search
           </Button>
         </div>
-        <div className="flex w-full gap-2">
+        <div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
           <Link href="/search" className="mt-2 text-xs font-medium text-accent">
             Browse all datasets
           </Link>
           {description && (
-            <span className="ml-auto mt-2 line-clamp-1 overflow-hidden text-ellipsis text-center  text-sm font-normal text-gray-500">
+            <span className="mt-2 text-sm font-normal text-gray-500 md:ml-auto md:line-clamp-1 md:overflow-hidden  md:text-ellipsis md:text-end ">
               {description}
             </span>
           )}
