@@ -1,5 +1,6 @@
 import Video from "@components/home/heroSection/Video";
 import { Button } from "@components/ui/button";
+import Link from "next/link";
 
 export default () => {
   return (
@@ -16,10 +17,15 @@ export default () => {
 
       <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
         <Button className="bg-white text-[#1F2A37] ring-1 ring-[#E5E7EB] hover:bg-white hover:opacity-80">
-          TDC data submission guidelines
+          <Link
+            href="https://github.com/orgs/transport-data/discussions"
+            target="_blank"
+          >
+            TDC data submission guidelines
+          </Link>
         </Button>
         <Button className="bg-white text-[#1F2A37] ring-1 ring-[#E5E7EB] hover:bg-white hover:opacity-80">
-          Data submission FAQ
+          <Link href="/faq#submitting_data">Data submission FAQ</Link>
         </Button>
       </div>
       <div className="flex w-full items-center justify-center">

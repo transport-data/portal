@@ -1,8 +1,9 @@
 import { Button } from "@components/ui/button";
+import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="pb-6 md:pb-[96px] pt-[64px]">
+    <section className="pb-6 pt-[64px] md:pb-[96px]">
       <div className="container">
         <div className="flex items-center gap-x-16 xl:items-start">
           <div className="flex w-full flex-col items-center">
@@ -15,7 +16,7 @@ export default function Hero() {
               datasets.
             </p>
             <Button className="mb-16 bg-[#006064] px-6 py-3.5">
-              Add data to TDC
+              <Link href="/dashboard/datasets/create">Add data to TDC</Link>
             </Button>
             <p className="font-semibold text-gray-500">
               Join organisation which already provide data to TDC
