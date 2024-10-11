@@ -244,6 +244,24 @@ export const getDataset = async ({
   return dataset;
 };
 
+export const getDatasetActivities = async ({
+  id,
+  apiKey,
+}: {
+  id: string;
+  apiKey: string;
+}) => {
+  const activities: CkanResponse<Activity[]> = await CkanRequest.post(
+    "package_activity_list",
+    {
+      apiKey,
+      json: { id },
+    }
+  );
+
+  return activities;
+};
+
 export const getDatasetSchema = async ({ apiKey }: { apiKey: string }) => {
   const dataset: CkanResponse<DatasetSchemaType> = await CkanRequest.get(
     "scheming_dataset_schema_show?type=dataset",

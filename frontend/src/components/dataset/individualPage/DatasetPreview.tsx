@@ -1,5 +1,4 @@
 import { DataExplorer } from "@components/data-explorer/DataExplorer";
-import { Dataset } from "@portaljs/ckan";
 import {
   Select,
   SelectContent,
@@ -10,6 +9,7 @@ import {
 import { useState } from "react";
 import { FormLabel } from "@components/ui/form";
 import { Label } from "@components/ui/label";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export function DatasetPreview({ dataset }: { dataset: Dataset }) {
   const [currentResource, setCurrentResource] = useState(

@@ -1,116 +1,46 @@
-import { Dataset } from "@portaljs/ckan";
+import { formatBytes, formatIcon, getFileName } from "@lib/utils";
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Citation } from "./Citation";
-import { formatBytes, cn, formatIcon, getFileName } from "@lib/utils";
-import {
-  ArrowDownIcon,
   ArrowDownToLineIcon,
   ChevronRightIcon,
   DownloadIcon,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import { datasetDownloadEvent } from "@utils/ga";
-
-//convert date string to Month Year format
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-  });
-}
-
-const chartData = [
-  {
-    dateHuman: "September 2022",
-    downloads: 9,
-    date: "2022-09-05",
-  },
-  {
-    dateHuman: "October 2022",
-    downloads: 14,
-    date: "2022-10-05",
-  },
-  {
-    dateHuman: "Jan 2023",
-    downloads: 6,
-    date: "2023-01-05",
-  },
-  {
-    dateHuman: "Feb 2023",
-    downloads: 16,
-    date: "2023-02-05",
-  },
-  {
-    dateHuman: "Mar 2023",
-    downloads: 12,
-    date: "2023-03-05",
-  },
-  {
-    dateHuman: "April 2023",
-    downloads: 20,
-    date: "2023-04-05",
-  },
-];
-
-const chartConfig = {
-  downloads: {
-    label: "Downloads",
-    color: "182 100% 20%",
-  },
-} satisfies ChartConfig;
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { api } from "@utils/api";
+import { Skeleton } from "@mui/material";
 
 export function Downloads({ dataset }: { dataset: Dataset }) {
-  // function trackDownload(resourceId: string) {
-  //   //@ts-ignore
-  //   if (typeof window !== "undefined" && window._paq) {
-  //     //@ts-ignore
-  //     window._paq.push(['trackEvent', 'DownloadResource', resourceId]);
-  //     //@ts-ignore
-  //     window._paq.push(['trackEvent', 'DownloadDataset', dataset.id]);
-  //   }
-  // }
+  const { data: datasetDownloads, isLoading } =
+    api.ga.getDownloadStats.useQuery({
+      id: dataset.id,
+    });
+  const dataResources = dataset.resources.filter(
+    (r) => r.resource_type && r.resource_type === "data"
+  );
+  const docsResources = dataset.resources.filter(
+    (r) => r.resource_type && r.resource_type === "documentation"
+  );
   return (
-    <div className="min-h-[500px] bg-gray-50">
+    <div className="min-h-[60vh] bg-gray-50">
       <div className="container grid py-8 lg:grid-cols-2">
         <div>
           <h3 className="text-3xl font-semibold leading-loose text-primary">
             Data and Resources
           </h3>
-          <p className="max-w-lg text-gray-500">
-            The dataset is maintained and updated by TDC and comprises of data
-            from multiple sources that were validated and harmonised to build a
-            single repository.
-          </p>
+          {dataset.tdc_category === "tdc_harmonized" && (
+            <p className="max-w-lg text-gray-500">
+              The dataset is maintained and updated by TDC and comprises of data
+              from multiple sources that were validated and harmonised to build
+              a single repository.
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-y-4 py-4">
           <ul
             role="list"
             className="divide-y divide-gray-100 rounded-md border border-gray-200"
           >
-            {dataset.resources.map((r) => (
+            {dataResources.map((r) => (
               <li
                 key={r.id}
                 className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
@@ -166,13 +96,12 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
           <div className="grid grid-cols-2">
             <div className="pb-4 pl-4">
               <dd className="flex items-baseline">
-                <p className="text-3xl font-semibold text-gray-900">128</p>
-                <p className=" ml-2 flex items-baseline text-base font-semibold text-green-600">
-                  10%
-                  <ArrowUpIcon
-                    aria-hidden="true"
-                    className="h-5 w-5 flex-shrink-0 self-center text-green-500"
-                  />
+                <p className="text-3xl font-semibold text-gray-900">
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    datasetDownloads?.lastSixMonths
+                  )}
                 </p>
               </dd>
               <p className="truncate text-sm font-medium text-gray-500">
@@ -181,43 +110,19 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
             </div>
             <div className="pb-4 pl-4">
               <dd className="flex items-baseline">
-                <p className="text-3xl font-semibold text-gray-900">12k</p>
+                <p className="text-3xl font-semibold text-gray-900">
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    datasetDownloads?.total
+                  )}
+                </p>
               </dd>
               <p className="truncate text-sm font-medium text-gray-500">
                 Total downloads
               </p>
             </div>
           </div>
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <LineChart accessibilityLayer data={chartData}>
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value) => formatDate(value)}
-              />
-              <YAxis
-                dataKey="downloads"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-              />
-              <CartesianGrid vertical={false} />
-              <Line
-                type="step"
-                dot={false}
-                dataKey="downloads"
-                stroke="#006064"
-                strokeWidth={2}
-                fill="var(--transparent)"
-                radius={4}
-              />
-              <ChartTooltip
-                content={<ChartTooltipContent labelKey="dateHuman" />}
-              />
-            </LineChart>
-          </ChartContainer>
         </div>
       </div>
       <div className="container grid py-8 lg:grid-cols-2">
@@ -234,29 +139,7 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
             role="list"
             className="divide-y divide-gray-100 rounded-md border border-gray-200"
           >
-            {[
-              {
-                name: "TDC Database documentation (2023 edition) Updated: 23 March 2023",
-                id: 1,
-                format: "PDF",
-                url: "https://google.com",
-                size: null,
-              },
-              {
-                name: "TDC Database documentation (2023 edition) Updated: 23 March 2023",
-                id: 1,
-                format: "PDF",
-                url: "https://google.com",
-                size: null,
-              },
-              {
-                name: "TDC Database documentation (2023 edition) Updated: 23 March 2023",
-                id: 1,
-                format: "PDF",
-                url: "https://google.com",
-                size: null,
-              },
-            ].map((r) => (
+            {docsResources.map((r) => (
               <li
                 key={r.id}
                 className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"

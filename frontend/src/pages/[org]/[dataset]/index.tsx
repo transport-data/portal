@@ -1,7 +1,7 @@
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Layout from "@/components/_shared/Layout";
-import { Dataset as DatasetType } from "@portaljs/ckan";
+import { Dataset as DatasetType } from "interfaces/ckan/da";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
 import { ChevronLeftIcon, ArrowDownToLineIcon, Landmark } from "lucide-react";
@@ -14,11 +14,13 @@ import { Overview } from "@components/dataset/individualPage/Overview";
 import { DatasetPreview } from "@components/dataset/individualPage/DatasetPreview";
 import { Metadata } from "@components/dataset/individualPage/Metadata";
 import { Downloads } from "@components/dataset/individualPage/Downloads";
-import useMatomoTracker from "@lib/useMatomoTracker";
-import { api } from "@utils/api";
 import { DefaultTooltip } from "@components/ui/tooltip";
 import Link from "next/link";
 import { useDatasetViewEvent } from "@utils/ga";
+import { getDataset } from "@utils/dataset";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { toast } from "@components/ui/use-toast";
+import { api } from "@utils/api";
 
 const siteTitle = "TDC Data Portal";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
@@ -40,7 +42,6 @@ export async function getStaticPaths() {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ckan = new CKAN(backend_url);
   try {
     const datasetName = context.params?.dataset;
     if (!datasetName) {
@@ -48,15 +49,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
-    let dataset = await ckan.getDatasetDetails(datasetName as string);
-    if (!dataset) {
+    let dataset = await getDataset({
+      id: datasetName as string,
+      apiKey: "",
+    });
+    console.log("DATASET", dataset);
+    if (!dataset.result) {
       return {
         notFound: true,
       };
     }
     return {
       props: {
-        dataset,
+        dataset: dataset.result,
       },
       revalidate: 1800,
     };
@@ -69,36 +74,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 export default function DatasetPage({
   dataset,
-}: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
-  // useMatomoTracker();
-  useDatasetViewEvent({
-    datasetTitle: dataset.title,
-    datasetId: dataset.id,
-    datasetName: dataset.name,
-  });
+}: {
+  dataset: Dataset;
+}): JSX.Element {
+  const { data: datasetDownloads, isLoading } =
+    api.ga.getDownloadStats.useQuery({
+      id: dataset.id,
+    });
 
-  const tabs = [
-    {
-      id: "overview",
-      content: <Overview dataset={dataset} />,
-      title: "Overview",
-    },
-    {
-      id: "dataset",
-      content: <DatasetPreview dataset={dataset} />,
-      title: "Dataset",
-    },
-    {
-      id: "metadata",
-      content: <Metadata dataset={dataset} />,
-      title: "Metadata",
-    },
-    {
-      id: "downloads",
-      content: <Downloads dataset={dataset} />,
-      title: "Downloads",
-    },
-  ];
   const breadcrumbs = [
     {
       href: `/search`,
@@ -106,10 +89,9 @@ export default function DatasetPage({
     },
     {
       href: `/${dataset.organization?.name}`,
-      label: `${dataset.organization?.title || dataset.organizatio?.name}`,
+      label: `${dataset.organization?.title || dataset.organization?.name}`,
     },
   ];
-  // const matomo = api.matomo.getVisitorStats.useQuery();
   return (
     <>
       <Head>
@@ -119,7 +101,7 @@ export default function DatasetPage({
         <meta
           name="description"
           content={`Dataset page for the ${dataset.title || dataset.name} - ${
-            dataset.description
+            dataset.notes
           } `}
         />
         <link rel="icon" href="/favicon.ico" />
@@ -149,37 +131,42 @@ export default function DatasetPage({
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                   {dataset.title || dataset.name}
                 </h2>
-                <DefaultTooltip
-                  contentClassName="max-w-[180px]"
-                  content={
-                    <div className="flex flex-col">
-                      <span className="text-semibold text-sm">
-                        TDC Harmonized
-                      </span>
-                      <div className="text-xs">
-                        Data have been validated, and derived from multiple
-                        sources by TDC. For more information,{" "}
-                        <Link
-                          className="underline"
-                          target="_blank"
-                          href={"https://google.com"}
-                        >
-                          click here
-                        </Link>
+                {dataset.tdc_category === "tdc_harmonized" && (
+                  <DefaultTooltip
+                    contentClassName="max-w-[180px]"
+                    content={
+                      <div className="flex flex-col">
+                        <span className="text-semibold text-sm">
+                          TDC Harmonized
+                        </span>
+                        <div className="text-xs">
+                          Data have been validated, and derived from multiple
+                          sources by TDC. For more information,{" "}
+                          <Link
+                            className="underline"
+                            target="_blank"
+                            href={"https://google.com"}
+                          >
+                            click here
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  }
-                >
-                  <button
-                    className="mt-4 flex w-fit gap-1 rounded-[6px] bg-yellow-100 px-[10px] py-[2px] text-xs font-medium text-yellow-800 transition-colors focus:outline-none focus:ring-2 
-                    focus:ring-ring focus:ring-offset-2"
+                    }
                   >
-                    TDC Harmonized
-                  </button>
-                </DefaultTooltip>
-                <div className="mt-4 text-justify text-base font-normal leading-normal text-gray-500">
-                  {dataset.notes ?? "-"}
-                </div>
+                    <button
+                      className="mt-4 flex w-fit gap-1 rounded-[6px] bg-yellow-100 px-[10px] py-[2px] text-xs font-medium text-yellow-800 transition-colors focus:outline-none focus:ring-2 
+                    focus:ring-ring focus:ring-offset-2"
+                    >
+                      TDC Harmonized
+                    </button>
+                  </DefaultTooltip>
+                )}
+                <div
+                  className="mt-4 text-justify text-base font-normal leading-normal text-gray-500"
+                  dangerouslySetInnerHTML={{
+                    __html: dataset.notes ?? "-",
+                  }}
+                ></div>
                 <div className="flex flex-col pt-2 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-2.5">
                   <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
                     <Landmark
@@ -191,23 +178,30 @@ export default function DatasetPage({
                   <div className="mt-2.5 hidden text-center font-['Inter'] text-xs font-medium leading-none text-gray-500 lg:block">
                     •
                   </div>
-                  <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
-                    <CalendarIcon
-                      aria-hidden="true"
-                      className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
-                    />
-                    Updated {new Date(dataset.metadata_modified).toDateString()}
-                  </div>
-                  <div className="mt-2.5 hidden text-center font-['Inter'] text-xs font-medium leading-none text-gray-500 lg:block">
-                    •
-                  </div>
-                  <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
-                    <ArrowDownToLineIcon
-                      aria-hidden="true"
-                      className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
-                    />
-                    1700+ Downloads
-                  </div>
+                  {dataset.metadata_modified && (
+                    <>
+                      <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
+                        <CalendarIcon
+                          aria-hidden="true"
+                          className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
+                        />
+                        Updated{" "}
+                        {new Date(dataset.metadata_modified).toDateString()}
+                      </div>
+                      <div className="mt-2.5 hidden text-center font-['Inter'] text-xs font-medium leading-none text-gray-500 lg:block">
+                        •
+                      </div>
+                    </>
+                  )}
+                  {datasetDownloads && datasetDownloads.total && (
+                    <div className="mt-2 flex items-center text-center text-xs font-medium leading-none text-gray-500">
+                      <ArrowDownToLineIcon
+                        aria-hidden="true"
+                        className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
+                      />
+                      {datasetDownloads.total}+ Downloads
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -217,27 +211,54 @@ export default function DatasetPage({
           <div className="border-b border-gray-200 shadow-sm">
             <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
               <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
-                {tabs.map((tab) => (
-                  <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
-                ))}
+                {dataset.introduction_text && (
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                )}
+                <TabsTrigger value="dataset">Dataset</TabsTrigger>
+                <TabsTrigger value="metadata">Metadata</TabsTrigger>
+                <TabsTrigger value="downloads">Downloads</TabsTrigger>
               </TabsList>
               <div className="flex w-full items-center justify-end space-x-4 lg:w-auto">
-                <Button variant="secondary">
-                  <EnvelopeIcon className="mr-2 h-5 w-5" />
-                  Contact the contributor
-                </Button>
-                <Button variant="secondary">
+                {dataset.organization && dataset.organization?.email && (
+                  <Button variant="secondary" asChild>
+                    <a href={`mailto:${dataset.organization.email}`}>
+                      <EnvelopeIcon className="mr-2 h-5 w-5" />
+                      Contact the contributor
+                    </a>
+                  </Button>
+                )}
+                <Button
+                  onClick={() => {
+                    //copy to clipboard the url
+                    navigator.clipboard.writeText(window.location.href);
+                    toast({
+                      title: "Link copied to clipboard",
+                      description: "You can now share the link with others",
+                      duration: 5000,
+                    });
+                  }}
+                  variant="secondary"
+                >
                   <ShareIcon className="mr-2 h-4 w-4" />
                   Share
                 </Button>
               </div>
             </div>
           </div>
-          {tabs.map((tab) => (
-            <TabsContent className="mt-0" value={tab.id}>
-              {tab.content}
+          {dataset.introduction_text && (
+            <TabsContent className="mt-0" value="overview">
+              <Overview introduction_text={dataset.introduction_text} />
             </TabsContent>
-          ))}
+          )}
+          <TabsContent className="mt-0" value="dataset">
+            <DatasetPreview dataset={dataset} />
+          </TabsContent>
+          <TabsContent className="mt-0" value="metadata">
+            <Metadata dataset={dataset} />
+          </TabsContent>
+          <TabsContent className="mt-0" value="downloads">
+            <Downloads dataset={dataset} />
+          </TabsContent>
         </Tabs>
       </Layout>
     </>
