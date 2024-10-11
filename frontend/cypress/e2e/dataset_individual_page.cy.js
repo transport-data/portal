@@ -74,6 +74,7 @@ describe("Dataset individual page", () => {
     cy.contains('Overview', { timeout: 10000})
     cy.contains('TEST OVERVIEW')
     cy.contains('tag 1')
+    cy.contains('ckan_admin')
     cy.get('#downloads').click({ force: true })
     cy.contains('Sample Data')
     cy.contains('Sample Doc')
