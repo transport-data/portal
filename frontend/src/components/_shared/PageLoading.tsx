@@ -45,10 +45,10 @@ export default function PageLoading() {
             <div className="progress left-right h-full w-full bg-accent"></div>
           </div>
         </div>
-        <div className="container mt-auto flex h-full w-full flex-col ">
-          <div className="ml-auto mt-auto py-4">
+        <div className="mt-auto flex h-full w-full flex-col px-[32px] ">
+          <div className="ml-auto mt-auto py-6">
             <div
-              className="block h-8 w-8  rounded-full  border-t-transparent text-[#00BBC2]"
+              className="block h-8 w-8 rounded-full  border-t-transparent  bg-white text-[#00BBC2]"
               role="status"
               aria-label="loading"
             >
