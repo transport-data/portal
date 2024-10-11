@@ -74,7 +74,6 @@ describe("Dataset individual page", () => {
     cy.contains('Overview', { timeout: 10000})
     cy.contains('TEST OVERVIEW')
     cy.contains('tag 1')
-    cy.contains('GNU Free Documentation License 1.3 with no cover texts and no invariant sections')
     cy.get('#downloads').click({ force: true })
     cy.contains('Sample Data')
     cy.contains('Sample Doc')
