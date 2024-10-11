@@ -1,7 +1,7 @@
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Layout from "@/components/_shared/Layout";
-import { Dataset as DatasetType } from "interfaces/ckan/da";
+import { Dataset as DatasetType } from "@portaljs/ckan";
 import { CKAN } from "@portaljs/ckan";
 import { env } from "@env.mjs";
 import { ChevronLeftIcon, ArrowDownToLineIcon, Landmark } from "lucide-react";
