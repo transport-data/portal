@@ -66,8 +66,8 @@ export default function DatasetsPage({
 
       fetch(
         // Using the flagscdn because it responds faster than S3
-        `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png` ??
-          country.image_display_url,
+        `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
+          // country.image_display_url,
       ).then(async (r) => {
         const blob = await r.blob();
         const reader = new FileReader();
