@@ -222,6 +222,10 @@ def package_patch(up_func, context, data_dict):
     result = up_func(context, data_dict)
     return result
 
+@tk.chained_action
+def package_show(up_func, context, data_dict):
+    result = up_func(context, data_dict)
+    return result
 
 def _control_archived_datasets_visibility(data_dict):
     include_archived_param = data_dict.get("include_archived", "false")
@@ -657,7 +661,20 @@ def package_show(up_func, context, data_dict):
     output_format = data_dict.get("output_format", "json")
 
     result = up_func(context, data_dict)
-
+    full_org = tk.get_action('organization_show')({"ignore_auth": True}, {"id": result.get("owner_org"), "include_extras": True })
+    # Hiding too much information
+    full_org['users'] = None
+    result['organization'] = full_org
+    creator_user = tk.get_action('user_show')({"ignore_auth": True}, {"id": result.get("creator_user_id")})
+    if creator_user:
+        result['creator_user'] = { "fullname": creator_user.get("fullname"), "display_name": creator_user.get("display_name"), "name": creator_user.get("name"), "email": creator_user.get("email") }
+    contributors_data = [{
+        "fullname": contributor.get("fullname"),
+        "display_name": contributor.get("display_name"),
+        "name": contributor.get("name"),
+        "email": contributor.get("email")
+    } for contributor in tk.get_action('user_list')({"ignore_auth": True}, {"id": result.get("contributors")})]
+    result['contributors_data'] = contributors_data
     if output_format != "json":
         converter = converters.get(output_format)
         if converter:

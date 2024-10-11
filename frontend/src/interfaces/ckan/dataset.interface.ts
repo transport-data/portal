@@ -15,7 +15,12 @@ export interface Dataset {
     name: string;
     fullname?: string;
     email: string;
-  }
+  };
+  contributors_data: Array<{
+    name: string;
+    fullname?: string;
+    email: string;
+  }>;
   id: string;
   isopen?: boolean;
   license_id?: string;
@@ -41,14 +46,14 @@ export interface Dataset {
   activity_stream?: Array<Activity>;
   resources: Array<Resource>;
   comments: Array<{
-    initials : string;
-    comment : string;
-    date : string;
-  }>
+    initials: string;
+    comment: string;
+    date: string;
+  }>;
   sources?: Array<{
-    title : string;
+    title: string;
     url?: string;
-  }>
+  }>;
   related_datasets?: Array<string>;
   temporal_coverage_start?: string;
   temporal_coverage_end?: string;
@@ -57,12 +62,12 @@ export interface Dataset {
   sectors?: Array<string>;
   services?: Array<string>;
   units: Array<string>;
-  organization?: Organization & { url?: string, email?: string };
+  organization?: Organization & { url?: string; email?: string };
   groups?: Array<Group>;
   tags?: Array<Tag>;
   total_downloads?: number;
   tdc_category: string;
-  indicators?: string[]
+  indicators?: string[];
   frequency: string;
   geographies?: string[];
   regions?: string[];
