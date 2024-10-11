@@ -222,11 +222,6 @@ def package_patch(up_func, context, data_dict):
     result = up_func(context, data_dict)
     return result
 
-@tk.chained_action
-def package_show(up_func, context, data_dict):
-    result = up_func(context, data_dict)
-    return result
-
 def _control_archived_datasets_visibility(data_dict):
     include_archived_param = data_dict.get("include_archived", "false")
     include_archived = tk.asbool(include_archived_param)
@@ -659,7 +654,7 @@ def request_new_organization(context, data_dict):
 @tk.side_effect_free
 def package_show(up_func, context, data_dict):
     output_format = data_dict.get("output_format", "json")
-    include_extras = data_dict.get("include_frontend_fields", False)
+    include_extras = data_dict.get("include_extras", False)
 
     result = up_func(context, data_dict)
     if include_extras:
