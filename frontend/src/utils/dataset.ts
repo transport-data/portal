@@ -229,15 +229,17 @@ export async function searchDatasets<T = Dataset>({
 export const getDataset = async ({
   id,
   apiKey,
+  include_extras = false,
 }: {
   id: string;
   apiKey: string;
+  include_extras?: boolean;
 }) => {
   const dataset: CkanResponse<Dataset> = await CkanRequest.post(
     "package_show",
     {
       apiKey,
-      json: { id },
+      json: { id, include_extras },
     }
   );
 

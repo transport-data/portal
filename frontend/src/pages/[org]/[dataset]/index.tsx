@@ -52,8 +52,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     let dataset = await getDataset({
       id: datasetName as string,
       apiKey: "",
+      include_extras: true,
     });
-    console.log("DATASET", dataset);
     if (!dataset.result) {
       return {
         notFound: true,
