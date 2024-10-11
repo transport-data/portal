@@ -1,10 +1,10 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-from ckan.types import Schema
 
 import ckanext.tdc.logic.action as action
 import ckanext.tdc.cli as cli
 import ckanext.tdc.logic.auth as auth
+import ckanext.tdc.activity as activity
 
 import json
 import logging
@@ -51,6 +51,7 @@ class TdcPlugin(plugins.SingletonPlugin):
             "invite_user_to_tdc": action.invite_user_to_tdc,
             "request_organization_owner": action.request_organization_owner,
             "request_new_organization": action.request_new_organization,
+            "tdc_dashboard_activity_list": activity.dashboard_activity_list_action
         }
 
     # IPackageController
