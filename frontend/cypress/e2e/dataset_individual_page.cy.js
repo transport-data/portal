@@ -64,7 +64,7 @@ describe("Dataset individual page", () => {
   });
 
   it("Should show the individual page", () => {
-    cy.visit(`/@${owner_org}/${datasetName}`);
+    cy.visit(`/@${sample_org}/${datasetName}`);
     cy.contains(datasetTitle)
     cy.contains('TDC Harmonized')
     cy.contains('EXAMPLE INTRODUCTION')
