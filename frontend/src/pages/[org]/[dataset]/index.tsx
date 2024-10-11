@@ -212,11 +212,11 @@ export default function DatasetPage({
             <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
               <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
                 {dataset.introduction_text && (
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger id="overview" value="overview">Overview</TabsTrigger>
                 )}
-                <TabsTrigger value="dataset">Dataset</TabsTrigger>
-                <TabsTrigger value="metadata">Metadata</TabsTrigger>
-                <TabsTrigger value="downloads">Downloads</TabsTrigger>
+                <TabsTrigger id="dataset" value="dataset">Dataset</TabsTrigger>
+                <TabsTrigger id="metadata" value="metadata">Metadata</TabsTrigger>
+                <TabsTrigger id="downloads" value="downloads">Downloads</TabsTrigger>
               </TabsList>
               <div className="flex w-full items-center justify-end space-x-4 lg:w-auto">
                 {dataset.organization && dataset.organization?.email && (

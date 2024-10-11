@@ -64,6 +64,20 @@ describe("Dataset individual page", () => {
   });
 
   it("Should show the individual page", () => {
+    cy.visit(`/@${owner_org}/${datasetName}`);
+    cy.contains(datasetTitle)
+    cy.contains('TDC Harmonized')
+    cy.contains('EXAMPLE INTRODUCTION')
+    cy.contains('Share')
+    cy.contains('Contact the contributor')
+    cy.get('#metadata').click({ force: true })
+    cy.contains('Overview', { timeout: 10000})
+    cy.contains('TEST OVERVIEW')
+    cy.contains('tag 1')
+    cy.contains('GNU Free Documentation License 1.3 with no cover texts and no invariant sections')
+    cy.get('#downloads').click({ force: true })
+    cy.contains('Sample Data')
+    cy.contains('Sample Doc')
   });
 
   after(() => {
