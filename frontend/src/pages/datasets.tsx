@@ -75,12 +75,11 @@ export default function DatasetsPage({
               and 120+ countries.
             </p>
             <div className="mt-8 ">
-              <SearchBar />
+              <SearchBar
+                description="You can also browse the topics below to find what you are looking
+              for."
+              />
             </div>
-            <p className="mt-[20px] text-center text-sm font-normal text-gray-500">
-              You can also browse the topics below to find what you are looking
-              for.
-            </p>
           </div>
           <div className="pb-[96px] pt-[80px]">
             <div className="grid auto-rows-fr grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

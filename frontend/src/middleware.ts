@@ -7,9 +7,11 @@ export async  function middleware(req: NextRequest) {
 
   const token = await getToken  ({ req });
   const { pathname } = req.nextUrl;
-
-  if (pathname === "/dashboard") {
-    return NextResponse.redirect(new URL("/dashboard/newsfeed", req.url));
+  
+  if (req.nextUrl.pathname === "/dashboard") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard/newsfeed";
+    return NextResponse.rewrite(url);
   }
 
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {

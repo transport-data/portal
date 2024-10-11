@@ -15,6 +15,7 @@ import { VariableIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { Badge } from "@components/ui/badge";
 import { useRouter } from "next/router";
 import { api } from "@utils/api";
+import Link from "next/link";
 
 interface FacetValueProps {
   display_name: string;
@@ -29,7 +30,11 @@ interface RecentSearchProps {
   query: any;
 }
 
-export default function SearchBar() {
+export default function SearchBar({
+  description = "",
+}: {
+  description?: string;
+}) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const commandRef = useRef<HTMLDivElement>(null);
@@ -274,6 +279,7 @@ export default function SearchBar() {
             }}
             value={inputValue}
           />
+
           {/* clear search */}
           {(isTyping || facetName || facetValue.name) && (
             <span
@@ -293,6 +299,17 @@ export default function SearchBar() {
             Search
           </Button>
         </div>
+        <div className="flex w-full gap-2">
+          <Link href="/search" className="mt-2 text-xs font-medium text-accent">
+            Browse all datasets
+          </Link>
+          {description && (
+            <span className="ml-auto mt-2 line-clamp-1 overflow-hidden text-ellipsis text-center  text-sm font-normal text-gray-500">
+              {description}
+            </span>
+          )}
+        </div>
+
         <CommandList
           className={`absolute top-0 z-[15] mt-[70px] max-h-[500px] w-full bg-white shadow-[0px_4px_6px_0px_#0000000D] ${
             showCommandList ? "block" : "hidden"
