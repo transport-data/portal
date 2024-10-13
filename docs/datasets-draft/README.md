@@ -4,7 +4,7 @@ When creating a dataset, users can save it as a draft to continue editing later.
 
 Saving a dataset as a draft updates the dataset's **state** field to "draft."
 
-![Save Draft](image.png)
+![Save Draft](draft.png)
 
 #### Required Fields for Creating a Draft:
 
