@@ -2,7 +2,7 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
-import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
+import { DatasetFormType, SearchDatasetType, DatasetDraftType } from "@schema/dataset.schema";
 
 import { DatasetSchemaType, License } from "@schema/dataset.schema";
 
@@ -276,6 +276,39 @@ export const createDataset = async ({
     }
   );
   return dataset.result;
+};
+
+export const draftDataset = async ({
+  apiKey,
+  input,
+}: {
+  apiKey: string;
+  input: DatasetDraftType;
+}) => {
+  const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
+    `package_create`,{
+      apiKey,
+      json: {
+        ...input,
+        state:"draft"//todo: state:"draft" is not working when creating datasets
+      },
+    }
+  );
+  if(dataset.result?.id && dataset.result?.state !== "draft"){
+    const draft = await CkanRequest.post<CkanResponse<Dataset>>(
+      "package_patch",
+      {
+        apiKey: apiKey,
+        json: {
+          id: dataset.result.id,
+          state:"draft"
+        },
+      }
+    );
+    return draft.result;
+  }
+  
+  
 };
 
 export const patchDataset = async ({

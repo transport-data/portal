@@ -1,8 +1,9 @@
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { DatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
+import { DatasetSchema, DraftDatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
 import {
   createDataset,
   deleteDatasets,
+  draftDataset,
   getDataset,
   getDatasetSchema,
   licensesList,
@@ -49,6 +50,14 @@ export const datasetRouter = createTRPCRouter({
         temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
       };
       const dataset = await createDataset({ apiKey, input: _dataset });
+      return dataset;
+    }),
+  draft: protectedProcedure
+    .input(DraftDatasetSchema)
+    .mutation( async ({ input,ctx })=>{
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const dataset = await draftDataset({ apiKey, input });
       return dataset;
     }),
   patch: protectedProcedure
