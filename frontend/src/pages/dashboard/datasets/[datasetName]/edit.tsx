@@ -137,7 +137,10 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
   });
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
-    return editDataset.mutate(data);
+    return editDataset.mutate({
+      ...data,
+      state: "active",
+    });
   }
   const currentStep = match(current.value)
     .with("general", () => 0)

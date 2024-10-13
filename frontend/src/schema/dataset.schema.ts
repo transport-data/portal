@@ -62,12 +62,21 @@ export const DatasetSchema = z.object({
   url: z.string().url().optional().or(emptyStringToUndefined),
   data_provider: z.string().optional().or(emptyStringToUndefined),
   data_access: z.string().optional().or(emptyStringToUndefined),
+  state:z.string().optional().default(""),
   related_datasets: z.array(z.object({
     name: z.string(),
     title: z.string()
   })),
   resources: z.array(ResourceSchema),
 });
+
+export const DraftDatasetSchema = DatasetSchema.partial().extend({
+  name:z.string(),
+  notes:z.string(),
+  owner_org:z.string(),
+  tdc_category:z.string().default("public")
+});
+
 export const SearchDatasetSchema = z.object({
   advancedQueries: z
     .array(
@@ -139,4 +148,5 @@ export type License = {
 
 export type SearchDatasetType = z.infer<typeof SearchDatasetSchema>;
 export type DatasetFormType = z.infer<typeof DatasetSchema>;
+export type DatasetDraftType = z.infer<typeof DraftDatasetSchema>;
 export type ResourceFormType = z.infer<typeof ResourceSchema>;
