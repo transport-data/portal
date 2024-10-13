@@ -4,11 +4,7 @@ import Loading from "@components/_shared/Loading";
 import { api } from "@utils/api";
 import { useMachine } from "@xstate/react";
 import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
-import {
-  ArrowLeftCircleIcon,
-  ArrowLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/20/solid";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { NextSeo } from "next-seo";
 import { formatIcon, slugify } from "@lib/utils";
 import { Steps } from "@components/dataset/form/Steps";
@@ -26,7 +22,6 @@ import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import { ErrorAlert } from "@components/_shared/Alerts";
-import Link from "next/link";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 
 const docs = [
@@ -173,14 +168,13 @@ const CreateDatasetDashboard: NextPage = () => {
   };
 
   const handleSaveDraft = async () => {
-    setTimeout(() => {
-      if (validatePrimeRequiredFields()) {
-        const values = form.getValues();
+    form.trigger().then(() => {
+      if (validatePrimeRequiredFields())
         createDraftDataset.mutate({
-          ...values,
+          ...form.getValues(),
         });
-      }
-    }, 250);
+    });
+
     return false;
   };
 
