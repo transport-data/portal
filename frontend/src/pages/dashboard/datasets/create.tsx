@@ -4,12 +4,12 @@ import Loading from "@components/_shared/Loading";
 import { api } from "@utils/api";
 import { useMachine } from "@xstate/react";
 import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
-import { ArrowLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { NextSeo } from "next-seo";
 import { formatIcon, slugify } from "@lib/utils";
 import { Steps } from "@components/dataset/form/Steps";
 import { MetadataForm } from "@components/dataset/form/Metadata";
-import { FieldErrors, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -22,13 +22,6 @@ import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import { ErrorAlert } from "@components/_shared/Alerts";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
-
-import { createDataset as create } from "@utils/dataset";
-import CkanRequest from "@datopian/ckan-api-client-js";
-import { CkanResponse } from "@schema/ckan.schema";
-import { Toaster } from "@components/ui/toaster";
-import Link from "next/link";
 
 const docs = [
   {
