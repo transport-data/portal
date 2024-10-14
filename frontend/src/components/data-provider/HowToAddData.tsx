@@ -1,8 +1,9 @@
-import Video from "@components/home/heroSection/Video";
 import { Button } from "@components/ui/button";
 import Link from "next/link";
+import HowToAsset from "@components/_shared/HowToAsset";
+import { HeroAsset } from "@components/home/heroSection/Hero";
 
-export default () => {
+export default ({ asset }: { asset: HeroAsset }) => {
   return (
     <div className="space-y-8 py-6 text-gray-500 md:py-[96px]">
       <div>
@@ -30,7 +31,11 @@ export default () => {
       </div>
       <div className="flex w-full items-center justify-center">
         <div className="w-[804px] max-w-[804px]">
-          <Video heightInPx="460px" />
+          <HowToAsset
+            assetType={asset.type}
+            assetPath={asset.path}
+            heightInPx="460px"
+          />
         </div>
       </div>
     </div>
