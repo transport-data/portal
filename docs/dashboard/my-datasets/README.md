@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [MY DATASETS](#my-datasets)
+  - [Listing All Datasets](#listing-all-datasets)
+    - [Filtering by State](#filtering-by-state)
+    - [Advanced Filters](#advanced-filters)
+    - [Viewing and Editing a Dataset](#viewing-and-editing-a-dataset)
+  - [Adding New Datasets](#adding-new-datasets)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # MY DATASETS
 
 This feature enables data publishers to manage their datasets efficiently through the CKAN API, with a user-friendly interface powered by PortalJS.

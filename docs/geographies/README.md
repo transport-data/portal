@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Geography page](#geography-page)
+- [Geographies](#geographies)
+  - [Commands](#commands)
+    - [Seed default geographies](#seed-default-geographies)
+    - [Delete default geographies](#delete-default-geographies)
+    - [List default geographies](#list-default-geographies)
+  - [List of default geographies](#list-of-default-geographies)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Geography page
 
 The Geography page presents a map that is colored based on the number of datasets in each country. A darker green color indicates the country with the highest number of datasets. 

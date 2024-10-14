@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [SDMX metadata structure compatibility](#sdmx-metadata-structure-compatibility)
+  - [CKAN metadata schema -> TDCI metadata sctructure](#ckan-metadata-schema---tdci-metadata-sctructure)
+    - [Mapping](#mapping)
+    - [Manual conversion](#manual-conversion)
+    - [CKAN conversion endpoint](#ckan-conversion-endpoint)
+      - [Usage](#usage)
+      - [Extending the metadata schema](#extending-the-metadata-schema)
+      - [Extending the converter](#extending-the-converter)
+  - [CKAN metadata schema -> ESMS](#ckan-metadata-schema---esms)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # SDMX metadata structure compatibility
 
 ## CKAN metadata schema -> TDCI metadata sctructure

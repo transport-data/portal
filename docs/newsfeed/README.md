@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Newsfeed Page](#newsfeed-page)
+  - [Searching](#searching)
+  - [Filtering](#filtering)
+    - [Filter by category](#filter-by-category)
+    - [Filter by action](#filter-by-action)
+  - [Sorting](#sorting)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Newsfeed Page
 
 The newsfeed page shows the activities regarding organizations that a user is a member of, or follower and also the datasets that belong to these organizations

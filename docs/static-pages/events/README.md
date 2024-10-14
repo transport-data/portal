@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Events page](#events-page)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Events page
 
 If you want to change the content in the Events Page
