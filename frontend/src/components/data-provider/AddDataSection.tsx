@@ -13,7 +13,7 @@ export default () => {
           individuals and organisations to contribute their valuable data to
           drive insights and innovations in sustainable transportation.
         </p>
-        <Button className="max-w-fit bg-[#006064] px-6 py-3.5">
+        <Button asChild className="max-w-fit bg-[#006064] px-6 py-3.5">
           <Link href="/dashboard/datasets/create">Add data</Link>
         </Button>
       </div>

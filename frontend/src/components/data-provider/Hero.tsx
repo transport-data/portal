@@ -15,7 +15,7 @@ export default function Hero() {
               repository by contributing your own transportation-related
               datasets.
             </p>
-            <Button className="mb-16 bg-[#006064] px-6 py-3.5">
+            <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
               <Link href="/dashboard/datasets/create">Add data to TDC</Link>
             </Button>
             <p className="font-semibold text-gray-500">
