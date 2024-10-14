@@ -5,7 +5,7 @@ const protectedRoutes = ['/dashboard'];
 
 export async  function middleware(req: NextRequest) {
 
-  const token = await getToken  ({ req });
+  const token = await getToken({ req });
   const { pathname } = req.nextUrl;
 
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {

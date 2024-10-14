@@ -229,19 +229,39 @@ export async function searchDatasets<T = Dataset>({
 export const getDataset = async ({
   id,
   apiKey,
+  include_extras = false,
+}: {
+  id: string;
+  apiKey: string;
+  include_extras?: boolean;
+}) => {
+  const dataset: CkanResponse<Dataset> = await CkanRequest.post(
+    "package_show",
+    {
+      apiKey,
+      json: { id, include_extras },
+    }
+  );
+
+  return dataset;
+};
+
+export const getDatasetActivities = async ({
+  id,
+  apiKey,
 }: {
   id: string;
   apiKey: string;
 }) => {
-  const dataset: CkanResponse<Dataset> = await CkanRequest.post(
-    "package_show",
+  const activities: CkanResponse<Activity[]> = await CkanRequest.post(
+    "package_activity_list",
     {
       apiKey,
       json: { id },
     }
   );
 
-  return dataset;
+  return activities;
 };
 
 export const getDatasetSchema = async ({ apiKey }: { apiKey: string }) => {

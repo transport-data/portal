@@ -5,6 +5,7 @@ import {
   deleteDatasets,
   draftDataset,
   getDataset,
+  getDatasetActivities,
   getDatasetSchema,
   licensesList,
   patchDataset,
@@ -21,8 +22,6 @@ export const datasetRouter = createTRPCRouter({
       const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
-
-  
   get: protectedProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -31,9 +30,17 @@ export const datasetRouter = createTRPCRouter({
       const dataset = await getDataset({ id: input.name, apiKey });
       return dataset;
     }),
-  schema: protectedProcedure.query(async ({ ctx }) => {
-    const user = ctx.session.user;
-    const apiKey = user.apikey;
+  activities: publicProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session?.user ?? null;
+      const apiKey = user?.apikey ?? '';
+      const activities = await getDatasetActivities({ id: input.name, apiKey });
+      return activities;
+    }),
+  schema: publicProcedure.query(async ({ ctx }) => {
+    const user = ctx.session?.user ?? null;
+    const apiKey = user?.apikey ?? '';
     const schema = await getDatasetSchema({ apiKey });
     return schema;
   }),
@@ -42,7 +49,7 @@ export const datasetRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-    //convert the date to string YYYY-MM-DD
+    //convert the date to string# YYYY-MM-DD
       const _dataset = {
         ...input,
         related_datasets: input.related_datasets.map((d) => d.name),
