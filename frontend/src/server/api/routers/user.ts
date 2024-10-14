@@ -143,11 +143,11 @@ export const userRouter = createTRPCRouter({
       );
     }
   }),
-  getUsersByIds: publicProcedure
+  getUsersByIds: protectedProcedure
     .input(z.object({ ids: z.array(z.string()) }))
     .query(async ({ input, ctx }) => {
-      const user = ctx.session?.user;
-      const apiKey = user?.apikey ?? env.SYS_ADMIN_API_KEY;
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
       // NOTE: user_list cannot be used here because it only
       // finds users by name
       const users = await getUsersById({ ids: input.ids, apiKey });

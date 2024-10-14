@@ -81,13 +81,13 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
               <ul className="ml-6 list-disc marker:text-accent">
-                {dataset.contributors_data && dataset.contributors_data.map((contributor, index) => (
-                  <span className="text-accent">
-                    {contributor.fullname ??
-                      contributor.name}{" "}
-                    - ({contributor.email})
-                  </span>
-                ))}
+                {dataset.contributors_data &&
+                  dataset.contributors_data.map((contributor, index) => (
+                    <span className="text-accent">
+                      {contributor.fullname ?? contributor.name} - (
+                      {contributor.email})
+                    </span>
+                  ))}
               </ul>
             </dd>
           </div>
@@ -165,7 +165,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   "TDC"
                 }. ${
                   dataset.metadata_created
-                    ? new Date(dataset.metadata_created).toLocaleString()
+                    ? new Date(dataset.metadata_created).toLocaleDateString()
                     : "(n.d)"
                 }. ${
                   dataset.organization?.display_name ??
