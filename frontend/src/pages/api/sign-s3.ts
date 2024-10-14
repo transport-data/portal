@@ -30,12 +30,12 @@ export default async function handler(
   let _filePath = filePath;
   const resourceId = uuidv4();
   if (!filePath) {
-    _filePath = `ckan/resources/${resourceId}`;
+    _filePath = `resources/${resourceId}`;
   }
   //done just for local development
-  if (env.R2_ACCESS_KEY_ID === "minioadmin") {
-    _filePath = _filePath.replace("ckan/", "");
-  }
+  //if (env.R2_ACCESS_KEY_ID === "minioadmin") {
+  //  _filePath = _filePath.replace("ckan/", "");
+  //}
   const extension = filename.split(".").pop();
   const _filename = filename.split(".")[0];
   const key = slugify(`${_filename}-${makeid(6)}`);
