@@ -92,6 +92,8 @@ export default function DatasetPage({
       label: `${dataset.organization?.title || dataset.organization?.name}`,
     },
   ];
+  const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
+  const overviewTab = !!dataset.introduction_text;
   return (
     <>
       <Head>
@@ -207,16 +209,26 @@ export default function DatasetPage({
             </div>
           </div>
         </div>
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue={overviewTab ? 'overview' : 'metadata'}>
           <div className="border-b border-gray-200 shadow-sm">
             <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
               <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
-                {dataset.introduction_text && (
-                  <TabsTrigger id="overview" value="overview">Overview</TabsTrigger>
+                {overviewTab && (
+                  <TabsTrigger id="overview" value="overview">
+                    Overview
+                  </TabsTrigger>
                 )}
-                <TabsTrigger id="dataset" value="dataset">Dataset</TabsTrigger>
-                <TabsTrigger id="metadata" value="metadata">Metadata</TabsTrigger>
-                <TabsTrigger id="downloads" value="downloads">Downloads</TabsTrigger>
+                {datasetsTab && (
+                  <TabsTrigger id="dataset" value="dataset">
+                    Dataset
+                  </TabsTrigger>
+                )}
+                <TabsTrigger id="metadata" value="metadata">
+                  Metadata
+                </TabsTrigger>
+                <TabsTrigger id="downloads" value="downloads">
+                  Downloads
+                </TabsTrigger>
               </TabsList>
               <div className="flex w-full items-center justify-end space-x-4 lg:w-auto">
                 {dataset.organization && dataset.organization?.email && (
@@ -245,14 +257,16 @@ export default function DatasetPage({
               </div>
             </div>
           </div>
-          {dataset.introduction_text && (
+          {overviewTab && (
             <TabsContent className="mt-0" value="overview">
-              <Overview introduction_text={dataset.introduction_text} />
+              <Overview introduction_text={dataset.introduction_text as string} />
             </TabsContent>
           )}
-          <TabsContent className="mt-0" value="dataset">
-            <DatasetPreview dataset={dataset} />
-          </TabsContent>
+          {datasetsTab && (
+            <TabsContent className="mt-0" value="dataset">
+              <DatasetPreview dataset={dataset} />
+            </TabsContent>
+          )}
           <TabsContent className="mt-0" value="metadata">
             <Metadata dataset={dataset} />
           </TabsContent>

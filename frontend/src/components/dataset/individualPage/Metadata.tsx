@@ -81,7 +81,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
               <ul className="ml-6 list-disc marker:text-accent">
-                {dataset.contributors_data.map((contributor, index) => (
+                {dataset.contributors_data && dataset.contributors_data.map((contributor, index) => (
                   <span className="text-accent">
                     {contributor.fullname ??
                       contributor.name}{" "}
