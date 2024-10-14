@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Home Page](#home-page)
+    - [Hero](#hero)
+      - [Dataset Search](#dataset-search)
+      - [Featured Asset](#featured-asset)
+    - [Recently Added Datasets](#recently-added-datasets)
+    - [Testimonials Section](#testimonials-section)
+    - [FAQ's](#faqs)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Home Page
 
 The portal's home page consists of the following sections and features:

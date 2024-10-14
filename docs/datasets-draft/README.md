@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Saving Datasets as Draft](#saving-datasets-as-draft)
+      - [Required Fields for Creating a Draft:](#required-fields-for-creating-a-draft)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Saving Datasets as Draft
 
 When creating a dataset, users can save it as a draft to continue editing later. The dataset will remain in draft mode until all mandatory fields are completed and the user chooses to publish it.
