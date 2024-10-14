@@ -107,7 +107,6 @@ export const googleAnalyticsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       try {
-        console.log("INPUT ID", input.id);
         const propertyId = env.GA_PROPERTY_ID;
         const privateKey = Buffer.from(env.GA_PRIVATE_KEY, "base64")
           .toString("utf-8")
