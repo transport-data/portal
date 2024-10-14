@@ -17,7 +17,7 @@
 
 Instructions on how to use the final product once deployed can be found in the [docs folder](docs), below is a table of contents with all the current documentation pages
 
-- [1. About-Us page](/docs/abouts-us/README.md)
+- [1. About-Us page](/docs/about-us/README.md)
 - [2. Analytics](/docs/analytics/README.md)
 - [3. Contact-Us page](/docs/contact-us/README.md)
 - [4. Overview of the Dashboard](/docs/dashboard/README.md)
@@ -34,7 +34,7 @@ Instructions on how to use the final product once deployed can be found in the [
 - [15. SDMX Integration](/docs/sdmx/README.md)
 - [16. The search bar component](/docs/search-bar-component/README.md)
 - [17. Single Sign-On (Github Signin)](/docs/sso/README.md)
-- 18. Static Pages
+- 18 Static Pages
     - [18.1. Events](/docs/static-pages/events/README.md)
     - [18.2. FAQ](/docs/static-pages/faq/README.md)
     - [18.3. People](/docs/static-pages/people/README.md)
