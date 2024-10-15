@@ -127,39 +127,45 @@ def _fix_geographies_field(data_dict):
         data_dict["regions"] = regions
 
 
-def _update_contributors(data_dict, is_update=False):
+def _update_contributors(context, data_dict, is_update=False):
     """
     Whenever an update happens, contributors list
     is updated based on which user did the update
     """
-    current_user = tk.current_user
-    if not hasattr(current_user, "id"):
-        return
-    current_user_id = current_user.id
 
-    if is_update:
-        dataset_id = data_dict.get("id")
-        dataset_name = data_dict.get("name")
-        name_or_id = dataset_id or dataset_name
+    # If it's a approval status update, do not
+    # add user as contributor
+    is_approval_action = context.get("is_approval_action", False)
 
-        priviliged_context = {
-            "ignore_auth": True
-        }
+    if not is_approval_action:
+        current_user = tk.current_user
+        if not hasattr(current_user, "id"):
+            return
+        current_user_id = current_user.id
 
-        package_show_action = tk.get_action("package_show")
-        package_show_data_dict = {
-            "id": name_or_id
-        }
-        old_data_dict = package_show_action(
-            priviliged_context, package_show_data_dict)
-        old_contributors = old_data_dict.get("contributors")
-        new_contributors = list(set(old_contributors + [current_user_id]))
+        if is_update:
+            dataset_id = data_dict.get("id")
+            dataset_name = data_dict.get("name")
+            name_or_id = dataset_id or dataset_name
 
-        data_dict["contributors"] = new_contributors
+            privileged_context = {
+                "ignore_auth": True
+            }
 
-        return new_contributors
+            package_show_action = tk.get_action("package_show")
+            package_show_data_dict = {
+                "id": name_or_id
+            }
+            old_data_dict = package_show_action(
+                privileged_context, package_show_data_dict)
+            old_contributors = old_data_dict.get("contributors")
+            new_contributors = list(set(old_contributors + [current_user_id]))
 
-    data_dict["contributors"] = [current_user_id]
+            data_dict["contributors"] = new_contributors
+
+            return new_contributors
+
+        data_dict["contributors"] = [current_user_id]
 
 
 def _fix_user_group_permission(data_dict):
@@ -195,6 +201,8 @@ def _fix_approval_workflow(context, data_dict, is_update):
         is_private = tk.asbool(is_private)
     user_id = current_user.id
 
+    is_resource_create = context.get("is_resource_create", False)
+
     # TODO: consider drafts
     if is_update:
         id = data_dict.get("id")
@@ -212,8 +220,8 @@ def _fix_approval_workflow(context, data_dict, is_update):
             data_dict["private"] = True
             data_dict["approval_status"] = "pending"
             data_dict["approval_message"] = None
-            context["approval_status_auto"] = True
-        else:
+            context["ignore_approval_status"] = True
+        elif not is_resource_create:
             if "approval_message" in data_dict:
                 data_dict.pop("approval_message")
             if "approval_status" in data_dict:
@@ -223,7 +231,7 @@ def _fix_approval_workflow(context, data_dict, is_update):
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
     _fix_geographies_field(data_dict)
     _fix_topics_field(data_dict)
-    _update_contributors(data_dict, is_update=is_update)
+    _update_contributors(context, data_dict, is_update=is_update)
     _fix_user_group_permission(data_dict)
     _fix_approval_workflow(context, data_dict, is_update=is_update)
 
@@ -724,5 +732,7 @@ def dataset_approval_update(context, data_dict):
         package_patch_dict["private"] = True
         package_patch_dict["approval_message"] = data_dict.get("feedback")
         package_patch_dict["approval_status"] = "rejected"
+
+    context["is_approval_action"] = True
 
     package_patch_action(context, package_patch_dict)

@@ -3,6 +3,7 @@ from ckan.common import _, current_user
 import ckan.logic as logic
 import ckan.plugins.toolkit as tk
 from ckan.logic.auth.update import package_update as core_package_update
+from ckan.logic.auth.create import resource_create as core_resource_create
 
 import ckanext.tdc.authz as authz
 from ckanext.tdc.authz import is_org_admin_or_sysadmin
@@ -12,6 +13,14 @@ import logging
 log = logging.getLogger(__name__)
 
 
+def resource_create(context, data_dict):
+    # We have to allow resource creation even if the dataset
+    # has approval_status pending
+    context["ignore_approval_status"] = True
+    context["is_resource_create"] = True
+    return core_resource_create(context, data_dict)
+
+
 def package_update(context, data_dict):
     package_id = data_dict.get("id")
     user_id = current_user.id
@@ -19,7 +28,7 @@ def package_update(context, data_dict):
     approval_status = data_dict.get("approval_status")
     owner_org = data_dict.get("owner_org")
 
-    approval_status_auto = context.get("approval_status_auto")
+    ignore_approval_status = context.get("ignore_approval_status")
 
     if not approval_status or not owner_org:
         package_show_action = tk.get_action("package_show")
@@ -36,7 +45,7 @@ def package_update(context, data_dict):
 
     user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
-    if not user_is_admin and approval_status == "pending" and not approval_status_auto:
+    if not user_is_admin and approval_status == "pending" and not ignore_approval_status:
         return {"success": False,
                 "message": "User cannot update pending dataset"}
 
@@ -106,4 +115,5 @@ def get_auth_functions():
             "organization_create": organization_create,
             "group_show": group_show,
             "dataset_review": dataset_review,
-            "package_update": package_update}
+            "package_update": package_update,
+            "resource_create": resource_create}
