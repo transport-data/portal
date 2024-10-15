@@ -50,6 +50,9 @@ export default () => {
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
+    // advancedQueries: [
+    //   { key: "approval_status", values: ["pending", "rejected"] },
+    // ],
     facetsFields: `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
   });
 
@@ -75,6 +78,9 @@ export default () => {
 
   const resetFilter = () => {
     setSearchFilter({
+      advancedQueries: [
+        { key: "approval_status", values: ["pending", "rejected"] },
+      ],
       offset: 0,
       limit: hasOrganizations ? datasetsPerPage : 0,
       sort: "score desc, metadata_modified desc",

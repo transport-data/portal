@@ -38,6 +38,7 @@ export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
 export default function DashboardDatasetCard(props: DatasetCardProps) {
   const {
     name,
+    approval_status,
     tdc_category,
     title,
     tags,
@@ -96,7 +97,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
             <h2 className="inline text-lg font-bold">
               <Link href={`/@${organization?.name}/${name}`}>{title}</Link>
             </h2>
-            {canEdit && (
+            {canEdit && (approval_status === 'approved' || !approval_status) && (
               <Button
                 variant="default"
                 size="pill"
