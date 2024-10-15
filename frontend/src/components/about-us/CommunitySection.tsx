@@ -17,7 +17,7 @@ export default function CommunitySection({}: {}) {
         <div className="flex justify-center">
           <Button asChild className="mx-auto mt-[32px] inline-block">
             <Link
-              href="https://github.com/orgs/transport-data/discussions"
+              href="https://github.com/orgs/transport-data/discussions/categories/user-feedback"
               target="_blank"
             >
               🔗 TDC Discussions Board
