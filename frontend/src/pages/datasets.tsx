@@ -75,10 +75,11 @@ export default function DatasetsPage({
               and 120+ countries.
             </p>
             <div className="mt-8 ">
-              <SearchBar
-                description="You can also browse the topics below to find what you are looking
-              for."
-              />
+              <SearchBar />
+            </div>
+            <div className="flex items-center justify-center mt-5 text-sm text-[#6B7280]">
+              You can also browse the topics below to find what you are looking
+              for.
             </div>
           </div>
           <div className="pb-[96px] pt-[80px]">

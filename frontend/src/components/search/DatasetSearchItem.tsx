@@ -20,6 +20,7 @@ export default function DatasetSearchItem({
   frequency,
   regionOrCountry,
   title,
+  name,
   organization,
   id,
   tdc_category,
@@ -44,7 +45,7 @@ export default function DatasetSearchItem({
     <div
       id={`dataset-search-item-${title}`}
       className="flex w-full cursor-pointer gap-5"
-      onClick={() => router.push(`/${organization.title}/${id}`)}
+      onClick={() => router.push(`/${organization.title}/${name}`)}
     >
       <Tooltip
         placement="bottom"
