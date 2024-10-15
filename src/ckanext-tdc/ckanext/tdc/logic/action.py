@@ -27,6 +27,10 @@ cwd = path.abspath(path.dirname(__file__))
 template_dir = path.join(cwd, '../templates/emails/')
 env = Environment(loader=FileSystemLoader(template_dir))
 
+privileged_context = {
+    "ignore_auth": True
+}
+
 
 def _fix_topics_field(data_dict):
     """
@@ -131,26 +135,32 @@ def _update_contributors(data_dict, is_update=False):
     if not hasattr(current_user, "id"):
         return
     current_user_id = current_user.id
+    user_show_action = tk.get_action("user_show")
+    excluded_ids = []
+    try:
+        site_user = logic.get_action(u"get_site_user")(privileged_context, {})
+        excluded_ids.append(site_user.get("id"))
+        ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
+        excluded_ids.append(ckan_admin.get("id"))
+    except Exception as e:
+        log.error(e)
 
     if is_update:
         dataset_id = data_dict.get("id")
         dataset_name = data_dict.get("name")
         name_or_id = dataset_id or dataset_name
 
-        priviliged_context = {
-            "ignore_auth": True
-        }
-
         package_show_action = tk.get_action("package_show")
         package_show_data_dict = {
             "id": name_or_id
         }
         old_data_dict = package_show_action(
-            priviliged_context, package_show_data_dict)
+            privileged_context, package_show_data_dict)
         old_contributors = old_data_dict.get("contributors")
         new_contributors = list(set(old_contributors + [current_user_id]))
+        filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
 
-        data_dict["contributors"] = new_contributors
+        data_dict["contributors"] = filtered_new_contributors
 
         return new_contributors
 
