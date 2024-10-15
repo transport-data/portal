@@ -1,13 +1,12 @@
-import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
-
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import Loading from "@components/_shared/Loading";
-import MyTopicsTabContent from "@components/dashboard/MyTopicsTabContent";
+import MyDatasetsRequestsTabContent from "@components/dashboard/MyDatasetsRequestsTabContent";
+import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 
-const TopicsDashboard: NextPage = () => {
+const DatasetsDashboard: NextPage = () => {
   const { data: sessionData } = useSession();
   const isSysAdmin = sessionData?.user?.sysadmin == true;
   if (!isSysAdmin) {
@@ -17,12 +16,12 @@ const TopicsDashboard: NextPage = () => {
 
   return (
     <>
-      <NextSeo title="Newsfeed" />
-      <DashboardLayout active="topics">
-        <MyTopicsTabContent />
+      <NextSeo title="My Organization" />
+      <DashboardLayout active="datasets-requests">
+        <MyDatasetsRequestsTabContent />
       </DashboardLayout>
     </>
   );
 };
 
-export default TopicsDashboard;
+export default DatasetsDashboard;

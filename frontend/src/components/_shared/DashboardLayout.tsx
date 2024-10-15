@@ -67,6 +67,15 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       id: "organizations",
       href: "/dashboard/organizations",
     },
+    ...(isSysAdmin
+      ? [
+          {
+            title: "Datasets requests",
+            id: "datasets-requests",
+            href: "/dashboard/datasets-requests",
+          },
+        ]
+      : []),
   ];
   return (
     <>
