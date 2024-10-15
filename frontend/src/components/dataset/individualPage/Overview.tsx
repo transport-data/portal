@@ -8,14 +8,14 @@ export function Overview({ introduction_text }: { introduction_text: string }) {
           <h3 className="text-3xl font-semibold leading-loose text-primary">
             Introduction and key takeaways
           </h3>
-        </div>
-        <div>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: introduction_text,
-            }}
-            className="min-h-[60vh] prose text-justify marker:text-accent prose-p:mt-2 prose-p:text-gray-500 prose-a:text-accent prose-a:underline prose-ul:mt-2 prose-ul:decoration-accent prose-li:m-0"
-          ></div>
+          <div>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: introduction_text,
+              }}
+              className="prose min-h-[60vh] text-justify marker:text-accent prose-p:mt-2 prose-p:text-gray-500 prose-a:text-accent prose-a:underline prose-ul:mt-2 prose-ul:decoration-accent prose-li:m-0"
+            ></div>
+          </div>
         </div>
       </div>
     </div>
