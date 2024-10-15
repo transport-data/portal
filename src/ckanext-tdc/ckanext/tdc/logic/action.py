@@ -164,7 +164,9 @@ def _update_contributors(data_dict, is_update=False):
 
         return new_contributors
 
-    data_dict["contributors"] = [current_user_id]
+    new_contributors = [current_user_id]
+    filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+    data_dict["contributors"] = filtered_new_contributors
 
 
 def _fix_user_group_permission(data_dict):
