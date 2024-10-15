@@ -270,6 +270,7 @@ dataset_fields:
 
 - field_name: approval_message
   label: Approval message
+  preset: markdown
 
 resource_fields:
 
