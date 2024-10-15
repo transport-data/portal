@@ -85,7 +85,7 @@ export default function DatasetsPage({
             <div className="grid auto-rows-fr grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
                 {gaData && (
-                  <Image
+                  <img
                     src="/images/icons/group-mostviewed.png"
                     width={48}
                     height={48}
@@ -131,7 +131,7 @@ export default function DatasetsPage({
               </div>
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
                 {tdcHarmonizedDatasets && (
-                  <Image
+                  <img
                     src="/images/icons/group-hamornised.png"
                     width={48}
                     height={48}
@@ -200,7 +200,7 @@ function TopicCard({ group }: { group: Group }) {
   return (
     <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
       {groupDetails && groupDetails.image_display_url && (
-        <Image
+        <img
           src={groupDetails.image_display_url}
           width={48}
           height={48}
