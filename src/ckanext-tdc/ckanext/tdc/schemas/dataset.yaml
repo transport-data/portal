@@ -257,6 +257,20 @@ dataset_fields:
   label: Introduction and key takeaways
   preset: markdown
 
+- field_name: approval_status
+  label: Approval status
+  preset: select
+  choices:
+    - label: Pending
+      value: pending
+    - label: Approved
+      value: approved
+    - label: Rejected
+      value: rejected
+
+- field_name: approval_message
+  label: Approval message
+
 resource_fields:
 
 - field_name: url

@@ -51,7 +51,8 @@ class TdcPlugin(plugins.SingletonPlugin):
             "invite_user_to_tdc": action.invite_user_to_tdc,
             "request_organization_owner": action.request_organization_owner,
             "request_new_organization": action.request_new_organization,
-            "tdc_dashboard_activity_list": activity.dashboard_activity_list_action
+            "tdc_dashboard_activity_list": activity.dashboard_activity_list_action,
+            "dataset_approval_update": action.dataset_approval_update
         }
 
     # IPackageController
