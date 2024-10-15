@@ -53,7 +53,7 @@ export default function AboutUsPage({}) {
             effectively.<br></br>
             <Link
               className="mt-2 inline-block text-base font-semibold text-gray-900"
-              href="https://github.com/orgs/transport-data/discussions"
+              href="https://github.com/orgs/transport-data/discussions/categories/user-feedback"
               target="_blank"
             >
               🔗 GitHub Discussions Page

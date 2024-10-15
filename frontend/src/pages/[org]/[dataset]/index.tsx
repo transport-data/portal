@@ -87,10 +87,6 @@ export default function DatasetPage({
       href: `/search`,
       label: "Datasets",
     },
-    {
-      href: `/${dataset.organization?.name}`,
-      label: `${dataset.organization?.title || dataset.organization?.name}`,
-    },
   ];
   const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
   const overviewTab = !!dataset.introduction_text;
