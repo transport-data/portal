@@ -1,0 +1,16 @@
+diff --git a/ckan/ckanext/activity/subscriptions.py b/ckan/ckanext/activity/subscriptions.py
+index 183f1c173..68db0240d 100644
+--- a/ckan/ckanext/activity/subscriptions.py
++++ b/ckan/ckanext/activity/subscriptions.py
+@@ -154,6 +154,11 @@ def package_changed(sender: str, **kwargs: Any):
+             log.warning("Activity subscription ignored")
+             return
+ 
++    context = kwargs["context"]
++    ignore_activity_signal = context.get("ignore_activity_signal")
++    if ignore_activity_signal:
++        return
++
+     result: types.ActionResult.PackageUpdate = kwargs["result"]
+     data_dict = kwargs["data_dict"]
+
