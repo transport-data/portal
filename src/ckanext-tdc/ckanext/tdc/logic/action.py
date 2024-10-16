@@ -735,4 +735,7 @@ def dataset_approval_update(context, data_dict):
 
     context["is_approval_action"] = True
 
+    # This prevents the default package activity from being created
+    context["ignore_activity_signal"] = True
+
     package_patch_action(context, package_patch_dict)
