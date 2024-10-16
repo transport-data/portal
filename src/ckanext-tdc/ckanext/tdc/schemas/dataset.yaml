@@ -272,6 +272,9 @@ dataset_fields:
   label: Approval message
   preset: markdown
 
+- field_name: approval_requested_by
+  label: Approval requested by
+
 resource_fields:
 
 - field_name: url

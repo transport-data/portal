@@ -220,12 +220,15 @@ def _fix_approval_workflow(context, data_dict, is_update):
             data_dict["private"] = True
             data_dict["approval_status"] = "pending"
             data_dict["approval_message"] = None
+            data_dict["approval_requested_by"] = user_id
             context["ignore_approval_status"] = True
         elif not is_resource_create:
             if "approval_message" in data_dict:
                 data_dict.pop("approval_message")
             if "approval_status" in data_dict:
                 data_dict.pop("approval_status")
+            if "approval_requested_by" in data_dict:
+                data_dict.pop("approval_requested_by")
 
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
