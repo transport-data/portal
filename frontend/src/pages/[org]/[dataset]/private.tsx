@@ -1,32 +1,22 @@
-import { GetStaticProps } from "next";
-import { Dataset as DatasetType } from "@portaljs/ckan";
-import { CKAN } from "@portaljs/ckan";
-import { env } from "@env.mjs";
+import { GetServerSideProps } from "next";
 import { getDataset } from "@utils/dataset";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { getServerAuthSession } from "@server/auth";
 import IndexDatasetPage from "@components/dataset/individualPage/Index";
 
-const backend_url = env.NEXT_PUBLIC_CKAN_URL;
-
-export async function getStaticPaths() {
-  const ckan = new CKAN(backend_url);
-  const paths = (
-    await ckan.getDatasetsListWithDetails({ offset: 0, limit: 1000 })
-  ).map((dataset: DatasetType) => ({
-    params: {
-      dataset: dataset.name,
-      org: dataset.organization?.name ?? "no-org",
-    },
-  }));
-  return {
-    paths,
-    fallback: "blocking",
-  };
-}
-
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const datasetName = context.params?.dataset;
+    const session = await getServerAuthSession(context);
+    //if session is not there redirect to unauthorized page
+    if (!session) {
+      return {
+        redirect: {
+          destination: "/unauthorized",
+          permanent: false,
+        },
+      };
+    }
     if (!datasetName) {
       return {
         notFound: true,
@@ -34,7 +24,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
     let dataset = await getDataset({
       id: datasetName as string,
-      apiKey: "",
+      apiKey: session?.user.apikey,
       include_extras: true,
     });
     if (!dataset.result) {
@@ -46,7 +36,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       props: {
         dataset: dataset.result,
       },
-      revalidate: 1800,
     };
   } catch (e) {
     const error = e as any;

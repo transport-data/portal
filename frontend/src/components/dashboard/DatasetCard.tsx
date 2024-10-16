@@ -27,7 +27,9 @@ export default function DatasetCard({ dataset, publicUrl }: DatasetCardProps) {
         <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-slate-200 px-6 py-3 dark:border-slate-950/5 dark:bg-slate-900">
           <div>
             <Link
-              href={`${publicUrl}/${dataset.organization?.name}/${dataset.name}`}
+              href={`${publicUrl}/${dataset.organization?.name}/${
+                dataset.name
+              }${dataset.private ? "/private" : ""}`}
             >
               <div className="line-clamp-1 text-base font-semibold leading-6">
                 {dataset.title}
