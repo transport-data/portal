@@ -1,5 +1,7 @@
 import CkanRequest from "@datopian/ckan-api-client-js";
+import { env } from "@env.mjs";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { User } from "@interfaces/ckan/user.interface";
 import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
 import { DatasetFormType, SearchDatasetType, DatasetDraftType } from "@schema/dataset.schema";
@@ -402,3 +404,27 @@ export const listDatasetActivities = async ({
   );
   return activities.flat();
 };
+
+
+export const followDataset = async ({id,isFollowing,apiKey}:{id:string,isFollowing:boolean;apiKey:string})=>{
+  const response = await CkanRequest.post<CkanResponse<any>>(
+    `${isFollowing ? 'unfollow' : 'follow'}_dataset`,
+    {
+      apiKey: apiKey,
+      json: { id },
+    }
+  );
+
+  return response.result
+}
+
+export const getDatasetFollowersList = async ({id,apiKey}:{id:string,apiKey:string})=>{
+  const response = await CkanRequest.post<CkanResponse<User[]>>(
+    `dataset_follower_list`,
+    {
+      apiKey: apiKey,
+      json: { id },
+    }
+  );
+  return response.result
+}

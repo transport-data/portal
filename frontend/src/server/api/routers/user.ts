@@ -14,9 +14,12 @@ import {
   UserInviteSchema,
   UserSchema,
 } from "@schema/user.schema";
+import { getDatasetFollowersList } from "@utils/dataset";
+
 import { followGroups } from "@utils/group";
 import {
   addOrganizationMember,
+  getOrgFollowersList,
   requestNewOrganization,
   requestOrganizationOwner
 } from "@utils/organization";
@@ -256,4 +259,23 @@ export const userRouter = createTRPCRouter({
     const followee = await getUserFollowee({ id: user.id, apiKey });
     return followee;
   }),
+  isFollowingDataset: protectedProcedure
+    .input(z.object({ dataset: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getDatasetFollowersList({ apiKey, id: input.dataset });
+
+      return list?.some(follower => follower.id === user?.id);;
+    }),
+    isFollowingOrganization: protectedProcedure
+    .input(z.object({ org: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getOrgFollowersList({ apiKey, id: input.org });
+
+
+      return list?.some(follower => follower.id === user?.id);;
+    }),
 });
