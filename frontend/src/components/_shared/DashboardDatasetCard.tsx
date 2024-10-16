@@ -94,7 +94,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
           <div className="group relative  gap-2">
             <h2 className="inline text-lg font-bold">
-              <Link href={`/@${organization?.name}/${name}${isPrivate ? '/private' : ''}`}>{title}</Link>
+              <Link href={`/@${organization?.name}/${name}${isPrivate || state === 'draft' ? '/private' : ''}`}>{title}</Link>
             </h2>
             {canEdit && (
               <Button
