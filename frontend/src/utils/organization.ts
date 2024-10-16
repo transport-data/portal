@@ -299,7 +299,7 @@ export const followOrganization = async ({id,isFollowing,apiKey}:{id:string,isFo
   return response.result
 }
 
-export const getOrgFollowersList = async ({id,apiKey}:{id:string,apiKey:string})=>{
+export const getOrgFollowersList = async ({ id,apiKey }:{ id:string, apiKey:string })=>{
   const response = await CkanRequest.post<CkanResponse<User[]>>(
     `organization_follower_list`,
     {

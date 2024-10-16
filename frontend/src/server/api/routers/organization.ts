@@ -99,7 +99,7 @@ export const organizationRouter = createTRPCRouter({
       return members;
     }),
 
-    follow: protectedProcedure
+  follow: protectedProcedure
     .input(z.object({ dataset: z.string(), isFollowing:z.boolean() }))
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;

@@ -16,7 +16,7 @@ import {
 } from "@schema/user.schema";
 import { getDatasetFollowersList } from "@utils/dataset";
 
-import { followGroups } from "@utils/group";
+import { followGroups, getGroupFollowersList } from "@utils/group";
 import {
   addOrganizationMember,
   getOrgFollowersList,
@@ -266,16 +266,31 @@ export const userRouter = createTRPCRouter({
       const apiKey = user.apikey;
       const list = await getDatasetFollowersList({ apiKey, id: input.dataset });
 
-      return list?.some(follower => follower.id === user?.id);;
+      return list?.some(follower => follower.id === user?.id);
     }),
-    isFollowingOrganization: protectedProcedure
+
+  isFollowingOrganization: protectedProcedure
     .input(z.object({ org: z.string() }))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
       const list = await getOrgFollowersList({ apiKey, id: input.org });
 
-
-      return list?.some(follower => follower.id === user?.id);;
+      return list?.some(follower => follower.id === user?.id);
     }),
+
+  isFollowingGeographies: protectedProcedure
+    .input(z.array(z.string()))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getGroupFollowersList({ apiKey, groups:input });
+      
+      return list.map( (g)=>({
+          id: g.id,
+          following: g.followers?.some(follower => follower.id === user?.id)
+         }
+      ))
+    }),
+
 });

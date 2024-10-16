@@ -1,3 +1,4 @@
+import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
@@ -39,37 +40,71 @@ export default function FollowDropdown({
   organization?: Organization;
   geographies?: FollowGeographyType[];
 }) {
-  const utils = api.useContext();
-
-  //const [followOrganization, setFollowOrg] = useState<Checked>(false);
-  const [followGeographies, setFollowGeographies] = useState<Checked>(false);
+  const utils = api.useUtils();
 
   const { data: followingDataset } = api.user.isFollowingDataset.useQuery({
     dataset: dataset.id,
   });
+
   const { data: followingOrganization } =
     api.user.isFollowingOrganization.useQuery({
       org: organization?.id ?? "",
     });
 
+  const { data: followingGeographies } =
+    api.user.isFollowingGeographies.useQuery(
+      (geographies ?? [])?.map((g) => g.id)
+    );
+
   const followDataset = api.dataset.follow.useMutation({
     onSuccess: () => {
       utils.user.isFollowingDataset.invalidate();
     },
-    onError: () => {},
   });
 
   const followOrg = api.organization.follow.useMutation({
     onSuccess: () => {
       utils.user.isFollowingOrganization.invalidate();
     },
-    onError: () => {},
   });
+
+  const followGeography = api.group.follow.useMutation({
+    onSuccess: () => {
+      utils.user.isFollowingGeographies.invalidate();
+    },
+  });
+
+  const followingAny =
+    followingDataset ||
+    followingOrganization ||
+    followingGeographies?.some((item) => item.following === true);
+
+  const geographiesFollowingCount =
+    followingGeographies?.filter((item) => item.following === true).length ?? 0;
+
+  const followingCount =
+    geographiesFollowingCount +
+    (followingDataset ? 1 : 0) +
+    (followingOrganization ? 1 : 0);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary">Follow</Button>
+        <Button variant="secondary">
+          {followingAny ? (
+            <div className="flex gap-2">
+              Following{" "}
+              <Badge
+                variant="default"
+                className="flex h-[20px] w-[20px] items-center justify-center rounded-full bg-gray-200 p-0 font-semibold text-gray-900 hover:bg-gray-200"
+              >
+                {followingCount}
+              </Badge>
+            </div>
+          ) : (
+            "Follow"
+          )}
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuCheckboxItem
@@ -78,7 +113,7 @@ export default function FollowDropdown({
             event.preventDefault();
             return false;
           }}
-          onCheckedChange={(event) => {
+          onCheckedChange={() => {
             followDataset.mutate({
               dataset: dataset.id,
               isFollowing: followingDataset ?? false,
@@ -94,7 +129,7 @@ export default function FollowDropdown({
               event.preventDefault();
               return false;
             }}
-            onCheckedChange={(event) => {
+            onCheckedChange={() => {
               followOrg.mutate({
                 dataset: organization.id,
                 isFollowing: followingOrganization ?? false,
@@ -107,30 +142,29 @@ export default function FollowDropdown({
 
         <DropdownMenuLabel>Geographies</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuCheckboxItem
-          checked={followGeographies}
-          onCheckedChange={setFollowGeographies}
-        >
-          United States of America
-        </DropdownMenuCheckboxItem>
+        {geographies?.map((geo) => (
+          <DropdownMenuCheckboxItem
+            key={geo.id}
+            checked={
+              followingGeographies?.find((g) => g.id === geo.id)?.following
+            }
+            onSelect={(event) => {
+              event.preventDefault();
+              return false;
+            }}
+            onCheckedChange={(event) => {
+              followGeography.mutate({
+                id: geo.id,
+                isFollowing:
+                  followingGeographies?.find((g) => g.id === geo.id)
+                    ?.following ?? false,
+              });
+            }}
+          >
+            {geo.name}
+          </DropdownMenuCheckboxItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
-  /*(
-    <Button
-      onClick={() => {
-        //copy to clipboard the url
-
-        toast({
-          title: "Followed",
-          description: "You can now share the link with others",
-          duration: 5000,
-        });
-      }}
-      variant="secondary"
-      className={cn("", className)}
-    >
-      Follow
-    </Button>
-  );*/
 }
