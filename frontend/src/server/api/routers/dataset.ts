@@ -49,11 +49,11 @@ export const datasetRouter = createTRPCRouter({
       const searchResults = await rejectDataset({ apiKey, datasetId, reason });
       return searchResults;
     }),
-  get: protectedProcedure
+  get: publicProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
-      const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const user = ctx.session?.user ?? null;
+      const apiKey = user?.apikey ?? '';
       const dataset = await getDataset({ id: input.name, apiKey });
       return dataset;
     }),

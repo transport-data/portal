@@ -8,8 +8,7 @@ export const ResourceSchema = z.object({
   url_type: z.string(),
   format: z.string().optional(),
   size: z.number().optional(),
-  type: z.enum(["data", "documentation"]),
-  resource_type: z.string().optional().nullable(),
+  resource_type: z.enum(["data", "documentation"]),
   url: z.string().url(),
 });
 
@@ -94,6 +93,7 @@ export const SearchDatasetSchema = z.object({
   countries: z.array(z.string()).optional(),
   fuel: z.string().optional(),
   tdc_category: z.string().optional(),
+  data_provider: z.string().optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),
   groups: z.array(z.string()).optional(),

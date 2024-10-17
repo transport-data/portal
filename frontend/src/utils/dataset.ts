@@ -124,6 +124,10 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("tdc_category", [options.tdc_category]));
   }
 
+  if (options.data_provider) {
+    fqAr.push(buildOrFq("data_provider", [options.data_provider]));
+  }
+
   if (options.query) {
     fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }
