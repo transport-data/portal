@@ -46,7 +46,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
     return {
       props: {
-        dataset: dataset.result,
+        _dataset: dataset.result,
       },
       revalidate: 1800,
     };
