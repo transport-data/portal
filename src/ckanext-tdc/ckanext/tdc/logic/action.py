@@ -27,6 +27,10 @@ cwd = path.abspath(path.dirname(__file__))
 template_dir = path.join(cwd, '../templates/emails/')
 env = Environment(loader=FileSystemLoader(template_dir))
 
+privileged_context = {
+    "ignore_auth": True
+}
+
 
 def _fix_topics_field(data_dict):
     """
@@ -131,30 +135,38 @@ def _update_contributors(data_dict, is_update=False):
     if not hasattr(current_user, "id"):
         return
     current_user_id = current_user.id
+    user_show_action = tk.get_action("user_show")
+    excluded_ids = []
+    try:
+        site_user = logic.get_action(u"get_site_user")(privileged_context, {})
+        excluded_ids.append(site_user.get("id"))
+        ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
+        excluded_ids.append(ckan_admin.get("id"))
+    except Exception as e:
+        log.error(e)
 
     if is_update:
         dataset_id = data_dict.get("id")
         dataset_name = data_dict.get("name")
         name_or_id = dataset_id or dataset_name
 
-        priviliged_context = {
-            "ignore_auth": True
-        }
-
         package_show_action = tk.get_action("package_show")
         package_show_data_dict = {
             "id": name_or_id
         }
         old_data_dict = package_show_action(
-            priviliged_context, package_show_data_dict)
+            privileged_context, package_show_data_dict)
         old_contributors = old_data_dict.get("contributors")
         new_contributors = list(set(old_contributors + [current_user_id]))
+        filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
 
-        data_dict["contributors"] = new_contributors
+        data_dict["contributors"] = filtered_new_contributors
 
         return new_contributors
 
-    data_dict["contributors"] = [current_user_id]
+    new_contributors = [current_user_id]
+    filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+    data_dict["contributors"] = filtered_new_contributors
 
 
 def _fix_user_group_permission(data_dict):
@@ -650,6 +662,46 @@ def request_new_organization(context, data_dict):
     return "Request Sent Successfully"
 
 
+def _add_contributors_data_to_dataset(dataset):
+    user_show_action = tk.get_action("user_show")
+    organization_show_action = tk.get_action("organization_show")
+    privileged_context = {"ignore_auth": True}
+
+    owner_org = dataset.get("owner_org")
+    org_dict = {"id": owner_org, "include_extras": True}
+    full_org = organization_show_action(privileged_context, org_dict)
+
+    # Hiding too much information
+    full_org['users'] = None
+    dataset['organization'] = full_org
+
+    creator_user_id = dataset.get("creator_user_id")
+    creator_user_dict = {"id": creator_user_id}
+    creator_user = user_show_action(privileged_context, creator_user_dict)
+
+    if creator_user:
+        dataset['creator_user'] = {
+            "fullname": creator_user.get("fullname"),
+            "display_name": creator_user.get("display_name"),
+            "name": creator_user.get("name"),
+            "email": creator_user.get("email")
+        }
+
+    contributor_ids = dataset.get("contributors")
+    contributors_dict_list = [
+            user_show_action(privileged_context, {"id": id})
+            for id in contributor_ids]
+
+    contributors_data = [{
+        "fullname": contributor.get("fullname"),
+        "display_name": contributor.get("display_name"),
+        "name": contributor.get("name"),
+        "email": contributor.get("email")
+    } for contributor in contributors_dict_list]
+
+    dataset['contributors_data'] = contributors_data
+
+
 @tk.chained_action
 @tk.side_effect_free
 def package_show(up_func, context, data_dict):
@@ -657,21 +709,10 @@ def package_show(up_func, context, data_dict):
     include_extras = data_dict.get("include_extras", False)
 
     result = up_func(context, data_dict)
+
     if include_extras:
-        full_org = tk.get_action('organization_show')({"ignore_auth": True}, {"id": result.get("owner_org"), "include_extras": True })
-        # Hiding too much information
-        full_org['users'] = None
-        result['organization'] = full_org
-        creator_user = tk.get_action('user_show')({"ignore_auth": True}, {"id": result.get("creator_user_id")})
-        if creator_user:
-            result['creator_user'] = { "fullname": creator_user.get("fullname"), "display_name": creator_user.get("display_name"), "name": creator_user.get("name"), "email": creator_user.get("email") }
-        contributors_data = [{
-            "fullname": contributor.get("fullname"),
-            "display_name": contributor.get("display_name"),
-            "name": contributor.get("name"),
-            "email": contributor.get("email")
-        } for contributor in tk.get_action('user_list')({"ignore_auth": True}, {"id": result.get("contributors")})]
-        result['contributors_data'] = contributors_data
+        _add_contributors_data_to_dataset(result)
+
     if output_format != "json":
         converter = converters.get(output_format)
         if converter:

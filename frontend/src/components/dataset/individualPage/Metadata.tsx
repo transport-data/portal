@@ -84,7 +84,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 {dataset.contributors_data &&
                   dataset.contributors_data.map((contributor, index) => (
                     <li className="text-accent">
-                      {contributor.fullname ?? contributor.name} 
+                      {contributor.fullname || contributor.name} 
                     </li>
                   ))}
               </ul>
