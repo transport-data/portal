@@ -1,4 +1,3 @@
-import { api } from "@utils/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,21 +9,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import TextEditor from "@components/_shared/TextEditor";
 import { Button, LoaderButton } from "@components/ui/button";
-import { useState } from "react";
 import { toast } from "@components/ui/use-toast";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { SearchDatasetType } from "@schema/dataset.schema";
+import { api } from "@utils/api";
 import { useSession } from "next-auth/react";
+import { ReactNode, useState } from "react";
 
-export function DeleteDatasetButton({
-  datasetId,
-  children,
+export default function ({
+  dataset: { title, id },
   onSuccess,
+  children,
 }: {
-  datasetId: string;
+  children?: ReactNode;
+  dataset: Dataset;
   onSuccess: () => void;
-  children?: React.ReactNode;
 }) {
+  const [reason, setRejectReason] = useState<string | undefined>();
   const utils = api.useContext();
   const { data: session } = useSession();
   const options: SearchDatasetType = {
@@ -37,10 +40,10 @@ export function DeleteDatasetButton({
     ],
   };
   const [open, setOpen] = useState(false);
-  const deleteDataset = api.dataset.delete.useMutation({
+  const rejectDataset = api.dataset.reject.useMutation({
     onSuccess: async () => {
       toast({
-        description: "Succesfully deleted dataset",
+        description: "Succesfully rejected dataset",
       });
       onSuccess();
       await utils.dataset.search.invalidate(options);
@@ -49,7 +52,7 @@ export function DeleteDatasetButton({
     onError: (e) => {
       setOpen(false);
       toast({
-        title: "Failed to delete dataset",
+        title: "Failed to reject dataset",
         description: e.message,
         variant: "danger",
       });
@@ -58,14 +61,29 @@ export function DeleteDatasetButton({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        {children || <Button variant="danger">Delete Dataset</Button>}
+        {children || (
+          <Button
+            variant="default"
+            className="bg-yellow-400 hover:bg-yellow-300"
+          >
+            Reject Dataset
+          </Button>
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. It will permanently remove the
-            dataset.
+            Why do you reject the creation of the{" "}
+            <span className="font-bold">"{title}"</span> dataset?
+            <div className="mt-4">
+              <TextEditor
+                placeholder="Rejection message to the dataset's creator..."
+                setText={(x) =>
+                  setRejectReason(x.replace(/<\/?[^>]+(>|$)/g, ""))
+                }
+              />
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -74,13 +92,16 @@ export function DeleteDatasetButton({
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <LoaderButton
-              loading={deleteDataset.isLoading}
-              onClick={() => deleteDataset.mutate({ ids: [datasetId] })}
-              className="bg-red-600 text-white hover:bg-red-400"
-              id="confirmDelete"
-              variant="danger"
+              loading={rejectDataset.isLoading}
+              disabled={!reason}
+              onClick={() =>
+                rejectDataset.mutate({ datasetId: id, reason: reason! })
+              }
+              className="bg-yellow-400 hover:bg-yellow-300"
+              id="confirmReject"
+              variant="default"
             >
-              Delete
+              Reject
             </LoaderButton>
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -1,40 +1,36 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useSession } from "next-auth/react";
 
-import Loading from "@components/_shared/Loading";
-import { Dashboard } from "@components/_shared/Dashboard";
-import { api } from "@utils/api";
-import { useMachine } from "@xstate/react";
-import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
-import {
-  ArrowLeftCircleIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/20/solid";
-import Spinner from "@components/_shared/Spinner";
-import { NextSeo } from "next-seo";
-import { formatIcon } from "@lib/utils";
-import { Steps } from "@components/dataset/form/Steps";
-import { MetadataForm } from "@components/dataset/form/Metadata";
-import { useForm } from "react-hook-form";
-import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
-import { Button, LoaderButton } from "@components/ui/button";
-import { GeneralForm } from "@components/dataset/form/General";
-import { UploadsForm } from "@components/dataset/form/Uploads";
-import { toast } from "@components/ui/use-toast";
-import { match } from "ts-pattern";
-import { useRouter } from "next/router";
-import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Layout from "@components/_shared/Layout";
-import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
-import { getDataset } from "@utils/dataset";
-import { getServerAuthSession } from "@server/auth";
-import { Dataset as TdcDataset } from "@interfaces/ckan/dataset.interface";
+import Loading from "@components/_shared/Loading";
+import ApproveDatasetButton from "@components/dataset/ApproveDatasetButton";
 import { DeleteDatasetButton } from "@components/dataset/DeleteDatasetButton";
+import { GeneralForm } from "@components/dataset/form/General";
+import { MetadataForm } from "@components/dataset/form/Metadata";
+import { Steps } from "@components/dataset/form/Steps";
+import { UploadsForm } from "@components/dataset/form/Uploads";
+import RejectDatasetButton from "@components/dataset/RejectDatasetButton";
+import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
+import { Button, LoaderButton } from "@components/ui/button";
+import { toast } from "@components/ui/use-toast";
+import { ChevronLeftIcon } from "@heroicons/react/20/solid";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Dataset as TdcDataset } from "@interfaces/ckan/dataset.interface";
+import { cn } from "@lib/utils";
+import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
+import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
+import { getServerAuthSession } from "@server/auth";
+import { api } from "@utils/api";
+import { getDataset } from "@utils/dataset";
+import { listUserOrganizations } from "@utils/organization";
+import { useMachine } from "@xstate/react";
+import { NextSeo } from "next-seo";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { match } from "ts-pattern";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -49,9 +45,20 @@ export async function getServerSideProps(
       notFound: true,
     };
   }
+
   const dataset = _dataset.result;
+
+  const userOrgs = await listUserOrganizations({
+    apiKey: session?.user.apikey || "",
+    id: session?.user.id || "",
+  });
+
+  const isUserAdminOfTheDatasetOrg = !!userOrgs.find(
+    (x) => x.id === dataset.organization?.id && x.capacity === "admin"
+  );
+
   if (!dataset.related_datasets || dataset.related_datasets.length === 0)
-    return { props: { dataset } };
+    return { props: { isUserAdminOfTheDatasetOrg, dataset } };
   //we need to do this to have the title for the related_datasets in the combobox
   const relatedDatasets = await Promise.all(
     dataset.related_datasets.map((id) =>
@@ -61,8 +68,10 @@ export async function getServerSideProps(
       })
     )
   );
+
   return {
     props: {
+      isUserAdminOfTheDatasetOrg,
       dataset: {
         ...dataset,
         related_datasets: relatedDatasets.map((d) => d.result),
@@ -84,7 +93,10 @@ function convertStringToDate(date: string) {
   return dateObject;
 }
 
-const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
+const EditDatasetDashboard: NextPage<{
+  dataset: Dataset;
+  isUserAdminOfTheDatasetOrg: boolean;
+}> = ({ dataset, isUserAdminOfTheDatasetOrg }) => {
   const { data: sessionData } = useSession();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
@@ -135,7 +147,9 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
         })) ?? [],
     },
   });
+
   if (!sessionData) return <Loading />;
+
   function onSubmit(data: DatasetFormType) {
     return editDataset.mutate({
       ...data,
@@ -189,6 +203,11 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
       })
       .otherwise(() => false);
 
+  const disabledForm = isUserAdminOfTheDatasetOrg
+    ? false
+    : dataset.approval_status === "pending" || // TODO remove this OR after
+      !["rejected", "approved", ""].includes(dataset.approval_status || "");
+
   return (
     <>
       <NextSeo title="Edit dataset" />
@@ -230,11 +249,43 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
                           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
                             Edit Dataset
                           </h2>
-                          <DeleteDatasetButton
-                            datasetId={dataset.id}
-                            onSuccess={() => router.push("/dashboard/datasets")}
-                          />
+                          <div className="flex flex-col gap-2 sm:flex-row">
+                            {isUserAdminOfTheDatasetOrg &&
+                              ["pending", "rejected"].includes(
+                                dataset.approval_status || "rejected" // TODO change it to empty string after
+                              ) && (
+                                <>
+                                  <ApproveDatasetButton
+                                    datasetId={dataset.id}
+                                    onSuccess={() =>
+                                      router.push("/dashboard/datasets")
+                                    }
+                                  />
+                                  <RejectDatasetButton
+                                    dataset={dataset as any}
+                                    onSuccess={() =>
+                                      router.push("/dashboard/datasets")
+                                    }
+                                  />
+                                </>
+                              )}
+                            <DeleteDatasetButton
+                              datasetId={dataset.id}
+                              onSuccess={() =>
+                                router.push("/dashboard/datasets")
+                              }
+                            />
+                          </div>
                         </div>
+                        {dataset.approval_message && (
+                          <div
+                            className="mt-4 border-l-4 border-orange-500 bg-orange-100 p-4 text-base text-orange-700"
+                            role="alert"
+                          >
+                            <p className="font-bold">Rejection reason</p>
+                            <p>{dataset.approval_message}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </h2>
@@ -249,7 +300,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
             <form onSubmit={form.handleSubmit(onSubmit)}>
               {current.matches("general") && (
                 <>
-                  <GeneralForm editing />
+                  <GeneralForm disabled={disabledForm} />
                   <Button
                     type="button"
                     className="w-full"
@@ -267,7 +318,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
               )}
               {current.matches("metadata") && (
                 <>
-                  <MetadataForm />
+                  <MetadataForm disabled={disabledForm} />
                   <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                     <Button
                       type="button"
@@ -295,7 +346,7 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
               )}
               {current.matches("uploads") && (
                 <>
-                  <UploadsForm />
+                  <UploadsForm disabled={disabledForm} />
                   <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                     <Button
                       type="button"
@@ -306,8 +357,12 @@ const EditDatasetDashboard: NextPage<{ dataset: Dataset }> = ({ dataset }) => {
                       Prev
                     </Button>
                     <LoaderButton
+                      disabled={disabledForm}
+                      className={cn(
+                        disabledForm && "cursor-not-allowed",
+                        "w-full"
+                      )}
                       loading={editDataset.isLoading}
-                      className="w-full"
                       type="submit"
                     >
                       Submit

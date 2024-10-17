@@ -1,18 +1,3 @@
-import { DatasetFormType } from "@schema/dataset.schema";
-import { format } from "date-fns";
-import { UseFormReturn, useFieldArray, useFormContext } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@components/ui/button";
-import { RTEForm } from "@components/ui/formRte";
 import {
   Command,
   CommandEmpty,
@@ -22,17 +7,19 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn, slugify } from "@lib/utils";
-import { MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { P, match } from "ts-pattern";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { api } from "@utils/api";
-import { useEffect, useState } from "react";
-import Spinner from "@components/_shared/Spinner";
 import {
   Select,
   SelectContent,
@@ -40,11 +27,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check } from "lucide-react";
+import Spinner from "@components/_shared/Spinner";
+import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
+import { RTEForm } from "@components/ui/formRte";
+import { PlusIcon } from "@heroicons/react/20/solid";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { cn } from "@lib/utils";
+import { DatasetFormType } from "@schema/dataset.schema";
+import { api } from "@utils/api";
+import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { P, match } from "ts-pattern";
 
-export function GeneralForm({ editing = false }: { editing?: boolean} ) {
+export function GeneralForm({
+  editing = false,
+  disabled,
+}: {
+  editing?: boolean;
+  disabled?: boolean;
+}) {
   const formObj = useFormContext<DatasetFormType>();
   const {
     getValues,
@@ -63,7 +67,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
 
   const userOrganization = api.organization.listForUser.useQuery();
   const allOrganizations = api.organization.list.useQuery();
-  const session = useSession()
+  const session = useSession();
   const topics = api.group.list.useQuery({
     showGeographyShapes: false,
     type: "topic",
@@ -84,7 +88,12 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Title..." {...field} />
+                <Input
+                  disabled={disabled}
+                  className={cn(disabled ? "cursor-not-allowed" : "")}
+                  placeholder="Title..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -101,7 +110,15 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input disabled={editing} className="disabled:bg-gray-200" placeholder="Dataset slug" {...field} />
+                <Input
+                  disabled={editing || disabled}
+                  className={cn(
+                    disabled ? "cursor-not-allowed" : "",
+                    "disabled:bg-gray-200"
+                  )}
+                  placeholder="Dataset slug"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
               <FormDescription>
@@ -123,7 +140,11 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                {match(session.data?.user.sysadmin ? allOrganizations : userOrganization)
+                {match(
+                  session.data?.user.sysadmin
+                    ? allOrganizations
+                    : userOrganization
+                )
                   .with({ isLoading: true }, () => (
                     <span className="flex items-center gap-x-2 text-sm">
                       <Spinner />{" "}
@@ -138,6 +159,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                   ))
                   .with({ isSuccess: true, data: P.select() }, (data) => (
                     <Select
+                      disabled={disabled}
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
@@ -147,12 +169,11 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {data
-                          .map((group, index) => (
-                            <SelectItem key={index} value={group.id}>
-                              {group.title ?? group.display_name ?? group.name}
-                            </SelectItem>
-                          ))}
+                        {data.map((group, index) => (
+                          <SelectItem key={index} value={group.id}>
+                            {group.title ?? group.display_name ?? group.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   ))
@@ -207,13 +228,18 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                 },
                 (data) => (
                   <Popover>
-                    <PopoverTrigger asChild>
+                    <PopoverTrigger
+                      className={cn(disabled && "hover:cursor-not-allowed first:hover:cursor-not-allowed [&>*]:cursor-not-allowed")}
+                      disabled={disabled}
+                      asChild
+                    >
                       <FormControl>
                         <Button
                           variant="outline"
                           role="combobox"
+                          disabled={disabled}
                           className={cn(
-                            "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
+                            "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary disabled:cursor-not-allowed",
                             (!field.value || field.value.length === 0) &&
                               "text-gray-400"
                           )}
@@ -233,11 +259,15 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                       style={{ width: "var(--radix-popover-trigger-width)" }}
                     >
                       <Command>
-                        <CommandInput placeholder="Search topics..." />
+                        <CommandInput
+                          disabled={disabled}
+                          placeholder="Search topics..."
+                        />
                         <CommandList>
                           <CommandEmpty>No topic found</CommandEmpty>
                           {data.map((t) => (
                             <CommandItem
+                              disabled={disabled}
                               value={t.name}
                               keywords={[t.title ?? t.name]}
                               key={t.name}
@@ -289,6 +319,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           Description
         </div>
         <RTEForm
+          disabled={disabled}
           name="notes"
           placeholder="Write a short description of this dataset"
           formObj={formObj}
@@ -299,6 +330,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
           Overview
         </div>
         <RTEForm
+          disabled={disabled}
           name="overview_text"
           placeholder="Write a overview description of this dataset"
           formObj={formObj}
@@ -306,11 +338,14 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
       </div>
       <FormField
         control={control}
+        disabled={disabled}
         name="is_archived"
         render={({ field }) => (
           <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
             <FormControl>
               <Checkbox
+                className={cn(disabled ? "cursor-not-allowed" : "")}
+                disabled={disabled}
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
@@ -324,10 +359,13 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
       <FormField
         control={control}
         name="private"
+        disabled={disabled}
         render={({ field }) => (
           <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
             <FormControl>
               <Checkbox
+                className={cn(disabled ? "cursor-not-allowed" : "")}
+                disabled={disabled}
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
@@ -350,12 +388,16 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
               <Popover>
                 {field.value.map((tag, index) => (
                   <Button
+                    disabled={disabled}
                     key={index}
                     size="pill"
                     variant="outline"
                     role="combobox"
                     type="button"
-                    className="w-fit gap-x-2 border-accent text-xs text-accent"
+                    className={cn(
+                      disabled ? "cursor-not-allowed" : "",
+                      "w-fit gap-x-2 border-accent text-xs text-accent"
+                    )}
                     onClick={() =>
                       setValue(
                         "tags",
@@ -372,10 +414,13 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                     <Button
                       size="pill"
                       variant="outline"
-                      disabled={field.value.length >= 3}
+                      disabled={field.value.length >= 3 || disabled}
                       role="combobox"
                       type="button"
-                      className="w-fit gap-x-2 border-accent text-xs text-accent"
+                      className={cn(
+                        disabled ? "cursor-not-allowed" : "",
+                        "w-fit gap-x-2 border-accent text-xs text-accent"
+                      )}
                     >
                       <PlusIcon className="h-4 w-4" />
                       Add a keyword
@@ -417,14 +462,16 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                                 {data.map((t) => (
                                   <CommandItem
                                     disabled={
-                                      field.value.some(_t => _t.name === t) ||
+                                      field.value.some((_t) => _t.name === t) ||
                                       field.value.length >= 3
                                     }
                                     className="disabled:opacity-50"
                                     value={t}
                                     key={t}
                                     onSelect={() => {
-                                      match(field.value.some(v => v.name === t))
+                                      match(
+                                        field.value.some((v) => v.name === t)
+                                      )
                                         .with(true, () =>
                                           setValue(
                                             "tags",
@@ -436,7 +483,9 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                                         .with(false, () =>
                                           setValue(
                                             "tags",
-                                            getValues("tags").concat({ name: t})
+                                            getValues("tags").concat({
+                                              name: t,
+                                            })
                                           )
                                         );
                                     }}
@@ -444,7 +493,7 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                                     <CheckIcon
                                       className={cn(
                                         "mr-2 h-4 w-4",
-                                        field.value.some(v => v.name === t)
+                                        field.value.some((v) => v.name === t)
                                           ? "opacity-100"
                                           : "opacity-0"
                                       )}
@@ -464,12 +513,18 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                               <CommandItem
                                 value={searchedTag}
                                 className={cn(
-                                  field.value.some(v => v.name === searchedTag)
+                                  field.value.some(
+                                    (v) => v.name === searchedTag
+                                  )
                                     ? "bg-accent text-accent-foreground"
                                     : ""
                                 )}
                                 onSelect={() => {
-                                  match(field.value.some(v => v.name === searchedTag))
+                                  match(
+                                    field.value.some(
+                                      (v) => v.name === searchedTag
+                                    )
+                                  )
                                     .with(true, () =>
                                       setValue(
                                         "tags",
@@ -481,7 +536,9 @@ export function GeneralForm({ editing = false }: { editing?: boolean} ) {
                                     .with(false, () =>
                                       setValue(
                                         "tags",
-                                        getValues("tags").concat({ name: searchedTag})
+                                        getValues("tags").concat({
+                                          name: searchedTag,
+                                        })
                                       )
                                     );
                                 }}

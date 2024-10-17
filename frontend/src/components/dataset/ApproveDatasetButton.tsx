@@ -1,4 +1,3 @@
-import { api } from "@utils/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,12 +10,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, LoaderButton } from "@components/ui/button";
-import { useState } from "react";
 import { toast } from "@components/ui/use-toast";
 import { SearchDatasetType } from "@schema/dataset.schema";
+import { api } from "@utils/api";
 import { useSession } from "next-auth/react";
+import { useState } from "react";
 
-export function DeleteDatasetButton({
+export default function ({
   datasetId,
   children,
   onSuccess,
@@ -37,10 +37,10 @@ export function DeleteDatasetButton({
     ],
   };
   const [open, setOpen] = useState(false);
-  const deleteDataset = api.dataset.delete.useMutation({
+  const approveDataset = api.dataset.approve.useMutation({
     onSuccess: async () => {
       toast({
-        description: "Succesfully deleted dataset",
+        description: "Succesfully approved dataset",
       });
       onSuccess();
       await utils.dataset.search.invalidate(options);
@@ -49,7 +49,7 @@ export function DeleteDatasetButton({
     onError: (e) => {
       setOpen(false);
       toast({
-        title: "Failed to delete dataset",
+        title: "Failed to approve dataset",
         description: e.message,
         variant: "danger",
       });
@@ -58,14 +58,20 @@ export function DeleteDatasetButton({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        {children || <Button variant="danger">Delete Dataset</Button>}
+        {children || (
+          <Button
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border-transparent bg-accent px-[20px] py-[10px] text-sm font-medium text-white ring-offset-background transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            variant="success"
+          >
+            Approve Dataset
+          </Button>
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. It will permanently remove the
-            dataset.
+            This action cannot be undone. It will make the dataset public.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -74,13 +80,12 @@ export function DeleteDatasetButton({
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <LoaderButton
-              loading={deleteDataset.isLoading}
-              onClick={() => deleteDataset.mutate({ ids: [datasetId] })}
-              className="bg-red-600 text-white hover:bg-red-400"
-              id="confirmDelete"
-              variant="danger"
+              loading={approveDataset.isLoading}
+              onClick={() => approveDataset.mutate(datasetId)}
+              id="confirmApproval"
+              variant="success"
             >
-              Delete
+              Approve
             </LoaderButton>
           </AlertDialogAction>
         </AlertDialogFooter>

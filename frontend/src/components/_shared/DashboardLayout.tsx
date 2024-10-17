@@ -48,11 +48,6 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       href: "/dashboard/datasets/my-organization",
       id: "my-organization",
     },
-    {
-      title: "My Discussions",
-      id: "my-discussions",
-      href: "/dashboard/discussions",
-    },
     ...(isSysAdmin
       ? [
           {

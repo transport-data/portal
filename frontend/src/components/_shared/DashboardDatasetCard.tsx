@@ -3,23 +3,25 @@ import {
   CheckCircleIcon,
   CircleStackIcon,
   PencilIcon,
+  QuestionMarkCircleIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
 
-import { formatDate } from "@lib/utils";
-import { capitalize } from "remeda";
-import UserAvatar from "./UserAvatar";
+import { Button } from "@components/ui/button";
+import { X } from "@components/ui/rteIcons";
+import { Skeleton } from "@components/ui/skeleton";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 import {
   DocumentSearchIcon,
   EyeOffIcon,
   GlobeAltIcon,
   RegionIcon,
 } from "@lib/icons";
-import Link from "next/link";
+import { formatDate } from "@lib/utils";
 import { api } from "@utils/api";
-import { Button } from "@components/ui/button";
-import { Skeleton } from "@components/ui/skeleton";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
+import Link from "next/link";
+import { capitalize } from "remeda";
+import UserAvatar from "./UserAvatar";
 
 type DatasetCardProps = Dataset & {
   canEdit?: boolean;
@@ -97,7 +99,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
             <h2 className="inline text-lg font-bold">
               <Link href={`/@${organization?.name}/${name}`}>{title}</Link>
             </h2>
-            {canEdit && (approval_status === 'approved' || !approval_status) && (
+            {canEdit && (
               <Button
                 variant="default"
                 size="pill"
@@ -158,7 +160,28 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
               Public
             </Badge>
           )}
-
+          {["pending", "rejected"].includes(approval_status || "") && (
+            <span className="hidden xl:block">•</span>
+          )}
+          {approval_status === "pending" ? (
+            <Badge
+              variant={"warning"}
+              className="items-center capitalize"
+              icon={<QuestionMarkCircleIcon width={16} />}
+            >
+              {approval_status}
+            </Badge>
+          ) : (
+            approval_status === "rejected" && (
+              <Badge
+                variant={"default"}
+                className="items-center bg-red-500 capitalize"
+                icon={<X />}
+              >
+                {approval_status}
+              </Badge>
+            )
+          )}
           <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <svg

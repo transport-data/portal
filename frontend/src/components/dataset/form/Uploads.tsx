@@ -1,5 +1,9 @@
-import { Button } from "@components/ui/button";
-import { SearchIcon } from "lucide-react";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -7,36 +11,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useFieldArray, useFormContext } from "react-hook-form";
-import { DatasetFormType } from "@schema/dataset.schema";
-import { FileUploader } from "./FileUploader";
-import { formatBytes, formatIcon, getFileName } from "@lib/utils";
-import { TrashIcon } from "@heroicons/react/20/solid";
-import { UploadResult } from "@uppy/core";
-import { api } from "@utils/api";
-import { P, match } from "ts-pattern";
 import Spinner from "@components/_shared/Spinner";
 import { env } from "@env.mjs";
+import { TrashIcon } from "@heroicons/react/20/solid";
+import { cn, formatBytes, formatIcon, getFileName } from "@lib/utils";
+import { DatasetFormType } from "@schema/dataset.schema";
+import { UploadResult } from "@uppy/core";
+import { api } from "@utils/api";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { P, match } from "ts-pattern";
+import { FileUploader } from "./FileUploader";
 
 function findIndex<T>(arr: T[], predicate: (item: T) => boolean): number {
-    for (let i = 0; i < arr.length; i++) {
-        if (predicate(arr[i] as T)) {
-            return i;
-        }
+  for (let i = 0; i < arr.length; i++) {
+    if (predicate(arr[i] as T)) {
+      return i;
     }
-    return -1;
+  }
+  return -1;
 }
 
-export function UploadsForm() {
+export function UploadsForm({ disabled }: any) {
   const form = useFormContext<DatasetFormType>();
   const licenses = api.dataset.listLicenses.useQuery();
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
@@ -60,18 +55,17 @@ export function UploadsForm() {
           </div>
           <div className="flex w-full items-center justify-center">
             <FileUploader
+              disabled={disabled}
               id="files-upload"
               onUploadSuccess={(response: UploadResult) => {
                 let url = response.successful[0]?.uploadURL as string;
-                console.log('RESPONSE', response.successful[0])
+                console.log("RESPONSE", response.successful[0]);
                 const urlParts = url.split("/");
                 const resourceId = urlParts[urlParts.length - 2];
                 const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
                   "id"
-                )}/resource/${resourceId}/${
-                  fileName ?? ""
-                }`;
+                )}/resource/${resourceId}/${fileName ?? ""}`;
                 append({
                   id: resourceId,
                   name: response.successful[0]?.name ?? "",
@@ -112,21 +106,21 @@ export function UploadsForm() {
                         </div>
                       </div>
                       <div className="ml-4 flex-shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const _index = findIndex(
-                                fields,
-                                (f) => f.id === r.id
-                              );
-                              console.log('INDEX', _index)
-                              remove(_index);
-                            }}
-                            type="button"
-                            className="font-medium text-gray-500 hover:text-accent"
-                          >
-                            <TrashIcon className="h-5 w-5" />
-                          </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const _index = findIndex(
+                              fields,
+                              (f) => f.id === r.id
+                            );
+                            console.log("INDEX", _index);
+                            remove(_index);
+                          }}
+                          type="button"
+                          className="font-medium text-gray-500 hover:text-accent"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
                       </div>
                     </li>
                   ))}
@@ -141,6 +135,7 @@ export function UploadsForm() {
           </div>
           <div className="flex w-full items-center justify-center">
             <FileUploader
+              disabled={disabled}
               id="docs-upload"
               onUploadSuccess={(response: UploadResult) => {
                 let url = response.successful[0]?.uploadURL as string;
@@ -150,9 +145,7 @@ export function UploadsForm() {
                 const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
                   "id"
-                )}/resource/${resourceId}/${
-                  fileName ?? ""
-                }`;
+                )}/resource/${resourceId}/${fileName ?? ""}`;
                 append({
                   id: resourceId,
                   name: response.successful[0]?.name ?? "",
@@ -195,6 +188,11 @@ export function UploadsForm() {
                       <div className="ml-4 flex-shrink-0">
                         <button
                           type="button"
+                          disabled={disabled}
+                          className={cn(
+                            disabled && "cursor-not-allowed",
+                            "font-medium text-gray-500 hover:text-accent"
+                          )}
                           onClick={(e) => {
                             e.stopPropagation();
                             const _index = findIndex(
@@ -203,7 +201,6 @@ export function UploadsForm() {
                             );
                             remove(_index);
                           }}
-                          className="font-medium text-gray-500 hover:text-accent"
                         >
                           <TrashIcon className="h-5 w-5" />
                         </button>
@@ -240,6 +237,7 @@ export function UploadsForm() {
                     ))
                     .with({ isSuccess: true, data: P.select() }, (data) => (
                       <Select
+                        disabled={disabled}
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
