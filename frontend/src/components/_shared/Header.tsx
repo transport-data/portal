@@ -1,7 +1,8 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { Skeleton } from "@components/ui/skeleton";
+import UserMenuDropdown from "./UserMenuDropDown";
 import { Disclosure } from "@headlessui/react";
 import {
   ArrowRightEndOnRectangleIcon,
@@ -45,27 +46,10 @@ export default function Header({
 }) {
   const { data: session, status } = useSession();
   const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleToggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setShowDropdown(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleSignOut = () => {
     signOut({
@@ -166,47 +150,13 @@ export default function Header({
                   </Avatar>
                 </button>
                 {showDropdown && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute left-3 top-10 rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                  >
-                    <div
-                      className="py-1"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="options-menu"
-                    >
-                      <div className="px-4 py-2 text-sm font-bold text-gray-900">
-                        {session.user.name}
-                      </div>
-                      <div className="px-4 py-2 text-sm text-gray-500">
-                        {session.user.email}
-                      </div>
-                      {isSysAdmin && (
-                        <div
-                          className="block px-4 py-2 text-sm font-bold text-gray-900"
-                          role="menuitem"
-                        >
-                          System Admin
-                        </div>
-                      )}
-                      <hr className="my-1" />
-                      <Link
-                        href="/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700"
-                        role="menuitem"
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700"
-                        role="menuitem"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  </div>
+                  <UserMenuDropdown
+                    userName={session?.user?.name || ""}
+                    userEmail={session.user.email}
+                    isSysAdmin={isSysAdmin}
+                    handleSignOut={handleSignOut}
+                    setShowDropdown={setShowDropdown}
+                  />
                 )}
                 <Button
                   variant="ghost"
