@@ -5,6 +5,8 @@ import { env } from "@env.mjs";
 import { getDataset } from "@utils/dataset";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import IndexDatasetPage from "@components/dataset/individualPage/Index";
+import { api } from "@utils/api";
+import { createCkanResponse } from "@utils/createCkanResponse";
 
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
@@ -65,9 +67,17 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 export default function DatasetPage({
-  dataset,
+  _dataset,
 }: {
-  dataset: Dataset;
+  _dataset: Dataset;
 }): JSX.Element {
-  return <IndexDatasetPage dataset={dataset} />;
+  const { data: dataset } = api.dataset.get.useQuery(
+    {
+      name: _dataset.name,
+    },
+    {
+      initialData: createCkanResponse(_dataset),
+    }
+  );
+  return <IndexDatasetPage dataset={dataset.result} />;
 }
