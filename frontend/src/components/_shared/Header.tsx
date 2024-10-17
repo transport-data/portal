@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { Skeleton } from "@components/ui/skeleton";
@@ -43,6 +44,36 @@ export default function Header({
   backgroundColor?: string;
 }) {
   const { data: session, status } = useSession();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleToggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setShowDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleSignOut = () => {
+    signOut({
+      callbackUrl: "/",
+      redirect: true,
+    });
+  };
+  const isSysAdmin = session?.user?.sysadmin == true;
 
   return (
     <Disclosure
@@ -114,10 +145,9 @@ export default function Header({
                 <Skeleton className="h-[20px] w-[20px]"></Skeleton>
               </div>
             ) : session?.user ? (
-              <div className="flex items-center gap-[12px]">
+              <div className="relative flex items-center gap-[12px]">
                 <BellIcon width={22} className="text-gray-500" />
-
-                <Link href="/dashboard">
+                <button onClick={handleToggleDropdown}>
                   <Avatar className="h-[32px] w-[32px]">
                     <AvatarImage
                       src={session.user.image || ""}
@@ -134,16 +164,54 @@ export default function Header({
                         .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                </Link>
+                </button>
+                {showDropdown && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute left-3 top-10 rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                  >
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
+                    >
+                      <div className="px-4 py-2 text-sm font-bold text-gray-900">
+                        {session.user.name}
+                      </div>
+                      <div className="px-4 py-2 text-sm text-gray-500">
+                        {session.user.email}
+                      </div>
+                      {isSysAdmin && (
+                        <div
+                          className="block px-4 py-2 text-sm font-bold text-gray-900"
+                          role="menuitem"
+                        >
+                          System Admin
+                        </div>
+                      )}
+                      <hr className="my-1" />
+                      <Link
+                        href="/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700"
+                        role="menuitem"
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700"
+                        role="menuitem"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <Button
                   variant="ghost"
                   className="relative px-0 text-gray-500"
-                  onClick={() =>
-                    signOut({
-                      callbackUrl: "/",
-                      redirect: true,
-                    })
-                  }
+                  onClick={handleSignOut}
                 >
                   <ArrowRightEndOnRectangleIcon width={20} />
                 </Button>
