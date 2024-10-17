@@ -222,6 +222,15 @@ def _fix_approval_workflow(context, data_dict, is_update):
             data_dict["approval_message"] = None
             data_dict["approval_requested_by"] = user_id
             context["ignore_approval_status"] = True
+
+            # Register pending status as an approval activity
+            context["is_approval_action"] = True
+            context["is_approval_action_pending"] = True
+
+            # Ignore the default acitivity to enforce that
+            # the approval status change acitivty only happens
+            # after the package changed activity
+            context["ignore_activity_signal"] = True
         elif not is_resource_create:
             if "approval_message" in data_dict:
                 data_dict.pop("approval_message")
