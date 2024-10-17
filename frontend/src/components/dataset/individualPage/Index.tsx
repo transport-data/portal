@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { toast } from "@components/ui/use-toast";
 import { api } from "@utils/api";
+import FollowDropdown from "../FollowDropdown";
 
 const siteTitle = "TDC Data Portal";
 
@@ -151,7 +152,7 @@ export default function IndexDatasetPage({
             </div>
           </div>
         </div>
-        <Tabs defaultValue={overviewTab ? 'overview' : 'metadata'}>
+        <Tabs defaultValue={overviewTab ? "overview" : "metadata"}>
           <div className="border-b border-gray-200 shadow-sm">
             <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
               <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
@@ -196,12 +197,25 @@ export default function IndexDatasetPage({
                   <ShareIcon className="mr-2 h-4 w-4" />
                   Share
                 </Button>
+                <FollowDropdown
+                  dataset={{
+                    id: dataset.id,
+                    name: dataset.title ?? dataset.name,
+                  }}
+                  organization={dataset.organization}
+                  geographies={dataset.groups?.map((geo) => ({
+                    name: geo.title,
+                    id: geo.id,
+                  }))}
+                />
               </div>
             </div>
           </div>
           {overviewTab && (
             <TabsContent className="mt-0" value="overview">
-              <Overview introduction_text={dataset.introduction_text as string} />
+              <Overview
+                introduction_text={dataset.introduction_text as string}
+              />
             </TabsContent>
           )}
           {datasetsTab && (
