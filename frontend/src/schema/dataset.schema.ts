@@ -8,8 +8,7 @@ export const ResourceSchema = z.object({
   url_type: z.string(),
   format: z.string().optional(),
   size: z.number().optional(),
-  type: z.enum(["data", "documentation"]),
-  resource_type: z.string().optional().nullable(),
+  resource_type: z.enum(["data", "documentation"]),
   url: z.string().url(),
 });
 
