@@ -45,8 +45,8 @@ export function UploadsForm() {
       name: "resources", // unique name for your Field Array
     }
   );
-  const docs = fields.filter((f) => f.type === "documentation");
-  const files = fields.filter((f) => f.type === "data");
+  const docs = fields.filter((f) => f.resource_type === "documentation");
+  const files = fields.filter((f) => f.resource_type === "data");
   return (
     <div className="py-4">
       <div className="pb-4 text-xl font-bold leading-normal text-primary">
@@ -78,7 +78,6 @@ export function UploadsForm() {
                   url: url as string,
                   url_type: "upload",
                   resource_type: "data",
-                  type: "data",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
                 });
@@ -159,7 +158,6 @@ export function UploadsForm() {
                   url: url as string,
                   url_type: "upload",
                   resource_type: "documentation",
-                  type: "documentation",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
                 });
