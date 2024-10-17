@@ -15,6 +15,8 @@ def activity_type_exists(activity_type):
     very safe.
 
     """
+    log.error("!@#!@#")
+    log.error(object_id_validators)
     if activity_type in object_id_validators:
         return activity_type
     else:
@@ -22,7 +24,7 @@ def activity_type_exists(activity_type):
 
 
 object_id_validators = {
-    **core_activity_validators.VALIDATORS_PACKAGE_ACTIVITY_TYPES,
+    **core_activity_validators.object_id_validators,
     "reviewed package": "package_id_exists"
 }
 
