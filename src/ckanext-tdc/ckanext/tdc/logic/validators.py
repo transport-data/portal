@@ -15,8 +15,6 @@ def activity_type_exists(activity_type):
     very safe.
 
     """
-    log.error("!@#!@#")
-    log.error(object_id_validators)
     if activity_type in object_id_validators:
         return activity_type
     else:
