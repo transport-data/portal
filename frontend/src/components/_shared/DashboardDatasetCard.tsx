@@ -80,11 +80,9 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
       <CircleStackIcon {...badgeIconOptions} />
     );
 
-  const { data: contributorsData } = api.user.getUsersByIds.useQuery(
-    {
-      ids: contributors,
-    }
-  );
+  const { data: contributorsData } = api.user.getUsersByIds.useQuery({
+    ids: contributors,
+  });
 
   return (
     <div className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6">
@@ -115,7 +113,11 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
                 className=" right-0 ml-2 px-2.5 py-0.5 text-sm"
                 asChild
               >
-                <Link href={`/dashboard/datasets/${name}/edit`}>
+                <Link
+                  href={`/dashboard/datasets/${name}/edit${
+                    datasetRequest ? "?fromDatasetsRequests=true" : ""
+                  }`}
+                >
                   <PencilIcon className="mr-1 h-3 w-3" /> Edit
                 </Link>
               </Button>

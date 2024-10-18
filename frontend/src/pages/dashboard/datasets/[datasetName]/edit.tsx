@@ -53,12 +53,15 @@ export async function getServerSideProps(
     id: session?.user.id || "",
   });
 
+  const fromDatasetsRequests = !!context.query.fromDatasetsRequests;
   const isUserAdminOfTheDatasetOrg = !!userOrgs.find(
     (x) => x.id === dataset.organization?.id && x.capacity === "admin"
   );
 
   if (!dataset.related_datasets || dataset.related_datasets.length === 0)
-    return { props: { isUserAdminOfTheDatasetOrg, dataset } };
+    return {
+      props: { isUserAdminOfTheDatasetOrg, dataset, fromDatasetsRequests },
+    };
   //we need to do this to have the title for the related_datasets in the combobox
   const relatedDatasets = await Promise.all(
     dataset.related_datasets.map((id) =>
@@ -72,6 +75,7 @@ export async function getServerSideProps(
   return {
     props: {
       isUserAdminOfTheDatasetOrg,
+      fromDatasetsRequests,
       dataset: {
         ...dataset,
         related_datasets: relatedDatasets.map((d) => d.result),
@@ -96,7 +100,8 @@ function convertStringToDate(date: string) {
 const EditDatasetDashboard: NextPage<{
   dataset: Dataset;
   isUserAdminOfTheDatasetOrg: boolean;
-}> = ({ dataset, isUserAdminOfTheDatasetOrg }) => {
+  fromDatasetsRequests: boolean;
+}> = ({ dataset, isUserAdminOfTheDatasetOrg, fromDatasetsRequests }) => {
   const { data: sessionData } = useSession();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
@@ -207,8 +212,6 @@ const EditDatasetDashboard: NextPage<{
   const disabledForm = isUserAdminOfTheDatasetOrg
     ? false
     : dataset.approval_status === "pending";
-  // || // TODO remove this OR after
-  // !["rejected", "approved", ""].includes(dataset.approval_status || "");
 
   return (
     <>
@@ -234,7 +237,12 @@ const EditDatasetDashboard: NextPage<{
                   links={[
                     { label: "Home", href: "/" },
                     { label: "Dashboard", href: "/dashboard" },
-                    { label: "Datasets", href: "/dashboard/datasets" },
+                    fromDatasetsRequests
+                      ? {
+                          label: "Datasets Requests",
+                          href: "/dashboard/datasets-requests",
+                        }
+                      : { label: "Datasets", href: "/dashboard/datasets" },
                     {
                       label: "Edit Dataset",
                       href: `/dashboard/datasets/${dataset.name}/edit`,
