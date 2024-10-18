@@ -89,11 +89,17 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
     q = (
             model.Session.query(core_model_activity.Activity)
             .outerjoin(model.User, model.User.id == text("data::json->'package'->>'approval_requested_by'"))
+            .outerjoin(model.Member, and_(
+                model.Member.capacity == "admin",
+                model.Member.table_name == "user",
+                model.Member.table_id == user_id
+            ))
             .filter(core_model_activity.Activity.activity_type == "reviewed package")
             .filter(
                 or_(
                     text("data::json->'package'->>'approval_requested_by' = :user_id"),
-                    text("data::json->'package'->>'contributors' LIKE '%' || :user_id || '%'")
+                    text("data::json->'package'->>'contributors' LIKE '%' || :user_id || '%'"),
+                    text("data::json->'package'->>'owner_org'") == model.Member.group_id,
                 )
             )
             .params(user_id=user_id)
