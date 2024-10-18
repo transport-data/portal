@@ -73,7 +73,7 @@ function ResourceCard({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="flex items-center gap-x-1 text-sm font-semibold text-accent">
-            Show advanced options{" "}
+            Access by API{" "}
             <ChevronRightIcon className="mt-0.5 h-4 w-4" />
           </button>
         </DialogTrigger>
