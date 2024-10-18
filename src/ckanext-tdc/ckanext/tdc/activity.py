@@ -83,25 +83,45 @@ def _activities_from_everything_followed_by_user_query(
     return core_model_activity._activities_union_all(q1, q2, q3)
 
 
-def _activities_from_dataset_approval_workflow(user_id, limit):
+def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=None):
     # The user that will receive this notification is the
     # user that triggered the approval request
     q = (
             model.Session.query(core_model_activity.Activity)
             .outerjoin(model.User, model.User.id == text("data::json->'package'->>'approval_requested_by'"))
             .filter(core_model_activity.Activity.activity_type == "reviewed package")
-            .filter(text("data::json->'package'->>'approval_requested_by' = :user_id"))
+            .filter(
+                or_(
+                    text("data::json->'package'->>'approval_requested_by' = :user_id"),
+                    text("data::json->'package'->>'contributors' LIKE '%' || :user_id || '%'")
+                )
+            )
             .params(user_id=user_id)
     )
 
+    if approval_status is not None:
+        q = (
+            q.filter(text("data::json->'package'->>'approval_status' = :approval_status"))
+            .params(approval_status=approval_status)
+        )
+
     return core_model_activity._activities_limit(q, limit)
+
+
+def _dashboard_approval_activity_query(user_id: str, limit: int = 0, approval_status=None):
+    q1 = _activities_from_dataset_approval_workflow(user_id, limit, approval_status=approval_status)
+
+    return core_model_activity._activities_union_all(q1)
 
 
 def _dashboard_activity_query(user_id: str, limit: int = 0):
     q1 = core_model_activity._user_activity_query(user_id, limit)
     q2 = _activities_from_everything_followed_by_user_query(user_id, limit)
-    q3 = _activities_from_dataset_approval_workflow(user_id, limit)
-    return core_model_activity._activities_union_all(q1, q2, q3)
+
+    return (
+            core_model_activity._activities_union_all(q1, q2)
+            .filter(core_model_activity.Activity.activity_type != "reviewed package")
+    )
 
 
 def dashboard_activity_list(
@@ -111,8 +131,14 @@ def dashboard_activity_list(
     before=None,
     after=None,
     user_permission_labels=None,
+    mode="newsfeed",
+    approval_status=None
 ):
-    q = _dashboard_activity_query(user_id)
+
+    if mode == "approval":
+        q = _dashboard_approval_activity_query(user_id, approval_status=approval_status)
+    else:
+        q = _dashboard_activity_query(user_id)
 
     q = core_model_activity._filter_activitites_from_users(q)
 
@@ -152,7 +178,6 @@ def dashboard_activity_list_action(
     data_dict
 ):
     tk.check_access("dashboard_activity_list", context, data_dict)
-
     model = context["model"]
     user_obj = model.User.get(context["user"])
     assert user_obj
@@ -161,13 +186,23 @@ def dashboard_activity_list_action(
     limit = data_dict["limit"]  # defaulted, limited & made an int by schema
     before = data_dict.get("before")
     after = data_dict.get("after")
+
+    mode = "newsfeed"
+    approval_status = None
+    extras = data_dict.get("__extras")
+    if extras:
+        mode = extras.get("mode", "newsfeed")
+        approval_status = extras.get("approval_status", None)
+
     activity_objects = dashboard_activity_list(
         user_id,
         limit=limit,
         offset=offset,
         before=before,
         after=after,
-        user_permission_labels=_get_user_permission_labels(context)
+        user_permission_labels=_get_user_permission_labels(context),
+        mode=mode,
+        approval_status=approval_status
     )
 
     activity_dicts = core_model_activity.activity_list_dictize(
