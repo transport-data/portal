@@ -22,9 +22,11 @@ import { api } from "@utils/api";
 import Link from "next/link";
 import { capitalize } from "remeda";
 import UserAvatar from "./UserAvatar";
+import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 
 type DatasetCardProps = Dataset & {
   canEdit?: boolean;
+  datasetRequest?: boolean;
 };
 
 export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
@@ -42,6 +44,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
     name,
     approval_status,
     tdc_category,
+    datasetRequest,
     title,
     tags,
     metadata_modified,
@@ -77,7 +80,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
       <CircleStackIcon {...badgeIconOptions} />
     );
 
-  const { data: contributorsData, isLoading } = api.user.getUsersByIds.useQuery(
+  const { data: contributorsData } = api.user.getUsersByIds.useQuery(
     {
       ids: contributors,
     }
@@ -97,7 +100,13 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
           <div className="group relative  gap-2">
             <h2 className="inline text-lg font-bold">
-              <Link href={`/@${organization?.name}/${name}${isPrivate || state === 'draft' ? '/private' : ''}`}>{title}</Link>
+              <Link
+                href={`/@${organization?.name}/${name}${
+                  isPrivate || state === "draft" ? "/private" : ""
+                }`}
+              >
+                {title}
+              </Link>
             </h2>
             {canEdit && (
               <Button
@@ -160,28 +169,37 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
               Public
             </Badge>
           )}
-          {["pending", "rejected"].includes(approval_status || "") && (
-            <span className="hidden xl:block">•</span>
-          )}
-          {approval_status === "pending" ? (
-            <Badge
-              variant={"warning"}
-              className="items-center capitalize"
-              icon={<QuestionMarkCircleIcon width={16} />}
-            >
-              {approval_status}
-            </Badge>
-          ) : (
-            approval_status === "rejected" && (
+          {["pending", "rejected"].includes(approval_status || "") &&
+            datasetRequest && <span className="hidden xl:block">•</span>}
+
+          {datasetRequest &&
+            (approval_status === "pending" ? (
               <Badge
-                variant={"default"}
-                className="items-center bg-red-500 capitalize"
-                icon={<X />}
+                variant={"warning"}
+                className="items-center capitalize"
+                icon={<QuestionMarkCircleIcon width={16} />}
               >
                 {approval_status}
               </Badge>
-            )
-          )}
+            ) : approval_status === "rejected" ? (
+              <Badge
+                variant={"default"}
+                className="items-center bg-red-500 capitalize hover:bg-red-500"
+                icon={<CircleXIcon width={16} height={16} />}
+              >
+                {approval_status}
+              </Badge>
+            ) : (
+              approval_status === "approved" && (
+                <Badge
+                  variant={"success"}
+                  className="items-center capitalize"
+                  icon={<CircleCheckIcon width={16} height={16} />}
+                >
+                  {approval_status}
+                </Badge>
+              )
+            ))}
           <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <svg

@@ -3,9 +3,9 @@ import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
 import {
+  DatasetDraftType,
   DatasetFormType,
   SearchDatasetType,
-  DatasetDraftType,
 } from "@schema/dataset.schema";
 
 import { DatasetSchemaType, License } from "@schema/dataset.schema";
@@ -239,14 +239,10 @@ export async function approveDataset<T = Dataset>({
 }: {
   apiKey: string;
   datasetId: string;
-}): Promise<{
-  datasets: Array<T>;
-  count: number;
-  facets: Record<string, any>;
-}> {
+}): Promise<boolean> {
   const endpoint = "dataset_approval_update";
   const headers = { Authorization: apiKey };
-  const response = await CkanRequest.post<any>(endpoint, {
+  const response = await CkanRequest.post<CkanResponse<null>>(endpoint, {
     headers,
     json: {
       id: datasetId,
@@ -254,14 +250,10 @@ export async function approveDataset<T = Dataset>({
     },
   });
 
-  return {
-    datasets: response.result.results,
-    count: response.result.count,
-    facets: response.result.search_facets,
-  };
+  return response.success;
 }
 
-export async function rejectDataset<T = Dataset>({
+export async function rejectDataset({
   apiKey,
   datasetId,
   reason,
@@ -269,14 +261,10 @@ export async function rejectDataset<T = Dataset>({
   apiKey: string;
   datasetId: string;
   reason: string;
-}): Promise<{
-  datasets: Array<T>;
-  count: number;
-  facets: Record<string, any>;
-}> {
+}): Promise<boolean> {
   const endpoint = "dataset_approval_update";
   const headers = { Authorization: apiKey };
-  const response = await CkanRequest.post<any>(endpoint, {
+  const response = await CkanRequest.post<CkanResponse<null>>(endpoint, {
     headers,
     json: {
       feedback: reason,
@@ -285,11 +273,7 @@ export async function rejectDataset<T = Dataset>({
     },
   });
 
-  return {
-    datasets: response.result.results,
-    count: response.result.count,
-    facets: response.result.search_facets,
-  };
+  return response.success;
 }
 
 export const getDataset = async ({

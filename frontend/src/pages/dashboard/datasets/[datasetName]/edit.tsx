@@ -108,7 +108,8 @@ const EditDatasetDashboard: NextPage<{
           data.title ?? data.name
         } dataset`,
       });
-      await router.push("/dashboard/datasets");
+      if (isUserAdminOfTheDatasetOrg) await router.push("/dashboard/datasets");
+      await router.push("/dashboard/datasets-requests");
     },
     onError: (error) => {
       setErrorMessage(error.message);
@@ -205,8 +206,9 @@ const EditDatasetDashboard: NextPage<{
 
   const disabledForm = isUserAdminOfTheDatasetOrg
     ? false
-    : dataset.approval_status === "pending" || // TODO remove this OR after
-      !["rejected", "approved", ""].includes(dataset.approval_status || "");
+    : dataset.approval_status === "pending";
+  // || // TODO remove this OR after
+  // !["rejected", "approved", ""].includes(dataset.approval_status || "");
 
   return (
     <>
@@ -251,20 +253,22 @@ const EditDatasetDashboard: NextPage<{
                           </h2>
                           <div className="flex flex-col gap-2 sm:flex-row">
                             {isUserAdminOfTheDatasetOrg &&
-                              ["pending", "rejected"].includes(
-                                dataset.approval_status || "rejected" // TODO change it to empty string after
-                              ) && (
+                              "pending" === dataset.approval_status && (
                                 <>
                                   <ApproveDatasetButton
                                     datasetId={dataset.id}
                                     onSuccess={() =>
-                                      router.push("/dashboard/datasets")
+                                      router.push(
+                                        "/dashboard/datasets-requests"
+                                      )
                                     }
                                   />
                                   <RejectDatasetButton
                                     dataset={dataset as any}
                                     onSuccess={() =>
-                                      router.push("/dashboard/datasets")
+                                      router.push(
+                                        "/dashboard/datasets-requests"
+                                      )
                                     }
                                   />
                                 </>
@@ -300,7 +304,10 @@ const EditDatasetDashboard: NextPage<{
             <form onSubmit={form.handleSubmit(onSubmit)}>
               {current.matches("general") && (
                 <>
-                  <GeneralForm disabled={disabledForm} />
+                  <GeneralForm
+                    isUserAdminOfTheDatasetOrg={isUserAdminOfTheDatasetOrg}
+                    disabled={disabledForm}
+                  />
                   <Button
                     type="button"
                     className="w-full"

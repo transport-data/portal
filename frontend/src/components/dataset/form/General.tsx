@@ -45,8 +45,10 @@ import { P, match } from "ts-pattern";
 export function GeneralForm({
   editing = false,
   disabled,
+  isUserAdminOfTheDatasetOrg,
 }: {
   editing?: boolean;
+  isUserAdminOfTheDatasetOrg?: boolean;
   disabled?: boolean;
 }) {
   const formObj = useFormContext<DatasetFormType>();
@@ -229,7 +231,10 @@ export function GeneralForm({
                 (data) => (
                   <Popover>
                     <PopoverTrigger
-                      className={cn(disabled && "hover:cursor-not-allowed first:hover:cursor-not-allowed [&>*]:cursor-not-allowed")}
+                      className={cn(
+                        disabled &&
+                          "hover:cursor-not-allowed first:hover:cursor-not-allowed [&>*]:cursor-not-allowed"
+                      )}
                       disabled={disabled}
                       asChild
                     >
@@ -371,7 +376,19 @@ export function GeneralForm({
               />
             </FormControl>
             <div className="space-y-1 leading-none">
-              <FormLabel>Is this dataset private?</FormLabel>
+              <FormLabel>
+                Is this dataset private?
+                {!isUserAdminOfTheDatasetOrg && !field.value ? (
+                  <span className=" text-gray-500">
+                    {" "}
+                    Before this dataset is published it'll be reviewed by an
+                    admin from the dataset's organization, and you won't be able
+                    to edit it before this review
+                  </span>
+                ) : (
+                  <></>
+                )}
+              </FormLabel>
             </div>
           </FormItem>
         )}
