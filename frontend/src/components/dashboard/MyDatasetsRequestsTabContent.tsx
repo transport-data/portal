@@ -39,7 +39,7 @@ export default ({
     includeDrafts: true,
     includePrivate: true,
     orgs: adminOrEditorUserOrgs.map((x) => x.name),
-    contributors: session?.user.sysadmin ? undefined : [session?.user.id || ""],
+    contributors: session?.user.sysadmin ? undefined : [session?.user.id || ""], // TODO check if we'll keep it or remove and present all the datasets for the user's org
     advancedQueries: [
       { key: "approval_status", values: ["pending", "rejected", "approved"] },
     ],
@@ -54,7 +54,7 @@ export default ({
   } = api.dataset.search.useQuery({
     ...searchFilter,
   });
-  
+
   api.dataset.search.useQuery({
     ...searchFilter,
     offset: (currentPage + 1) * 9,

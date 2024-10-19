@@ -63,6 +63,7 @@ export default function ({
       <AlertDialogTrigger asChild>
         {children || (
           <Button
+            id="rejectButton"
             variant="default"
             className="bg-yellow-400 hover:bg-yellow-300"
           >
@@ -78,6 +79,7 @@ export default function ({
             <span className="font-bold">"{title}"</span> dataset?
             <div className="mt-4">
               <TextEditor
+                id="rejectDatasetMessage"
                 placeholder="Rejection message to the dataset's creator..."
                 setText={(x) =>
                   setRejectReason(x.replace(/<\/?[^>]+(>|$)/g, ""))
