@@ -10,7 +10,6 @@ const datasetName = `${uuid()}${datasetSuffix}`;
 const notes = `${uuid()}${datasetSuffix}`;
 const tags = ["tag1", "tag2", "tag3"];
 const geographies = ["cpv"];
-const regions = ["afr"];
 const random = Math.random() * 100;
 const tdc_category =
   random < 33
@@ -51,28 +50,31 @@ describe("Follow/Unfollow Datasets, Organization and Geographies", () => {
 
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
-    cy.visit(`/${org}/${datasetName}`);
+    
   });
 
   
 
   it("Follow dataset", () => {
+    cy.visit(`/${org}/${datasetName}`);
     cy.get('.follow-btn').click();
-    const datasetFollowItem = cy.get('.follow-content [role="menuitemcheckbox"]').first()
+    const datasetFollowItem = cy.get('[role="menuitemcheckbox"]').first()
     datasetFollowItem.click();
     datasetFollowItem.should('have.attr', 'aria-checked', 'true');
   });
 
   it("Follow organization", () => {
+    cy.visit(`/${org}/${datasetName}`);
     cy.get('.follow-btn').click();
-    const orgFollowItem = cy.get('.follow-content [role="menuitemcheckbox"]').eq(1)
+    const orgFollowItem = cy.get('[role="menuitemcheckbox"]').eq(1)
     orgFollowItem.click();
     orgFollowItem.should('have.attr', 'aria-checked', 'true');
   });
 
   it("Follow region", () => {
+    cy.visit(`/${org}/${datasetName}`);
     cy.get('.follow-btn').click();
-    const regionFollowItem = cy.get('.follow-content [role="menuitemcheckbox"]').contains('Cabo Verde')
+    const regionFollowItem = cy.get('[role="menuitemcheckbox"]').contains('Cabo Verde')
     regionFollowItem.click();
     regionFollowItem.should('have.attr', 'aria-checked', 'true');
   });
