@@ -1,7 +1,9 @@
-import Video from "@components/home/heroSection/Video";
 import { Button } from "@components/ui/button";
+import Link from "next/link";
+import HowToAsset from "@components/_shared/HowToAsset";
+import { HeroAsset } from "@components/home/heroSection/Hero";
 
-export default () => {
+export default ({ asset }: { asset: HeroAsset }) => {
   return (
     <div className="space-y-8 py-6 text-gray-500 md:py-[96px]">
       <div>
@@ -16,15 +18,24 @@ export default () => {
 
       <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
         <Button className="bg-white text-[#1F2A37] ring-1 ring-[#E5E7EB] hover:bg-white hover:opacity-80">
-          TDC data submission guidelines
+          <Link
+            href="https://github.com/orgs/transport-data/discussions"
+            target="_blank"
+          >
+            TDC data submission guidelines
+          </Link>
         </Button>
         <Button className="bg-white text-[#1F2A37] ring-1 ring-[#E5E7EB] hover:bg-white hover:opacity-80">
-          Data submission FAQ
+          <Link href="/faq#submitting_data">Data submission FAQ</Link>
         </Button>
       </div>
       <div className="flex w-full items-center justify-center">
         <div className="w-[804px] max-w-[804px]">
-          <Video heightInPx="460px" />
+          <HowToAsset
+            assetType={asset.type}
+            assetPath={asset.path}
+            heightInPx="460px"
+          />
         </div>
       </div>
     </div>

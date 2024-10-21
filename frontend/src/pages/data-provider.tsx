@@ -9,8 +9,22 @@ import Layout from "../components/_shared/Layout";
 import clientPromise from "@lib/mddb.mjs";
 import fs from "fs";
 import { Faq } from "@interfaces/faq.interface";
+import path from "path";
 
 export const getStaticProps = async () => {
+  let tdcConfig = {
+    hero: {
+      path: "/images/video-thumbnail.png",
+      type: "image",
+    },
+  };
+  try {
+    const tdcConfigPath = path.join(process.cwd(), "public", "tdc-config.json");
+    const tdcConfigContent = fs.readFileSync(tdcConfigPath, "utf8");
+    tdcConfig = tdcConfigContent ? JSON.parse(tdcConfigContent) : {};
+  } catch (err) {
+    console.log(err);
+  }
   const mddb = await clientPromise;
   const faqsFiles = await mddb.getFiles({
     folder: "faq",
@@ -36,14 +50,17 @@ export const getStaticProps = async () => {
 
   return {
     props: {
+      tdcConfig,
       faqs,
     },
   };
 };
 
 export default function DataProviderPage({
+  tdcConfig,
   faqs,
 }: {
+  tdcConfig: any;
   faqs: Faq[];
 }): JSX.Element {
   return (
@@ -58,7 +75,7 @@ export default function DataProviderPage({
           <Hero />
           <HowDatasetWorks />
           <AddDataSection />
-          <HowToAddData />
+          <HowToAddData asset={tdcConfig.hero} />
           <FaqsSection faqs={faqs} />
           <NewsLetterSignUpSection />
         </div>

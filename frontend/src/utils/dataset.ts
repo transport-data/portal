@@ -2,7 +2,7 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
-import { DatasetFormType, SearchDatasetType } from "@schema/dataset.schema";
+import { DatasetFormType, SearchDatasetType, DatasetDraftType } from "@schema/dataset.schema";
 
 import { DatasetSchemaType, License } from "@schema/dataset.schema";
 
@@ -121,6 +121,10 @@ export async function searchDatasets<T = Dataset>({
     fqAr.push(buildOrFq("tdc_category", [options.tdc_category]));
   }
 
+  if (options.data_provider) {
+    fqAr.push(buildOrFq("data_provider", [options.data_provider]));
+  }
+
   if (options.query) {
     fqAr.push(buildOrFq("text", [`*"${options.query}"*`]));
   }
@@ -229,19 +233,39 @@ export async function searchDatasets<T = Dataset>({
 export const getDataset = async ({
   id,
   apiKey,
+  include_extras = false,
+}: {
+  id: string;
+  apiKey: string;
+  include_extras?: boolean;
+}) => {
+  const dataset: CkanResponse<Dataset> = await CkanRequest.post(
+    "package_show",
+    {
+      apiKey,
+      json: { id, include_extras },
+    }
+  );
+
+  return dataset;
+};
+
+export const getDatasetActivities = async ({
+  id,
+  apiKey,
 }: {
   id: string;
   apiKey: string;
 }) => {
-  const dataset: CkanResponse<Dataset> = await CkanRequest.post(
-    "package_show",
+  const activities: CkanResponse<Activity[]> = await CkanRequest.post(
+    "package_activity_list",
     {
       apiKey,
       json: { id },
     }
   );
 
-  return dataset;
+  return activities;
 };
 
 export const getDatasetSchema = async ({ apiKey }: { apiKey: string }) => {
@@ -276,6 +300,39 @@ export const createDataset = async ({
     }
   );
   return dataset.result;
+};
+
+export const draftDataset = async ({
+  apiKey,
+  input,
+}: {
+  apiKey: string;
+  input: DatasetDraftType;
+}) => {
+  const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
+    `package_create`,{
+      apiKey,
+      json: {
+        ...input,
+        state:"draft"//todo: state:"draft" is not working when creating datasets
+      },
+    }
+  );
+  if(dataset.result?.id && dataset.result?.state !== "draft"){
+    const draft = await CkanRequest.post<CkanResponse<Dataset>>(
+      "package_patch",
+      {
+        apiKey: apiKey,
+        json: {
+          id: dataset.result.id,
+          state:"draft"
+        },
+      }
+    );
+    return draft.result;
+  }
+  
+  
 };
 
 export const patchDataset = async ({

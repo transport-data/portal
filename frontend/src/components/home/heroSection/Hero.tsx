@@ -1,9 +1,9 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import SearchBar from "@components/search/SearchBar";
-import Video from "./Video";
 import InfoCards from "./InfoCards";
 import PartnersCarousel from "@components/_shared/PartnersCarousel";
+import HowToAsset from "@components/_shared/HowToAsset";
 
 export type HeroAsset = {
   path: string;
@@ -41,20 +41,7 @@ export default function Hero({ asset }: { asset: HeroAsset }) {
             </div>
           </div>
           <div className="m-auto hidden min-w-[420px] lg:block xl:min-w-[540px]">
-            {asset.type === "mp4" && <Video path={asset.type} />}
-            {asset.type === "youtube" && (
-              <iframe
-                className="h-[405px] w-full"
-                src={asset.path}
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              ></iframe>
-            )}
-            {asset.type === "image" && (
-              <img src={asset.path} className="h-[405px] w-full" />
-            )}
+            <HowToAsset assetType={asset.type} assetPath={asset.path} />
           </div>
         </div>
         <InfoCards />

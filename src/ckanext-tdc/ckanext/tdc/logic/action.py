@@ -32,6 +32,10 @@ cwd = path.abspath(path.dirname(__file__))
 template_dir = path.join(cwd, '../templates/emails/')
 env = Environment(loader=FileSystemLoader(template_dir))
 
+privileged_context = {
+    "ignore_auth": True
+}
+
 
 def _fix_topics_field(data_dict):
     """
@@ -132,11 +136,28 @@ def _update_contributors(context, data_dict, is_update=False):
     Whenever an update happens, contributors list
     is updated based on which user did the update
     """
+<<<<<<< HEAD
+=======
+    current_user = tk.current_user
+    if not hasattr(current_user, "id"):
+        return
+    current_user_id = current_user.id
+    user_show_action = tk.get_action("user_show")
+    excluded_ids = []
+    try:
+        site_user = logic.get_action(u"get_site_user")(privileged_context, {})
+        excluded_ids.append(site_user.get("id"))
+        ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
+        excluded_ids.append(ckan_admin.get("id"))
+    except Exception as e:
+        log.error(e)
+>>>>>>> 7ebf22a37dd8bf8af138a94ebcd7a6553acc4cb4
 
     # If it's a approval status update, do not
     # add user as contributor
     is_approval_action = context.get("is_approval_action", False)
 
+<<<<<<< HEAD
     if not is_approval_action:
         current_user = tk.current_user
         if not hasattr(current_user, "id"):
@@ -151,6 +172,19 @@ def _update_contributors(context, data_dict, is_update=False):
             privileged_context = {
                 "ignore_auth": True
             }
+=======
+        package_show_action = tk.get_action("package_show")
+        package_show_data_dict = {
+            "id": name_or_id
+        }
+        old_data_dict = package_show_action(
+            privileged_context, package_show_data_dict)
+        old_contributors = old_data_dict.get("contributors")
+        new_contributors = list(set(old_contributors + [current_user_id]))
+        filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+
+        data_dict["contributors"] = filtered_new_contributors
+>>>>>>> 7ebf22a37dd8bf8af138a94ebcd7a6553acc4cb4
 
             package_show_action = tk.get_action("package_show")
             package_show_data_dict = {
@@ -161,11 +195,17 @@ def _update_contributors(context, data_dict, is_update=False):
             old_contributors = old_data_dict.get("contributors")
             new_contributors = list(set(old_contributors + [current_user_id]))
 
+<<<<<<< HEAD
             data_dict["contributors"] = new_contributors
 
             return new_contributors
 
         data_dict["contributors"] = [current_user_id]
+=======
+    new_contributors = [current_user_id]
+    filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+    data_dict["contributors"] = filtered_new_contributors
+>>>>>>> 7ebf22a37dd8bf8af138a94ebcd7a6553acc4cb4
 
 
 def _fix_user_group_permission(data_dict):
@@ -280,7 +320,6 @@ def package_patch(up_func, context, data_dict):
     _before_dataset_create_or_update(context, data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
-
 
 def _control_archived_datasets_visibility(data_dict):
     include_archived_param = data_dict.get("include_archived", "false")
@@ -710,12 +749,56 @@ def request_new_organization(context, data_dict):
     return "Request Sent Successfully"
 
 
+def _add_contributors_data_to_dataset(dataset):
+    user_show_action = tk.get_action("user_show")
+    organization_show_action = tk.get_action("organization_show")
+    privileged_context = {"ignore_auth": True}
+
+    owner_org = dataset.get("owner_org")
+    org_dict = {"id": owner_org, "include_extras": True}
+    full_org = organization_show_action(privileged_context, org_dict)
+
+    # Hiding too much information
+    full_org['users'] = None
+    dataset['organization'] = full_org
+
+    creator_user_id = dataset.get("creator_user_id")
+    creator_user_dict = {"id": creator_user_id}
+    creator_user = user_show_action(privileged_context, creator_user_dict)
+
+    if creator_user:
+        dataset['creator_user'] = {
+            "fullname": creator_user.get("fullname"),
+            "display_name": creator_user.get("display_name"),
+            "name": creator_user.get("name"),
+            "email": creator_user.get("email")
+        }
+
+    contributor_ids = dataset.get("contributors")
+    contributors_dict_list = [
+            user_show_action(privileged_context, {"id": id})
+            for id in contributor_ids]
+
+    contributors_data = [{
+        "fullname": contributor.get("fullname"),
+        "display_name": contributor.get("display_name"),
+        "name": contributor.get("name"),
+        "email": contributor.get("email")
+    } for contributor in contributors_dict_list]
+
+    dataset['contributors_data'] = contributors_data
+
+
 @tk.chained_action
 @tk.side_effect_free
 def package_show(up_func, context, data_dict):
     output_format = data_dict.get("output_format", "json")
+    include_extras = data_dict.get("include_extras", False)
 
     result = up_func(context, data_dict)
+
+    if include_extras:
+        _add_contributors_data_to_dataset(result)
 
     if output_format != "json":
         converter = converters.get(output_format)

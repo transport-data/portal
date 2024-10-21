@@ -30,11 +30,7 @@ interface RecentSearchProps {
   query: any;
 }
 
-export default function SearchBar({
-  description = "",
-}: {
-  description?: string;
-}) {
+export default function SearchBar() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const commandRef = useRef<HTMLDivElement>(null);
@@ -303,11 +299,6 @@ export default function SearchBar({
           <Link href="/search" className="mt-2 text-xs font-medium text-accent">
             Browse all datasets
           </Link>
-          {description && (
-            <span className="mt-2 text-sm font-normal text-gray-500 md:ml-auto md:line-clamp-1 md:overflow-hidden  md:text-ellipsis md:text-end ">
-              {description}
-            </span>
-          )}
         </div>
 
         <CommandList

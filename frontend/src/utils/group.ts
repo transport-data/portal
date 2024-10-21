@@ -25,12 +25,14 @@ export const listGroups = async ({
   showCoordinates,
   limit,
   sort,
+  groupIds,
 }: {
   apiKey?: string;
   limit?: number;
   type: "topic" | "geography";
   sort?: string;
   showCoordinates?: boolean;
+  groupIds?: string[];
 }) => {
   // TODO: implement pagination and other parameters
   let action = "group_list?";
@@ -48,6 +50,10 @@ export const listGroups = async ({
 
   if (limit) {
     action += `&limit=${limit}`;
+  }
+
+  if (groupIds) {
+    action += `&groups=[${groupIds.join(",")}]`;
   }
 
   const groups = await CkanRequest.get<
@@ -126,8 +132,8 @@ export const deleteGroups = async ({
         await CkanRequest.post(`group_delete`, {
           apiKey: apiKey,
           json: { id },
-        })
-    )
+        }),
+    ),
   );
   return { groups: groups.map((group) => group.result) };
 };
@@ -154,7 +160,7 @@ export const followGroups = async ({
           json: { id },
         });
       }
-    })
+    }),
   );
   return groups;
 };

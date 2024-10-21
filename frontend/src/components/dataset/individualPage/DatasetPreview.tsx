@@ -1,5 +1,4 @@
 import { DataExplorer } from "@components/data-explorer/DataExplorer";
-import { Dataset } from "@portaljs/ckan";
 import {
   Select,
   SelectContent,
@@ -10,10 +9,12 @@ import {
 import { useState } from "react";
 import { FormLabel } from "@components/ui/form";
 import { Label } from "@components/ui/label";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export function DatasetPreview({ dataset }: { dataset: Dataset }) {
+  const resources = dataset.resources.filter(r => !!r.datastore_active)
   const [currentResource, setCurrentResource] = useState(
-    dataset.resources[0]?.id ?? ""
+    resources[0]?.id ?? ""
   );
   return (
     <div className="min-h-[500px] bg-gray-50">
@@ -29,7 +30,7 @@ export function DatasetPreview({ dataset }: { dataset: Dataset }) {
                 <SelectValue placeholder="Resource" />
               </SelectTrigger>
               <SelectContent>
-                {dataset.resources.map((resource) => (
+                {resources.map((resource) => (
                   <SelectItem key={resource.id} value={resource.id}>
                     {resource.name ?? resource.id}
                   </SelectItem>

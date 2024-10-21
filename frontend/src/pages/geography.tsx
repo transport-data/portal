@@ -10,73 +10,89 @@ import { useEffect } from "react";
 import { Group } from "@schema/group.schema";
 import Link from "next/link";
 import Layout from "../components/_shared/Layout";
-import React from "react";
 
-export async function getServerSideProps(ctx: any) {
+export async function getStaticProps() {
+  const countriesByLetterObj: any = {};
+
+  const groups = (
+    await listGroups({
+      type: "geography",
+      showCoordinates: true,
+      limit: 350,
+    })
+  ).filter((country) => {
+    if (country.geography_type === "country") {
+      let letter = country.title[0]!.toLowerCase();
+      if (letter === "Å".toLowerCase()) letter = "a";
+      const array = countriesByLetterObj[letter];
+      if (!array) {
+        countriesByLetterObj[letter] = [
+          { name: country.name, title: country.title },
+        ];
+      } else {
+        array.push({ name: country.name, title: country.title });
+      }
+      return true;
+    }
+    return false;
+  }) as Array<Group & { geography_shape: any; iso2: string }>;
   return {
     props: {
-      groups: (
-        await listGroups({
-          apiKey: ctx.session?.apiKey || "",
-          type: "geography",
-          showCoordinates: true,
-          limit: 350,
-        })
-      ).filter((x) => x.geography_type === "country") as Array<
-        Group & { geography_shape: any; iso2: string }
-      >,
+      groups,
+      countriesByLetterObj,
     },
   };
 }
 
+const flagsCache = new Map();
+
 export default function DatasetsPage({
   groups,
-}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
-  const countriesFlagsByName = new Map<string, boolean>();
-  const letterMap = new Map<string, { name: string; title: string }[]>();
+  countriesByLetterObj,
+}: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
+  const countriesFlagsByName = new Map<string, string>();
   const router = useRouter();
-  groups.forEach((country) => {
-    let letter = country.title[0]!.toLowerCase();
-    if (letter === "Å".toLowerCase()) letter = "a";
-    const array = letterMap.get(letter);
-    if (!array) {
-      letterMap.set(letter, [{ name: country.name, title: country.title }]);
-    } else {
-      array.push({ name: country.name, title: country.title });
-    }
-  });
 
   useEffect(() => {
-    // This is caching the flags to the frontend stop to make requests to the server to get each flag
-    groups.forEach(async (country) => {
-      countriesFlagsByName.set(
-        country.name,
-        await (
-          await fetch(
-            country.image_display_url ||
-              country.image_url ||
-              `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
-          ).catch(() =>
-            fetch(`https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`)
-          )
-        )
-          .blob()
-          .then(
-            (blob) =>
-              new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as any);
-                reader.onerror = () =>
-                  reject(new Error("Error reading the blob"));
-                reader.readAsDataURL(blob);
-              })
-          )
-      );
-    });
+    const getCountryFlag = (country: (typeof groups)[0]) => {
+      const cachedImage = flagsCache.get(country.iso2);
+
+      if (cachedImage && !cachedImage.isLoading) {
+        return cachedImage;
+      }
+
+      flagsCache.set(country.iso2, {
+        isLoading: true,
+        url: "",
+      });
+
+      fetch(
+        // Using the flagscdn because it responds faster than S3
+        `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
+        // country.image_display_url,
+      ).then(async (r) => {
+        const blob = await r.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          flagsCache.set(country.iso2, {
+            isLoading: false,
+            url: reader.result as string,
+          });
+          const imgEl: any = document.getElementById(
+            `country-popup-flag-${country.iso2}`
+          );
+          if (imgEl) {
+            imgEl.src = reader.result;
+          }
+        };
+        reader.readAsDataURL(blob);
+      });
+    };
 
     const map = new maplibregl.Map({
       style: style,
       container: "map",
+      attributionControl: false,
       interactive: window.innerWidth < 787,
       renderWorldCopies: false,
       scrollZoom: false,
@@ -119,29 +135,46 @@ export default function DatasetsPage({
         return colors[index];
       };
 
-      groups.forEach(async (x) => {
+      map.addSource("countriesWithDashedLines", {
+        type: "geojson",
+        data: countriesWithDashedLines as any,
+      });
+
+      groups.forEach((x, index) => {
         if (x.geography_shape) {
+          const lineLayerId = x.id + `--${index}`;
+          const fillColor = getFillColor(x.package_count);
           map.addSource(x.id, {
             type: "geojson",
             data: x.geography_shape,
           });
+
           map.addLayer({
             id: x.id,
             type: "fill",
             source: x.id,
             paint: {
-              "fill-color": getFillColor(x.package_count),
+              "fill-color": fillColor,
               "fill-outline-color": "white",
             },
           });
 
-          map.on("click", x.id, (e) => {
-            router.push(
-              `/search?country=${(e.features || [])[0]?.properties.ISO_A2}`
-            );
+          map.addLayer({
+            id: lineLayerId,
+            type: "line",
+            source: x.id,
+            paint: {
+              "line-width": 2,
+              "line-color": "white",
+            },
+          });
+
+          map.on("click", x.id, () => {
+            router.push(`/search?country=${x.name.toLowerCase()}`);
           });
 
           map.on("mouseenter", x.id, () => {
+            map.setPaintProperty(lineLayerId, "line-color", fillColor);
             map.getCanvas().style.cursor = "pointer";
           });
 
@@ -157,122 +190,51 @@ export default function DatasetsPage({
             popup
               .setLngLat(e.lngLat)
               .setHTML(
-                `        
+                `
               <div>
-              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" src="${countriesFlagsByName.get(
-                x.name
-              )}"></img>
-                
+              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" id="country-popup-flag-${
+                x.iso2
+              }" src="${
+                  getCountryFlag(x)?.url ?? "/assets/loading.webp"
+                }"></img>
+
               <div class="country-title" style="color: white'; font-size: 14px">${
                 x.title
               }
               </div>
               <div style="color: #9CA3AF">${x.iso2.toUpperCase()}</div>
 
-
                 </div>
-                
-                <div style="color: white; font-size: 30px">${formatCalculatorNumber(
+
+                <div style="color: white; font-size: 30px">${formatNumber(
                   x.package_count
                 )}</div>
-                <div style="color: #9CA3AF; font-size: 16px">Datasets</div>
+                <div style="color: #9CA3AF; font-size: 16px">${
+                  x.package_count > 1 ? "Datasets" : "Dataset"
+                }</div>
               `
               )
               .addTo(map);
           });
 
           map.on("mouseleave", x.id, () => {
+            map.setPaintProperty(lineLayerId, "line-color", "white");
             map.getCanvas().style.cursor = "";
             popup.remove();
           });
         }
       });
 
-      // Add a layer showing the countries polygons.
-      // TODO remove it
-      // map.addLayer({
-      //   id: "countries-layer",
-      //   type: "fill",
-      //   source: "countries",
-      //   paint: {
-      //     "fill-color": [
-      //       "match",
-      //       ["get", "ISO_A3"],
-      //       top,
-      //       "#006064",
-      //       countriesWithMediumAmountOfDatasets,
-      //       "#00BCD4",
-      //       "#D1D5DB",
-      //     ],
-      //     "fill-outline-color": "white",
-      //   },
-      // });
-
-      // map.on("click", "countries-layer", (e) => {
-      //   router.push(
-      //     `/search?country=${(e.features || [])[0]?.properties.ISO_A2}`
-      //   );
-      // });
-
-      // map.on("mouseenter", "countries-layer", () => {
-      //   map.getCanvas().style.cursor = "pointer";
-      // });
-
-      // map.on("mousemove", "countries-layer", (e) => {
-      //   if (popup._container) {
-      //     popup._container.style.minWidth = "194px";
-      //     popup._container.style.cursor = "pointer";
-      //     popup._container.style.width = "194px";
-      //     popup._container.style.height = "171px";
-      //     popup._container.style.minHeight = "171px";
-      //   }
-
-      //   if (
-      //     (e.features || []).length > 0 &&
-      //     !(
-      //       (e.features || [])[0]?.properties.ADMIN ===
-      //       popup
-      //         .getElement()
-      //         ?.getElementsByTagName("div")
-      //         ?.item(1)
-      //         ?.getElementsByTagName("div")
-      //         ?.item(0)
-      //         ?.getElementsByClassName("country-title")
-      //         ?.item(0)
-      //         ?.textContent?.trim()
-      //     )
-      //   ) {
-      //     popup
-      //       .setLngLat(e.lngLat)
-      //       .setHTML(
-      //         `
-      //         <div>
-      //         <img style="object-fit: none; width: 40px; height: 40px; border-radius: 9999px" src="https://flagsapi.com/${
-      //           (e.features || [])[0]?.properties.ISO_A2
-      //         }/flat/64.png"></img>
-
-      //         <div class="country-title" style="color: white'; font-size: 14px">${
-      //           (e.features || [])[0]?.properties.ADMIN
-      //         }
-      //         </div>
-      //         <div style="color: #9CA3AF">${
-      //           (e.features || [])[0]?.properties.ISO_A2
-      //         }</div>
-
-      //           </div>
-
-      //           <div style="color: white; font-size: 30px">${1650}+</div>
-      //           <div style="color: #9CA3AF; font-size: 16px">Datasets</div>
-      //         `
-      //       )
-      //       .addTo(map);
-      //   }
-      // });
-
-      // map.on("mouseleave", "countries-layer", () => {
-      //   map.getCanvas().style.cursor = "";
-      //   popup.remove();
-      // });
+      map.addLayer({
+        id: "countriesWithDashedLines",
+        source: "countriesWithDashedLines",
+        type: "line",
+        paint: {
+          "line-width": 1.8,
+          "line-color": "black",
+          "line-dasharray": [0.7, 0.5], // [dash length, gap length]
+        },
+      });
     });
   }, []);
 
@@ -297,14 +259,91 @@ export default function DatasetsPage({
             <div
               className="flex max-h-[523px] min-h-[523px] sm:max-h-[823px] sm:min-h-[823px]"
               id="map"
-            ></div>
+            >
+              <div className="customized-scroll absolute top-[650px] z-10 max-h-[157px] max-w-60 overflow-y-scroll rounded border-black bg-transparent p-2">
+                <p>
+                  The United Nations Geospatial Data, or Geodata, is a worldwide
+                  geospatial dataset of the United Nations.
+                  <br />
+                  <br />
+                  The United Nations Geodata is provided to facilitate the
+                  preparation of cartographic materials in the United Nations
+                  includes geometry, attributes and labels to facilitate the
+                  adequate depiction and naming of geographic features for the
+                  preparation of maps in accordance with United Nations policies
+                  and practices.
+                  <br />
+                  <br />
+                  The geospatial datasets here included are referred to as UN
+                  Geodata simplified and are generalized based on UNGeodata 25
+                  million scale.
+                  <br />
+                  <br />
+                  The feature layers include polygons/areas of countries
+                  (BNDA_simplified), lines for international boundaries and
+                  limits (BNDL_simplified), and major water body
+                  (WBYA_simplified). In addition, aggregated regional areas are
+                  available following M49 methodology (GEOA_simplified,
+                  SUBA_simplified, INTA_simplified) and SDG regional grouping
+                  (SDGA_simplified).
+                  <br />
+                  <br />
+                  The UN Geodata simplified is prepared in the context of the
+                  Administrative Instruction on the “Guidelines for the
+                  Publication of Maps” and should serve global mapping purposes
+                  as opposed to local mapping. The scale is unspecific for the
+                  United Nations Geodata simplified and is suitable for
+                  generalized world maps and web-maps.
+                  <br />
+                  <br />
+                  <span className="font-bold">Terms of use</span>
+                  <br />
+                  <br />
+                  The boundaries and names shown and the designations used on
+                  this map do not imply official endorsement or acceptance by
+                  the United Nations. (short form)
+                  <br />
+                  <br />
+                  The designations employed and the presentation of material on
+                  this map do not imply the expression of any opinion whatsoever
+                  on the part of the Secretariat of the United Nations
+                  concerning the legal status of any country, territory, city or
+                  area or of its authorities, or concerning the delimitation of
+                  its frontiers or boundaries. (long form)
+                  <br />
+                  <br />
+                  Final boundary between the Republic of Sudan and the Republic
+                  of South Sudan has not yet been determined.
+                  <br />
+                  <br />
+                  Dotted line represents approximately the Line of Control in
+                  Jammu and Kashmir agreed upon by India and Pakistan. The final
+                  status of Jammu and Kashmir has not yet been agreed upon by
+                  the parties.
+                  <br />
+                  <br />A dispute exists between the Governments of Argentina
+                  and the United Kingdom of Great Britain and Northern Ireland
+                  concerning sovereignty over the Falkland Islands (Malvinas).
+                </p>
+                <br />
+                <ul style={{ listStyleType: "disc" }} className="pl-7">
+                  <li>Non-Self-Governing-Territories</li>
+                </ul>
+                <br />
+                <br />
+                <span className="font-bold">Credits</span>
+                <br />
+                <br />
+                United Nations Geospatial
+              </div>
+            </div>
           </div>
           <div className="flex flex-wrap items-center justify-center">
-            <div className="mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 pt-20 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2473px]">
-              {Array.from(letterMap.keys()).map((letter) => (
+            <div className="mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 pt-20 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2873px]">
+              {Object.keys(countriesByLetterObj).map((letter) => (
                 <LetterCard
                   letter={letter}
-                  countries={letterMap.get(letter) || []}
+                  countries={countriesByLetterObj[letter] || []}
                 />
               ))}
             </div>
@@ -945,7 +984,7 @@ const interpolateColors = (color1: any, color2: any, steps: number) => {
   return interpolatedColorArray;
 };
 
-const formatCalculatorNumber = (number: number) => {
+const formatNumber = (number: number) => {
   if (isNaN(number)) {
     return "0";
   }
@@ -956,4 +995,396 @@ const formatCalculatorNumber = (number: number) => {
   });
 
   return formattedNumber;
+};
+
+const countriesWithDashedLines = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      id: 772,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [35.508736187916504, 4.619999999947218],
+          [35.43030149236893, 4.79332942968174],
+          [35.43474648414758, 4.9202095018781815],
+          [35.290769099377705, 5.013020699228646],
+          [34.378459999883944, 4.619999999947218],
+        ],
+      },
+      properties: {
+        objectid: 772,
+        iso3cd: "SSD_SSD",
+        globalid: "{2A7E361E-437D-417A-B547-B2D5504B1FA8}",
+        iso2cd: "SS_SS",
+        m49_cd: "728_728",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1077,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [47.973497071505626, 7.987108915663162],
+          [45.231602438805105, 5.175008692975682],
+          [44.7475767156994, 4.927890339144354],
+          [44.01513999978635, 4.960440000340008],
+          [43.43491999958071, 4.794679999865685],
+          [43.04428000019481, 4.572130000076265],
+          [42.969239999583266, 4.403349999867918],
+          [42.8333099995406, 4.270619999866002],
+          [42.52662000050564, 4.202910000227229],
+          [42.08767000015908, 4.179370000308956],
+          [41.98603334353084, 4.094583393640397],
+          [41.910118999921366, 3.9827555598646036],
+        ],
+      },
+      properties: {
+        objectid: 1077,
+        iso3cd: "ETH_SOM",
+        globalid: "{891A0F93-8617-4C61-8330-CE5A276033FF}",
+        iso2cd: "ET_SO",
+        m49_cd: "231_706",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1134,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [34.113245520872034, 9.498635660225817],
+          [33.909723277507254, 9.49890336408207],
+          [33.88767242402655, 9.546225546995544],
+          [33.9176521295521, 9.751811027150788],
+          [33.96667098861472, 9.820816039359556],
+          [33.99332046484154, 9.929319382357251],
+          [33.971427916993285, 10.140615462946885],
+          [33.565263012575116, 10.562080977980228],
+          [33.37220380882119, 10.690272502368888],
+          [33.26155737122842, 10.821537799631544],
+          [33.16014032887897, 11.471016568751311],
+          [33.15704350045853, 11.690330278348304],
+          [33.282032012416906, 12.190558433986476],
+          [33.26613692215145, 12.215400903840743],
+          [32.95053955872494, 12.229112765838611],
+          [32.755380305421916, 12.235191276124214],
+          [32.714770511346295, 11.946912689736944],
+          [32.10657882721776, 11.94499778666153],
+          [32.33387986079703, 11.7470894071106],
+          [32.39289738653538, 11.56370145694751],
+          [32.45191559351871, 11.034088243694264],
+          [31.92123814464115, 10.528596401279403],
+          [31.75394248970062, 10.26829433396173],
+          [31.31464958098241, 9.77233695932177],
+          [30.876976012199236, 9.738337517353115],
+          [30.719932556658804, 9.806336403225412],
+          [30.533744810705745, 9.955824851111899],
+          [29.996772766150333, 10.288802146871932],
+          [29.942266463695884, 10.287722587119296],
+          [29.53903961201597, 10.08183193062576],
+          [29.538087846368512, 9.93346857408384],
+          [29.23821317130918, 9.749674353833214],
+          [29.075044631704756, 9.744899749728022],
+          [28.999999999890203, 9.6666670000066],
+          [27.914202941690167, 9.610167399006508],
+          [27.91420300009119, 9.610166999628863],
+          [27.137382508114595, 9.624267577882403],
+          [26.710691367566174, 9.489760834047894],
+          [26.509525298528292, 9.529685020364717],
+          [26.37549400333694, 9.576263427095041],
+          [26.313705443548244, 9.636625290261783],
+          [25.918264389237663, 10.407545088913082],
+          [25.851724625434834, 10.438914299012202],
+          [25.276863097910525, 10.342160224751868],
+          [25.031778336525722, 10.168458938675082],
+          [24.866167068709604, 9.882448196652712],
+          [24.67533493013216, 9.43558502237025],
+          [24.49116516067802, 8.829773904204192],
+          [24.22335924455728, 8.642150831815043],
+        ],
+      },
+      properties: {
+        objectid: 1134,
+        iso3cd: "SDN_SSD",
+        globalid: "{01781466-EF63-4B6B-8657-D8207EFFC49B}",
+        iso2cd: "SD_SS",
+        m49_cd: "729_728",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1296,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [33.182632954315494, 22.00165984138765],
+          [33.564080000042914, 21.725389999970027],
+          [33.96683952329081, 21.768294962835917],
+          [34.01710107994641, 21.806046325262315],
+          [34.08652927460527, 22.002508469847765],
+          [34.08690685115036, 22.00355089211025],
+        ],
+      },
+      properties: {
+        objectid: 1296,
+        iso3cd: "SDN_EGY",
+        globalid: "{5540A0B1-8467-46BF-A97E-99C02CB3DBB0}",
+        iso2cd: "SD_EG",
+        m49_cd: "729_818",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1308,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [114.22614306456467, 22.54411182826099],
+          [114.16246500046687, 22.561114999913578],
+          [114.03428430987702, 22.506850115285875],
+        ],
+      },
+      properties: {
+        objectid: 1308,
+        iso3cd: "CHN_HKG",
+        globalid: "{0BB9885A-B3BD-44B4-90C6-14403B2EC267}",
+        iso2cd: "CN_HK",
+        m49_cd: "156_344",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1318,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [35.62337560307272, 23.146886229915893],
+          [35.29706891859894, 22.8617857812707],
+          [35.10042277974609, 22.817468057802543],
+          [34.7947026101843, 22.520182660272603],
+          [34.43572644345971, 22.254343529935923],
+          [34.16068999996512, 22.207099999856617],
+          [34.08690685115036, 22.00355089211025],
+        ],
+      },
+      properties: {
+        objectid: 1318,
+        iso3cd: "EGY_SDN",
+        globalid: "{8C2C5AC2-2236-4C81-8054-6D6787AD544D}",
+        iso2cd: "EG_SD",
+        m49_cd: "818_729",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1434,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [34.2688393929402, 31.220534936832156],
+          [34.272928385214136, 31.227410616155193],
+          [34.27443437175998, 31.22549428719827],
+          [34.312072753632634, 31.250122069828763],
+          [34.364685058651055, 31.289123535276786],
+          [34.36999511683272, 31.32685851997286],
+          [34.36968994113332, 31.328308105031113],
+          [34.36850992802873, 31.334289550356257],
+          [34.36791992249015, 31.3372802732146],
+          [34.36761474651932, 31.338836670198262],
+          [34.366699218872085, 31.34350585911798],
+          [34.36645507811576, 31.344787596815877],
+          [34.365478515961904, 31.349914551389826],
+          [34.365197754178915, 31.351391602359865],
+          [34.36491699216854, 31.352868652665215],
+          [34.36407470750743, 31.35729980461243],
+          [34.36347961433654, 31.3611907958406],
+          [34.363281250321684, 31.362487793367123],
+          [34.36368815130581, 31.364888508922473],
+          [34.36389160228007, 31.366088867160656],
+          [34.36529540965403, 31.368713378936],
+          [34.384820677006, 31.393533537182307],
+          [34.39677200207621, 31.405490002253558],
+          [34.39856811416251, 31.407282579308628],
+          [34.399466170548706, 31.40817886701786],
+          [34.40036422573461, 31.409075155017373],
+          [34.401393863888075, 31.410009711046676],
+          [34.40345314087403, 31.411878822022697],
+          [34.466524238445935, 31.463227173252243],
+          [34.5176086426931, 31.500396728855502],
+          [34.55151843550365, 31.518442884282596],
+          [34.56567382780325, 31.53387451179298],
+          [34.56688232388873, 31.538452147737154],
+          [34.56768798813236, 31.54150390564489],
+          [34.545715331924534, 31.557495116851953],
+          [34.54442681202813, 31.558403862584626],
+          [34.53669569212545, 31.563856336770087],
+          [34.53411865207606, 31.565673827730652],
+          [34.53296137358595, 31.566482654926393],
+          [34.52833226085754, 31.569717962852927],
+          [34.52601770408757, 31.571335617391483],
+          [34.524860286057105, 31.572144369620275],
+          [34.52370286813858, 31.572953122850876],
+          [34.52254545025146, 31.573761876246817],
+          [34.51791577747826, 31.57699688730394],
+          [34.51675821891487, 31.577805566236457],
+          [34.512127985840834, 31.581040281110994],
+          [34.50981286991838, 31.582657638287625],
+          [34.508655171853334, 31.583466243084867],
+          [34.50170898360734, 31.588317871162175],
+          [34.49969482356951, 31.589721679884125],
+          [34.498687744452575, 31.59042358372293],
+          [34.497680664534, 31.59112548832927],
+          [34.49409179738442, 31.593615722671082],
+          [34.492895507657174, 31.594445801029114],
+          [34.491699218669574, 31.595275878951615],
+        ],
+      },
+      properties: {
+        objectid: 1434,
+        iso3cd: "ISR_PSE",
+        globalid: "{AC315BD2-9C82-448A-8D25-5627797FA0A1}",
+        iso2cd: "IL_PS",
+        m49_cd: "376_275",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1436,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [35.555121288697244, 32.38899549915337],
+          [35.33544331051296, 32.516531874737936],
+          [35.23184029591032, 32.54295556940267],
+          [35.09061928819869, 32.474879191134065],
+          [34.99072059347541, 32.209567806603154],
+          [34.98628289904339, 31.96781457337249],
+          [35.222327070885775, 31.799736061185826],
+          [35.123101507580294, 31.71089476726089],
+          [35.01230049120411, 31.6615004840253],
+          [34.957500487469396, 31.591100484105738],
+          [34.896500498508956, 31.43050047795805],
+          [34.935500502776414, 31.34530049606292],
+          [35.23330047680286, 31.376300483656717],
+          [35.47602899984751, 31.49316700018092],
+        ],
+      },
+      properties: {
+        objectid: 1436,
+        iso3cd: "ISR_PSE",
+        globalid: "{2AF289D0-74C7-40F1-8492-ECBE499A2460}",
+        iso2cd: "IL_PS",
+        m49_cd: "376_725",
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1453,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [75.33294673050831, 32.32612721636903],
+          [75.53137000025792, 32.321379999948135],
+          [75.82609999942848, 32.4938699997803],
+          [75.91253999983203, 32.60667999990243],
+          [75.94720000013658, 32.725820000208806],
+          [75.90387000029591, 32.800829999661275],
+          [76.03747978560783, 32.90804511218764],
+          [76.48415000053265, 33.17083000027146],
+          [76.75554999994841, 33.15804000024802],
+          [76.91331999952594, 33.06388000002508],
+          [77.00639030622263, 32.965825151365294],
+          [77.27944000002321, 32.839990000129255],
+          [77.44609000054481, 32.82471000007027],
+          [77.5994300004792, 32.88249000026528],
+          [77.89665000011634, 32.76999000025169],
+          [78.33134709218423, 32.57714983111817],
+          [78.28137000001796, 32.47193000038734],
+          [78.31749000037406, 32.436930000030706],
+          [78.40207700047777, 32.526977999822634],
+        ],
+      },
+      properties: {
+        objectid: 1453,
+        iso3cd: "IND_xjk",
+        globalid: "{46662EA3-2121-40D1-94C5-06ADDE5B69F3}",
+        iso2cd: null,
+        m49_cd: null,
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1494,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [73.8402699996985, 36.79130999988092],
+          [73.8547000003434, 36.71379999997551],
+          [73.52385999962681, 36.72319999963212],
+          [73.0588500002863, 36.63692999991667],
+          [72.55276999960194, 36.23135000032359],
+          [72.51277000059082, 35.900270000354915],
+          [72.67082000001247, 35.81833000002961],
+          [73.11294315115349, 35.77796001717021],
+          [73.72192000023857, 35.42749000005682],
+          [73.9370704983568, 35.197075193791974],
+          [74.11580999944685, 35.123049999727584],
+          [74.05524999971561, 34.97166000036893],
+          [73.96666000035489, 34.85833000018799],
+          [73.47637999985291, 34.57277000018173],
+          [73.43932648904952, 34.5353666838695],
+          [73.4008200000681, 34.404709999947364],
+          [73.40609999962894, 34.33167000039308],
+          [73.48831000035082, 34.17304999964867],
+          [73.57925048757838, 33.76617678939458],
+          [73.62830999996373, 33.09471000013906],
+          [74.43779012577775, 32.79222709568531],
+        ],
+      },
+      properties: {
+        objectid: 1494,
+        iso3cd: "PAK_xjk",
+        globalid: "{A13B687B-8C76-4C27-89F0-D654C42CE1A4}",
+        iso2cd: null,
+        m49_cd: null,
+        bdytyp: 3,
+      },
+    },
+    {
+      type: "Feature",
+      id: 1523,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [126.69173731127555, 37.84327613761065],
+          [126.6937402172607, 37.95543884229136],
+          [127.11938992651052, 38.295157446671745],
+          [127.38920067188317, 38.3330188213949],
+          [128.0809137545987, 38.3105345923874],
+          [128.27965366079474, 38.43161345599732],
+          [128.36080363659994, 38.61497621825292],
+        ],
+      },
+      properties: {
+        objectid: 1523,
+        iso3cd: "KOR_PRK",
+        globalid: "{D19D3808-B642-4EF1-9107-2DC77CFBF5E6}",
+        iso2cd: "KR_KP",
+        m49_cd: "410_408",
+        bdytyp: 3,
+      },
+    },
+  ],
 };
