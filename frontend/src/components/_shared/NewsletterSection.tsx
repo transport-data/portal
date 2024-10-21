@@ -43,56 +43,19 @@ export default function NewsLetterSection() {
       <div className="container ">
         <div className="mx-auto text-center lg:max-w-[672px]">
           <Heading>Sign up for our newsletter</Heading>
-          <p className="mt-4 text-xl font-normal text-gray-500">
+          <p className="my-4 text-xl font-normal text-gray-500">
             Stay up-to-date on the latest sustainable transportation data
             insights by signing up for the Transport Data Commons newsletter
             today!
           </p>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="mx-auto mt-8 max-w-[478px]"
+          <Button asChild className="tdc-newsletter">
+            <Link
+              href="https://civicrm.changing-transport.org/content/registration-transport-data-commons-newsletter"
+              target="_blank"
             >
-              <div className="flex w-full  items-start justify-center space-x-2">
-                <div className="relative w-full">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem className="relative ">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 top-[15px] flex h-fit items-center pl-3">
-                          <EnvelopeIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 text-gray-400"
-                          />
-                        </div>
-                        <FormControl className="">
-                          <Input
-                            placeholder="Enter your email"
-                            {...field}
-                            className="pl-10 mt-0 w-full max-w-none h-12 focus-visible:border-0 focus-visible:outline-0 "
-                          />
-                        </FormControl>
-                        <FormMessage className="text-left" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="h-12 mt-2 border border-accent"
-                >
-                  Subscribe
-                </Button>
-              </div>
-              <FormDescription className="mt-2 text-start text-sm font-normal text-gray-500">
-                We care about the protection of your data. Read our{" "}
-                <Link href="#" className="underline">
-                  Privacy Policy.
-                </Link>
-              </FormDescription>
-            </form>
-          </Form>
+              Join Newsletter
+            </Link>
+          </Button>
         </div>
       </div>
     </div>
