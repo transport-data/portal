@@ -27,6 +27,13 @@ import { env } from "@env.mjs";
 import { toast } from "@components/ui/use-toast";
 import { useState } from "react";
 
+const isDownloadable = (url: string) => {
+  const _url = new URL(url);
+  const urlParts = _url.pathname.split("/");
+  const lastPart = urlParts[urlParts.length - 1];
+  if (!lastPart) return false;
+  return lastPart.includes(".");
+};
 function ResourceCard({
   resource,
   dataset,
@@ -35,13 +42,6 @@ function ResourceCard({
   dataset: Dataset;
 }) {
   const [open, setOpen] = useState(false);
-  const isDownloadable = (url: string) => {
-    const _url = new URL(url);
-    const urlParts = _url.pathname.split("/");
-    const lastPart = urlParts[urlParts.length - 1];
-    if (!lastPart) return false;
-    return lastPart.includes(".");
-  };
   return (
     <div className="flex flex-col gap-y-2">
       <li className="flex items-center justify-between rounded-md border border-gray-200 py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100">
@@ -248,7 +248,11 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                       href={r.url}
                       className="font-medium text-primary hover:text-accent"
                     >
-                      <DownloadIcon className="h-5 w-5" />
+                      {isDownloadable(r.url ?? "") ? (
+                        <ArrowDownToLineIcon className="h-5 w-5" />
+                      ) : (
+                        <LinkIcon className="h-5 w-5" />
+                      )}
                     </a>
                   </div>
                 </li>
