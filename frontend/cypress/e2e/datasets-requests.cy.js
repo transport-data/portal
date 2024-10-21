@@ -30,10 +30,7 @@ const rejectMessage = uuid();
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 
-const createdUserUsername = "createduserusername";
-const createdUserPassword = "createdUserUsername1";
-
-const editorUser = describe("Datasets Requests", () => {
+const editorUser = describe("Dataset Approval", () => {
   before(() => {
     cy.createOrganizationViaAPI({ title: org, name: org });
     cy.createDatasetViaAPI({

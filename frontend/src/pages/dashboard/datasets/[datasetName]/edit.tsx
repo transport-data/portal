@@ -239,7 +239,7 @@ const EditDatasetDashboard: NextPage<{
                     { label: "Dashboard", href: "/dashboard" },
                     fromDatasetsRequests
                       ? {
-                          label: "Datasets Requests",
+                          label: "Dataset Approval",
                           href: "/dashboard/datasets-requests",
                         }
                       : { label: "Datasets", href: "/dashboard/datasets" },
