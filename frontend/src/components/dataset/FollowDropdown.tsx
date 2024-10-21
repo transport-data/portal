@@ -8,23 +8,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { toast } from "@components/ui/use-toast";
-import { cn } from "@lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@components/ui/tooltip";
+import { HeartIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@portaljs/ckan";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
+import { GroupTree } from "@schema/group.schema";
 import { api } from "@utils/api";
-import { useSession } from "next-auth/react";
-
-import { useEffect, useState } from "react";
-
-type Checked = DropdownMenuCheckboxItemProps["checked"];
 
 type FollowDatasetType = {
-  id: string;
-  name: string;
-};
-
-type FollowGeographyType = {
   id: string;
   name: string;
 };
@@ -38,7 +34,7 @@ export default function FollowDropdown({
   className?: string;
   dataset: FollowDatasetType;
   organization?: Organization;
-  geographies?: FollowGeographyType[];
+  geographies?: GroupTree[];
 }) {
   const utils = api.useUtils();
 
@@ -53,7 +49,14 @@ export default function FollowDropdown({
 
   const { data: followingGeographies } =
     api.user.isFollowingGeographies.useQuery(
-      (geographies ?? [])?.map((g) => g.id)
+      Array.from(
+        new Set(
+          geographies?.flatMap((parent) => [
+            parent.id,
+            ...parent.children.map((child) => child.id),
+          ])
+        )
+      )
     );
 
   const followDataset = api.dataset.follow.useMutation({
@@ -87,84 +90,146 @@ export default function FollowDropdown({
     (followingDataset ? 1 : 0) +
     (followingOrganization ? 1 : 0);
 
+  console.log(followingGeographies);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="secondary">
-          {followingAny ? (
-            <div className="flex gap-2">
-              Following{" "}
-              <Badge
-                variant="default"
-                className="flex h-[20px] w-[20px] items-center justify-center rounded-full bg-gray-200 p-0 font-semibold text-gray-900 hover:bg-gray-200"
-              >
-                {followingCount}
-              </Badge>
-            </div>
-          ) : (
-            "Follow"
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuCheckboxItem
-          checked={followingDataset}
-          onSelect={(event) => {
-            event.preventDefault();
-            return false;
-          }}
-          onCheckedChange={() => {
-            followDataset.mutate({
-              dataset: dataset.id,
-              isFollowing: followingDataset ?? false,
-            });
-          }}
-        >
-          Dataset
-        </DropdownMenuCheckboxItem>
-        {organization && (
+    <TooltipProvider delayDuration={100}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="secondary" className="follow-btn">
+            <HeartIcon className="mr-2 h-4 w-4" />
+            {followingAny ? (
+              <div className="flex gap-2">
+                Following{" "}
+                <Badge
+                  variant="default"
+                  className="flex h-[20px] w-[20px] items-center justify-center rounded-full bg-gray-200 p-0 font-semibold text-gray-900 hover:bg-gray-200"
+                >
+                  {followingCount}
+                </Badge>
+              </div>
+            ) : (
+              "Follow"
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="follow-content w-56" align="end">
           <DropdownMenuCheckboxItem
-            checked={followingOrganization}
+            checked={followingDataset}
             onSelect={(event) => {
               event.preventDefault();
               return false;
             }}
             onCheckedChange={() => {
-              followOrg.mutate({
-                dataset: organization.id,
-                isFollowing: followingOrganization ?? false,
+              followDataset.mutate({
+                dataset: dataset.id,
+                isFollowing: followingDataset ?? false,
               });
             }}
           >
-            {organization.title}
+            <Tooltip>
+              <TooltipTrigger>This Dataset</TooltipTrigger>
+              <TooltipContent className={``}>{dataset.name}</TooltipContent>
+            </Tooltip>
           </DropdownMenuCheckboxItem>
-        )}
+          {organization && (
+            <DropdownMenuCheckboxItem
+              checked={followingOrganization}
+              onSelect={(event) => {
+                event.preventDefault();
+                return false;
+              }}
+              onCheckedChange={() => {
+                followOrg.mutate({
+                  dataset: organization.id,
+                  isFollowing: followingOrganization ?? false,
+                });
+              }}
+            >
+              <Tooltip>
+                <TooltipTrigger>This Organization</TooltipTrigger>
+                <TooltipContent className={``}>
+                  {organization.title}
+                </TooltipContent>
+              </Tooltip>
+            </DropdownMenuCheckboxItem>
+          )}
 
-        <DropdownMenuLabel>Geographies</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {geographies?.map((geo) => (
-          <DropdownMenuCheckboxItem
-            key={geo.id}
-            checked={
-              followingGeographies?.find((g) => g.id === geo.id)?.following
-            }
-            onSelect={(event) => {
-              event.preventDefault();
-              return false;
-            }}
-            onCheckedChange={(event) => {
-              followGeography.mutate({
-                id: geo.id,
-                isFollowing:
-                  followingGeographies?.find((g) => g.id === geo.id)
-                    ?.following ?? false,
-              });
-            }}
-          >
-            {geo.name}
-          </DropdownMenuCheckboxItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuLabel className="">Regions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {geographies?.map((geo) => (
+            <DropdownGeoGroup
+              followingGeographies={followingGeographies}
+              key={geo.id}
+              group={geo}
+              onChange={followGeography.mutate}
+            />
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </TooltipProvider>
   );
 }
+
+const DropdownGeoGroup = ({
+  followingGeographies,
+  group,
+  onChange,
+}: {
+  followingGeographies: any;
+  group: GroupTree;
+  onChange: Function;
+}) => {
+  const groupChecked =
+    followingGeographies?.find((g: any) => g.id === group.id)?.following ??
+    false;
+  return (
+    <div>
+      <DropdownMenuCheckboxItem
+        checked={groupChecked}
+        onSelect={(event) => {
+          event.preventDefault();
+          return false;
+        }}
+        onCheckedChange={(event) => {
+          onChange({
+            id: group.id,
+            isFollowing: groupChecked,
+          });
+        }}
+      >
+        <span className="font-semibold">{group.title}</span>
+      </DropdownMenuCheckboxItem>
+      {group.children.length > 0 && (
+        <div>
+          {group.children.map((child) => {
+            const childChecked =
+              followingGeographies?.find((g: any) => g.id === child.id)
+                ?.following ?? false;
+            return (
+              <div key={child.id}>
+                <DropdownMenuCheckboxItem
+                  className="pl-10"
+                  checked={childChecked}
+                  disabled={groupChecked}
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    return false;
+                  }}
+                  onCheckedChange={(event) => {
+                    onChange({
+                      id: child.id,
+                      isFollowing: childChecked,
+                    });
+                  }}
+                >
+                  {child.title}
+                </DropdownMenuCheckboxItem>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};

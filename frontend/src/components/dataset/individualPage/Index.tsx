@@ -16,14 +16,19 @@ import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { toast } from "@components/ui/use-toast";
 import { api } from "@utils/api";
 import FollowDropdown from "../FollowDropdown";
+import { useSession } from "next-auth/react";
+import { GroupTree } from "@schema/group.schema";
 
 const siteTitle = "TDC Data Portal";
 
 export default function IndexDatasetPage({
   dataset,
+  locationsGroup,
 }: {
   dataset: Dataset;
+  locationsGroup: GroupTree[];
 }): JSX.Element {
+  const { data: sessionData } = useSession();
   const { data: datasetDownloads, isLoading } =
     api.ga.getDownloadStats.useQuery({
       id: dataset.id,
@@ -37,6 +42,7 @@ export default function IndexDatasetPage({
   ];
   const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
   const overviewTab = !!dataset.introduction_text;
+
   return (
     <>
       <Head>
@@ -197,17 +203,23 @@ export default function IndexDatasetPage({
                   <ShareIcon className="mr-2 h-4 w-4" />
                   Share
                 </Button>
-                <FollowDropdown
-                  dataset={{
-                    id: dataset.id,
-                    name: dataset.title ?? dataset.name,
-                  }}
-                  organization={dataset.organization}
-                  geographies={dataset.groups?.map((geo) => ({
-                    name: geo.title,
-                    id: geo.id,
-                  }))}
-                />
+                {sessionData?.user && (
+                  <FollowDropdown
+                    dataset={{
+                      id: dataset.id,
+                      name: dataset.title ?? dataset.name,
+                    }}
+                    organization={dataset.organization}
+                    geographies={locationsGroup
+                      .filter((item) => dataset.regions?.includes(item.name))
+                      .map((item) => ({
+                        ...item,
+                        children: item.children.filter((child) =>
+                          dataset.geographies?.includes(child.name)
+                        ),
+                      }))}
+                  />
+                )}
               </div>
             </div>
           </div>
