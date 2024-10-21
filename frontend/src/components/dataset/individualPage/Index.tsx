@@ -211,7 +211,7 @@ export default function IndexDatasetPage({
                     }}
                     organization={dataset.organization}
                     geographies={locationsGroup
-                      .filter((item) => dataset.regions?.includes(item.name))
+                      ?.filter((item) => dataset.regions?.includes(item.name))
                       .map((item) => ({
                         ...item,
                         children: item.children.filter((child) =>
