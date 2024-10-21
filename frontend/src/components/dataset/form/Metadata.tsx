@@ -406,19 +406,32 @@ export function MetadataForm() {
                               <CommandGroup
                                 key={r.name}
                                 heading={
-                                  <DefaultTooltip content="Select all countries in this region">
+                                  <DefaultTooltip content={`${r.children.map(c => c.name).every(c => field.value.includes(c)) ? 'Remove' : 'Select'} all countries in this region`}>
                                     <span
                                       className="text-gray-600"
                                       onClick={() => {
                                         const countries = r.children.map(
                                           (c) => c.name
                                         );
-                                        let newCountries =
-                                          field.value.concat(countries);
-                                        newCountries = newCountries.filter(
-                                          (v, i, a) => a.indexOf(v) === i
-                                        );
-                                        setValue("geographies", newCountries);
+                                        if (
+                                          countries.every((c) =>
+                                            field.value.includes(c)
+                                          )
+                                        ) {
+                                          setValue(
+                                            "geographies",
+                                            field.value.filter(
+                                              (v) => !countries.includes(v)
+                                            )
+                                          );
+                                        } else {
+                                          let newCountries =
+                                            field.value.concat(countries);
+                                          newCountries = newCountries.filter(
+                                            (v, i, a) => a.indexOf(v) === i
+                                          );
+                                          setValue("geographies", newCountries);
+                                        }
                                       }}
                                     >
                                       {r.title ?? r.name}

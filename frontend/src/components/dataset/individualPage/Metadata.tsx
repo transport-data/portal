@@ -84,7 +84,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 {dataset.contributors_data &&
                   dataset.contributors_data.map((contributor, index) => (
                     <li className="text-accent">
-                      {contributor.fullname ?? contributor.name} 
+                      {contributor.fullname || contributor.name}
                     </li>
                   ))}
               </ul>
@@ -158,19 +158,68 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "APA",
-                content: `${dataset.title ?? dataset.name} - Data product - ${
+                content: `${
                   dataset.creator_user?.fullname ??
                   dataset.creator_user?.name ??
                   "TDC"
                 }. ${
                   dataset.metadata_created
-                    ? new Date(dataset.metadata_created).toLocaleDateString()
+                    ? new Date(dataset.metadata_created).getFullYear()
+                    : "(n.d)"
+                }.${dataset.title ?? dataset.name}. ${
+                  dataset.organization?.display_name ??
+                  dataset.organization?.name ??
+                  "TDC"
+                }. ${typeof window !== "undefined" && window.location.href}`,
+              },
+              {
+                type: "quotation",
+                label: "MLA",
+                content: `${
+                  dataset.creator_user?.fullname ??
+                  dataset.creator_user?.name ??
+                  "TDC"
+                }.${dataset.title ?? dataset.name}, ${
+                  dataset.organization?.display_name ??
+                  dataset.organization?.name ??
+                  "TDC"
+                }, ${
+                  dataset.metadata_created
+                    ? new Date(dataset.metadata_created).getFullYear()
+                    : "(n.d)"
+                }, ${typeof window !== "undefined" && window.location.href}`,
+              },
+              {
+                type: "quotation",
+                label: "Chicago",
+                content: `${
+                  dataset.creator_user?.fullname ??
+                  dataset.creator_user?.name ??
+                  "TDC"
+                }. ${dataset.title ?? dataset.name}. ${
+                  dataset.metadata_created
+                    ? new Date(dataset.metadata_created).getFullYear()
                     : "(n.d)"
                 }. ${
                   dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
                 }. ${typeof window !== "undefined" && window.location.href}`,
+              },
+              {
+                type: "quotation",
+                label: "Harvard",
+                content: `${
+                  dataset.creator_user?.fullname ??
+                  dataset.creator_user?.name ??
+                  "TDC"
+                }. ${
+                  dataset.metadata_created
+                    ? new Date(dataset.metadata_created).getFullYear()
+                    : "(n.d)"
+                }.${dataset.title ?? dataset.name}. Available at: ${
+                  typeof window !== "undefined" && window.location.href
+                }`,
               },
             ]}
           />
