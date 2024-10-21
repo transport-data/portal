@@ -10,4 +10,5 @@ To use this feature, users must be signed in. After visiting a dataset page, the
 
 - **This dataset**: Follow or unfollow the currently displayed dataset.
 - **This organization**: Follow or unfollow the organization associated with the dataset.
-- **Regions**: Follow or unfollow the region(s) related to the dataset. Following a parent region will disable the selection of child regions, as users will automatically receive notifications from all regions belonging to the selected parent region.
+- **Regions**: Follow or unfollow the region(s) related to the dataset.
+  Following a parent region will disable the selection of child regions, as users will automatically receive notifications from all regions belonging to the selected parent region.
