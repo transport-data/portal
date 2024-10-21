@@ -3,11 +3,133 @@ import {
   ArrowDownToLineIcon,
   ChevronRightIcon,
   DownloadIcon,
+  LinkIcon,
 } from "lucide-react";
 import { datasetDownloadEvent } from "@utils/ga";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { Dataset, Resource } from "@interfaces/ckan/dataset.interface";
 import { api } from "@utils/api";
 import { Skeleton } from "@mui/material";
+import { Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { env } from "@env.mjs";
+import { toast } from "@components/ui/use-toast";
+import { useState } from "react";
+
+const isDownloadable = (url: string) => {
+  const _url = new URL(url);
+  const urlParts = _url.pathname.split("/");
+  const lastPart = urlParts[urlParts.length - 1];
+  if (!lastPart) return false;
+  return lastPart.includes(".");
+};
+function ResourceCard({
+  resource,
+  dataset,
+}: {
+  resource: Resource;
+  dataset: Dataset;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col gap-y-2">
+      <li className="flex items-center justify-between rounded-md border border-gray-200 py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100">
+        <div className="flex w-0 flex-1 items-center">
+          <img
+            src={formatIcon(resource.format?.toLowerCase() ?? "")}
+            aria-hidden="true"
+            className="h-8 w-8 flex-shrink-0 text-gray-400"
+          />
+          <div className="ml-4 flex min-w-0 flex-1 gap-2">
+            <span className="truncate font-medium">
+              {resource.name ?? getFileName(resource.url ?? "")}
+            </span>
+            {resource.size && (
+              <span className="flex-shrink-0 text-gray-400">
+                {formatBytes(resource.size)}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="ml-4 flex-shrink-0">
+          <a
+            href={resource.url}
+            onClick={() =>
+              datasetDownloadEvent({
+                datasetTitle: dataset.title,
+                datasetId: dataset.id,
+                datasetName: dataset.name,
+              })
+            }
+            className="font-medium text-gray-500 hover:text-accent"
+          >
+            {isDownloadable(resource.url ?? "") ? (
+              <ArrowDownToLineIcon className="h-5 w-5" />
+            ) : (
+              <LinkIcon className="h-5 w-5" />
+            )}
+          </a>
+        </div>
+      </li>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <button className="flex items-center gap-x-1 text-sm font-semibold text-accent">
+            Access by API <ChevronRightIcon className="mt-0.5 h-4 w-4" />
+          </button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>API Usage</DialogTitle>
+            <DialogDescription>
+              Copy the link below to use the API
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Link
+              </Label>
+              <Input
+                id="link"
+                defaultValue={`${env.NEXT_PUBLIC_CKAN_URL}/api/action/resource_show?id=${resource.id}`}
+                readOnly
+              />
+            </div>
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${env.NEXT_PUBLIC_CKAN_URL}/api/action/resource_show?id=${resource.id}`
+                );
+                toast({
+                  title: "Link copied to clipboard",
+                  duration: 5000,
+                });
+                setOpen(false);
+              }}
+              type="button"
+              size="sm"
+              className="px-3"
+            >
+              <span className="sr-only">Copy</span>
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
 
 export function Downloads({ dataset }: { dataset: Dataset }) {
   const { data: datasetDownloads, isLoading } =
@@ -37,54 +159,11 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
             )}
           </div>
           <div className="flex flex-col gap-y-4 py-4">
-            <ul
-              role="list"
-              className="divide-y divide-gray-100 rounded-md border border-gray-200"
-            >
+            <ul role="list" className="flex flex-col gap-y-4">
               {dataResources.map((r) => (
-                <li
-                  key={r.id}
-                  className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
-                >
-                  <div className="flex w-0 flex-1 items-center">
-                    <img
-                      src={formatIcon(r.format?.toLowerCase() ?? "")}
-                      aria-hidden="true"
-                      className="h-8 w-8 flex-shrink-0 text-gray-400"
-                    />
-                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                      <span className="truncate font-medium">
-                        {r.name ?? getFileName(r.url ?? "")}
-                      </span>
-                      {r.size && (
-                        <span className="flex-shrink-0 text-gray-400">
-                          {formatBytes(r.size)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="ml-4 flex-shrink-0">
-                    <a
-                      href={r.url}
-                      onClick={() =>
-                        datasetDownloadEvent({
-                          datasetTitle: dataset.title,
-                          datasetId: dataset.id,
-                          datasetName: dataset.name,
-                        })
-                      }
-                      className="font-medium text-gray-500 hover:text-accent"
-                    >
-                      <ArrowDownToLineIcon className="h-5 w-5" />
-                    </a>
-                  </div>
-                </li>
+                <ResourceCard resource={r} dataset={dataset} />
               ))}
             </ul>
-            <span className="flex items-center gap-x-1 text-sm font-semibold text-accent">
-              Show advanced options{" "}
-              <ChevronRightIcon className="mt-0.5 h-4 w-4" />
-            </span>
           </div>
         </div>
       )}
@@ -169,7 +248,11 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                       href={r.url}
                       className="font-medium text-primary hover:text-accent"
                     >
-                      <DownloadIcon className="h-5 w-5" />
+                      {isDownloadable(r.url ?? "") ? (
+                        <ArrowDownToLineIcon className="h-5 w-5" />
+                      ) : (
+                        <LinkIcon className="h-5 w-5" />
+                      )}
                     </a>
                   </div>
                 </li>
