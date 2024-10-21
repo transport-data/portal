@@ -3,6 +3,7 @@ import {
   ArrowDownToLineIcon,
   ChevronRightIcon,
   DownloadIcon,
+  LinkIcon,
 } from "lucide-react";
 import { datasetDownloadEvent } from "@utils/ga";
 import { Dataset, Resource } from "@interfaces/ckan/dataset.interface";
@@ -24,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { env } from "@env.mjs";
 import { toast } from "@components/ui/use-toast";
-import { useState } from 'react'
+import { useState } from "react";
 
 function ResourceCard({
   resource,
@@ -34,6 +35,13 @@ function ResourceCard({
   dataset: Dataset;
 }) {
   const [open, setOpen] = useState(false);
+  const isDownloadable = (url: string) => {
+    const _url = new URL(url);
+    const urlParts = _url.pathname.split("/");
+    const lastPart = urlParts[urlParts.length - 1];
+    if (!lastPart) return false;
+    return lastPart.includes(".");
+  };
   return (
     <div className="flex flex-col gap-y-2">
       <li className="flex items-center justify-between rounded-md border border-gray-200 py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100">
@@ -66,15 +74,18 @@ function ResourceCard({
             }
             className="font-medium text-gray-500 hover:text-accent"
           >
-            <ArrowDownToLineIcon className="h-5 w-5" />
+            {isDownloadable(resource.url ?? "") ? (
+              <ArrowDownToLineIcon className="h-5 w-5" />
+            ) : (
+              <LinkIcon className="h-5 w-5" />
+            )}
           </a>
         </div>
       </li>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="flex items-center gap-x-1 text-sm font-semibold text-accent">
-            Access by API{" "}
-            <ChevronRightIcon className="mt-0.5 h-4 w-4" />
+            Access by API <ChevronRightIcon className="mt-0.5 h-4 w-4" />
           </button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
@@ -97,7 +108,9 @@ function ResourceCard({
             </div>
             <Button
               onClick={() => {
-                navigator.clipboard.writeText(`${env.NEXT_PUBLIC_CKAN_URL}/api/action/resource_show?id=${resource.id}`);
+                navigator.clipboard.writeText(
+                  `${env.NEXT_PUBLIC_CKAN_URL}/api/action/resource_show?id=${resource.id}`
+                );
                 toast({
                   title: "Link copied to clipboard",
                   duration: 5000,
