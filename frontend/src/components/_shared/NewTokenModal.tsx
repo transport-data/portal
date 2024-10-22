@@ -16,25 +16,23 @@ export const NewTokenModal = ({
           ✖️
         </button>
         <h2 className="mb-4 text-xl font-bold">Create a new API Token</h2>
-        <form>
-          <input
-            type="text"
-            placeholder="api_token"
-            className="mb-4 w-full border p-2"
-            onChange={(e) => {
-              setValue(e.target.value);
-            }}
-            value={value}
-            required
-          />
-          <button
-            type="button"
-            onClick={onSubmit}
-            className="w-full rounded bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-600"
-          >
-            Create Token
-          </button>
-        </form>
+        <input
+          type="text"
+          placeholder="api_token"
+          className="mb-4 w-full border p-2"
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+          value={value}
+          required
+        />
+        <button
+          type="button"
+          onClick={onSubmit}
+          className="w-full rounded bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-600"
+        >
+          Create Token
+        </button>
       </div>
     </div>
   );

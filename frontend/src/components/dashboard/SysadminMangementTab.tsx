@@ -4,6 +4,15 @@ import AddSysadminModal from "@components/_shared/AddSysadminModal";
 import { Button } from "@components/ui/button";
 import { useRef } from "react";
 import { User } from "@interfaces/ckan/user.interface";
+import { useMemo } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@components/ui/pagination";
 
 export default ({
   adminUsers,
@@ -26,6 +35,8 @@ export default ({
   const [isAddSysadminModalOpen, setIsAddSysadminModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isNewUserSelected, setIsNewUserSelected] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const utils = api.useContext();
   const patchUser = api.user.patch.useMutation({
@@ -66,6 +77,13 @@ export default ({
       setIndeterminate(false);
     }
   }
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return adminUsers?.slice(startIndex, endIndex);
+  }, [adminUsers, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil((adminUsers?.length || 0) / itemsPerPage);
   return (
     <div>
       <div className="mb-2 flex">
@@ -132,9 +150,9 @@ export default ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
-                  {adminUsers && (
+                  {paginatedData && (
                     <>
-                      {adminUsers.map((user: any) => (
+                      {paginatedData.map((user: any) => (
                         <tr
                           key={user.name}
                           className={
@@ -210,6 +228,30 @@ export default ({
           }}
         />
       )}
+      <Pagination className="mt-2">
+        <PaginationContent>
+          <PaginationPrevious
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+          />
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                isActive={index + 1 === currentPage}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationNext
+            onClick={() =>
+              setCurrentPage(Math.min(currentPage + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          />
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 };

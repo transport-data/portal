@@ -4,6 +4,15 @@ import { useState } from "react";
 import { NewTokenModal } from "@components/_shared/NewTokenModal";
 import { Calendar } from "lucide-react";
 import { Button } from "@components/ui/button";
+import { useMemo } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@components/ui/pagination";
 
 export interface Tokens {
   id: string;
@@ -27,6 +36,8 @@ export default ({
 }) => {
   const [isNewTokenModalOpen, setIsNewTokenModalOpen] = useState(false);
   const [tokenName, setTokenName] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const utils = api.useContext();
   const revokeApiKey = api.user.revokeApiToken.useMutation({
@@ -56,6 +67,14 @@ export default ({
     },
   });
 
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return tokens?.slice(startIndex, endIndex);
+  }, [tokens, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil((tokens?.length || 0) / itemsPerPage);
+
   return (
     <div>
       <div className="mb-2 flex">
@@ -67,8 +86,8 @@ export default ({
         </Button>
       </div>
       <div>
-        {tokens &&
-          tokens.map((token: any, index: number) => (
+        {paginatedData &&
+          paginatedData.map((token: any, index: number) => (
             <div
               key={token.id}
               className={`cursor-pointer p-4 text-sm 
@@ -118,6 +137,30 @@ export default ({
           onSubmit={() => createApiKey.mutate({ name: tokenName })}
         />
       )}
+      <Pagination className="mt-2">
+        <PaginationContent>
+          <PaginationPrevious
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+          />
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                isActive={index + 1 === currentPage}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationNext
+            onClick={() =>
+              setCurrentPage(Math.min(currentPage + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          />
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 };
