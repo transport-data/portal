@@ -60,9 +60,7 @@ describe("Settings Page", () => {
       });
   
     cy.get('table').contains('td', normalUser).should("not.exist");
-  });
-
-  after(() => {
     cy.deleteUserApi(normalUser);
+
   });
 });
