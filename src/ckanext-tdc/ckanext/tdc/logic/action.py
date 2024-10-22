@@ -136,55 +136,30 @@ def _update_contributors(context, data_dict, is_update=False):
     Whenever an update happens, contributors list
     is updated based on which user did the update
     """
-<<<<<<< HEAD
-=======
-    current_user = tk.current_user
-    if not hasattr(current_user, "id"):
-        return
-    current_user_id = current_user.id
-    user_show_action = tk.get_action("user_show")
-    excluded_ids = []
-    try:
-        site_user = logic.get_action(u"get_site_user")(privileged_context, {})
-        excluded_ids.append(site_user.get("id"))
-        ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
-        excluded_ids.append(ckan_admin.get("id"))
-    except Exception as e:
-        log.error(e)
->>>>>>> 7ebf22a37dd8bf8af138a94ebcd7a6553acc4cb4
 
     # If it's a approval status update, do not
     # add user as contributor
     is_approval_action = context.get("is_approval_action", False)
 
-<<<<<<< HEAD
     if not is_approval_action:
         current_user = tk.current_user
         if not hasattr(current_user, "id"):
             return
         current_user_id = current_user.id
+        user_show_action = tk.get_action("user_show")
+        excluded_ids = []
+        try:
+            site_user = logic.get_action(u"get_site_user")(privileged_context, {})
+            excluded_ids.append(site_user.get("id"))
+            ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
+            excluded_ids.append(ckan_admin.get("id"))
+        except Exception as e:
+            log.error(e)
 
         if is_update:
             dataset_id = data_dict.get("id")
             dataset_name = data_dict.get("name")
             name_or_id = dataset_id or dataset_name
-
-            privileged_context = {
-                "ignore_auth": True
-            }
-=======
-        package_show_action = tk.get_action("package_show")
-        package_show_data_dict = {
-            "id": name_or_id
-        }
-        old_data_dict = package_show_action(
-            privileged_context, package_show_data_dict)
-        old_contributors = old_data_dict.get("contributors")
-        new_contributors = list(set(old_contributors + [current_user_id]))
-        filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
-
-        data_dict["contributors"] = filtered_new_contributors
->>>>>>> 7ebf22a37dd8bf8af138a94ebcd7a6553acc4cb4
 
             package_show_action = tk.get_action("package_show")
             package_show_data_dict = {
@@ -194,18 +169,15 @@ def _update_contributors(context, data_dict, is_update=False):
                 privileged_context, package_show_data_dict)
             old_contributors = old_data_dict.get("contributors")
             new_contributors = list(set(old_contributors + [current_user_id]))
+            filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
 
-<<<<<<< HEAD
-            data_dict["contributors"] = new_contributors
+            data_dict["contributors"] = filtered_new_contributors
 
             return new_contributors
 
-        data_dict["contributors"] = [current_user_id]
-=======
-    new_contributors = [current_user_id]
-    filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
-    data_dict["contributors"] = filtered_new_contributors
->>>>>>> 7ebf22a37dd8bf8af138a94ebcd7a6553acc4cb4
+        new_contributors = [current_user_id]
+        filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+        data_dict["contributors"] = filtered_new_contributors
 
 
 def _fix_user_group_permission(data_dict):
