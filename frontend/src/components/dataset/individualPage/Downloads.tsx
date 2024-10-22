@@ -3,6 +3,7 @@ import {
   ArrowDownToLineIcon,
   ChevronRightIcon,
   DownloadIcon,
+  LinkIcon,
 } from "lucide-react";
 import { datasetDownloadEvent } from "@utils/ga";
 import { Dataset, Resource } from "@interfaces/ckan/dataset.interface";
@@ -24,8 +25,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { env } from "@env.mjs";
 import { toast } from "@components/ui/use-toast";
-import { useState } from 'react'
+import { useState } from "react";
 
+const isDownloadable = (url: string) => {
+  const _url = new URL(url);
+  const urlParts = _url.pathname.split("/");
+  const lastPart = urlParts[urlParts.length - 1];
+  if (!lastPart) return false;
+  return lastPart.includes(".");
+};
 function ResourceCard({
   resource,
   dataset,
@@ -66,15 +74,18 @@ function ResourceCard({
             }
             className="font-medium text-gray-500 hover:text-accent"
           >
-            <ArrowDownToLineIcon className="h-5 w-5" />
+            {isDownloadable(resource.url ?? "") ? (
+              <ArrowDownToLineIcon className="h-5 w-5" />
+            ) : (
+              <LinkIcon className="h-5 w-5" />
+            )}
           </a>
         </div>
       </li>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="flex items-center gap-x-1 text-sm font-semibold text-accent">
-            Access by API{" "}
-            <ChevronRightIcon className="mt-0.5 h-4 w-4" />
+            Access by API <ChevronRightIcon className="mt-0.5 h-4 w-4" />
           </button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
@@ -97,7 +108,9 @@ function ResourceCard({
             </div>
             <Button
               onClick={() => {
-                navigator.clipboard.writeText(`${env.NEXT_PUBLIC_CKAN_URL}/api/action/resource_show?id=${resource.id}`);
+                navigator.clipboard.writeText(
+                  `${env.NEXT_PUBLIC_CKAN_URL}/api/action/resource_show?id=${resource.id}`
+                );
                 toast({
                   title: "Link copied to clipboard",
                   duration: 5000,
@@ -235,7 +248,11 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                       href={r.url}
                       className="font-medium text-primary hover:text-accent"
                     >
-                      <DownloadIcon className="h-5 w-5" />
+                      {isDownloadable(r.url ?? "") ? (
+                        <ArrowDownToLineIcon className="h-5 w-5" />
+                      ) : (
+                        <LinkIcon className="h-5 w-5" />
+                      )}
                     </a>
                   </div>
                 </li>
