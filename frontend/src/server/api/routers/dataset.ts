@@ -8,6 +8,7 @@ import {
   DraftDatasetSchema,
   SearchDatasetSchema,
 } from "@schema/dataset.schema";
+
 import {
   approveDataset,
   createDataset,
@@ -50,11 +51,17 @@ export const datasetRouter = createTRPCRouter({
       return searchResults;
     }),
   get: publicProcedure
-    .input(z.object({ name: z.string() }))
+    .input(
+      z.object({ name: z.string(), includeExtras: z.boolean().optional() }),
+    )
     .query(async ({ input, ctx }) => {
       const user = ctx.session?.user ?? null;
-      const apiKey = user?.apikey ?? '';
-      const dataset = await getDataset({ id: input.name, apiKey });
+      const apiKey = user?.apikey ?? "";
+      const dataset = await getDataset({
+        id: input.name,
+        apiKey,
+        include_extras: !!input?.includeExtras,
+      });
       return dataset;
     }),
   activities: publicProcedure

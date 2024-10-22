@@ -74,10 +74,11 @@ export default function DatasetPage({
   const { data: dataset } = api.dataset.get.useQuery(
     {
       name: _dataset.name,
+      includeExtras: true
     },
     {
       initialData: createCkanResponse(_dataset),
-    }
+    },
   );
   return <IndexDatasetPage dataset={dataset.result} />;
 }
