@@ -3,6 +3,8 @@ import { getDataset } from "@utils/dataset";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { getServerAuthSession } from "@server/auth";
 import IndexDatasetPage from "@components/dataset/individualPage/Index";
+import { groupTree } from "@utils/group";
+import { GroupTree } from "@schema/group.schema";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
@@ -27,14 +29,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       apiKey: session?.user.apikey,
       include_extras: true,
     });
+
     if (!dataset.result) {
       return {
         notFound: true,
       };
     }
+    const locationsGroup = await groupTree({
+      type: "geography",
+    });
     return {
       props: {
         dataset: dataset.result,
+        locationsGroup,
       },
     };
   } catch (e) {
@@ -55,8 +62,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function DatasetPage({
   dataset,
+  locationsGroup,
 }: {
   dataset: Dataset;
+  locationsGroup: GroupTree[];
 }): JSX.Element {
-  return <IndexDatasetPage dataset={dataset} />;
+  return <IndexDatasetPage dataset={dataset} locationsGroup={locationsGroup} />;
 }

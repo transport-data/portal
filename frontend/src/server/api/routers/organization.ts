@@ -10,6 +10,7 @@ import {
   patchOrganization,
   deleteOrganizations,
   removeOrganizationMembers,
+  followOrganization,
 } from "@utils/organization";
 import { z } from "zod";
 
@@ -96,5 +97,19 @@ export const organizationRouter = createTRPCRouter({
       const apiKey = user.apikey;
       const members = removeOrganizationMembers({ input, apiKey });
       return members;
+    }),
+
+  follow: protectedProcedure
+    .input(z.object({ dataset: z.string(), isFollowing:z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const res = await followOrganization({ 
+        apiKey, 
+        isFollowing: input.isFollowing,
+        id: input.dataset 
+      });
+
+      return res;
     }),
 });

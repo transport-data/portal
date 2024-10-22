@@ -285,3 +285,27 @@ export const requestNewOrganization = async ({
   );
   return response;
 };
+
+
+export const followOrganization = async ({id,isFollowing,apiKey}:{id:string,isFollowing:boolean;apiKey:string})=>{
+  const response = await CkanRequest.post<CkanResponse<any>>(
+    `${isFollowing ? 'unfollow' : 'follow'}_group`,
+    {
+      apiKey: apiKey,
+      json: { id },
+    }
+  );
+
+  return response.result
+}
+
+export const getOrgFollowersList = async ({ id,apiKey }:{ id:string, apiKey:string })=>{
+  const response = await CkanRequest.post<CkanResponse<User[]>>(
+    `organization_follower_list`,
+    {
+      apiKey: apiKey,
+      json: { id },
+    }
+  );
+  return response.result
+}
