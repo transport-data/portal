@@ -5,7 +5,7 @@ import { Skeleton } from "@components/ui/skeleton";
 import UserMenuDropdown from "./UserMenuDropDown";
 import { Disclosure } from "@headlessui/react";
 import {
-  ArrowRightEndOnRectangleIcon,
+  ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -163,7 +163,7 @@ export default function Header({
                   className="relative px-0 text-gray-500"
                   onClick={handleSignOut}
                 >
-                  <ArrowRightEndOnRectangleIcon width={20} />
+                  <ArrowRightOnRectangleIcon width={20} />
                 </Button>
               </div>
             ) : (
