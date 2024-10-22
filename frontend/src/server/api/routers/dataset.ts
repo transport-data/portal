@@ -1,9 +1,11 @@
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { DatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
+import { DatasetSchema, DraftDatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
 import {
   createDataset,
   deleteDatasets,
+  draftDataset,
   getDataset,
+  getDatasetActivities,
   getDatasetSchema,
   licensesList,
   patchDataset,
@@ -20,19 +22,25 @@ export const datasetRouter = createTRPCRouter({
       const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
-
-  
-  get: protectedProcedure
+  get: publicProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
-      const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const user = ctx.session?.user ?? null;
+      const apiKey = user?.apikey ?? '';
       const dataset = await getDataset({ id: input.name, apiKey });
       return dataset;
     }),
-  schema: protectedProcedure.query(async ({ ctx }) => {
-    const user = ctx.session.user;
-    const apiKey = user.apikey;
+  activities: publicProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session?.user ?? null;
+      const apiKey = user?.apikey ?? '';
+      const activities = await getDatasetActivities({ id: input.name, apiKey });
+      return activities;
+    }),
+  schema: publicProcedure.query(async ({ ctx }) => {
+    const user = ctx.session?.user ?? null;
+    const apiKey = user?.apikey ?? '';
     const schema = await getDatasetSchema({ apiKey });
     return schema;
   }),
@@ -41,7 +49,7 @@ export const datasetRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-    //convert the date to string YYYY-MM-DD
+    //convert the date to string# YYYY-MM-DD
       const _dataset = {
         ...input,
         related_datasets: input.related_datasets.map((d) => d.name),
@@ -49,6 +57,14 @@ export const datasetRouter = createTRPCRouter({
         temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
       };
       const dataset = await createDataset({ apiKey, input: _dataset });
+      return dataset;
+    }),
+  draft: protectedProcedure
+    .input(DraftDatasetSchema)
+    .mutation( async ({ input,ctx })=>{
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const dataset = await draftDataset({ apiKey, input });
       return dataset;
     }),
   patch: protectedProcedure

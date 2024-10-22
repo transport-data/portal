@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [My Organizations](#my-organizations)
+  - [Filtering by Status and Contributors](#filtering-by-status-and-contributors)
+    - [Advanced Filters](#advanced-filters)
+    - [Viewing and Editing a Dataset](#viewing-and-editing-a-dataset)
+  - [Adding New Datasets](#adding-new-datasets)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # My Organizations
 
 This page allows users to list and filter datasets from the organizations they belong to.

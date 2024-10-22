@@ -4,9 +4,7 @@ import Loading from "@components/_shared/Loading";
 import { api } from "@utils/api";
 import { useMachine } from "@xstate/react";
 import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
-import {
-  ChevronRightIcon,
-} from "@heroicons/react/20/solid";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { NextSeo } from "next-seo";
 import { formatIcon, slugify } from "@lib/utils";
 import { Steps } from "@components/dataset/form/Steps";
@@ -24,6 +22,7 @@ import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import { ErrorAlert } from "@components/_shared/Alerts";
+import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 
 const docs = [
   {
@@ -66,6 +65,20 @@ const CreateDatasetDashboard: NextPage = () => {
       setErrorMessage(error.message);
     },
   });
+  const createDraftDataset = api.dataset.draft.useMutation({
+    onSuccess: async (data) => {
+      setErrorMessage(null);
+      toast({
+        description: `Successfully created the ${
+          data?.title ?? data?.name
+        } dataset as Draft`,
+      });
+      await router.push("/dashboard/datasets");
+    },
+    onError: (error) => {
+      setErrorMessage(error.message);
+    },
+  });
   const [current, send] = useMachine(datasetOnboardingMachine);
   const form = useForm<DatasetFormType>({
     resolver: zodResolver(DatasetSchema),
@@ -75,6 +88,7 @@ const CreateDatasetDashboard: NextPage = () => {
       private: true,
       title: "",
       notes: "",
+      state: "active",
       geographies: [],
       topics: [],
       sectors: [],
@@ -87,7 +101,8 @@ const CreateDatasetDashboard: NextPage = () => {
     },
   });
   useEffect(() => {
-    if (!form.formState.dirtyFields["name"]) form.setValue("name", slugify(form.watch("title")));
+    if (!form.formState.dirtyFields["name"])
+      form.setValue("name", slugify(form.watch("title")));
   }, [form.watch("title")]);
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
@@ -140,44 +155,85 @@ const CreateDatasetDashboard: NextPage = () => {
       })
       .otherwise(() => false);
 
+  const validatePrimeRequiredFields = () => {
+    const primeRequiredFields = ["name", "notes", "owner_org"];
+    let hasPrimeError = false;
+    for (var name in form.formState.errors) {
+      if (primeRequiredFields.find((f) => f === name)) {
+        hasPrimeError = true;
+        break;
+      }
+    }
+    return !hasPrimeError;
+  };
+
+  const handleSaveDraft = async () => {
+    form.trigger().then(() => {
+      if (validatePrimeRequiredFields())
+        createDraftDataset.mutate({
+          ...form.getValues(),
+        });
+    });
+
+    return false;
+  };
+
   return (
     <>
       <NextSeo title="Create dataset" />
       <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col justify-center gap-y-4 px-4 py-8 lg:px-20">
+          <nav className="mb-6 hidden sm:flex">
+            <DefaultBreadCrumb
+              links={[
+                { label: "Home", href: "/" },
+                { label: "Dashboard", href: "/dashboard" },
+                { label: "Datasets", href: "/dashboard/datasets" },
+                {
+                  label: "Create Dataset",
+                  href: "#",
+                },
+              ]}
+            />
+          </nav>
+
           <Steps currentStep={currentStep} />
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               {current.matches("general") && (
                 <>
                   <GeneralForm />
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={async () => {
-                      await form.trigger();
-                      if (checkDisableNext()) {
-                        return;
-                      }
-                      return send("next");
-                    }}
-                  >
-                    Next
-                  </Button>
+                  <div className="flex items-center gap-4">
+                    <SaveDraftButton callback={() => handleSaveDraft()} />
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={async () => {
+                        await form.trigger();
+                        if (checkDisableNext()) {
+                          return;
+                        }
+                        return send("next");
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </>
               )}
               {current.matches("metadata") && (
                 <>
                   <MetadataForm />
-                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                  <div className="flex items-center gap-4">
                     <Button
                       type="button"
                       variant="secondary"
-                      className="w-full"
+                      className="w-fit"
                       onClick={() => send("prev")}
                     >
                       Prev
                     </Button>
+                    <SaveDraftButton callback={() => handleSaveDraft()} />
                     <Button
                       type="button"
                       className="w-full"
@@ -197,15 +253,15 @@ const CreateDatasetDashboard: NextPage = () => {
               {current.matches("uploads") && (
                 <>
                   <UploadsForm />
-                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                  <div className="flex items-center gap-4">
                     <Button
                       type="button"
                       variant="secondary"
-                      className="w-full"
                       onClick={() => send("prev")}
                     >
                       Prev
                     </Button>
+                    <SaveDraftButton callback={() => handleSaveDraft()} />
                     <LoaderButton
                       loading={createDataset.isLoading}
                       className="w-full"
@@ -277,3 +333,18 @@ const CreateDatasetDashboard: NextPage = () => {
 };
 
 export default CreateDatasetDashboard;
+
+const SaveDraftButton = ({ callback }: { callback: Function }) => {
+  return (
+    <Button
+      variant="secondary"
+      onClick={(e) => {
+        e.preventDefault();
+        callback();
+        return false;
+      }}
+    >
+      Save Draft
+    </Button>
+  );
+};

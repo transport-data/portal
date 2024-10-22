@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Testimonials Section](#testimonials-section)
+    - [Key fields:](#key-fields)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Testimonials Section
 
 To update the content in the testimonials section on the home page:

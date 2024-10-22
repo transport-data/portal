@@ -276,16 +276,13 @@ export default () => {
                 : selected === "draft"
                 ? {
                     includeDrafts: true,
-                    includePrivate: false,
+                    includePrivate: true,
                     advancedQueries: [
-                      //preserve other advancedQueries and remove "state" and "private"
+                      //preserve other advancedQueries and remove "state"
                       ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
+                        (aq) => aq.key !== "state"
                       ),
-                      ...[
-                        { key: "state", values: ["draft"] },
-                        { key: "private", values: ["(false)"] },
-                      ],
+                      ...[{ key: "state", values: ["draft"] }],
                     ],
                   }
                 : {

@@ -45,8 +45,8 @@ export function UploadsForm() {
       name: "resources", // unique name for your Field Array
     }
   );
-  const docs = fields.filter((f) => f.type === "documentation");
-  const files = fields.filter((f) => f.type === "data");
+  const docs = fields.filter((f) => f.resource_type === "documentation");
+  const files = fields.filter((f) => f.resource_type === "data");
   return (
     <div className="py-4">
       <div className="pb-4 text-xl font-bold leading-normal text-primary">
@@ -63,13 +63,14 @@ export function UploadsForm() {
               id="files-upload"
               onUploadSuccess={(response: UploadResult) => {
                 let url = response.successful[0]?.uploadURL as string;
-                //get last and second to last items in url, last is going to be the name and second to last is going to be the resourceId
+                console.log('RESPONSE', response.successful[0])
                 const urlParts = url.split("/");
                 const resourceId = urlParts[urlParts.length - 2];
+                const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
                   "id"
                 )}/resource/${resourceId}/${
-                  response.successful[0]?.name ?? ""
+                  fileName ?? ""
                 }`;
                 append({
                   id: resourceId,
@@ -77,7 +78,6 @@ export function UploadsForm() {
                   url: url as string,
                   url_type: "upload",
                   resource_type: "data",
-                  type: "data",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
                 });
@@ -146,10 +146,11 @@ export function UploadsForm() {
                 //get last and second to last items in url, last is going to be the name and second to last is going to be the resourceId
                 const urlParts = url.split("/");
                 const resourceId = urlParts[urlParts.length - 2];
+                const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
                   "id"
                 )}/resource/${resourceId}/${
-                  response.successful[0]?.name ?? ""
+                  fileName ?? ""
                 }`;
                 append({
                   id: resourceId,
@@ -157,7 +158,6 @@ export function UploadsForm() {
                   url: url as string,
                   url_type: "upload",
                   resource_type: "documentation",
-                  type: "documentation",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
                 });

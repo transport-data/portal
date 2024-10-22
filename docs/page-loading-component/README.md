@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Page Loading Component](#page-loading-component)
+    - [Key Features:](#key-features)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Page Loading Component
 
 This component provides users with a visual indicator when the application is loading a page. It displays a loading bar at the top of the screen and a TDC logo with three animated loading dots in the bottom-right corner. The purpose is to enhance user experience by offering a clear and aesthetic way of communicating page loading status.

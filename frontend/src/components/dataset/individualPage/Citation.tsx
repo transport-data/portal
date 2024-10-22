@@ -5,17 +5,17 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Dataset } from "@portaljs/ckan";
 import { Button } from "@/components/ui/button";
 import { cn } from "@lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { ClipboardCopy, QuoteIcon } from "lucide-react";
 import { CodeBracketIcon } from "@heroicons/react/24/outline";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export interface Option {
   label: string;
-  content: React.ReactNode;
+  content: string;
   type: "code" | "quotation";
 }
 
@@ -26,31 +26,12 @@ export function Citation({
   dataset: Dataset;
   options: Option[];
 }) {
-  const citationCode = `
-            @software{schlottke_lakemper_michael_2023_7911779,
-  author = {Schlottke-Lakemper, Michael and
-             Gassner, Gregor J. and
-             Ranocha, Hendrik and
-             Winters, Andrew R. and
-             Chan, Jesse},
-   title = {TDC Global Vehicle Registration},
-   month = march,
-   year = 2023,
-   publisher = {TDC},
-   version = {v0.5.22},
-   doi = {10.5281/TDC.7911779},
-   url = {https://doi.org/10.5281/TDC.7911779}
-}
-`;
-  function onClick(content: string) {
-    toast({
-      title: "Success",
-      description: content 
-    });
-  }
   return (
-    <Tabs defaultValue={options[0]?.label ?? ""} className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[80vw]">
-      <TabsList className="w-full justify-start overflow-hidden p-0 bg-transparent">
+    <Tabs
+      defaultValue={options[0]?.label ?? ""}
+      className="max-w-[95vw] md:max-w-[80vw] lg:max-w-[80vw]"
+    >
+      <TabsList className="w-full justify-start overflow-hidden bg-transparent p-0">
         <Carousel className="w-full">
           <CarouselContent>
             {options.map((option, index) => (
@@ -93,9 +74,36 @@ export function Citation({
                 <CodeBracketIcon className="h-8 w-8 text-black" />
               )}
             </div>
-            <pre className="text-sm font-normal leading-tight text-gray-500 overflow-hidden">{citationCode}</pre>
+            {option.type === "quotation" ? (
+              <p
+                className={cn(
+                  "overflow-hidden text-sm font-normal leading-tight text-gray-500"
+                )}
+              >
+                {option.content}
+              </p>
+            ) : (
+              <pre
+                className={cn(
+                  "overflow-hidden text-sm font-normal leading-tight text-gray-500"
+                )}
+              >
+                {option.content}
+              </pre>
+            )}
           </div>
-          <Button variant="secondary" className="bg-gray-200 border-gray-200 outline-gray-200 ring-gray-200 gap-x-2">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              navigator.clipboard.writeText(option.content);
+              toast({
+                title: "Copied to clipboard",
+                description: option.content,
+                duration: 5000,
+              });
+            }}
+            className="gap-x-2 border-gray-200 bg-gray-200 outline-gray-200 ring-gray-200"
+          >
             <ClipboardCopy className="h-4 w-4" />
             Copy to clipboard
           </Button>
