@@ -1,35 +1,29 @@
-import { Color } from "@tiptap/extension-color";
-import ListItem from "@tiptap/extension-list-item";
-import TextStyle from "@tiptap/extension-text-style";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import Text from "@tiptap/extension-text";
-import Link from "@tiptap/extension-link";
-import Bold from "@tiptap/extension-bold";
-import Underline from "@tiptap/extension-underline";
-import Italic from "@tiptap/extension-italic";
-import Strike from "@tiptap/extension-strike";
-import Code from "@tiptap/extension-code";
-import BulletList from "@tiptap/extension-bullet-list";
-import { EditorProvider, useCurrentEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { Dispatch, SetStateAction } from "react";
-import Placeholder from "@tiptap/extension-placeholder";
-import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import * as Icons from "./rteIcons";
 import { cn } from "@lib/utils";
+import Bold from "@tiptap/extension-bold";
+import BulletList from "@tiptap/extension-bullet-list";
+import Code from "@tiptap/extension-code";
+import { Color } from "@tiptap/extension-color";
+import Document from "@tiptap/extension-document";
+import Italic from "@tiptap/extension-italic";
+import ListItem from "@tiptap/extension-list-item";
+import Paragraph from "@tiptap/extension-paragraph";
+import Placeholder from "@tiptap/extension-placeholder";
+import Strike from "@tiptap/extension-strike";
+import Text from "@tiptap/extension-text";
+import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
+import { EditorProvider, useCurrentEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
+import * as Icons from "./rteIcons";
 
-const MenuBar = () => {
+const MenuBar = ({ disabled }: any) => {
   const { editor } = useCurrentEditor();
 
   if (!editor) {
@@ -40,9 +34,11 @@ const MenuBar = () => {
     <div className="control-group">
       <div className="Button-group flex h-[40px] items-center gap-3.5 rounded-t-lg border-[1.5px] border-b-0 border-[#E5E7EB] bg-[#F9FAFB] px-5">
         <button
+          disabled={disabled}
           aria-label="Code"
           onClick={() => editor.chain().focus().toggleCode().run()}
           className={cn(
+            disabled && "cursor-not-allowed",
             "rounded-md p-1 hover:text-accent",
             editor.isActive("code") ? "bg-gray-400 text-white" : "",
             !editor.can().chain().focus().toggleCode().run()
@@ -53,9 +49,12 @@ const MenuBar = () => {
           <Icons.Code />
         </button>
         <button
+          disabled={disabled}
           aria-label="Code"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={cn(
+            disabled && "cursor-not-allowed",
+
             "rounded-md p-1 hover:text-accent",
             editor.isActive("bold") ? "bg-gray-400 text-white" : "",
             !editor.can().chain().focus().toggleBold().run()
@@ -66,9 +65,12 @@ const MenuBar = () => {
           <Icons.Bold />
         </button>
         <button
+          disabled={disabled}
           aria-label="Underline"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           className={cn(
+            disabled && "cursor-not-allowed",
+
             "rounded-md p-1 hover:text-accent",
             editor.isActive("underline") ? "bg-gray-400 text-white" : "",
             !editor.can().chain().focus().toggleUnderline().run()
@@ -79,9 +81,12 @@ const MenuBar = () => {
           <Icons.Underline />
         </button>
         <button
+          disabled={disabled}
           aria-label="Italic"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={cn(
+            disabled && "cursor-not-allowed",
+
             "rounded-md p-1 hover:text-accent",
             editor.isActive("italic") ? "bg-gray-400 text-white" : "",
             !editor.can().chain().focus().toggleItalic().run()
@@ -92,9 +97,12 @@ const MenuBar = () => {
           <Icons.Italic />
         </button>
         <button
+          disabled={disabled}
           aria-label="Strike"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           className={cn(
+            disabled && "cursor-not-allowed",
+
             "rounded-md p-1 hover:text-accent",
             editor.isActive("strike") ? "bg-gray-400 text-white" : "",
             !editor.can().chain().focus().toggleStrike().run()
@@ -105,9 +113,11 @@ const MenuBar = () => {
           <Icons.Strikethrough />
         </button>
         <button
+          disabled={disabled}
           aria-label="Bullet List"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={cn(
+            disabled && "cursor-not-allowed",
             "rounded-md p-1 hover:text-accent",
             editor.isActive("bulletList") ? "bg-gray-400 text-white" : "",
             !editor.can().chain().focus().toggleBulletList().run()
@@ -134,9 +144,10 @@ export function RTEForm<T extends FieldValues>({
   formObj,
   name,
   defaultValue,
+  disabled,
   placeholder,
   className,
-}: ControlleRTEEditorProps<T>) {
+}: ControlleRTEEditorProps<T> & { disabled?: boolean }) {
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
     TextStyle.configure({ types: [ListItem.name] } as any),
@@ -177,7 +188,11 @@ export function RTEForm<T extends FieldValues>({
           <FormItem className="space-y-0">
             <FormControl>
               <EditorProvider
-                slotBefore={<MenuBar />}
+                editable={!disabled}
+                editorContainerProps={{
+                  className: cn(disabled && "cursor-not-allowed opacity-60"),
+                }}
+                slotBefore={<MenuBar disabled={disabled} />}
                 extensions={extensions}
                 onUpdate={({ editor }) => field.onChange(editor.getHTML())}
                 content={field.value}

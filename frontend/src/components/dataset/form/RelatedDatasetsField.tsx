@@ -27,8 +27,9 @@ import { api } from "@utils/api";
 import { useState } from "react";
 import React from "react";
 
-export function RelatedDatasetsField() {
-  const { control, register, setValue, getValues, watch } = useFormContext<DatasetFormType>();
+export function RelatedDatasetsField({ disabled }: { disabled?: boolean }) {
+  const { control, register, setValue, getValues, watch } =
+    useFormContext<DatasetFormType>();
   const [searchedDataset, setSearchedDataset] = useState("");
   const datasets = api.dataset.search.useQuery({
     query: searchedDataset,
@@ -43,6 +44,7 @@ export function RelatedDatasetsField() {
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
+                  disabled={disabled}
                   variant="outline"
                   role="combobox"
                   className={cn(
@@ -52,7 +54,8 @@ export function RelatedDatasetsField() {
                   )}
                 >
                   {field.value && field.value.length > 0
-                    ? field.value.map((d) => d.title ?? d.name)
+                    ? field.value
+                        .map((d) => d.title ?? d.name)
                         .join(", ")
                         .slice(0, 50)
                     : "Select datasets"}
@@ -65,6 +68,7 @@ export function RelatedDatasetsField() {
             >
               <Command>
                 <CommandInput
+                  disabled={disabled}
                   value={searchedDataset}
                   onValueChange={setSearchedDataset}
                   placeholder="Search sectors..."
@@ -93,39 +97,47 @@ export function RelatedDatasetsField() {
                       },
                       (data) => (
                         <>
-                          {data.datasets.filter(d => d.id !== watch('id')).map((d) => (
-                            <CommandItem
-                              value={d.name}
-                              key={d.name}
-                              onSelect={() => {
-                                match(field.value.some(v => v.name === d.name))
-                                  .with(true, () =>
-                                    setValue(
-                                      "related_datasets",
-                                      getValues("related_datasets").filter(
-                                        (v) => v.name !== d.name
+                          {data.datasets
+                            .filter((d) => d.id !== watch("id"))
+                            .map((d) => (
+                              <CommandItem
+                                disabled={disabled}
+                                value={d.name}
+                                key={d.name}
+                                onSelect={() => {
+                                  match(
+                                    field.value.some((v) => v.name === d.name)
+                                  )
+                                    .with(true, () =>
+                                      setValue(
+                                        "related_datasets",
+                                        getValues("related_datasets").filter(
+                                          (v) => v.name !== d.name
+                                        )
                                       )
                                     )
-                                  )
-                                  .with(false, () =>
-                                    setValue(
-                                      "related_datasets",
-                                      getValues("related_datasets").concat({name: d.name, title: d.title ?? d.name})
-                                    )
-                                  );
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  field.value.some(v => v.name === d.name)
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {d.title ?? d.name}
-                            </CommandItem>
-                          ))}
+                                    .with(false, () =>
+                                      setValue(
+                                        "related_datasets",
+                                        getValues("related_datasets").concat({
+                                          name: d.name,
+                                          title: d.title ?? d.name,
+                                        })
+                                      )
+                                    );
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value.some((v) => v.name === d.name)
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {d.title ?? d.name}
+                              </CommandItem>
+                            ))}
                         </>
                       )
                     )

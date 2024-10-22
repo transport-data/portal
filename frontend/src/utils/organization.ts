@@ -1,7 +1,10 @@
 import { type User } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
 import CkanRequest from "@datopian/ckan-api-client-js";
-import { OrganizationFormType, type Organization } from "@schema/organization.schema";
+import {
+  OrganizationFormType,
+  type Organization,
+} from "@schema/organization.schema";
 
 export const createOrganization = async ({
   apiKey,
@@ -91,7 +94,7 @@ export const listOrganizations = async ({
   action += `&include_users=${!!input.includeUsers}`;
   const organizations = await CkanRequest.get<CkanResponse<Organization[]>>(
     action,
-    { apiKey: apiKey ?? '' }
+    { apiKey: apiKey ?? "" }
   );
   return organizations.result;
 };
@@ -105,9 +108,12 @@ export const listUserOrganizations = async ({
 }) => {
   const organizationList = await CkanRequest.get<
     CkanResponse<(Organization & { capacity: "admin" | "editor" | "member" })[]>
-  >(`organization_list_for_user?id=${id}&include_dataset_count=true`, {
-    apiKey: apiKey,
-  });
+  >(
+    `organization_list_for_user?id=${id}&include_dataset_count=true&limit=1000`,
+    {
+      apiKey: apiKey,
+    }
+  );
   const organizations = organizationList.result;
   return organizations;
 };
@@ -252,9 +258,9 @@ export const requestOrganizationOwner = async ({
     "request_organization_owner",
     {
       apiKey,
-      json: { 
+      json: {
         id: id,
-        message: message
+        message: message,
       },
     }
   );
@@ -276,7 +282,7 @@ export const requestNewOrganization = async ({
     "request_new_organization",
     {
       apiKey,
-      json: { 
+      json: {
         org_name: orgName,
         org_description: orgDescription,
         dataset_description: datasetDescription,
@@ -309,3 +315,4 @@ export const getOrgFollowersList = async ({ id,apiKey }:{ id:string, apiKey:stri
   );
   return response.result
 }
+

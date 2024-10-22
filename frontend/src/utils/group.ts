@@ -113,6 +113,7 @@ export const patchGroup = async ({
   apiKey: string;
   input: GroupFormType;
 }) => {
+  console.log('INPUT', input)
   const group: CkanResponse<Group> = await CkanRequest.post("group_patch", {
     apiKey,
     json: input,

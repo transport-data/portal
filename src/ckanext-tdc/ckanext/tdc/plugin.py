@@ -5,6 +5,8 @@ import ckanext.tdc.logic.action as action
 import ckanext.tdc.cli as cli
 import ckanext.tdc.logic.auth as auth
 import ckanext.tdc.activity as activity
+from ckanext.tdc.subscriptions import get_subscriptions
+import ckanext.tdc.logic.validators as validators
 
 import json
 import logging
@@ -19,6 +21,7 @@ class TdcPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IClick, inherit=True)
     plugins.implements(plugins.IAuthFunctions, inherit=True)
     plugins.implements(plugins.IValidators)
+    plugins.implements(plugins.ISignal)
 
     # IConfigurer
 
@@ -34,7 +37,11 @@ class TdcPlugin(plugins.SingletonPlugin):
         def empty_if_not_sysadmin(key, data, errors, context):
             return
 
-        return {"empty_if_not_sysadmin": empty_if_not_sysadmin}
+        return {
+            "empty_if_not_sysadmin": empty_if_not_sysadmin,
+            "object_id_validator": validators.object_id_validator,
+            "activity_type_exists": validators.activity_type_exists
+        }
 
     # IActions
 
@@ -43,7 +50,7 @@ class TdcPlugin(plugins.SingletonPlugin):
             "package_create": action.package_create,
             "package_delete": action.package_delete,
             "package_update": action.package_update,
-            "package_patch": action.package_patch,
+            # "package_patch": action.package_patch,
             "package_search": action.package_search,
             "package_show": action.package_show,
             "group_list": action.group_list,
@@ -51,7 +58,8 @@ class TdcPlugin(plugins.SingletonPlugin):
             "invite_user_to_tdc": action.invite_user_to_tdc,
             "request_organization_owner": action.request_organization_owner,
             "request_new_organization": action.request_new_organization,
-            "tdc_dashboard_activity_list": activity.dashboard_activity_list_action
+            "tdc_dashboard_activity_list": activity.dashboard_activity_list_action,
+            "dataset_approval_update": action.dataset_approval_update
         }
 
     # IPackageController
@@ -102,3 +110,8 @@ class TdcPlugin(plugins.SingletonPlugin):
         # This plugin doesn't handle any special package types, it just
         # registers itself as the default (above).
         return []
+
+    # ISignal
+
+    def get_signal_subscriptions(self):
+        return get_subscriptions()

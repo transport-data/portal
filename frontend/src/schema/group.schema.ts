@@ -11,6 +11,7 @@ import type { Group as GroupDefault } from "@portaljs/ckan";
   sort: z.string().optional(),
   include_private: z.boolean().optional()
 });*/
+const emptyStringToUndefined = z.literal('').transform(() => undefined)
 
 export const GroupSchema = z.object({
   id: z.string().optional(),
@@ -26,6 +27,8 @@ export const GroupSchema = z.object({
   parent: z.string().optional(),
   image_url: z.string().default(""),
   type: z.string().default("topic"),
+  email: z.string().email().optional().or(emptyStringToUndefined),
+  url: z.string().url().optional().or(emptyStringToUndefined)
 });
 
 export type GroupTree = {

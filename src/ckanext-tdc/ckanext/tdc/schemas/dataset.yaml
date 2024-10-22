@@ -257,6 +257,31 @@ dataset_fields:
   label: Introduction and key takeaways
   preset: markdown
 
+- field_name: approval_status
+  label: Approval status
+  preset: select
+  choices:
+    - label: Pending
+      value: pending
+    - label: Approved
+      value: approved
+    - label: Rejected
+      value: rejected
+
+- field_name: approval_message
+  label: Approval message
+  preset: markdown
+
+- field_name: approval_requested_by
+  label: Approval requested by
+
+# TODO: maybe it would be interesting to show the newsfeed
+# notifications only to the users that contributed before
+# the last approval
+# - field_name: approval_contributors
+#   label: Approval contributors
+#   preset: multiple_text
+
 resource_fields:
 
 - field_name: url

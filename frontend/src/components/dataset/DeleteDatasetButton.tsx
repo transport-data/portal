@@ -69,7 +69,9 @@ export function DeleteDatasetButton({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="hover:bg-gray-500">
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction asChild>
             <LoaderButton
               loading={deleteDataset.isLoading}
