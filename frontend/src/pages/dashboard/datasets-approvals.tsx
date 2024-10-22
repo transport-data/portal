@@ -1,12 +1,13 @@
-import DashboardLayout from "@components/_shared/DashboardLayout";
-import MyDatasetsRequestsTabContent from "@components/dashboard/MyDatasetsRequestsTabContent";
-import { listUserOrganizations } from "@utils/organization";
 import type { InferGetServerSidePropsType, NextPage } from "next";
-import { getSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 
-export async function getServerSideProps({ req }: any) {
-  const session = await getSession({ req });
+import DashboardLayout from "@components/_shared/DashboardLayout";
+import MyDatasetsRequestsTabContent from "@components/dashboard/MyDatasetsRequestsTabContent";
+import { getServerAuthSession } from "@server/auth";
+import { listUserOrganizations } from "@utils/organization";
+
+export async function getServerSideProps(context: any) {
+  const session = await getServerAuthSession(context);
 
   const userOrgs = await listUserOrganizations({
     apiKey: session?.user.apikey || "",
@@ -14,11 +15,13 @@ export async function getServerSideProps({ req }: any) {
   });
 
   const adminOrEditorUserOrgs = userOrgs.filter((x) =>
-    ["admin", "editor"].includes(x.capacity)
+    ["admin", "editor"].includes(x.capacity),
   );
 
   if (!session?.user.sysadmin && !adminOrEditorUserOrgs.length) {
-    return "/404";
+    return {
+      notFound: true,
+    };
   }
 
   return {
