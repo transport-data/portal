@@ -154,17 +154,20 @@ export default function FollowDropdown({
               </Tooltip>
             </DropdownMenuCheckboxItem>
           )}
-
-          <DropdownMenuLabel className="">Regions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {geographies?.map((geo) => (
-            <DropdownGeoGroup
-              followingGeographies={followingGeographies}
-              key={geo.id}
-              group={geo}
-              onChange={followGeography.mutate}
-            />
-          ))}
+          {geographies && geographies?.length > 0 && (
+            <>
+              <DropdownMenuLabel className="">Regions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {geographies?.map((geo) => (
+                <DropdownGeoGroup
+                  followingGeographies={followingGeographies}
+                  key={geo.id}
+                  group={geo}
+                  onChange={followGeography.mutate}
+                />
+              ))}
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </TooltipProvider>
