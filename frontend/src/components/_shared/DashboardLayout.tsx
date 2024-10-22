@@ -72,8 +72,8 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       ? [
           {
             title: "Datasets approvals",
-            id: "datasets-requests",
-            href: "/dashboard/datasets-requests",
+            id: "datasets-approvals",
+            href: "/dashboard/datasets-approvals",
           },
         ]
       : []),

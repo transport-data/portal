@@ -6,10 +6,12 @@ import {
   Tag,
 } from "@portaljs/ckan";
 
+export type ApprovalStatus = 'approved' | 'rejected' | 'pending';
+
 export interface Dataset {
   author?: string;
   author_email?: string;
-  approval_status?: 'approved' | 'rejected' | 'pending',
+  approval_status?: ApprovalStatus,
   approval_message?: string,
   creator_user_id?: string;
   creator_user?: {

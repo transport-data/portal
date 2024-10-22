@@ -1,3 +1,4 @@
+import { ApprovalStatus } from "@interfaces/ckan/dataset.interface";
 import { api } from "@utils/api";
 import { EyeOff, Globe, Building, Database, User } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -16,6 +17,7 @@ export interface DashboardNewsfeedCardProps {
     };
     package?: {
       name?: string;
+      approval_status?: ApprovalStatus | "reviewed";
       title?: string;
       private?: boolean;
       state?: string;
@@ -52,8 +54,19 @@ export default (activity: DashboardNewsfeedCardProps) => {
       color = "red";
       break;
     case "reviewed":
-      actionText = "reviewed the ";
-      color = "red";
+      const reviewStatus =
+        activity.data?.package?.approval_status || "reviewed";
+      actionText = `${
+        ["reviewed", "pending"].includes(reviewStatus)
+          ? "requested review of"
+          : reviewStatus
+      } the `;
+      color =
+        reviewStatus === "rejected"
+          ? "red"
+          : reviewStatus === "approved"
+          ? "green"
+          : "black";
       break;
     //  TODO: what other activity types are there?
   }
@@ -70,7 +83,7 @@ export default (activity: DashboardNewsfeedCardProps) => {
   let linkTitle: string | undefined = "";
   switch (activityTarget) {
     case "dataset":
-      linkHref = `datasets/${activity.data?.package?.name}/resources`;
+      linkHref = `/dashboard/datasets/${activity.data?.package?.name}/edit`;
       linkTitle = activity.data?.package?.title;
       break;
     case "organization":

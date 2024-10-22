@@ -41,7 +41,7 @@ export default ({
     orgs: adminOrEditorUserOrgs.map((x) => x.name),
     contributors: session?.user.sysadmin ? undefined : [session?.user.id || ""], // TODO check if we'll keep it or remove and present all the datasets for the user's org
     advancedQueries: [
-      { key: "approval_status", values: ["pending", "rejected", "approved"] },
+      { key: "approval_status", values: ["pending", "rejected"] },
     ],
   });
 
@@ -78,12 +78,6 @@ export default ({
               value: "*",
             },
             {
-              icon: <CircleCheckIcon width={16} height={16} />,
-              isSelected: false,
-              text: "Approved",
-              value: "approved",
-            },
-            {
               icon: <CircleXIcon width={16} height={16} />,
               isSelected: false,
               text: "Rejected",
@@ -104,7 +98,7 @@ export default ({
                   key: "approval_status",
                   values:
                     selected === "*"
-                      ? ["pending", "rejected", "approved"]
+                      ? ["pending", "rejected"]
                       : [selected],
                 },
               ],

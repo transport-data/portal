@@ -77,13 +77,13 @@ const editorUser = describe("Dataset Approval", () => {
   });
 
   it("Should list pending dataset for the admin", () => {
-    cy.visit("/dashboard/datasets-requests");
+    cy.visit("/dashboard/datasets-approvals");
     cy.get("div").contains("h2", privateDatasetTitle).should("exist");
     cy.get("div").contains("Pending").should("exist");
   });
 
   it("Should filter the dataset using the approval status filter ", () => {
-    cy.visit("/dashboard/datasets-requests");
+    cy.visit("/dashboard/datasets-approvals");
     cy.get(
       "div.flex.max-w-full.cursor-pointer.items-center.gap-2.text-sm.text-sm"
     )
@@ -94,7 +94,7 @@ const editorUser = describe("Dataset Approval", () => {
   });
 
   it("Should open a pending dataset and reject its approval and reopen the page to see the reject message at the top", () => {
-    cy.visit("/dashboard/datasets-requests");
+    cy.visit("/dashboard/datasets-approvals");
     cy.get("div").contains("h2", privateDatasetTitle).should("exist");
     cy.get(
       `a[href="/dashboard/datasets/${privateDatasetName}/edit?fromDatasetsRequests=true"]`
@@ -113,7 +113,7 @@ const editorUser = describe("Dataset Approval", () => {
   });
 
   it("Should open a pending dataset and approve it", () => {
-    cy.visit("/dashboard/datasets-requests");
+    cy.visit("/dashboard/datasets-approvals");
     cy.get("div").contains("h2", privateDatasetTitle2).should("exist");
     cy.get(
       `a[href="/dashboard/datasets/${privateDatasetName2}/edit?fromDatasetsRequests=true"]`
@@ -121,9 +121,9 @@ const editorUser = describe("Dataset Approval", () => {
     cy.get("#approveDatasetButton").click();
     cy.get("#confirmApproval").click();
 
-    cy.get("div").contains("h2", privateDatasetTitle2).should("exist");
-    cy.get("div").contains("Approved").should("exist");
-    cy.get("div").contains("Public").should("exist");
+    cy.get("div").contains("h2", privateDatasetTitle2).should("not.exist");
+    cy.get("div").contains("Approved").should("not.exist");
+    cy.get("div").contains("Public").should("not.exist");
   });
 
   after(() => {

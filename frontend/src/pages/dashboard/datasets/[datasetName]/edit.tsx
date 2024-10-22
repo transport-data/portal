@@ -114,7 +114,7 @@ const EditDatasetDashboard: NextPage<{
         } dataset`,
       });
       if (isUserAdminOfTheDatasetOrg) await router.push("/dashboard/datasets");
-      await router.push("/dashboard/datasets-requests");
+      await router.push("/dashboard/datasets-approvals");
     },
     onError: (error) => {
       setErrorMessage(error.message);
@@ -240,7 +240,7 @@ const EditDatasetDashboard: NextPage<{
                     fromDatasetsRequests
                       ? {
                           label: "Dataset Approval",
-                          href: "/dashboard/datasets-requests",
+                          href: "/dashboard/datasets-approvals",
                         }
                       : { label: "Datasets", href: "/dashboard/datasets" },
                     {
@@ -267,7 +267,7 @@ const EditDatasetDashboard: NextPage<{
                                     datasetId={dataset.id}
                                     onSuccess={() =>
                                       router.push(
-                                        "/dashboard/datasets-requests"
+                                        "/dashboard/datasets-approvals"
                                       )
                                     }
                                   />
@@ -275,7 +275,7 @@ const EditDatasetDashboard: NextPage<{
                                     dataset={dataset as any}
                                     onSuccess={() =>
                                       router.push(
-                                        "/dashboard/datasets-requests"
+                                        "/dashboard/datasets-approvals"
                                       )
                                     }
                                   />

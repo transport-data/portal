@@ -183,20 +183,12 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
               >
                 {approval_status}
               </Badge>
-            ) : approval_status === "rejected" ? (
-              <Badge
-                variant={"default"}
-                className="items-center bg-red-500 capitalize hover:bg-red-500"
-                icon={<CircleXIcon width={16} height={16} />}
-              >
-                {approval_status}
-              </Badge>
             ) : (
-              approval_status === "approved" && (
+              approval_status === "rejected" && (
                 <Badge
-                  variant={"success"}
-                  className="items-center capitalize"
-                  icon={<CircleCheckIcon width={16} height={16} />}
+                  variant={"default"}
+                  className="items-center bg-red-500 capitalize hover:bg-red-500"
+                  icon={<CircleXIcon width={16} height={16} />}
                 >
                   {approval_status}
                 </Badge>
