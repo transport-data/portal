@@ -6,14 +6,17 @@ import { getUploadParameters } from "@/utils/uppyFunctions";
 import { Button } from "@components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { ArrowUpTrayIcon } from "@heroicons/react/20/solid";
+import { cn } from "@lib/utils";
 
 export function FileUploader({
   onUploadSuccess,
+  disabled,
   onUploadStart,
   id,
   children,
 }: {
   id: string;
+  disabled?: boolean;
   onUploadSuccess: (result: UploadResult) => void;
   onUploadStart?: () => void;
   children: React.ReactNode;
@@ -85,8 +88,13 @@ export function FileUploader({
         {children}
         {!children && (
           <div
-            onClick={() => uploadInputRef && uploadInputRef.current?.click()}
-            className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            onClick={() =>
+              !disabled && uploadInputRef && uploadInputRef.current?.click()
+            }
+            className={cn(
+              disabled ? "cursor-not-allowed" : "cursor-pointer",
+              "flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            )}
           >
             <div className="flex flex-col items-center justify-center pb-6 pt-5">
               {uploading ? (
@@ -134,7 +142,12 @@ export function FileUploader({
                     Max. File Size: 30 MB
                   </p>
                   <div className="py-6">
-                    <span className="inline-flex items-center justify-center gap-x-2 whitespace-nowrap rounded-lg bg-accent px-[20px] py-[10px] text-sm font-medium text-accent-foreground ring-offset-background transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+                    <span
+                      className={cn(
+                        disabled && "opacity-60",
+                        "inline-flex items-center justify-center gap-x-2 whitespace-nowrap rounded-lg bg-accent px-[20px] py-[10px] text-sm font-medium text-accent-foreground ring-offset-background transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                      )}
+                    >
                       <SearchIcon className="h-4 w-4" /> Browse Files
                     </span>
                   </div>
@@ -146,10 +159,15 @@ export function FileUploader({
         {children && (
           <Button
             variant="secondary"
-            disabled={uploading}
-            onClick={() => uploadInputRef && uploadInputRef.current?.click()}
+            disabled={uploading || disabled}
+            onClick={() =>
+              !disabled && uploadInputRef && uploadInputRef.current?.click()
+            }
             type="button"
-            className="mt-2 items-center gap-x-2"
+            className={cn(
+              disabled && "cursor-not-allowed",
+              "mt-2 items-center gap-x-2"
+            )}
           >
             <label
               htmlFor={id}

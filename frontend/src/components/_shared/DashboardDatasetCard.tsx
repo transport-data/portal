@@ -3,26 +3,30 @@ import {
   CheckCircleIcon,
   CircleStackIcon,
   PencilIcon,
+  QuestionMarkCircleIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/20/solid";
 
-import { formatDate } from "@lib/utils";
-import { capitalize } from "remeda";
-import UserAvatar from "./UserAvatar";
+import { Button } from "@components/ui/button";
+import { X } from "@components/ui/rteIcons";
+import { Skeleton } from "@components/ui/skeleton";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
 import {
   DocumentSearchIcon,
   EyeOffIcon,
   GlobeAltIcon,
   RegionIcon,
 } from "@lib/icons";
-import Link from "next/link";
+import { formatDate } from "@lib/utils";
 import { api } from "@utils/api";
-import { Button } from "@components/ui/button";
-import { Skeleton } from "@components/ui/skeleton";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
+import Link from "next/link";
+import { capitalize } from "remeda";
+import UserAvatar from "./UserAvatar";
+import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 
 type DatasetCardProps = Dataset & {
   canEdit?: boolean;
+  datasetRequest?: boolean;
 };
 
 export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
@@ -38,7 +42,9 @@ export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
 export default function DashboardDatasetCard(props: DatasetCardProps) {
   const {
     name,
+    approval_status,
     tdc_category,
+    datasetRequest,
     title,
     tags,
     metadata_modified,
@@ -74,11 +80,9 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
       <CircleStackIcon {...badgeIconOptions} />
     );
 
-  const { data: contributorsData, isLoading } = api.user.getUsersByIds.useQuery(
-    {
-      ids: contributors,
-    }
-  );
+  const { data: contributorsData } = api.user.getUsersByIds.useQuery({
+    ids: contributors,
+  });
 
   return (
     <div className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6">
@@ -94,7 +98,13 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
           <div className="group relative  gap-2">
             <h2 className="inline text-lg font-bold">
-              <Link href={`/@${organization?.name}/${name}${isPrivate || state === 'draft' ? '/private' : ''}`}>{title}</Link>
+              <Link
+                href={`/@${organization?.name}/${name}${
+                  isPrivate || state === "draft" ? "/private" : ""
+                }`}
+              >
+                {title}
+              </Link>
             </h2>
             {canEdit && (
               <Button
@@ -103,7 +113,11 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
                 className=" right-0 ml-2 px-2.5 py-0.5 text-sm"
                 asChild
               >
-                <Link href={`/dashboard/datasets/${name}/edit`}>
+                <Link
+                  href={`/dashboard/datasets/${name}/edit${
+                    datasetRequest ? "?fromDatasetsRequests=true" : ""
+                  }`}
+                >
                   <PencilIcon className="mr-1 h-3 w-3" /> Edit
                 </Link>
               </Button>
@@ -157,7 +171,37 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
               Public
             </Badge>
           )}
+          {["pending", "rejected"].includes(approval_status || "") &&
+            datasetRequest && <span className="hidden xl:block">•</span>}
 
+          {datasetRequest &&
+            (approval_status === "pending" ? (
+              <Badge
+                variant={"warning"}
+                className="items-center capitalize"
+                icon={<QuestionMarkCircleIcon width={16} />}
+              >
+                {approval_status}
+              </Badge>
+            ) : approval_status === "rejected" ? (
+              <Badge
+                variant={"default"}
+                className="items-center bg-red-500 capitalize hover:bg-red-500"
+                icon={<CircleXIcon width={16} height={16} />}
+              >
+                {approval_status}
+              </Badge>
+            ) : (
+              approval_status === "approved" && (
+                <Badge
+                  variant={"success"}
+                  className="items-center capitalize"
+                  icon={<CircleCheckIcon width={16} height={16} />}
+                >
+                  {approval_status}
+                </Badge>
+              )
+            ))}
           <span className="hidden xl:block">•</span>
           <span className="flex items-center gap-1">
             <svg

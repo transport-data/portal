@@ -51,7 +51,7 @@ import { SourcesForm } from "./SourcesForm";
 import { CommentsForm } from "./CommentsForm";
 import { RTEForm } from "@components/ui/formRte";
 
-export function MetadataForm() {
+export function MetadataForm({ disabled }: any) {
   const formObj = useFormContext<DatasetFormType>();
   const { control, setValue, getValues, watch } = formObj;
   const geographies = api.group.tree.useQuery({
@@ -63,8 +63,8 @@ export function MetadataForm() {
       <div className="text-xl font-bold leading-normal text-primary">
         Add metadata
       </div>
-      <SourcesForm />
-      <CommentsForm />
+      <SourcesForm disabled={disabled} />
+      <CommentsForm disabled={disabled} />
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
         Update Frequency
       </div>
@@ -89,6 +89,7 @@ export function MetadataForm() {
                 ))
                 .with({ isSuccess: true, data: P.select() }, (data) => (
                   <Select
+                    disabled={disabled}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
@@ -138,6 +139,7 @@ export function MetadataForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={disabled}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select TDC Category..." />
@@ -164,7 +166,7 @@ export function MetadataForm() {
           <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
             Related Datasets
           </div>
-          <RelatedDatasetsField />
+          <RelatedDatasetsField disabled={disabled} />
         </>
       )}
       {watch("tdc_category") === "tdc_harmonized" && (
@@ -173,6 +175,7 @@ export function MetadataForm() {
             Introduction and key takeaways
           </div>
           <RTEForm
+            disabled={disabled}
             name="introduction_text"
             placeholder="Write a overview description of this dataset"
             formObj={formObj}
@@ -182,7 +185,7 @@ export function MetadataForm() {
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
         Units
       </div>
-      <UnitsField />
+      <UnitsField disabled={disabled} />
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
         Language
       </div>
@@ -197,7 +200,9 @@ export function MetadataForm() {
                   <Button
                     variant="outline"
                     role="combobox"
+                    disabled={disabled}
                     className={cn(
+                      disabled && "cursor-not-allowed",
                       "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                       (!field.value || field.value.length === 0) &&
                         "text-gray-400"
@@ -216,12 +221,16 @@ export function MetadataForm() {
                 style={{ width: "var(--radix-popover-trigger-width)" }}
               >
                 <Command>
-                  <CommandInput placeholder="Search language..." />
+                  <CommandInput
+                    disabled={disabled}
+                    placeholder="Search language..."
+                  />
                   <CommandList>
                     <CommandEmpty>No language found.</CommandEmpty>
                     <CommandGroup>
                       {languages.map((language) => (
                         <CommandItem
+                          disabled={disabled}
                           value={language.code}
                           key={language.code}
                           keywords={[language.name]}
@@ -262,8 +271,10 @@ export function MetadataForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
+                      disabled={disabled}
                       variant={"outline"}
                       className={cn(
+                        disabled && "cursor-not-allowed",
                         "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                         !field.value && "text-muted-foreground"
                       )}
@@ -282,7 +293,10 @@ export function MetadataForm() {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) => date < new Date("1900-01-01")}
+                    disabled={(date) =>
+                      date < new Date("1900-01-01") || disabled
+                    }
+                    className={cn(disabled && "cursor-not-allowed")}
                     initialFocus
                   />
                 </PopoverContent>
@@ -300,8 +314,10 @@ export function MetadataForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
+                      disabled={disabled}
                       variant={"outline"}
                       className={cn(
+                        disabled && "cursor-not-allowed",
                         "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                         !field.value && "text-muted-foreground"
                       )}
@@ -377,7 +393,9 @@ export function MetadataForm() {
                           <Button
                             variant="outline"
                             role="combobox"
+                            disabled={disabled}
                             className={cn(
+                              disabled && "cursor-not-allowed",
                               "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
@@ -538,8 +556,10 @@ export function MetadataForm() {
                         <FormControl>
                           <Button
                             variant="outline"
+                            disabled={disabled}
                             role="combobox"
                             className={cn(
+                              disabled && "cursor-not-allowed",
                               "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
@@ -658,7 +678,9 @@ export function MetadataForm() {
                           <Button
                             variant="outline"
                             role="combobox"
+                            disabled={disabled}
                             className={cn(
+                              disabled && "cursor-not-allowed",
                               "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
@@ -778,7 +800,9 @@ export function MetadataForm() {
                           <Button
                             variant="outline"
                             role="combobox"
+                            disabled={disabled}
                             className={cn(
+                              disabled && "cursor-not-allowed",
                               "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
@@ -854,7 +878,7 @@ export function MetadataForm() {
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Indicator
         </div>
-        <IndicatorsField />
+        <IndicatorsField disabled={disabled} />
       </div>
       <div className="flex flex-col gap-y-2 py-2">
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
@@ -866,7 +890,12 @@ export function MetadataForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Dimensioning..." {...field} />
+                <Input
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed")}
+                  placeholder="Dimensioning..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -883,7 +912,12 @@ export function MetadataForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Data Provider..." {...field} />
+                <Input
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed")}
+                  placeholder="Data Provider..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
               <FormDescription>
@@ -904,7 +938,12 @@ export function MetadataForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Data Provider..." {...field} />
+                <Input
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed")}
+                  placeholder="Data Provider..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
               <FormDescription>
@@ -926,7 +965,12 @@ export function MetadataForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="URL..." {...field} />
+                <Input
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed")}
+                  placeholder="URL..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
               <FormDescription>

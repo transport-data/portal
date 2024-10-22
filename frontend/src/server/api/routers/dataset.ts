@@ -1,6 +1,16 @@
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { DatasetSchema, DraftDatasetSchema, SearchDatasetSchema } from "@schema/dataset.schema";
 import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
+import {
+  DatasetSchema,
+  DraftDatasetSchema,
+  SearchDatasetSchema,
+} from "@schema/dataset.schema";
+
+import {
+  approveDataset,
   createDataset,
   deleteDatasets,
   draftDataset,
@@ -9,12 +19,13 @@ import {
   getDatasetSchema,
   licensesList,
   patchDataset,
+  rejectDataset,
   searchDatasets,
 } from "@utils/dataset";
 import { z } from "zod";
 
 export const datasetRouter = createTRPCRouter({
-  search: publicProcedure 
+  search: publicProcedure
     .input(SearchDatasetSchema)
     .query(async ({ input, ctx }) => {
       const user = ctx?.session?.user;
@@ -22,25 +33,48 @@ export const datasetRouter = createTRPCRouter({
       const searchResults = await searchDatasets({ apiKey, options: input });
       return searchResults;
     }),
+  approve: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input: datasetId, ctx }) => {
+      const user = ctx?.session?.user;
+      const apiKey = user?.apikey;
+      const searchResults = await approveDataset({ apiKey, datasetId });
+      return searchResults;
+    }),
+
+  reject: protectedProcedure
+    .input(z.object({ datasetId: z.string(), reason: z.string() }))
+    .mutation(async ({ input: { datasetId, reason }, ctx }) => {
+      const user = ctx?.session?.user;
+      const apiKey = user?.apikey;
+      const searchResults = await rejectDataset({ apiKey, datasetId, reason });
+      return searchResults;
+    }),
   get: publicProcedure
-    .input(z.object({ name: z.string() }))
+    .input(
+      z.object({ name: z.string(), includeExtras: z.boolean().optional() }),
+    )
     .query(async ({ input, ctx }) => {
       const user = ctx.session?.user ?? null;
-      const apiKey = user?.apikey ?? '';
-      const dataset = await getDataset({ id: input.name, apiKey });
+      const apiKey = user?.apikey ?? "";
+      const dataset = await getDataset({
+        id: input.name,
+        apiKey,
+        include_extras: !!input?.includeExtras,
+      });
       return dataset;
     }),
   activities: publicProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
       const user = ctx.session?.user ?? null;
-      const apiKey = user?.apikey ?? '';
+      const apiKey = user?.apikey ?? "";
       const activities = await getDatasetActivities({ id: input.name, apiKey });
       return activities;
     }),
   schema: publicProcedure.query(async ({ ctx }) => {
     const user = ctx.session?.user ?? null;
-    const apiKey = user?.apikey ?? '';
+    const apiKey = user?.apikey ?? "";
     const schema = await getDatasetSchema({ apiKey });
     return schema;
   }),
@@ -49,19 +83,21 @@ export const datasetRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-    //convert the date to string# YYYY-MM-DD
+      //convert the date to string# YYYY-MM-DD
       const _dataset = {
         ...input,
         related_datasets: input.related_datasets.map((d) => d.name),
-        temporal_coverage_start: input.temporal_coverage_start.toISOString().split('T')[0] ?? '',
-        temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
+        temporal_coverage_start:
+          input.temporal_coverage_start.toISOString().split("T")[0] ?? "",
+        temporal_coverage_end:
+          input.temporal_coverage_end.toISOString().split("T")[0] ?? "",
       };
       const dataset = await createDataset({ apiKey, input: _dataset });
       return dataset;
     }),
   draft: protectedProcedure
     .input(DraftDatasetSchema)
-    .mutation( async ({ input,ctx })=>{
+    .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
       const dataset = await draftDataset({ apiKey, input });
@@ -75,8 +111,10 @@ export const datasetRouter = createTRPCRouter({
       const _dataset = {
         ...input,
         related_datasets: input.related_datasets.map((d) => d.name),
-        temporal_coverage_start: input.temporal_coverage_start.toISOString().split('T')[0] ?? '',
-        temporal_coverage_end: input.temporal_coverage_end.toISOString().split('T')[0] ?? '',
+        temporal_coverage_start:
+          input.temporal_coverage_start.toISOString().split("T")[0] ?? "",
+        temporal_coverage_end:
+          input.temporal_coverage_end.toISOString().split("T")[0] ?? "",
       };
       const dataset = await patchDataset({ apiKey, input: _dataset });
       return dataset;

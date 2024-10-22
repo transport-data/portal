@@ -2,7 +2,11 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
-import { DatasetFormType, SearchDatasetType, DatasetDraftType } from "@schema/dataset.schema";
+import {
+  DatasetDraftType,
+  DatasetFormType,
+  SearchDatasetType,
+} from "@schema/dataset.schema";
 
 import { DatasetSchemaType, License } from "@schema/dataset.schema";
 
@@ -112,7 +116,6 @@ export async function searchDatasets<T = Dataset>({
     );
   }
 
-  
   if (options.fuel) {
     fqAr.push(buildOrFq("fuel", [options.fuel]));
   }
@@ -214,9 +217,9 @@ export async function searchDatasets<T = Dataset>({
   endpoint += `&include_archived=${!!options.showArchived}`;
   endpoint += `&include_drafts=${!!options.includeDrafts}`;
 
-  const headers: any = {}
+  const headers: any = {};
   if (apiKey) {
-      headers["Authorization"] = apiKey
+    headers["Authorization"] = apiKey;
   }
 
   const response = await CkanRequest.get<any>(endpoint, {
@@ -228,6 +231,49 @@ export async function searchDatasets<T = Dataset>({
     count: response.result.count,
     facets: response.result.search_facets,
   };
+}
+
+export async function approveDataset<T = Dataset>({
+  apiKey,
+  datasetId,
+}: {
+  apiKey: string;
+  datasetId: string;
+}): Promise<boolean> {
+  const endpoint = "dataset_approval_update";
+  const headers = { Authorization: apiKey };
+  const response = await CkanRequest.post<CkanResponse<null>>(endpoint, {
+    headers,
+    json: {
+      id: datasetId,
+      status: "approved",
+    },
+  });
+
+  return response.success;
+}
+
+export async function rejectDataset({
+  apiKey,
+  datasetId,
+  reason,
+}: {
+  apiKey: string;
+  datasetId: string;
+  reason: string;
+}): Promise<boolean> {
+  const endpoint = "dataset_approval_update";
+  const headers = { Authorization: apiKey };
+  const response = await CkanRequest.post<CkanResponse<null>>(endpoint, {
+    headers,
+    json: {
+      feedback: reason,
+      id: datasetId,
+      status: "rejected",
+    },
+  });
+
+  return response.success;
 }
 
 export const getDataset = async ({
@@ -310,29 +356,28 @@ export const draftDataset = async ({
   input: DatasetDraftType;
 }) => {
   const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
-    `package_create`,{
+    `package_create`,
+    {
       apiKey,
       json: {
         ...input,
-        state:"draft"//todo: state:"draft" is not working when creating datasets
+        state: "draft", //todo: state:"draft" is not working when creating datasets
       },
     }
   );
-  if(dataset.result?.id && dataset.result?.state !== "draft"){
+  if (dataset.result?.id && dataset.result?.state !== "draft") {
     const draft = await CkanRequest.post<CkanResponse<Dataset>>(
       "package_patch",
       {
         apiKey: apiKey,
         json: {
           id: dataset.result.id,
-          state:"draft"
+          state: "draft",
         },
       }
     );
     return draft.result;
   }
-  
-  
 };
 
 export const patchDataset = async ({
