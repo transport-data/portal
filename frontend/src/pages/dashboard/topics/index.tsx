@@ -1,13 +1,16 @@
 import type { NextPage } from "next";
-import { getSession } from "next-auth/react";
 
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import MyTopicsTabContent from "@components/dashboard/MyTopicsTabContent";
 import { NextSeo } from "next-seo";
+import { getServerAuthSession } from "@server/auth";
 
-export async function getServerSideProps({ req }: any) {
-  if (!(await getSession({ req }))?.user.sysadmin) {
-    return "/404";
+export async function getServerSideProps(context: any) {
+  const session = await getServerAuthSession(context);
+  if (!session?.user.sysadmin) {
+    return {
+      notFound: true,
+    };
   }
 
   return { props: {} };
