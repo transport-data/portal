@@ -15,6 +15,7 @@ import { Skeleton } from "@mui/material";
 import { prettifyDateString } from "@utils/prettifyDateString";
 import { getChoicesFromField } from "@utils/dataset";
 import { slugify } from "@lib/utils";
+import { ScrollArea } from "@components/ui/scroll-area";
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
   return (
@@ -231,7 +232,14 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 type: "code",
                 label: "BibTex",
                 content: `
-@techreport{ ${slugify((dataset.creator_user?.fullname ?? 'TDC').replaceAll(' ', ''))+new Date(dataset.metadata_created as string).getFullYear()},
+@techreport{ ${
+                  slugify(
+                    (dataset.creator_user?.fullname ?? "TDC").replaceAll(
+                      " ",
+                      ""
+                    )
+                  ) + new Date(dataset.metadata_created as string).getFullYear()
+                },
    author = {${
      dataset.creator_user?.fullname ?? dataset.creator_user?.name ?? "TDC"
    }},
@@ -302,41 +310,43 @@ function DatasetUpdates({ dataset }: { dataset: Dataset }) {
         )}
       </div>
       <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>DATE</TableHead>
-              <TableHead>STATUS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading &&
-              [0, 1, 2].map((i) => (
+        <ScrollArea className="h-96">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>DATE</TableHead>
+                <TableHead>STATUS</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading &&
+                [0, 1, 2].map((i) => (
+                  <TableRow>
+                    <TableCell className="text-gray-500">
+                      <Skeleton className="h-4 w-12" />
+                    </TableCell>
+                    <TableCell className="text-gray-500">
+                      <Skeleton className="h-4 w-12" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {activities?.result.map((activity, index) => (
                 <TableRow>
                   <TableCell className="text-gray-500">
-                    <Skeleton className="h-4 w-12" />
+                    {formatDate(new Date(activity.timestamp))}
                   </TableCell>
-                  <TableCell className="text-gray-500">
-                    <Skeleton className="h-4 w-12" />
+                  <TableCell>
+                    {index === 0 ? (
+                      <Badge variant="success">Latest</Badge>
+                    ) : (
+                      <Badge variant="muted">Past</Badge>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
-            {activities?.result.map((activity, index) => (
-              <TableRow>
-                <TableCell className="text-gray-500">
-                  {formatDate(new Date(activity.timestamp))}
-                </TableCell>
-                <TableCell>
-                  {index === 0 ? (
-                    <Badge variant="success">Latest</Badge>
-                  ) : (
-                    <Badge variant="muted">Past</Badge>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        </ScrollArea>
       </div>
     </div>
   );
