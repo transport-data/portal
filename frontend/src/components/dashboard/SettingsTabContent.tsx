@@ -23,7 +23,7 @@ export default () => {
   const [createdToken, setCreatedToken] = useState("");
   const { data: tokens } = api.user.listApiTokens.useQuery();
   const filteredTokens = tokens?.filter(
-    (token: Token) => !token.name.includes("frontend")
+    (token: Token) => !token.name.toLowerCase().includes("frontend")
   );
   const sortedTokens = filteredTokens
     ?.slice()

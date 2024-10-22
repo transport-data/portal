@@ -140,7 +140,14 @@ export default ({
           setValue={setTokenName}
           onClose={() => setIsNewTokenModalOpen(false)}
           onSubmit={() => {
-            createApiKey.mutate({ name: tokenName });
+            if (tokenName.toLowerCase().includes("frontend")) {
+              setIsNewTokenModalOpen(false);
+              setErrorMessage(
+                "Your token name should not include 'frontend' in it."
+              );
+            } else {
+              createApiKey.mutate({ name: tokenName });
+            }
           }}
         />
       )}
