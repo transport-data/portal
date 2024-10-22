@@ -32,6 +32,9 @@ describe("Settings Page", () => {
       cy.get(".lucide-trash2").click();
     });
 
+    cy.contains("Are you sure you want to revoke Token").should("be.visible");
+    cy.get('button').contains('Yes').click({ force: true });
+
     cy.contains(sampleToken).should("not.exist");
   });
 
