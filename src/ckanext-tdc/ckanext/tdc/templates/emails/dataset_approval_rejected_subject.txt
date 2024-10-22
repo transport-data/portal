@@ -1,3 +1,4 @@
 {% trans %}
-A dataset has been rejected by an admin
+User {{ user_name }} has rejected the "{{ dataset_title }}" dataset
 {% endtrans %}
+

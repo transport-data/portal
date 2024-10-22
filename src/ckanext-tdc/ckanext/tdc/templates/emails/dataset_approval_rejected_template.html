@@ -51,33 +51,35 @@
     </style>
 </head>
 <body>
-    <h2 class="background" style="text-align: center; color: #FFFFFF; padding: 10px 0px;">An admin has rejected a pending dataset</h2>
+    <h2 class="background" style="text-align: center; color: #FFFFFF; padding: 10px 0px;">{{ user_name }} has rejected a dataset</h2>
     <p style="margin-top: 15px;">
-        <span class="highlight color" title="{{ user_email }}">
-            {{ user_name }}
-        </span> 
-        has rejected a dataset on {{ site_title }}.
+    The dataset is now <span class="highlight color">private</span> and in <span class="highlight color">rejected state</span>.<br /> <br />
+    Contributors can now update the dataset based on the feedback provided by the admin and request a new review.<br/><br/>
+    {{ reason }}
     </p>
 
     <div class="request-box">
-        <h3 class="background request-heading">The contributors can update the dataset according to the feedback provided bellow and request a new review.</h3>
+        <h3 class="background request-heading">Rejected dataset</h3>
         <div style="padding: 0px 15px 15px 15px;">
             <h4 class="highlight color heading">Organization</h4>
             <div class="details">
-                {{ org_name }}
+                {{ org_title }}
             </div>
             <h4 class="highlight color heading">Dataset</h4>
             <div class="details">
-                {{ dataset_name }}
+                {{ dataset_title }}
             </div>
-            <h4 class="highlight color heading">Review feedback</h4>
+            <h4 class="highlight color heading">Admin feedback</h4>
             <div class="details">
                 {{ feedback }}
             </div>
         </div>
     </div>
-    <p>To view the rejected dataset, please visit the link bellow:</p>
-    <a href="{{ dataset_url }}" class="background visit_btn">VIEW DATASET {{ dataset_url }}</a>
+    <p>To visit the datasets approval page, click the link bellow:</p>
+    <a href="{{ site_url }}" class="background visit_btn">DATASET APPROVALS</a>
+    <br />
     <p>Have a nice day.</p>
 </body>
 </html>
+
+

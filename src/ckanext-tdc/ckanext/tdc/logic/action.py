@@ -594,6 +594,9 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
 
     site_title = site_title if site_title else config.get('ckan.site_title')
     site_url = site_url if site_url else config.get('ckan.frontend_portal_url')
+    user_name = from_user.fullname
+    if not user_name or user_name == "":
+        user_name = from_user.name
 
     if email_type == "organization_participation":
         subject_template = 'emails/user_participation_subject.txt'
@@ -608,14 +611,17 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
         subject_vars = {}
     elif email_type.startswith("dataset_approval_"):
         subject_template = 'emails/{}_subject.txt'.format(email_type)
-        subject_vars = {}
+        subject_vars = {
+            "dataset_title": kwargs["dataset_title"],
+            "user_name": user_name
+        }
     else:
         raise ValueError("Invalid Email Type.")
 
     body_vars = {
         'site_title': site_title,
         'site_url': site_url,
-        'user_name': from_user.name,
+        'user_name': user_name,
         'user_email': from_user.email,
         **kwargs
     }
