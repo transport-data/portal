@@ -1,6 +1,8 @@
 import ckan.plugins.toolkit as tk
+import ckan.model as model
 
 from ckanext.activity.subscriptions import _create_package_activity
+from ckanext.tdc.logic.action import send_email
 
 import logging
 
@@ -56,3 +58,42 @@ def package_changed(sender: str, **kwargs):
             id_,
             tk.fresh_context(kwargs["context"])
         )
+
+        _notify_approval_action_via_email(context, data_dict)
+
+
+def _notify_approval_action_via_email(context, data_dict):
+    # TODO: what if it's a patch?
+    # identify if it's a patch and get the entire package
+    approval_status = data_dict.get("approval_status")
+    contributors = data_dict.get("contributors", [])
+
+    from_user = None
+    if approval_status == "pending":
+        approval_requested_by = data_dict.get("approval_requested_by")
+        from_user = model.User.get(approval_requested_by)
+    else:
+        from_user = model.User.get(context["user"])
+
+    owner_org = data_dict.get("owner_org")
+    owner_org_dict = model.Group.get(owner_org)
+
+    member_list_action = tk.get_action("member_list")
+    member_list_data_dict = {"capacity": "admin", "id": owner_org}
+    privileged_context = {"ignore_auth": True}
+    member_list = member_list_action(privileged_context, member_list_data_dict)
+
+    # Send emails to all contributors and admins
+    user_id_list = list(set(contributors + [member[0] for member in member_list]))
+
+    for id in user_id_list:
+        user = model.User.get(id)
+
+        # send_email(
+        #     "dataset_approval_{}".format(approval_status),
+        #     user.email,
+        #     from_user, # TODO: use fullname instead of name
+        #     site_url=tk.config.get('ckan.frontend_portal_url', None),
+        #     org_name=owner_org_dict.title,
+        #     dataset_name=data_dict.get("title")
+        # )

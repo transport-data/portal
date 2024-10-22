@@ -203,12 +203,16 @@ def _fix_approval_workflow(context, data_dict, is_update):
 
     is_resource_create = context.get("is_resource_create", False)
 
-    # TODO: consider drafts
     if is_update:
         id = data_dict.get("id")
         package_show_action = tk.get_action("package_show")
         priviliged_context = {"ignore_auth": True}
         dataset = package_show_action(priviliged_context, {"id": id})
+
+        log.error("!@#!@#!@#")
+        if is_private is None:
+            is_private = dataset.get("private", False)
+            log.error(is_private)
     else:
         dataset = data_dict
 
@@ -591,6 +595,9 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
         }
     elif email_type == "new_organization_request":
         subject_template = 'emails/new_organization_request_subject.txt'
+        subject_vars = {}
+    elif email_type.startswith("dataset_approval_"):
+        subject_template = 'emails/{}_subject.txt'.format(email_type)
         subject_vars = {}
     else:
         raise ValueError("Invalid Email Type.")

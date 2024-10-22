@@ -1,0 +1,3 @@
+{% trans %}
+A dataset has been rejected by an admin
+{% endtrans %}
