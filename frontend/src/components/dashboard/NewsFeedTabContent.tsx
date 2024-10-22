@@ -1,8 +1,5 @@
 import Guidelines from "@components/_shared/Guidelines";
 import NewsFeedSearchFilters from "@components/search/NewsfeedSearchFilters";
-import { SelectableItemsList } from "@components/ui/selectable-items-list";
-import { api } from "@utils/api";
-import { useState, useMemo, useEffect } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -11,13 +8,17 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@components/ui/pagination";
-import MiniSearch from "minisearch";
-import { Building, CircleCheck, Database } from "lucide-react";
+import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { DocumentReportIcon } from "@lib/icons";
-import DashboardNewsFeedCard from "./DashboardNewsFeedCard";
-import { format } from "date-fns";
-import { DashboardNewsfeedCardProps } from "./DashboardNewsFeedCard";
 import { Activity } from "@portaljs/ckan";
+import { api } from "@utils/api";
+import { format } from "date-fns";
+import { Building, CircleCheck, Database } from "lucide-react";
+import MiniSearch from "minisearch";
+import { useEffect, useMemo, useState } from "react";
+import DashboardNewsFeedCard, {
+  DashboardNewsfeedCardProps,
+} from "./DashboardNewsFeedCard";
 
 const groupByDate = (activities: Activity[]) => {
   return activities.reduce((groups: any, activity: Activity) => {
@@ -43,7 +44,15 @@ export interface NewsFeedCardProps {
   activity_type: string;
 }
 export default () => {
-  const actionsFilterOptions = ["All", "created", "deleted", "updated"];
+  const actionsFilterOptions = [
+    "All",
+    "created",
+    "deleted",
+    "updated",
+    "rejected",
+    "approved",
+    "requested",
+  ];
   const [searchText, setSearchText] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [actionsFilter, setActionsFilter] = useState("All");
@@ -94,7 +103,9 @@ export default () => {
               : categoryFilter === "Datasets"
               ? item.activity_type?.includes("package")
               : categoryFilter === "Datasets approvals"
-              ? item.activity_type?.includes("reviewed") // TODO change this to the correct text
+              ? ["reviewed", "pending", "rejected", "approved"].some((x) =>
+                  item.activity_type?.includes(x)
+                )
               : true
           );
     const actionFilteredActivities =
@@ -107,6 +118,14 @@ export default () => {
               ? item.activity_type?.includes("changed")
               : actionsFilter === "created"
               ? item.activity_type?.includes("new")
+              : actionsFilter === "requested"
+              ? ["reviewed", "pending"].includes(
+                  item.data?.package?.approval_status || ""
+                )
+              : actionsFilter === "approved"
+              ? item.data?.package?.approval_status?.includes("approved")
+              : actionsFilter === "rejected"
+              ? item.data?.package?.approval_status?.includes("rejected")
               : true
           );
     if (!searchText) {
