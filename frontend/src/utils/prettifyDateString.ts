@@ -4,7 +4,7 @@ export function prettifyDateString(date: string) {
   }
   const [year, month, day] = date.split("-").map(Number);
   const dateObject = new Date(year as number, (month as number) - 1, day);
-  return dateObject.toLocaleDateString("pt-BR", {
+  return dateObject.toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",

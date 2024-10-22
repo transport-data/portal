@@ -14,6 +14,7 @@ import { api } from "@utils/api";
 import { Skeleton } from "@mui/material";
 import { prettifyDateString } from "@utils/prettifyDateString";
 import { getChoicesFromField } from "@utils/dataset";
+import { slugify } from "@lib/utils";
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
   return (
@@ -166,7 +167,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
                     : "(n.d)"
-                }.${dataset.title ?? dataset.name}. ${
+                }.${dataset.title ?? dataset.name} [Data set]. ${
                   dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
@@ -230,17 +231,15 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 type: "code",
                 label: "BibTex",
                 content: `
-@software{,
-  author = {${
-    dataset.creator_user?.fullname ?? dataset.creator_user?.name ?? "TDC"
-  }},
-   title = {${dataset.title ?? dataset.name}},
-   month = ${new Date(dataset.metadata_created as string).getMonth()},
+@techreport{ ${slugify((dataset.creator_user?.fullname ?? 'TDC').replaceAll(' ', ''))+new Date(dataset.metadata_created as string).getFullYear()},
+   author = {${
+     dataset.creator_user?.fullname ?? dataset.creator_user?.name ?? "TDC"
+   }},
    year = ${new Date(dataset.metadata_created as string).getFullYear()},
-   publisher = {${
+   title = {${dataset.title ?? dataset.name}},
+   institution = {${
      dataset.organization?.title ?? dataset.organization?.name ?? "TDC"
    }},
-   doi = {10.5281/TDC.7911779},
    url = {${typeof window !== "undefined" && window.location.href}}
 }
 `,
