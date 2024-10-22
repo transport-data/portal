@@ -19,10 +19,12 @@ describe("Create and edit orgs", () => {
     cy.get("input[name=title]").type(org);
     //check if input with name url has the content of "test-team"
     cy.get("input[name=name]").should("have.value", org);
+    cy.get("input[name=email]").type('example@gmail.com');
     cy.get("textarea[name=description]").type("Test description");
     cy.get("button[type=submit]").click();
     cy.visit(`/dashboard/organizations/${org}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", org);
+      cy.get("input[name=email]").should("have.value", 'example@gmail.com');
       cy.get("input[name=title]").clear().type(org + " edited");
       cy.get("button[type=submit]").click();
       cy.visit(`/dashboard/organizations/${org}/edit`).then(() => {
