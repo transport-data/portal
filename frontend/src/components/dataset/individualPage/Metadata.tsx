@@ -232,7 +232,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 type: "code",
                 label: "BibTex",
                 content: `
-@techreport{ ${
+@techreport{${
                   slugify(
                     (dataset.creator_user?.fullname ?? "TDC").replaceAll(
                       " ",
