@@ -44,7 +44,7 @@ function PrivateLink({
 }) {
   const fileName = resource.url ? resource.url.split("/").pop() : null;
   const presignedGetUrl = api.uploads.getPresignedUrl.useQuery(
-    { key: `/resources/${resource.id}/${fileName}` },
+    { key: `resources/${resource.id}/${fileName}` },
     {
       enabled: !!resource.id && !!fileName,
     }
