@@ -172,21 +172,6 @@ export const GroupForm: React.FC<{
           )}
         />
       </div>
-      <div>
-        <FormField
-          control={control}
-          name="url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL</FormLabel>
-              <FormControl>
-                <Input placeholder="https://tdc.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
     </div>
   );
 };
