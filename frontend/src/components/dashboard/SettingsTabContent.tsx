@@ -30,7 +30,9 @@ export default () => {
         new Date(a.created_at || 0).getTime()
     );
   const { data: allUsers } = api.user.list.useQuery();
-  const adminUsers = allUsers?.filter((user) => user.sysadmin === true);
+  const adminUsers = allUsers?.filter(
+    (user) => user.sysadmin === true && user.id !== sessionData?.user.id
+  );
   const nonAdminUsers = allUsers?.filter((user) => user.sysadmin === false);
   return (
     <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:gap-8">
