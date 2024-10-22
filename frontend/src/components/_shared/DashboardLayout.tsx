@@ -67,6 +67,11 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       id: "organizations",
       href: "/dashboard/organizations",
     },
+    {
+      title: "Settings",
+      id: "settings",
+      href: "/dashboard/settings",
+    },
   ];
   return (
     <>

@@ -1,5 +1,6 @@
 import { XCircleIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
+import { Copy } from "lucide-react";
 
 export function ErrorAlert({
   text,
@@ -47,6 +48,52 @@ export function SuccessAlert({
           <h3 className="text-sm font-medium text-green-800">{title}</h3>
           <div className="mt-2 text-sm text-green-700">
             <p>{text}</p>
+          </div>
+        </div>
+        <div className="ml-auto flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="text-green-400 hover:text-green-600"
+          >
+            <XCircleIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TokenCreatedSuccessAlert({
+  token,
+  title = "Token Created Successfully",
+  onClose,
+}: {
+  token: string;
+  title?: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="rounded-md bg-green-50 p-4">
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <CheckCircleIcon
+            className="h-5 w-5 text-green-400"
+            aria-hidden="true"
+          />
+        </div>
+        <div className="max-w-full">
+          <h3 className="text-sm font-medium text-green-800">{title}</h3>
+          <div className="mt-2 text-sm text-green-700">
+            make sure to copy it now, you won't be able to see it again.
+            <p className="mt-1 break-words">
+              <span className="border bg-white p-1">{token}</span>
+              <span
+                className="mr-3"
+                onClick={() => navigator.clipboard.writeText(token)}
+              >
+                <Copy size={14} />
+              </span>
+            </p>
           </div>
         </div>
         <div className="ml-auto flex-shrink-0">

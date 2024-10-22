@@ -65,12 +65,19 @@ export default function UserMenuDropdown({
         >
           Dashboard
         </Link>
+        <Link
+          href="/dashboard/settings"
+          className="block px-4 py-2 text-sm text-gray-700"
+          role="menuitem"
+        >
+          Settings
+        </Link>
         <button
           onClick={handleSignOut}
           className="w-full px-4 py-2 text-left text-sm text-gray-700"
           role="menuitem"
         >
-          Sign Out
+          Log Out
         </button>
       </div>
     </div>
