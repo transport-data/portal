@@ -48,7 +48,7 @@ export default ({
         setIsNewUserSelected(false);
         setSelectedUser(null);
       } else {
-        setSuccessMessage("User demoted successfully");
+        setSuccessMessage("User removed from Sysadmin successfully");
       }
       setShowTokenPopup(false);
       setIsAddSysadminModalOpen(false);

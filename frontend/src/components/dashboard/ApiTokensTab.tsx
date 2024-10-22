@@ -14,7 +14,7 @@ import {
   PaginationPrevious,
 } from "@components/ui/pagination";
 
-export interface Tokens {
+export interface Token {
   id: string;
   name: string;
   user_id: string;
@@ -28,13 +28,15 @@ export default ({
   setShowTokenPopup,
   setCreatedToken,
 }: {
-  tokens: Tokens[];
+  tokens: Token[];
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
   setSuccessMessage: React.Dispatch<React.SetStateAction<string>>;
   setShowTokenPopup: React.Dispatch<React.SetStateAction<boolean>>;
   setCreatedToken: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [isNewTokenModalOpen, setIsNewTokenModalOpen] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [tokenSelected, setTokenSelected] = useState("");
   const [tokenName, setTokenName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -119,7 +121,10 @@ export default ({
                 </div>
                 <div className="flex items-center">
                   <Trash2
-                    onClick={() => revokeApiKey.mutate({ id: token.id })}
+                    onClick={() => {
+                      setTokenSelected(token.id);
+                      setIsConfirmationModalOpen(true);
+                    }}
                     className="cursor-pointer"
                     size={24}
                     color="red"
@@ -134,8 +139,44 @@ export default ({
           value={tokenName}
           setValue={setTokenName}
           onClose={() => setIsNewTokenModalOpen(false)}
-          onSubmit={() => createApiKey.mutate({ name: tokenName })}
+          onSubmit={() => {
+            createApiKey.mutate({ name: tokenName });
+          }}
         />
+      )}
+      {isConfirmationModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="relative w-96 rounded-lg bg-white p-6 shadow-lg">
+            <button
+              onClick={() => setIsConfirmationModalOpen(false)}
+              className="absolute right-2 top-2"
+            >
+              ✖️
+            </button>
+            <h3 className="mb-4">Are you sure you want to revoke Token</h3>
+            <Button
+              type="button"
+              onClick={() => {
+                setIsConfirmationModalOpen(false);
+                setTokenSelected("");
+              }}
+              className="mr-3 border-2 bg-white px-12 text-black hover:text-white"
+            >
+              No
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                revokeApiKey.mutate({ id: tokenSelected });
+                setTokenSelected("");
+                setIsConfirmationModalOpen(false);
+              }}
+              className="px-16"
+            >
+              Yes
+            </Button>
+          </div>
+        </div>
       )}
       <Pagination className="mt-2">
         <PaginationContent>

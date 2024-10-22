@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { api } from "@utils/api";
-import ApiTokensTab from "./ApiTokensTab";
+import ApiTokensTab, { Token } from "./ApiTokensTab";
 import SysadminMangementTab from "./SysadminMangementTab";
 import {
   SuccessAlert,
@@ -22,10 +22,13 @@ export default () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [createdToken, setCreatedToken] = useState("");
   const { data: tokens } = api.user.listApiTokens.useQuery();
-  const sortedTokens = tokens
+  const filteredTokens = tokens?.filter(
+    (token: Token) => !token.name.includes("frontend")
+  );
+  const sortedTokens = filteredTokens
     ?.slice()
     .sort(
-      (a: any, b: any) =>
+      (a: Token, b: Token) =>
         new Date(b.created_at || 0).getTime() -
         new Date(a.created_at || 0).getTime()
     );
@@ -74,7 +77,9 @@ export default () => {
             onClose={() => setSuccessMessage("")}
           />
         )}
-        {errorMessage && <ErrorAlert text={errorMessage} />}
+        {errorMessage && (
+          <ErrorAlert text={errorMessage} onClose={() => setErrorMessage("")} />
+        )}
 
         {selectedTab === "API Keys" ? (
           <ApiTokensTab

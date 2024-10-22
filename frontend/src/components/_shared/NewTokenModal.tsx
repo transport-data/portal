@@ -1,3 +1,5 @@
+import { Button } from "@components/ui/button";
+
 export const NewTokenModal = ({
   value,
   setValue,
@@ -26,13 +28,14 @@ export const NewTokenModal = ({
           value={value}
           required
         />
-        <button
+        <Button
           type="button"
           onClick={onSubmit}
-          className="w-full rounded bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-600"
+          className={"w-full " + (value === "" ? "disabled:opacity-50" : "")}
+          disabled={value === ""}
         >
           Create Token
-        </button>
+        </Button>
       </div>
     </div>
   );

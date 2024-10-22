@@ -8,6 +8,7 @@ import {
 } from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
 import { User } from "@interfaces/ckan/user.interface";
+import { Button } from "@components/ui/button";
 
 export default ({
   selectedUser,
@@ -29,7 +30,6 @@ export default ({
       : options?.filter((option) =>
           option?.display_name?.toLowerCase().includes(query?.toLowerCase())
         );
-  console.log("User", selectedUser);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-96 rounded-lg bg-white p-6 shadow-lg">
@@ -81,13 +81,16 @@ export default ({
           </div>
         </Combobox>
 
-        <button
+        <Button
           type="button"
           onClick={onSubmit}
-          className="mt-4 w-full rounded bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-600"
+          className={
+            "mt-4 w-full " + (!selectedUser ? "disabled:opacity-50" : "")
+          }
+          disabled={!selectedUser}
         >
           Select
-        </button>
+        </Button>
       </div>
     </div>
   );
