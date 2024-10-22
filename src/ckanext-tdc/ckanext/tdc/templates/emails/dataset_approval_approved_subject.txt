@@ -1,3 +1,4 @@
 {% trans %}
-A dataset has been approved by an admin
+User {{ user_name }} has approved the "{{ dataset_title }}" dataset
 {% endtrans %}
+

@@ -82,18 +82,39 @@ def _notify_approval_action_via_email(context, data_dict):
     member_list_data_dict = {"capacity": "admin", "id": owner_org}
     privileged_context = {"ignore_auth": True}
     member_list = member_list_action(privileged_context, member_list_data_dict)
+    member_id_list = [member[0] for member in member_list]
 
     # Send emails to all contributors and admins
-    user_id_list = list(set(contributors + [member[0] for member in member_list]))
+    user_id_list = list(set(contributors + member_id_list))
+
+    feedback = data_dict.get("approval_message")
+
+    from_user_name = from_user.fullname
+    if not from_user_name or from_user_name == "":
+        from_user_name = from_user.name
 
     for id in user_id_list:
         user = model.User.get(id)
 
-        # send_email(
-        #     "dataset_approval_{}".format(approval_status),
-        #     user.email,
-        #     from_user, # TODO: use fullname instead of name
-        #     site_url=tk.config.get('ckan.frontend_portal_url', None),
-        #     org_name=owner_org_dict.title,
-        #     dataset_name=data_dict.get("title")
-        # )
+        user_is_admin = id in member_id_list 
+        user_is_contributor = id in contributors
+
+        reason = ""
+        if user_is_admin:
+            reason = "You are receiving this notification because you have the permission to approve or reject datasets in this organization."
+        elif user_is_contributor:
+            reason = "You are receiving this notification because you are one of the contributors of the dataset."
+
+        frontend_url = tk.config.get('ckan.frontend_portal_url', None)
+        site_url = "{}/dashboard/datasets-requests".format(frontend_url)
+
+        send_email(
+            "dataset_approval_{}".format(approval_status),
+            user.email,
+            from_user,
+            site_url=site_url,
+            org_title=owner_org_dict.title,
+            dataset_title=data_dict.get("title"),
+            reason=reason,
+            feedback=feedback
+        )
