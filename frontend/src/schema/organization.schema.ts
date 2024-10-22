@@ -12,6 +12,8 @@ import type { Organization as OrganizationDefault } from "@portaljs/ckan";
   include_private: z.boolean().optional()
 });*/
 
+const emptyStringToUndefined = z.literal('').transform(() => undefined)
+
 export const OrganizationSchema = z.object({
   id: z.string().optional(),
   name: z
@@ -25,6 +27,8 @@ export const OrganizationSchema = z.object({
   image_display_url: z.string().default(""),
   parent: z.string().optional(),
   image_url: z.string().default(""),
+  email: z.string().email().optional().or(emptyStringToUndefined),
+  url: z.string().url().optional().or(emptyStringToUndefined)
 });
 
 export type OrganizationFormType = z.infer<typeof OrganizationSchema>;
