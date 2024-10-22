@@ -14,9 +14,12 @@ import {
   UserInviteSchema,
   UserSchema,
 } from "@schema/user.schema";
-import { followGroups } from "@utils/group";
+import { getDatasetFollowersList } from "@utils/dataset";
+
+import { followGroups, getGroupFollowersList } from "@utils/group";
 import {
   addOrganizationMember,
+  getOrgFollowersList,
   requestNewOrganization,
   requestOrganizationOwner,
 } from "@utils/organization";
@@ -310,4 +313,38 @@ export const userRouter = createTRPCRouter({
       });
       return result;
     }),
+  isFollowingDataset: protectedProcedure
+    .input(z.object({ dataset: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getDatasetFollowersList({ apiKey, id: input.dataset });
+
+      return list?.some(follower => follower.id === user?.id);
+    }),
+
+  isFollowingOrganization: protectedProcedure
+    .input(z.object({ org: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getOrgFollowersList({ apiKey, id: input.org });
+
+      return list?.some(follower => follower.id === user?.id);
+    }),
+
+  isFollowingGeographies: protectedProcedure
+    .input(z.array(z.string()))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getGroupFollowersList({ apiKey, groups:input });
+      
+      return list.map( (g)=>({
+          id: g.id,
+          following: g.followers?.some(follower => follower.id === user?.id)
+         }
+      ))
+    }),
+
 });

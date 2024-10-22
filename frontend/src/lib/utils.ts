@@ -24,6 +24,19 @@ export const formatIcon = (format: string) => {
     'xls': '/images/fileIcons/xls.png',
     'xml': '/images/fileIcons/xml.png',
     'mp4': '/images/fileIcons/mp4.png',
+    'avi': '/images/fileIcons/mp4.png',
+    'flv': '/images/fileIcons/mp4.png',
+    'mov': '/images/fileIcons/mp4.png',
+    'mpg': '/images/fileIcons/mp4.png',
+    'mpeg': '/images/fileIcons/mp4.png',
+    'wmv': '/images/fileIcons/mp4.png',
+    'png': '/images/fileIcons/image.png',
+    'bmp': '/images/fileIcons/image.png',
+    'gif': '/images/fileIcons/image.png',
+    'jpeg': '/images/fileIcons/image.png',
+    'jpg': '/images/fileIcons/image.png',
+    'tiff': '/images/fileIcons/image.png',
+    'svg': '/images/fileIcons/svg.png'
   }[format]
   if (icon) {
     return icon

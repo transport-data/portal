@@ -14,6 +14,8 @@ import { api } from "@utils/api";
 import { Skeleton } from "@mui/material";
 import { prettifyDateString } from "@utils/prettifyDateString";
 import { getChoicesFromField } from "@utils/dataset";
+import { slugify } from "@lib/utils";
+import { ScrollArea } from "@components/ui/scroll-area";
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
   return (
@@ -84,7 +86,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 {dataset.contributors_data &&
                   dataset.contributors_data.map((contributor, index) => (
                     <li className="text-accent">
-                      {contributor.fullname ?? contributor.name} 
+                      {contributor.fullname || contributor.name}
                     </li>
                   ))}
               </ul>
@@ -158,19 +160,68 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "APA",
-                content: `${dataset.title ?? dataset.name} - Data product - ${
+                content: `${
                   dataset.creator_user?.fullname ??
                   dataset.creator_user?.name ??
                   "TDC"
                 }. ${
                   dataset.metadata_created
-                    ? new Date(dataset.metadata_created).toLocaleDateString()
+                    ? new Date(dataset.metadata_created).getFullYear()
+                    : "(n.d)"
+                }.${dataset.title ?? dataset.name} [Data set]. ${
+                  dataset.organization?.display_name ??
+                  dataset.organization?.name ??
+                  "TDC"
+                }. ${typeof window !== "undefined" && window.location.href}`,
+              },
+              {
+                type: "quotation",
+                label: "MLA",
+                content: `${
+                  dataset.creator_user?.fullname ??
+                  dataset.creator_user?.name ??
+                  "TDC"
+                }.${dataset.title ?? dataset.name}, ${
+                  dataset.organization?.display_name ??
+                  dataset.organization?.name ??
+                  "TDC"
+                }, ${
+                  dataset.metadata_created
+                    ? new Date(dataset.metadata_created).getFullYear()
+                    : "(n.d)"
+                }, ${typeof window !== "undefined" && window.location.href}`,
+              },
+              {
+                type: "quotation",
+                label: "Chicago",
+                content: `${
+                  dataset.creator_user?.fullname ??
+                  dataset.creator_user?.name ??
+                  "TDC"
+                }. ${dataset.title ?? dataset.name}. ${
+                  dataset.metadata_created
+                    ? new Date(dataset.metadata_created).getFullYear()
                     : "(n.d)"
                 }. ${
                   dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
                 }. ${typeof window !== "undefined" && window.location.href}`,
+              },
+              {
+                type: "quotation",
+                label: "Harvard",
+                content: `${
+                  dataset.creator_user?.fullname ??
+                  dataset.creator_user?.name ??
+                  "TDC"
+                }. ${
+                  dataset.metadata_created
+                    ? new Date(dataset.metadata_created).getFullYear()
+                    : "(n.d)"
+                }.${dataset.title ?? dataset.name}. Available at: ${
+                  typeof window !== "undefined" && window.location.href
+                }`,
               },
             ]}
           />
@@ -181,17 +232,22 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 type: "code",
                 label: "BibTex",
                 content: `
-@software{,
-  author = {${
-    dataset.creator_user?.fullname ?? dataset.creator_user?.name ?? "TDC"
-  }},
-   title = {${dataset.title ?? dataset.name}},
-   month = ${new Date(dataset.metadata_created as string).getMonth()},
+@techreport{${
+                  slugify(
+                    (dataset.creator_user?.fullname ?? "TDC").replaceAll(
+                      " ",
+                      ""
+                    )
+                  ) + new Date(dataset.metadata_created as string).getFullYear()
+                },
+   author = {${
+     dataset.creator_user?.fullname ?? dataset.creator_user?.name ?? "TDC"
+   }},
    year = ${new Date(dataset.metadata_created as string).getFullYear()},
-   publisher = {${
+   title = {${dataset.title ?? dataset.name}},
+   institution = {${
      dataset.organization?.title ?? dataset.organization?.name ?? "TDC"
    }},
-   doi = {10.5281/TDC.7911779},
    url = {${typeof window !== "undefined" && window.location.href}}
 }
 `,
@@ -254,41 +310,43 @@ function DatasetUpdates({ dataset }: { dataset: Dataset }) {
         )}
       </div>
       <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>DATE</TableHead>
-              <TableHead>STATUS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading &&
-              [0, 1, 2].map((i) => (
+        <ScrollArea className="h-96">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>DATE</TableHead>
+                <TableHead>STATUS</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading &&
+                [0, 1, 2].map((i) => (
+                  <TableRow>
+                    <TableCell className="text-gray-500">
+                      <Skeleton className="h-4 w-12" />
+                    </TableCell>
+                    <TableCell className="text-gray-500">
+                      <Skeleton className="h-4 w-12" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {activities?.result.map((activity, index) => (
                 <TableRow>
                   <TableCell className="text-gray-500">
-                    <Skeleton className="h-4 w-12" />
+                    {formatDate(new Date(activity.timestamp))}
                   </TableCell>
-                  <TableCell className="text-gray-500">
-                    <Skeleton className="h-4 w-12" />
+                  <TableCell>
+                    {index === 0 ? (
+                      <Badge variant="success">Latest</Badge>
+                    ) : (
+                      <Badge variant="muted">Past</Badge>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
-            {activities?.result.map((activity, index) => (
-              <TableRow>
-                <TableCell className="text-gray-500">
-                  {formatDate(new Date(activity.timestamp))}
-                </TableCell>
-                <TableCell>
-                  {index === 0 ? (
-                    <Badge variant="success">Latest</Badge>
-                  ) : (
-                    <Badge variant="muted">Past</Badge>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        </ScrollArea>
       </div>
     </div>
   );

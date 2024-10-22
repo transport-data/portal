@@ -15,14 +15,20 @@ import Link from "next/link";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { toast } from "@components/ui/use-toast";
 import { api } from "@utils/api";
+import FollowDropdown from "../FollowDropdown";
+import { useSession } from "next-auth/react";
+import { GroupTree } from "@schema/group.schema";
 
 const siteTitle = "TDC Data Portal";
 
 export default function IndexDatasetPage({
   dataset,
+  locationsGroup,
 }: {
   dataset: Dataset;
+  locationsGroup: GroupTree[];
 }): JSX.Element {
+  const { data: sessionData } = useSession();
   const { data: datasetDownloads, isLoading } =
     api.ga.getDownloadStats.useQuery({
       id: dataset.id,
@@ -36,6 +42,7 @@ export default function IndexDatasetPage({
   ];
   const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
   const overviewTab = !!dataset.introduction_text;
+
   return (
     <>
       <Head>
@@ -151,7 +158,7 @@ export default function IndexDatasetPage({
             </div>
           </div>
         </div>
-        <Tabs defaultValue={overviewTab ? 'overview' : 'metadata'}>
+        <Tabs defaultValue={overviewTab ? "overview" : "metadata"}>
           <div className="border-b border-gray-200 shadow-sm">
             <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
               <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
@@ -196,12 +203,31 @@ export default function IndexDatasetPage({
                   <ShareIcon className="mr-2 h-4 w-4" />
                   Share
                 </Button>
+                {sessionData?.user && (
+                  <FollowDropdown
+                    dataset={{
+                      id: dataset.id,
+                      name: dataset.title ?? dataset.name,
+                    }}
+                    organization={dataset.organization}
+                    geographies={locationsGroup
+                      ?.filter((item) => dataset.regions?.includes(item.name))
+                      .map((item) => ({
+                        ...item,
+                        children: item.children.filter((child) =>
+                          dataset.geographies?.includes(child.name)
+                        ),
+                      }))}
+                  />
+                )}
               </div>
             </div>
           </div>
           {overviewTab && (
             <TabsContent className="mt-0" value="overview">
-              <Overview introduction_text={dataset.introduction_text as string} />
+              <Overview
+                introduction_text={dataset.introduction_text as string}
+              />
             </TabsContent>
           )}
           {datasetsTab && (

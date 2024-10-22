@@ -5,6 +5,10 @@ import { env } from "@env.mjs";
 import { getDataset } from "@utils/dataset";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import IndexDatasetPage from "@components/dataset/individualPage/Index";
+import { api } from "@utils/api";
+import { createCkanResponse } from "@utils/createCkanResponse";
+import { groupTree } from "@utils/group";
+import { GroupTree } from "@schema/group.schema";
 
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
@@ -42,9 +46,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
+    const locationsGroup = await groupTree({
+      type: "geography",
+    });
     return {
       props: {
-        dataset: dataset.result,
+        _dataset: dataset.result,
+        locationsGroup,
       },
       revalidate: 1800,
     };
@@ -65,9 +73,25 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 export default function DatasetPage({
-  dataset,
+  _dataset,
+  locationsGroup,
 }: {
-  dataset: Dataset;
+  _dataset: Dataset;
+  locationsGroup: GroupTree[];
 }): JSX.Element {
-  return <IndexDatasetPage dataset={dataset} />;
+  const { data: dataset } = api.dataset.get.useQuery(
+    {
+      name: _dataset.name,
+      includeExtras: true
+    },
+    {
+      initialData: createCkanResponse(_dataset),
+    },
+  );
+  return (
+    <IndexDatasetPage
+      dataset={dataset.result}
+      locationsGroup={locationsGroup}
+    />
+  );
 }
