@@ -5,6 +5,7 @@ import {
 } from "@/server/api/trpc";
 import CkanRequest, { CkanRequestError } from "@datopian/ckan-api-client-js";
 import { env } from "@env.mjs";
+import { ApprovalStatus } from "@interfaces/ckan/dataset.interface";
 import { type User } from "@interfaces/ckan/user.interface";
 import { type Activity, type Dataset } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
@@ -160,12 +161,19 @@ export const userRouter = createTRPCRouter({
       return users;
     }),
   listDashboardActivities: protectedProcedure.query(async ({ ctx }) => {
-    const activities = await CkanRequest.get<CkanResponse<Activity[]>>(
-      `tdc_dashboard_activity_list`,
-      {
-        apiKey: ctx.session.user.apikey,
-      }
-    );
+    const activities = await CkanRequest.get<
+      CkanResponse<
+        Array<
+          Activity & {
+            data?: {
+              package?: { title?: string; approval_status: ApprovalStatus };
+            };
+          }
+        >
+      >
+    >(`tdc_dashboard_activity_list`, {
+      apiKey: ctx.session.user.apikey,
+    });
 
     activities.result = await Promise.all(
       activities.result.map(async (a) => {
@@ -320,7 +328,7 @@ export const userRouter = createTRPCRouter({
       const apiKey = user.apikey;
       const list = await getDatasetFollowersList({ apiKey, id: input.dataset });
 
-      return list?.some(follower => follower.id === user?.id);
+      return list?.some((follower) => follower.id === user?.id);
     }),
 
   isFollowingOrganization: protectedProcedure
@@ -330,7 +338,7 @@ export const userRouter = createTRPCRouter({
       const apiKey = user.apikey;
       const list = await getOrgFollowersList({ apiKey, id: input.org });
 
-      return list?.some(follower => follower.id === user?.id);
+      return list?.some((follower) => follower.id === user?.id);
     }),
 
   isFollowingGeographies: protectedProcedure
@@ -338,13 +346,11 @@ export const userRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const list = await getGroupFollowersList({ apiKey, groups:input });
-      
-      return list.map( (g)=>({
-          id: g.id,
-          following: g.followers?.some(follower => follower.id === user?.id)
-         }
-      ))
-    }),
+      const list = await getGroupFollowersList({ apiKey, groups: input });
 
+      return list.map((g) => ({
+        id: g.id,
+        following: g.followers?.some((follower) => follower.id === user?.id),
+      }));
+    }),
 });

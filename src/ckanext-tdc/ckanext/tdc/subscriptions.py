@@ -106,7 +106,7 @@ def _notify_approval_action_via_email(context, data_dict):
             reason = "You are receiving this notification because you are one of the contributors of the dataset."
 
         frontend_url = tk.config.get('ckan.frontend_portal_url', None)
-        site_url = "{}/dashboard/datasets-requests".format(frontend_url)
+        site_url = "{}/dashboard/datasets-approvals".format(frontend_url)
 
         send_email(
             "dataset_approval_{}".format(approval_status),

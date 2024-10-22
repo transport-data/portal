@@ -758,7 +758,7 @@ def _add_contributors_data_to_dataset(dataset):
             "email": creator_user.get("email")
         }
 
-    contributor_ids = dataset.get("contributors")
+    contributor_ids = dataset.get("contributors", [])
     contributors_dict_list = [
             user_show_action(privileged_context, {"id": id})
             for id in contributor_ids]
