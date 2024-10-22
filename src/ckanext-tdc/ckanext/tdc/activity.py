@@ -123,11 +123,16 @@ def _dashboard_approval_activity_query(user_id: str, limit: int = 0, approval_st
 def _dashboard_activity_query(user_id: str, limit: int = 0):
     q1 = core_model_activity._user_activity_query(user_id, limit)
     q2 = _activities_from_everything_followed_by_user_query(user_id, limit)
+    q3 = _activities_from_dataset_approval_workflow(user_id, limit)
 
-    return (
-            core_model_activity._activities_union_all(q1, q2)
-            .filter(core_model_activity.Activity.activity_type != "reviewed package")
+    default_query = (
+        core_model_activity._activities_union_all(q1, q2)
+        .filter(core_model_activity.Activity.activity_type != "reviewed package")
     )
+
+    query_with_approval = core_model_activity._activities_union_all(default_query, q3)
+
+    return query_with_approval
 
 
 def dashboard_activity_list(
