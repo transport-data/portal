@@ -84,57 +84,61 @@ export const OrganizationForm: React.FC<{
           )}
         />
       </div>
-        <FormField
-          control={control}
-          name="parent"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Parent</FormLabel>
-              <FormControl>
-                {match(possibleParents)
-                  .with({ isLoading: true }, () => (
-                    <span className="flex items-center gap-x-2 text-sm">
-                      <Spinner />{" "}
-                      <span className="mt-1">Loading parents...</span>
-                    </span>
-                  ))
-                  .with({ isError: true, errors: P.select() }, (errors) => (
-                    <span className="flex items-center text-sm text-red-600">
-                      Error({JSON.stringify(errors)}) loading parents, please
-                      refresh the page
-                    </span>
-                  ))
-                  .with({ isSuccess: true, data: P.select() }, (data) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select parent for org" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="no-parent">No parent</SelectItem>
-                        {data.filter(org => org.name !== watch('name')).map((org, index) => (
+      <FormField
+        control={control}
+        name="parent"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Parent</FormLabel>
+            <FormControl>
+              {match(possibleParents)
+                .with({ isLoading: true }, () => (
+                  <span className="flex items-center gap-x-2 text-sm">
+                    <Spinner /> <span className="mt-1">Loading parents...</span>
+                  </span>
+                ))
+                .with({ isError: true, errors: P.select() }, (errors) => (
+                  <span className="flex items-center text-sm text-red-600">
+                    Error({JSON.stringify(errors)}) loading parents, please
+                    refresh the page
+                  </span>
+                ))
+                .with({ isSuccess: true, data: P.select() }, (data) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select parent for org" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="no-parent">No parent</SelectItem>
+                      {data
+                        .filter((org) => org.name !== watch("name"))
+                        .map((org, index) => (
                           <SelectItem key={index} value={org.name}>
                             {org.title ?? org.display_name ?? org.name}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  ))
-                  .otherwise(() => (
-                    <span className="flex items-center text-sm text-red-600">
-                      Error loading parents, please refresh the page
-                    </span>
-                  ))}
-              </FormControl>
-              <FormDescription>Use this if you want to say that this organization is a sub-organization of another organization</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                    </SelectContent>
+                  </Select>
+                ))
+                .otherwise(() => (
+                  <span className="flex items-center text-sm text-red-600">
+                    Error loading parents, please refresh the page
+                  </span>
+                ))}
+            </FormControl>
+            <FormDescription>
+              Use this if you want to say that this organization is a
+              sub-organization of another organization
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <div>
         <FormField
           control={control}
@@ -159,6 +163,36 @@ export const OrganizationForm: React.FC<{
             </FormItem>
           )}
         />
+      </div>
+        <div>
+          <FormField
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="example@tdc.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>{" "}
+        <div>
+          <FormField
+            control={control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://tdc.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
     </div>
   );

@@ -41,9 +41,9 @@ export const GroupForm: React.FC<{
   } = formObj;
 
   const possibleParents = api.group.list.useQuery({
-  showGeographyShapes: false,
-    type: 'topic'}
-  );
+    showGeographyShapes: false,
+    type: "topic",
+  });
 
   return (
     <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-2">
@@ -139,7 +139,10 @@ export const GroupForm: React.FC<{
                   </span>
                 ))}
             </FormControl>
-            <FormDescription>Use this if you want to say that this topic is a sub-group of another topic</FormDescription>
+            <FormDescription>
+              Use this if you want to say that this topic is a sub-group of
+              another topic
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -163,6 +166,21 @@ export const GroupForm: React.FC<{
                     setValue("image_url", name ?? "");
                   }}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div>
+        <FormField
+          control={control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL</FormLabel>
+              <FormControl>
+                <Input placeholder="https://tdc.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
