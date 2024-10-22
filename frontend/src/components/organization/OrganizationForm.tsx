@@ -164,36 +164,21 @@ export const OrganizationForm: React.FC<{
           )}
         />
       </div>
-        <div>
-          <FormField
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="example@tdc.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>{" "}
-        <div>
-          <FormField
-            control={control}
-            name="url"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://tdc.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+      <div>
+        <FormField
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="example@tdc.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>{" "}
     </div>
   );
 };
