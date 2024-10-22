@@ -34,6 +34,36 @@ const isDownloadable = (url: string) => {
   if (!lastPart) return false;
   return lastPart.includes(".");
 };
+
+function PrivateLink({
+  resource,
+  onClick,
+}: {
+  resource: Resource;
+  onClick?: () => void;
+}) {
+  const fileName = resource.url ? resource.url.split("/").pop() : null;
+  const presignedGetUrl = api.uploads.getPresignedUrl.useQuery(
+    { key: `/resources/${resource.id}/${fileName}` },
+    {
+      enabled: !!resource.id && !!fileName,
+    }
+  );
+
+  return (
+    <a
+      href={presignedGetUrl.data}
+      onClick={onClick}
+      className="font-medium text-gray-500 hover:text-accent"
+    >
+      {isDownloadable(resource.url ?? "") ? (
+        <ArrowDownToLineIcon className="h-5 w-5" />
+      ) : (
+        <LinkIcon className="h-5 w-5" />
+      )}
+    </a>
+  );
+}
 function ResourceCard({
   resource,
   dataset,
@@ -63,23 +93,36 @@ function ResourceCard({
           </div>
         </div>
         <div className="ml-4 flex-shrink-0">
-          <a
-            href={resource.url}
-            onClick={() =>
-              datasetDownloadEvent({
-                datasetTitle: dataset.title,
-                datasetId: dataset.id,
-                datasetName: dataset.name,
-              })
-            }
-            className="font-medium text-gray-500 hover:text-accent"
-          >
-            {isDownloadable(resource.url ?? "") ? (
-              <ArrowDownToLineIcon className="h-5 w-5" />
-            ) : (
-              <LinkIcon className="h-5 w-5" />
-            )}
-          </a>
+          {dataset.private && resource.url_type === "upload" ? (
+            <PrivateLink
+              resource={resource}
+              onClick={() =>
+                datasetDownloadEvent({
+                  datasetTitle: dataset.title,
+                  datasetId: dataset.id,
+                  datasetName: dataset.name,
+                })
+              }
+            />
+          ) : (
+            <a
+              href={resource.url}
+              onClick={() =>
+                datasetDownloadEvent({
+                  datasetTitle: dataset.title,
+                  datasetId: dataset.id,
+                  datasetName: dataset.name,
+                })
+              }
+              className="font-medium text-gray-500 hover:text-accent"
+            >
+              {isDownloadable(resource.url ?? "") ? (
+                <ArrowDownToLineIcon className="h-5 w-5" />
+              ) : (
+                <LinkIcon className="h-5 w-5" />
+              )}
+            </a>
+          )}
         </div>
       </li>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -244,16 +287,22 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                     </div>
                   </div>
                   <div className="ml-4 flex-shrink-0">
-                    <a
-                      href={r.url}
-                      className="font-medium text-primary hover:text-accent"
-                    >
-                      {isDownloadable(r.url ?? "") ? (
-                        <ArrowDownToLineIcon className="h-5 w-5" />
+                    <div className="ml-4 flex-shrink-0">
+                      {dataset.private && r.url_type === "upload" ? (
+                        <PrivateLink resource={r} />
                       ) : (
-                        <LinkIcon className="h-5 w-5" />
+                        <a
+                          href={r.url}
+                          className="font-medium text-primary hover:text-accent"
+                        >
+                          {isDownloadable(r.url ?? "") ? (
+                            <ArrowDownToLineIcon className="h-5 w-5" />
+                          ) : (
+                            <LinkIcon className="h-5 w-5" />
+                          )}
+                        </a>
                       )}
-                    </a>
+                    </div>
                   </div>
                 </li>
               ))}
