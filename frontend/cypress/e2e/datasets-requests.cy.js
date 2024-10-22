@@ -110,6 +110,9 @@ const editorUser = describe("Dataset Approval", () => {
       `a[href="/dashboard/datasets/${privateDatasetName}/edit?fromDatasetsRequests=true"]`
     ).click();
     cy.contains(rejectMessage)
+
+    cy.visit("/dashboard/newsfeed");
+    cy.get("p.text-base").contains(`You rejected the dataset ${privateDatasetTitle2}`).should("exist");
   });
 
   it("Should open a pending dataset and approve it", () => {
@@ -121,9 +124,8 @@ const editorUser = describe("Dataset Approval", () => {
     cy.get("#approveDatasetButton").click();
     cy.get("#confirmApproval").click();
 
-    cy.get("div").contains("h2", privateDatasetTitle2).should("not.exist");
-    cy.get("div").contains("Approved").should("not.exist");
-    cy.get("div").contains("Public").should("not.exist");
+    cy.visit("/dashboard/newsfeed");
+    cy.get("p.text-base").contains(`You approved the dataset ${privateDatasetTitle2}`).should("exist");
   });
 
   after(() => {
