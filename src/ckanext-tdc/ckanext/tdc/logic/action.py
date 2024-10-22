@@ -3,24 +3,29 @@ import logging
 import requests
 import random
 import string
-from sqlalchemy import func
-from ckan.common import _, config
-from ckan.plugins import toolkit as tk
 import json
-from ckanext.scheming import helpers as scheming_helpers
+import os.path as path
+
+from sqlalchemy import func
+from jinja2 import Environment, FileSystemLoader
+from ckan.common import _, config, current_user
+from ckan.plugins import toolkit as tk
 import ckan.lib.authenticator as authenticator
-from ckan.common import current_user
 from ckan.authz import users_role_for_group_or_org
 import ckan.lib.mailer as mailer
 from ckan.logic.action.create import _get_random_username_from_email
 from ckan.lib.base import render
 import ckan.logic as logic
-from jinja2 import Environment, FileSystemLoader
+
+from ckanext.scheming import helpers as scheming_helpers
 from ckanext.tdc.conversions import converters
-import os.path as path
+from ckanext.tdc.schemas.schemas import dataset_approval_schema
+from ckanext.tdc.authz import is_org_admin_or_sysadmin
+
 log = logging.getLogger(__name__)
 
 NotAuthorized = logic.NotAuthorized
+ValidationError = logic.ValidationError
 get_action = logic.get_action
 
 cwd = path.abspath(path.dirname(__file__))
@@ -126,11 +131,12 @@ def _fix_geographies_field(data_dict):
         data_dict["regions"] = regions
 
 
-def _update_contributors(data_dict, is_update=False):
+def _update_contributors(context, data_dict, is_update=False):
     """
     Whenever an update happens, contributors list
     is updated based on which user did the update
     """
+
     current_user = tk.current_user
     if not hasattr(current_user, "id"):
         return
@@ -178,7 +184,7 @@ def _fix_user_group_permission(data_dict):
     groups = data_dict.get("groups", [])
     if not hasattr(current_user, "id"):
         return
-    user_id = current_user.id
+    user_id = current_user.name
 
     if len(groups) > 0 and user_id:
         priviliged_context = {"ignore_auth": True}
@@ -196,18 +202,71 @@ def _fix_user_group_permission(data_dict):
                                            group_member_create_data_dict)
 
 
-def _before_dataset_create_or_update(data_dict, is_update=False):
-    _fix_geographies_field(data_dict)
-    _fix_topics_field(data_dict)
-    _update_contributors(data_dict, is_update=is_update)
-    _fix_user_group_permission(data_dict)
+def _fix_approval_workflow(context, data_dict, is_update):
+    is_private = data_dict.get("private", None)
+    if is_private is not None:
+        is_private = tk.asbool(is_private)
+    user_id = current_user.id
+
+    is_resource_create = context.get("is_resource_create", False)
+
+    if is_update:
+        dataset_id = data_dict.get("id")
+        package_show_action = tk.get_action("package_show")
+        dataset = package_show_action(privileged_context, {"id": dataset_id})
+
+        old_dataset_is_private = dataset.get("private", None)
+        if is_private is None and old_dataset_is_private is not None:
+            is_private = old_dataset_is_private
+    else:
+        dataset = data_dict
+
+    owner_org = dataset.get("owner_org")
+    user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
+
+    if not user_is_admin:
+        if is_private is False:
+            data_dict["private"] = True
+            data_dict["approval_status"] = "pending"
+            data_dict["approval_message"] = None
+            data_dict["approval_requested_by"] = user_id
+            context["ignore_approval_status"] = True
+
+            # Register pending status as an approval activity
+            context["is_approval_action"] = True
+            context["is_approval_action_pending"] = True
+
+            # Ignore the default acitivity to enforce that
+            # the approval status change acitivty only happens
+            # after the package changed activity
+            context["ignore_activity_signal"] = True
+        elif not is_resource_create:
+            if "approval_message" in data_dict:
+                data_dict.pop("approval_message")
+            if "approval_status" in data_dict:
+                data_dict.pop("approval_status")
+            if "approval_requested_by" in data_dict:
+                data_dict.pop("approval_requested_by")
+
+
+def _before_dataset_create_or_update(context, data_dict, is_update=False):
+    is_approval_action = context.get("is_approval_action", False)
+
+    if not is_approval_action:
+        _fix_geographies_field(data_dict)
+        _fix_topics_field(data_dict)
+        _update_contributors(context, data_dict, is_update=is_update)
+        _fix_user_group_permission(data_dict)
+
+    _fix_approval_workflow(context, data_dict, is_update=is_update)
 
 
 @tk.chained_action
 def package_create(up_func, context, data_dict):
-    _before_dataset_create_or_update(data_dict)
+    _before_dataset_create_or_update(context, data_dict)
     result = up_func(context, data_dict)
     return result
+
 
 @tk.chained_action
 def package_delete(up_func, context, data_dict):
@@ -221,18 +280,21 @@ def package_delete(up_func, context, data_dict):
     result = up_func(context, data_dict)
     return result
 
+
 @tk.chained_action
 def package_update(up_func, context, data_dict):
-    _before_dataset_create_or_update(data_dict, is_update=True)
+    _before_dataset_create_or_update(context, data_dict, is_update=True)
     result = up_func(context, data_dict)
     return result
 
 
-@tk.chained_action
-def package_patch(up_func, context, data_dict):
-    _before_dataset_create_or_update(data_dict, is_update=True)
-    result = up_func(context, data_dict)
-    return result
+# TODO: is overriding package_update enough?
+# @tk.chained_action
+# def package_patch(up_func, context, data_dict):
+#     _before_dataset_create_or_update(context, data_dict, is_update=True)
+#     result = up_func(context, data_dict)
+#     return result
+
 
 def _control_archived_datasets_visibility(data_dict):
     include_archived_param = data_dict.get("include_archived", "false")
@@ -532,6 +594,9 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
 
     site_title = site_title if site_title else config.get('ckan.site_title')
     site_url = site_url if site_url else config.get('ckan.frontend_portal_url')
+    user_name = from_user.fullname
+    if not user_name or user_name == "":
+        user_name = from_user.name
 
     if email_type == "organization_participation":
         subject_template = 'emails/user_participation_subject.txt'
@@ -544,13 +609,19 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
     elif email_type == "new_organization_request":
         subject_template = 'emails/new_organization_request_subject.txt'
         subject_vars = {}
+    elif email_type.startswith("dataset_approval_"):
+        subject_template = 'emails/{}_subject.txt'.format(email_type)
+        subject_vars = {
+            "dataset_title": kwargs["dataset_title"],
+            "user_name": user_name
+        }
     else:
         raise ValueError("Invalid Email Type.")
 
     body_vars = {
         'site_title': site_title,
         'site_url': site_url,
-        'user_name': from_user.name,
+        'user_name': user_name,
         'user_email': from_user.email,
         **kwargs
     }
@@ -719,3 +790,31 @@ def package_show(up_func, context, data_dict):
             result = converter(result).convert()
 
     return result
+
+
+@logic.validate(dataset_approval_schema)
+def dataset_approval_update(context, data_dict):
+    tk.check_access("dataset_review", context, data_dict)
+    id = data_dict.get("id")
+
+    status = data_dict.get("status")
+
+    package_patch_action = tk.get_action("package_patch")
+    package_patch_dict = {"id": id}
+
+    if status == "approved":
+        package_patch_dict["private"] = False
+        package_patch_dict["approval_message"] = None
+        package_patch_dict["approval_status"] = "approved"
+
+    if status == "rejected":
+        package_patch_dict["private"] = True
+        package_patch_dict["approval_message"] = data_dict.get("feedback")
+        package_patch_dict["approval_status"] = "rejected"
+
+    context["is_approval_action"] = True
+
+    # This prevents the default package activity from being created
+    context["ignore_activity_signal"] = True
+
+    package_patch_action(context, package_patch_dict)

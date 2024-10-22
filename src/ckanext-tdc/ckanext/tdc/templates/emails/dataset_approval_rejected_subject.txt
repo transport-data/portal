@@ -1,0 +1,4 @@
+{% trans %}
+User {{ user_name }} has rejected the "{{ dataset_title }}" dataset
+{% endtrans %}
+

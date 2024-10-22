@@ -1,13 +1,10 @@
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 
-import Loading from "@components/_shared/Loading";
-import { NextSeo } from "next-seo";
 import DashboardLayout from "@components/_shared/DashboardLayout";
-import NewsFeedTabContent from "@components/dashboard/NewsFeedTabContent";
-import MyDiscussionsTabContent from "@components/dashboard/MyDiscussionsTabContent";
-import MyTopicsTabContent from "@components/dashboard/MyTopicsTabContent";
+import Loading from "@components/_shared/Loading";
 import OrganizationsTabContent from "@components/dashboard/OrganizationsTabContent";
+import { NextSeo } from "next-seo";
 
 const OrgsDashboard: NextPage = () => {
   const { data: sessionData } = useSession();

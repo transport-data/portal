@@ -1,0 +1,3 @@
+{% trans %}
+User {{ user_name }} has requested the review of the "{{ dataset_title }}" dataset
+{% endtrans %}

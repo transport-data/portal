@@ -1,28 +1,26 @@
-import { DatasetFormType } from "@schema/dataset.schema";
-import { useFieldArray, useFormContext } from "react-hook-form";
-import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@components/ui/input";
-import { Button } from "@components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@lib/utils";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
 import {
-  CalendarIcon,
-  ChevronUpDownIcon,
-  FlagIcon,
+  CalendarIcon
 } from "@heroicons/react/20/solid";
-import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@lib/utils";
+import { DatasetFormType } from "@schema/dataset.schema";
+import { format } from "date-fns";
+import { useFieldArray, useFormContext } from "react-hook-form";
 
-export function CommentsForm() {
+export function CommentsForm({ disabled }: any) {
   const { control, register } = useFormContext<DatasetFormType>();
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
     {
@@ -47,7 +45,12 @@ export function CommentsForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Comments initials" {...field} />
+                    <Input
+                      disabled={disabled}
+                      className={cn(disabled && "cursor-not-allowed")}
+                      placeholder="Comments initials"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -71,11 +74,13 @@ export function CommentsForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <Popover>
-                    <PopoverTrigger asChild>
+                    <PopoverTrigger disabled={disabled} asChild>
                       <FormControl>
                         <Button
+                          disabled={disabled}
                           variant={"outline"}
                           className={cn(
+                            disabled && "cursor-not-allowed",
                             "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                             !field.value && "text-muted-foreground"
                           )}
@@ -107,6 +112,8 @@ export function CommentsForm() {
         </>
       ))}
       <Button
+        disabled={disabled}
+        className={cn(disabled && "cursor-not-allowed")}
         onClick={() =>
           append({
             initials: "",
@@ -122,5 +129,3 @@ export function CommentsForm() {
     </div>
   );
 }
-
-
