@@ -14,9 +14,11 @@ import {
   createDataset,
   deleteDatasets,
   draftDataset,
+  followDataset,
   getDataset,
   getDatasetActivities,
   getDatasetSchema,
+  getDatasetFollowersList,
   licensesList,
   patchDataset,
   rejectDataset,
@@ -132,5 +134,28 @@ export const datasetRouter = createTRPCRouter({
     const apiKey = user.apikey;
     const licenses = await licensesList({ apiKey });
     return licenses;
+  }),
+
+  followersList: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const list = await getDatasetFollowersList({ apiKey, id: input.id });
+      return list;
+    }),
+
+  follow: protectedProcedure
+  .input(z.object({ dataset: z.string(), isFollowing:z.boolean() }))
+  .mutation(async ({ input, ctx }) => {
+    const user = ctx.session.user;
+    const apiKey = user.apikey;
+    const res = await followDataset({ 
+      apiKey, 
+      isFollowing: input.isFollowing,
+      id: input.dataset 
+    });
+
+    return res;
   }),
 });

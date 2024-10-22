@@ -2,6 +2,7 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { GroupFormType, type Group, GroupTree } from "@schema/group.schema";
 import { FollowGroupSchema } from "@schema/onboarding.schema";
 import { type CkanResponse } from "@schema/ckan.schema";
+import { User } from "@interfaces/ckan/user.interface";
 
 export const getGroup = async ({
   apiKey,
@@ -112,6 +113,7 @@ export const patchGroup = async ({
   apiKey: string;
   input: GroupFormType;
 }) => {
+  console.log('INPUT', input)
   const group: CkanResponse<Group> = await CkanRequest.post("group_patch", {
     apiKey,
     json: input,
@@ -162,5 +164,37 @@ export const followGroups = async ({
       }
     }),
   );
+
   return groups;
 };
+
+export const followGroup = async ({id,isFollowing,apiKey}:{id:string,isFollowing:boolean;apiKey:string})=>{
+  const response = await CkanRequest.post<CkanResponse<any>>(
+    `${isFollowing ? 'unfollow' : 'follow'}_group`,
+    {
+      apiKey: apiKey,
+      json: { id },
+    }
+  );
+
+  return response.result
+}
+
+export const getGroupFollowersList = async ({groups,apiKey}:{groups:string[],apiKey:string})=>{
+  const response = await Promise.all( groups.map( async (group)=>{
+    const data = await CkanRequest.post<CkanResponse<User[]>>(
+      `group_follower_list`,
+      {
+        apiKey: apiKey,
+        json: { id:group },
+      }
+    )
+    return {
+      id:group,
+      followers : data.result
+    }
+  }))
+  
+  return response;
+
+}

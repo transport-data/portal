@@ -7,6 +7,8 @@ import {
   patchGroup,
   getGroup,
   groupTree,
+  followGroups,
+  followGroup,
 } from "@utils/group";
 import { z } from "zod";
 
@@ -80,5 +82,18 @@ export const groupRouter = createTRPCRouter({
       const apiKey = user.apikey;
       const groups = await deleteGroups({ apiKey, ids: input.ids });
       return groups;
+    }),
+
+  follow: protectedProcedure
+    .input(z.object({ id: z.string(), isFollowing:z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const res = await followGroup({ 
+        apiKey, 
+        ...input
+      });
+
+      return res;
     }),
 });
