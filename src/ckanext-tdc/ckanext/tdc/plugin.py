@@ -50,7 +50,7 @@ class TdcPlugin(plugins.SingletonPlugin):
             "package_create": action.package_create,
             "package_delete": action.package_delete,
             "package_update": action.package_update,
-            "package_patch": action.package_patch,
+            # "package_patch": action.package_patch,
             "package_search": action.package_search,
             "package_show": action.package_show,
             "group_list": action.group_list,

@@ -137,47 +137,42 @@ def _update_contributors(context, data_dict, is_update=False):
     is updated based on which user did the update
     """
 
-    # If it's a approval status update, do not
-    # add user as contributor
-    is_approval_action = context.get("is_approval_action", False)
+    current_user = tk.current_user
+    if not hasattr(current_user, "id"):
+        return
+    current_user_id = current_user.id
+    user_show_action = tk.get_action("user_show")
+    excluded_ids = []
+    try:
+        site_user = logic.get_action(u"get_site_user")(privileged_context, {})
+        excluded_ids.append(site_user.get("id"))
+        ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
+        excluded_ids.append(ckan_admin.get("id"))
+    except Exception as e:
+        log.error(e)
 
-    if not is_approval_action:
-        current_user = tk.current_user
-        if not hasattr(current_user, "id"):
-            return
-        current_user_id = current_user.id
-        user_show_action = tk.get_action("user_show")
-        excluded_ids = []
-        try:
-            site_user = logic.get_action(u"get_site_user")(privileged_context, {})
-            excluded_ids.append(site_user.get("id"))
-            ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
-            excluded_ids.append(ckan_admin.get("id"))
-        except Exception as e:
-            log.error(e)
+    if is_update:
+        dataset_id = data_dict.get("id")
+        dataset_name = data_dict.get("name")
+        name_or_id = dataset_id or dataset_name
 
-        if is_update:
-            dataset_id = data_dict.get("id")
-            dataset_name = data_dict.get("name")
-            name_or_id = dataset_id or dataset_name
-
-            package_show_action = tk.get_action("package_show")
-            package_show_data_dict = {
-                "id": name_or_id
-            }
-            old_data_dict = package_show_action(
-                privileged_context, package_show_data_dict)
-            old_contributors = old_data_dict.get("contributors")
-            new_contributors = list(set(old_contributors + [current_user_id]))
-            filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
-
-            data_dict["contributors"] = filtered_new_contributors
-
-            return new_contributors
-
-        new_contributors = [current_user_id]
+        package_show_action = tk.get_action("package_show")
+        package_show_data_dict = {
+            "id": name_or_id
+        }
+        old_data_dict = package_show_action(
+            privileged_context, package_show_data_dict)
+        old_contributors = old_data_dict.get("contributors")
+        new_contributors = list(set(old_contributors + [current_user_id]))
         filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+
         data_dict["contributors"] = filtered_new_contributors
+
+        return new_contributors
+
+    new_contributors = [current_user_id]
+    filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+    data_dict["contributors"] = filtered_new_contributors
 
 
 def _fix_user_group_permission(data_dict):
@@ -216,15 +211,13 @@ def _fix_approval_workflow(context, data_dict, is_update):
     is_resource_create = context.get("is_resource_create", False)
 
     if is_update:
-        id = data_dict.get("id")
+        dataset_id = data_dict.get("id")
         package_show_action = tk.get_action("package_show")
-        priviliged_context = {"ignore_auth": True}
-        dataset = package_show_action(priviliged_context, {"id": id})
+        dataset = package_show_action(privileged_context, {"id": dataset_id})
 
-        log.error("!@#!@#!@#")
-        if is_private is None:
-            is_private = dataset.get("private", False)
-            log.error(is_private)
+        old_dataset_is_private = dataset.get("private", None)
+        if is_private is None and old_dataset_is_private is not None:
+            is_private = old_dataset_is_private
     else:
         dataset = data_dict
 
@@ -257,10 +250,14 @@ def _fix_approval_workflow(context, data_dict, is_update):
 
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
-    _fix_geographies_field(data_dict)
-    _fix_topics_field(data_dict)
-    _update_contributors(context, data_dict, is_update=is_update)
-    _fix_user_group_permission(data_dict)
+    is_approval_action = context.get("is_approval_action", False)
+
+    if not is_approval_action:
+        _fix_geographies_field(data_dict)
+        _fix_topics_field(data_dict)
+        _update_contributors(context, data_dict, is_update=is_update)
+        _fix_user_group_permission(data_dict)
+
     _fix_approval_workflow(context, data_dict, is_update=is_update)
 
 
@@ -291,11 +288,13 @@ def package_update(up_func, context, data_dict):
     return result
 
 
-@tk.chained_action
-def package_patch(up_func, context, data_dict):
-    _before_dataset_create_or_update(context, data_dict, is_update=True)
-    result = up_func(context, data_dict)
-    return result
+# TODO: is overriding package_update enough?
+# @tk.chained_action
+# def package_patch(up_func, context, data_dict):
+#     _before_dataset_create_or_update(context, data_dict, is_update=True)
+#     result = up_func(context, data_dict)
+#     return result
+
 
 def _control_archived_datasets_visibility(data_dict):
     include_archived_param = data_dict.get("include_archived", "false")
