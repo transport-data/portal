@@ -1,32 +1,30 @@
-import { DatasetFormType } from "@schema/dataset.schema";
-import { useFormContext } from "react-hook-form";
+import {
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList
+} from "@/components/ui/command";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Button } from "@components/ui/button";
 import { cn } from "@lib/utils";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+import { DatasetFormType } from "@schema/dataset.schema";
 import { Check } from "lucide-react";
-import { P, match } from "ts-pattern";
-import { api } from "@utils/api";
 import { useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { match } from "ts-pattern";
 
-export function UnitsField() {
+export function UnitsField({ disabled }: any) {
   const { control, register, setValue, getValues } =
     useFormContext<DatasetFormType>();
   const [typedUnit, setTypedUnit] = useState("");
@@ -40,9 +38,11 @@ export function UnitsField() {
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
+                  disabled={disabled}
                   variant="outline"
                   role="combobox"
                   className={cn(
+                    disabled && "cursor-not-allowed",
                     "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                     (!field.value || field.value.length === 0) &&
                       "text-gray-400"

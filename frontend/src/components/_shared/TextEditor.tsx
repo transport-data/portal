@@ -5,8 +5,16 @@ import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Dispatch, SetStateAction } from "react";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Paperclip, Image, Code , Smile , Menu , Settings , ArrowDownToLine , Calendar } from 'lucide-react';
-
+import {
+  Paperclip,
+  Image,
+  Code,
+  Smile,
+  Menu,
+  Settings,
+  ArrowDownToLine,
+  Calendar,
+} from "lucide-react";
 
 const MenuBar = () => {
   const { editor } = useCurrentEditor();
@@ -46,9 +54,11 @@ const MenuBar = () => {
 export default ({
   setText,
   placeholder,
+  id,
 }: {
   setText: (text: string) => void;
   placeholder?: string;
+  id?: string;
 }) => {
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -72,6 +82,7 @@ export default ({
       <EditorProvider
         slotBefore={<MenuBar />}
         extensions={extensions}
+        editorProps={{ attributes: { id: id || "" } }}
         onUpdate={({ editor }) => setText(editor.getHTML())}
       ></EditorProvider>
     </div>

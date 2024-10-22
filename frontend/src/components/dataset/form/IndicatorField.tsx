@@ -26,7 +26,7 @@ import { P, match } from "ts-pattern";
 import { api } from "@utils/api";
 import { useState } from "react";
 
-export function IndicatorsField() {
+export function IndicatorsField({ disabled }: any) {
   const { control, register, setValue, getValues } =
     useFormContext<DatasetFormType>();
   const [typedIndicator, setTypedIndicator] = useState("");
@@ -42,7 +42,9 @@ export function IndicatorsField() {
                 <Button
                   variant="outline"
                   role="combobox"
+                  disabled={disabled}
                   className={cn(
+                    disabled && "cursor-not-allowed",
                     "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                     (!field.value || field.value.length === 0) &&
                       "text-gray-400"
@@ -78,7 +80,10 @@ export function IndicatorsField() {
                             )
                           )
                           .with(false, () =>
-                            setValue("indicators", getValues("indicators").concat(f))
+                            setValue(
+                              "indicators",
+                              getValues("indicators").concat(f)
+                            )
                           );
                       }}
                     >
@@ -91,37 +96,38 @@ export function IndicatorsField() {
                       {f}
                     </CommandItem>
                   ))}
-                  {typedIndicator.length > 2 && !field.value.includes(typedIndicator) && (
-                    <CommandGroup>
-                      <CommandItem
-                        value={typedIndicator}
-                        className={cn(
-                          field.value.includes(typedIndicator)
-                            ? "bg-accent text-accent-foreground"
-                            : ""
-                        )}
-                        onSelect={() => {
-                          match(field.value.includes(typedIndicator))
-                            .with(true, () =>
-                              setValue(
-                                "indicators",
-                                getValues("indicators").filter(
-                                  (v) => v !== typedIndicator
+                  {typedIndicator.length > 2 &&
+                    !field.value.includes(typedIndicator) && (
+                      <CommandGroup>
+                        <CommandItem
+                          value={typedIndicator}
+                          className={cn(
+                            field.value.includes(typedIndicator)
+                              ? "bg-accent text-accent-foreground"
+                              : ""
+                          )}
+                          onSelect={() => {
+                            match(field.value.includes(typedIndicator))
+                              .with(true, () =>
+                                setValue(
+                                  "indicators",
+                                  getValues("indicators").filter(
+                                    (v) => v !== typedIndicator
+                                  )
                                 )
                               )
-                            )
-                            .with(false, () =>
-                              setValue(
-                                "indicators",
-                                getValues("indicators").concat(typedIndicator)
-                              )
-                            );
-                        }}
-                      >
-                        Add {typedIndicator}
-                      </CommandItem>
-                    </CommandGroup>
-                  )}
+                              .with(false, () =>
+                                setValue(
+                                  "indicators",
+                                  getValues("indicators").concat(typedIndicator)
+                                )
+                              );
+                          }}
+                        >
+                          Add {typedIndicator}
+                        </CommandItem>
+                      </CommandGroup>
+                    )}
                 </CommandList>
               </Command>
             </PopoverContent>

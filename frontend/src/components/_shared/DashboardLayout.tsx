@@ -1,21 +1,15 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@components/_shared/Layout";
-import DatasetsTabContent from "@components/dashboard/MyDatasetsTabContent";
-import MyDiscussionsTabContent from "@components/dashboard/MyDiscussionsTabContent";
-import MyOrganizationTabContent from "@components/dashboard/MyOrganizationTabContent";
-import MyTopicsTabContent from "@components/dashboard/MyTopicsTabContent";
-import NewsFeedTabContent from "@components/dashboard/NewsFeedTabContent";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Button } from "@components/ui/button";
 import { ChevronLeftIcon, DocumentPlusIcon } from "@heroicons/react/20/solid";
 
-import type { NextPage } from "next";
+import { cn } from "@lib/utils";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import Loading from "./Loading";
 import Link from "next/link";
-import { cn } from "@lib/utils";
 import Heading from "./Heading";
+import Loading from "./Loading";
+import { api } from "@utils/api";
 
 interface DashboardLayotProps {
   children: React.ReactNode;
@@ -30,6 +24,18 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
 }) => {
   const { data: sessionData } = useSession();
   const isSysAdmin = sessionData?.user?.sysadmin == true;
+  const { data: userOrgs = [] } = api.organization.listForUser.useQuery();
+
+  const adminOrgs: typeof userOrgs = [];
+  const editorOrgs: typeof userOrgs = [];
+
+  userOrgs.forEach((x) => {
+    if (x.capacity === "admin") {
+      adminOrgs.push(x);
+    } else if (x.capacity === "editor") {
+      editorOrgs.push(x);
+    }
+  });
 
   if (!sessionData) return <Loading />;
   const tabs = [
@@ -47,11 +53,6 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       title: "My Organisation",
       href: "/dashboard/datasets/my-organization",
       id: "my-organization",
-    },
-    {
-      title: "My Discussions",
-      id: "my-discussions",
-      href: "/dashboard/discussions",
     },
     ...(isSysAdmin
       ? [
@@ -72,6 +73,15 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       id: "settings",
       href: "/dashboard/settings",
     },
+    ...(isSysAdmin || adminOrgs.length || editorOrgs.length
+      ? [
+          {
+            title: "Datasets approvals",
+            id: "datasets-approvals",
+            href: "/dashboard/datasets-approvals",
+          },
+        ]
+      : []),
   ];
   return (
     <>

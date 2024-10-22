@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@components/ui/input";
 import { Button } from "@components/ui/button";
+import { cn } from "@lib/utils";
 
-export function SourcesForm() {
+export function SourcesForm({ disabled }: { disabled?: boolean }) {
   const { control, register } = useFormContext<DatasetFormType>();
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
     {
@@ -34,7 +35,12 @@ export function SourcesForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Source title" {...field} />
+                    <Input
+                      placeholder="Source title"
+                      disabled={disabled}
+                      className={cn(disabled && "cursor-not-allowed")}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -46,7 +52,12 @@ export function SourcesForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Link (Optional)" {...field} />
+                    <Input
+                      disabled={disabled}
+                      className={cn(disabled && "cursor-not-allowed")}
+                      placeholder="Link (Optional)"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -56,6 +67,8 @@ export function SourcesForm() {
         </>
       ))}
       <Button
+        disabled={disabled}
+        className={cn(disabled && "cursor-not-allowed")}
         onClick={() =>
           append({
             title: "",
@@ -70,5 +83,3 @@ export function SourcesForm() {
     </div>
   );
 }
-
-

@@ -78,6 +78,7 @@ export default function DatasetSearch({
     setSearchFilter({
       offset: 0,
       limit: 9,
+      private: true,
       sort: "score desc, metadata_modified desc",
       facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
     });
@@ -92,6 +93,7 @@ export default function DatasetSearch({
     modes: mode ? [mode as string] : undefined,
     services: service ? [service as string] : undefined,
     sectors: sector ? [sector as string] : undefined,
+    private: true,
     groups: topic ? [topic as string] : undefined,
     data_provider: data_provider ? data_provider as string : undefined,
     tdc_category: tdc_category as string | undefined,

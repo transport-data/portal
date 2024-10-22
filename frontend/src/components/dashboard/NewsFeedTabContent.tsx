@@ -12,7 +12,7 @@ import {
   PaginationPrevious,
 } from "@components/ui/pagination";
 import MiniSearch from "minisearch";
-import { Building, Database } from "lucide-react";
+import { Building, CircleCheck, Database } from "lucide-react";
 import { DocumentReportIcon } from "@lib/icons";
 import DashboardNewsFeedCard from "./DashboardNewsFeedCard";
 import { format } from "date-fns";
@@ -43,12 +43,6 @@ export interface NewsFeedCardProps {
   activity_type: string;
 }
 export default () => {
-  const categoryFilterOptions = [
-    "All",
-    "Organizations",
-    "Datasets",
-    /*"Datasets Approvals"*/
-  ];
   const actionsFilterOptions = ["All", "created", "deleted", "updated"];
   const [searchText, setSearchText] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -99,6 +93,8 @@ export default () => {
               ? item.activity_type?.includes("organization")
               : categoryFilter === "Datasets"
               ? item.activity_type?.includes("package")
+              : categoryFilter === "Datasets approvals"
+              ? item.activity_type?.includes("reviewed") // TODO change this to the correct text
               : true
           );
     const actionFilteredActivities =
@@ -161,9 +157,6 @@ export default () => {
         setSearchText={setSearchText}
         sortOrder={sortOrder}
         setSortOrder={setSortOrder}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
-        categoryFilterOptions={categoryFilterOptions}
         actionsFilter={actionsFilter}
         setActionsFilter={setActionsFilter}
         actionsFilterOptions={actionsFilterOptions}
@@ -187,11 +180,11 @@ export default () => {
                 isSelected: false,
                 value: "Datasets",
               },
-              // {
-              //   icon: <CircleCheck size={14} />,
-              //   isSelected: false,
-              //   value: "Datasets Approvals",
-              // },
+              {
+                icon: <CircleCheck size={14} />,
+                isSelected: false,
+                value: "Datasets approvals",
+              },
             ]}
             onSelectedItem={(option) => setCategoryFilter(option)}
             selected={categoryFilter}

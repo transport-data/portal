@@ -8,7 +8,9 @@ import {
   DraftDatasetSchema,
   SearchDatasetSchema,
 } from "@schema/dataset.schema";
+
 import {
+  approveDataset,
   createDataset,
   deleteDatasets,
   draftDataset,
@@ -19,6 +21,7 @@ import {
   getDatasetFollowersList,
   licensesList,
   patchDataset,
+  rejectDataset,
   searchDatasets,
 } from "@utils/dataset";
 import { z } from "zod";
@@ -30,6 +33,23 @@ export const datasetRouter = createTRPCRouter({
       const user = ctx?.session?.user;
       const apiKey = user?.apikey;
       const searchResults = await searchDatasets({ apiKey, options: input });
+      return searchResults;
+    }),
+  approve: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input: datasetId, ctx }) => {
+      const user = ctx?.session?.user;
+      const apiKey = user?.apikey;
+      const searchResults = await approveDataset({ apiKey, datasetId });
+      return searchResults;
+    }),
+
+  reject: protectedProcedure
+    .input(z.object({ datasetId: z.string(), reason: z.string() }))
+    .mutation(async ({ input: { datasetId, reason }, ctx }) => {
+      const user = ctx?.session?.user;
+      const apiKey = user?.apikey;
+      const searchResults = await rejectDataset({ apiKey, datasetId, reason });
       return searchResults;
     }),
   get: publicProcedure
