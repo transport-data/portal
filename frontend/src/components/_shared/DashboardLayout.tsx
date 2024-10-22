@@ -71,7 +71,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
     ...(isSysAdmin || adminOrgs.length || editorOrgs.length
       ? [
           {
-            title: "Datasets requests",
+            title: "Datasets approvals",
             id: "datasets-requests",
             href: "/dashboard/datasets-requests",
           },
