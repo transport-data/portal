@@ -248,7 +248,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
             </>
           )}
 
-          {(regions?.length || geographies?.length) && (
+          {(!!regions?.length || !!geographies?.length) && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
