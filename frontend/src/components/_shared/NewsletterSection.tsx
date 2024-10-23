@@ -50,7 +50,7 @@ export default function NewsLetterSection() {
           </p>
           <Button asChild className="tdc-newsletter">
             <Link
-              href="https://civicrm.changing-transport.org/content/registration-transport-data-commons-newsletter"
+              href="https://civicrm.changing-transport.org/form/tdci-newsletter"
               target="_blank"
             >
               Join Newsletter
