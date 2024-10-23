@@ -23,17 +23,13 @@ jobs:
         run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
       - name: Copy .env.example into .env
         run: |
-          cp .env.example .env && \
-          echo "CKAN_SMTP_SERVER={{secrets.CKAN_SMTP_SERVER}}" >> .env && \
-          echo "CKAN_SMTP_USER={{secrets.CKAN_SMTP_USER}}" >> .env && \
-          echo "CKAN_SMTP_PASSWORD={{secrets.CKAN_SMTP_PASSWORD}}" >> .env && \
-          echo "CKAN_SMTP_MAIL_FROM={{secrets.CKAN_SMTP_MAIL_FROM}}" >> .env
+          cp .env.example .env
       - name: Install `Xvfb` and others to run browsers for end-to-end testing in local CI/CD simulations
         if: ${{ env.ACT }}
         run: sudo apt-get update && sudo apt-get install -y xvfb && npx playwright install-deps
       - name: Set up Docker Containers
         run: |
-          docker compose -f docker-compose.dev.yml --env-file .env up --build -d
+          docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
       - name: Create sysadmin API for Authorization
         run: bash ./scripts/cypress_setup.sh
       - name: Print Logs
