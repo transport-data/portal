@@ -33,6 +33,9 @@ import {
   inviteUser,
   listUsers,
   patchUser,
+  getApiTokens,
+  createApiToken,
+  revokeApiToken,
 } from "@utils/user";
 import { z } from "zod";
 
@@ -206,6 +209,20 @@ export const userRouter = createTRPCRouter({
       const updatedUser = await patchUser({ user: input, apiKey });
       return updatedUser;
     }),
+  removeSysadminUsers: protectedProcedure
+    .input(z.object({ ids: z.array(z.string()) }))
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const response = input.ids.map(async (id) => {
+        const user = await patchUser({
+          user: { id: id, sysadmin: false },
+          apiKey,
+        });
+        return user;
+      });
+      return response;
+    }),
   delete: protectedProcedure
     .input(z.object({ ids: z.array(z.string()) }))
     .mutation(async ({ input, ctx }) => {
@@ -267,6 +284,43 @@ export const userRouter = createTRPCRouter({
     const followee = await getUserFollowee({ id: user.id, apiKey });
     return followee;
   }),
+  listApiTokens: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const user_id = user.id;
+    const apiKey = user.apikey;
+    const tokens = await getApiTokens({ user_id, apiKey });
+    return tokens.result;
+  }),
+  createApiToken: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const apiKey = user.apikey;
+      const result = await createApiToken({
+        user_id: user.id,
+        name: input.name,
+        apiKey,
+      });
+      return result;
+    }),
+  revokeApiToken: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const apiKey = ctx.session.user.apikey;
+      const result = await revokeApiToken({
+        id: input.id,
+        apiKey,
+      });
+      return result;
+    }),
   isFollowingDataset: protectedProcedure
     .input(z.object({ dataset: z.string() }))
     .query(async ({ input, ctx }) => {

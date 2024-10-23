@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { Skeleton } from "@components/ui/skeleton";
+import UserMenuDropdown from "./UserMenuDropDown";
 import { Disclosure } from "@headlessui/react";
 import {
-  ArrowRightEndOnRectangleIcon,
+  ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -43,6 +45,19 @@ export default function Header({
   backgroundColor?: string;
 }) {
   const { data: session, status } = useSession();
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleToggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleSignOut = () => {
+    signOut({
+      callbackUrl: "/",
+      redirect: true,
+    });
+  };
+  const isSysAdmin = session?.user?.sysadmin == true;
 
   return (
     <Disclosure
@@ -114,10 +129,9 @@ export default function Header({
                 <Skeleton className="h-[20px] w-[20px]"></Skeleton>
               </div>
             ) : session?.user ? (
-              <div className="flex items-center gap-[12px]">
+              <div className="relative flex items-center gap-[12px]">
                 <BellIcon width={22} className="text-gray-500" />
-
-                <Link href="/dashboard">
+                <button onClick={handleToggleDropdown}>
                   <Avatar className="h-[32px] w-[32px]">
                     <AvatarImage
                       src={session.user.image || ""}
@@ -134,18 +148,22 @@ export default function Header({
                         .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                </Link>
+                </button>
+                {showDropdown && (
+                  <UserMenuDropdown
+                    userName={session?.user?.name || ""}
+                    userEmail={session.user.email}
+                    isSysAdmin={isSysAdmin}
+                    handleSignOut={handleSignOut}
+                    setShowDropdown={setShowDropdown}
+                  />
+                )}
                 <Button
                   variant="ghost"
                   className="relative px-0 text-gray-500"
-                  onClick={() =>
-                    signOut({
-                      callbackUrl: "/",
-                      redirect: true,
-                    })
-                  }
+                  onClick={handleSignOut}
                 >
-                  <ArrowRightEndOnRectangleIcon width={20} />
+                  <ArrowRightOnRectangleIcon width={20} />
                 </Button>
               </div>
             ) : (

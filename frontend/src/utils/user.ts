@@ -151,3 +151,63 @@ export const getUserFollowee = async ({
 
   return followee.result;
 };
+
+export const getApiTokens = async ({
+  user_id,
+  apiKey,
+}: {
+  user_id: string;
+  apiKey: string;
+}) => {
+  const tokens: CkanResponse<any> = await CkanRequest.get(
+    `api_token_list?user_id=${user_id}`,
+    {
+      apiKey: apiKey,
+    }
+  );
+
+  return tokens;
+};
+
+export const createApiToken = async ({
+  user_id,
+  name,
+  apiKey,
+}: {
+  user_id: string;
+  name: string;
+  apiKey: string;
+}) => {
+  const response: CkanResponse<any> = await CkanRequest.post(
+    "api_token_create",
+    {
+      apiKey: apiKey,
+      json: {
+        user: user_id,
+        name: name,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const revokeApiToken = async ({
+  id,
+  apiKey,
+}: {
+  id: string;
+  apiKey: string;
+}) => {
+  const response: CkanResponse<any> = await CkanRequest.post(
+    "api_token_revoke",
+    {
+      apiKey: apiKey,
+      json: {
+        jti: id,
+      },
+    }
+  );
+
+  return response;
+};

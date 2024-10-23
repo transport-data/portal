@@ -11,6 +11,7 @@ export const CKANUserSchema = z.object({
   email: z.string().email(),
   fullname: z.string().optional().default(""),
   about: z.string().optional(),
+  sysadmin: z.boolean().optional().default(false),
 });
 
 export type CKANUserFormType = z.infer<typeof CKANUserSchema>;
@@ -63,11 +64,14 @@ export const UserInviteSchema = z
     role: z.enum(["admin", "editor", "member"]),
     group_id: z.string(), //  ... or orgId,
   })
-  .refine((data) => data.existingUser ? true : checkIfStringIsEmail(data.user), {
-    message:
-      "If you wish to invite a new user, please provide a valid email address",
-    path: ["user"],
-  });
+  .refine(
+    (data) => (data.existingUser ? true : checkIfStringIsEmail(data.user)),
+    {
+      message:
+        "If you wish to invite a new user, please provide a valid email address",
+      path: ["user"],
+    }
+  );
 
 function checkIfStringIsEmail(value: string) {
   return value.includes("@");
