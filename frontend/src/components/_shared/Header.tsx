@@ -158,13 +158,6 @@ export default function Header({
                     setShowDropdown={setShowDropdown}
                   />
                 )}
-                <Button
-                  variant="ghost"
-                  className="relative px-0 text-gray-500"
-                  onClick={handleSignOut}
-                >
-                  <ArrowRightOnRectangleIcon width={20} />
-                </Button>
               </div>
             ) : (
               <>

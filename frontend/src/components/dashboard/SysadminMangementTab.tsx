@@ -116,98 +116,104 @@ export default ({
                 )}
               </div>
             )}
-            <div className="ring-1 ring-gray-300 dark:ring-slate-600 sm:mx-0 sm:rounded-lg">
-              <table className="min-w-full table-fixed divide-y divide-gray-300 dark:divide-gray-600">
-                <thead>
-                  <tr>
-                    <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
-                      <input
-                        type="checkbox"
-                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                        ref={checkbox}
-                        checked={checked}
-                        onChange={toggleAll}
-                      />
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold"
-                    >
-                      Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold"
-                    >
-                      State
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold"
-                    >
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
-                  {paginatedData && (
-                    <>
-                      {paginatedData.map((user: any) => (
-                        <tr
-                          key={user.name}
-                          className={
-                            selectedUsers.includes(user)
-                              ? "bg-gray-50 dark:bg-slate-700"
-                              : undefined
-                          }
-                        >
-                          <td className="relative px-7 sm:w-12 sm:px-6">
-                            {selectedUsers.includes(user) && (
-                              <div className="absolute inset-y-0 left-0 w-0.5 bg-stone-900" />
-                            )}
-                            <input
-                              type="checkbox"
-                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 focus:ring-accent"
-                              value={user.name}
-                              checked={selectedUsers.includes(user)}
-                              onChange={(e) =>
-                                setSelectedUsers(
-                                  e.target.checked
-                                    ? [...selectedUsers, user]
-                                    : selectedUsers.filter((p) => p !== user)
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm opacity-75">
-                            {user.name}
-                          </td>
-                          <td className="px-3 py-4 text-sm opacity-75">
-                            {user.state}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm font-medium">
-                            <button
-                              onClick={() =>
-                                patchUser.mutate({
-                                  id: user.id,
-                                  name: user.name,
-                                  email: user.email,
-                                  sysadmin: false,
-                                })
-                              }
-                              className="text-red-400 opacity-75 hover:opacity-100"
-                            >
-                              Remove
-                              <span className="sr-only">, {user.name}</span>
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            {paginatedData && paginatedData.length > 0 ? (
+              <div className="ring-1 ring-gray-300 dark:ring-slate-600 sm:mx-0 sm:rounded-lg">
+                <table className="min-w-full table-fixed divide-y divide-gray-300 dark:divide-gray-600">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
+                        <input
+                          type="checkbox"
+                          className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+                          ref={checkbox}
+                          checked={checked}
+                          onChange={toggleAll}
+                        />
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold"
+                      >
+                        Name
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold"
+                      >
+                        State
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold"
+                      >
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
+                    {paginatedData && (
+                      <>
+                        {paginatedData.map((user: any) => (
+                          <tr
+                            key={user.name}
+                            className={
+                              selectedUsers.includes(user)
+                                ? "bg-gray-50 dark:bg-slate-700"
+                                : undefined
+                            }
+                          >
+                            <td className="relative px-7 sm:w-12 sm:px-6">
+                              {selectedUsers.includes(user) && (
+                                <div className="absolute inset-y-0 left-0 w-0.5 bg-stone-900" />
+                              )}
+                              <input
+                                type="checkbox"
+                                className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 focus:ring-accent"
+                                value={user.name}
+                                checked={selectedUsers.includes(user)}
+                                onChange={(e) =>
+                                  setSelectedUsers(
+                                    e.target.checked
+                                      ? [...selectedUsers, user]
+                                      : selectedUsers.filter((p) => p !== user)
+                                  )
+                                }
+                              />
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm opacity-75">
+                              {user.name}
+                            </td>
+                            <td className="px-3 py-4 text-sm opacity-75">
+                              {user.state}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm font-medium">
+                              <button
+                                onClick={() =>
+                                  patchUser.mutate({
+                                    id: user.id,
+                                    name: user.name,
+                                    email: user.email,
+                                    sysadmin: false,
+                                  })
+                                }
+                                className="text-red-400 opacity-75 hover:opacity-100"
+                              >
+                                Remove
+                                <span className="sr-only">, {user.name}</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <h2 className="text-lg">No Sysadmin Users Found</h2>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -228,30 +234,32 @@ export default ({
           }}
         />
       )}
-      <Pagination className="mt-2">
-        <PaginationContent>
-          <PaginationPrevious
-            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-            disabled={currentPage === 1}
-          />
-          {Array.from({ length: totalPages }, (_, index) => (
-            <PaginationItem key={index}>
-              <PaginationLink
-                isActive={index + 1 === currentPage}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationNext
-            onClick={() =>
-              setCurrentPage(Math.min(currentPage + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-          />
-        </PaginationContent>
-      </Pagination>
+      {paginatedData && paginatedData.length > 0 && (
+        <Pagination className="mt-2">
+          <PaginationContent>
+            <PaginationPrevious
+              onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+              disabled={currentPage === 1}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={index + 1 === currentPage}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage(Math.min(currentPage + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            />
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };

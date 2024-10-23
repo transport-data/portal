@@ -43,26 +43,35 @@ describe("Settings Page", () => {
     cy.createUserApi(normalUser, normalUserEmail, normalUserPassword);
     
     cy.visit("/dashboard/settings");
-
+  
     cy.contains("Sysadmins").click();
-
+  
     cy.contains("New Sysadmin").click();
     cy.contains("Add Sysadmins")
-
+  
     cy.get('input[placeholder="Select a User"]').type(normalUser);
     cy.get('[role="option"]').contains(normalUser).click();
-
-    cy.contains("Select").click()
-
-    cy.get('table').contains('td', normalUser).should('be.visible');
-
-    cy.get('table').contains('td', normalUser)
-      .parents("tr")
-      .within(() => {
-        cy.contains("Remove").click();
-      });
   
-    cy.get('table').contains('td', normalUser).should("not.exist");
+    cy.contains("Select").click();
+  
+    // Check the number of rows in the table body to determine if the user is the last one
+    cy.get('table tbody tr').then(($rows) => {
+      const numberOfRows = $rows.length;
+
+      cy.get('table').contains('td', normalUser)
+        .parents("tr")
+        .within(() => {
+          cy.contains("Remove").click();
+        });
+
+      // If this was the last user, check for the "No Sysadmin Users Found" message
+      if (numberOfRows === 1) {
+        cy.contains("No Sysadmin Users Found").should("be.visible");
+      } else {
+        // Otherwise, check that the user has been removed from the table
+        cy.get('table').contains('td', normalUser).should("not.exist");
+      }
+    });
     cy.deleteUserApi(normalUser);
 
   });
