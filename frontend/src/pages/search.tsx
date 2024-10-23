@@ -95,7 +95,7 @@ export default function DatasetSearch({
     sectors: sector ? [sector as string] : undefined,
     private: true,
     groups: topic ? [topic as string] : undefined,
-    data_provider: data_provider ? data_provider as string : undefined,
+    data_provider: data_provider ? (data_provider as string) : undefined,
     tdc_category: tdc_category as string | undefined,
     regions: region ? [region as string] : undefined,
     countries: country ? [country as string] : undefined,
@@ -548,7 +548,17 @@ export default function DatasetSearch({
                             key={`dataset-result-${item.id}`}
                             {...item}
                             regionOrCountry={
-                              item.geographies?.length
+                              item.regions?.length && item.regions?.length > 1
+                                ? "Worldwide"
+                                : item.geographies?.length &&
+                                  item.geographies?.length > 1 &&
+                                  item.regions?.length &&
+                                  item.regions?.length === 1
+                                ? item.groups?.find(
+                                    (x) => x.name === item.regions?.at(0)
+                                  )?.title
+                                : item.geographies?.length &&
+                                  item.geographies?.length === 1
                                 ? item.groups?.find(
                                     (x) => x.name === item.geographies?.at(0)
                                   )?.title

@@ -8,7 +8,6 @@ import {
 } from "@heroicons/react/20/solid";
 
 import { Button } from "@components/ui/button";
-import { X } from "@components/ui/rteIcons";
 import { Skeleton } from "@components/ui/skeleton";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import {
@@ -19,10 +18,10 @@ import {
 } from "@lib/icons";
 import { formatDate } from "@lib/utils";
 import { api } from "@utils/api";
+import { CircleXIcon } from "lucide-react";
 import Link from "next/link";
 import { capitalize } from "remeda";
 import UserAvatar from "./UserAvatar";
-import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 
 type DatasetCardProps = Dataset & {
   canEdit?: boolean;
@@ -86,8 +85,25 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
     ids: contributors,
   });
 
+  const countryOrRegionName =
+    regions?.length && regions?.length > 1
+      ? "Worldwide"
+      : geographies?.length &&
+        geographies?.length > 1 &&
+        regions?.length &&
+        regions?.length === 1
+      ? groups?.find((x) => x.name === regions?.at(0))?.title
+      : geographies?.length && geographies?.length === 1
+      ? groups?.find((x) => x.name === geographies?.at(0))?.title
+      : groups?.find((x) => x.name === regions?.at(0))?.title;
+
   return (
-    <div className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6">
+    <Link
+      href={`/@${organization?.name}/${name}${
+        isPrivate || state === "draft" ? "/private" : ""
+      }`}
+      className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6"
+    >
       {!removeIcon && (
         <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
           <Badge
@@ -101,15 +117,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
       <div className="w-full space-y-2 text-sm">
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
           <div className="group relative  gap-2">
-            <h2 className="inline text-lg font-bold">
-              <Link
-                href={`/@${organization?.name}/${name}${
-                  isPrivate || state === "draft" ? "/private" : ""
-                }`}
-              >
-                {title}
-              </Link>
-            </h2>
+            <h2 className="inline text-lg font-bold">{title}</h2>
             {canEdit && (
               <Button
                 variant="default"
@@ -240,19 +248,12 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
             </>
           )}
 
-          {regions && regions.length > 0 && (
+          {(regions?.length || geographies?.length) && (
             <>
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
                 <RegionIcon />
-                {regions.map((r, idx) => {
-                  return (
-                    <span key={`group-${r}`}>
-                      {groups?.find((g) => g.name === r)?.display_name}
-                      {idx < regions.length - 1 && ","}
-                    </span>
-                  );
-                })}
+                <span key={`group-${countryOrRegionName}`}></span>
               </span>
             </>
           )}
@@ -289,6 +290,6 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

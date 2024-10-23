@@ -231,7 +231,7 @@ export default function DatasetsPage({
         type: "line",
         paint: {
           "line-width": 1.8,
-          "line-color": "black",
+          "line-color": "#dedede",
           "line-dasharray": [0.7, 0.5], // [dash length, gap length]
         },
       });
@@ -262,46 +262,7 @@ export default function DatasetsPage({
             >
               <div className="customized-scroll absolute top-[650px] z-10 max-h-[157px] max-w-60 overflow-y-scroll rounded border-black bg-transparent p-2">
                 <p>
-                  The United Nations Geospatial Data, or Geodata, is a worldwide
-                  geospatial dataset of the United Nations.
-                  <br />
-                  <br />
-                  The United Nations Geodata is provided to facilitate the
-                  preparation of cartographic materials in the United Nations
-                  includes geometry, attributes and labels to facilitate the
-                  adequate depiction and naming of geographic features for the
-                  preparation of maps in accordance with United Nations policies
-                  and practices.
-                  <br />
-                  <br />
-                  The geospatial datasets here included are referred to as UN
-                  Geodata simplified and are generalized based on UNGeodata 25
-                  million scale.
-                  <br />
-                  <br />
-                  The feature layers include polygons/areas of countries
-                  (BNDA_simplified), lines for international boundaries and
-                  limits (BNDL_simplified), and major water body
-                  (WBYA_simplified). In addition, aggregated regional areas are
-                  available following M49 methodology (GEOA_simplified,
-                  SUBA_simplified, INTA_simplified) and SDG regional grouping
-                  (SDGA_simplified).
-                  <br />
-                  <br />
-                  The UN Geodata simplified is prepared in the context of the
-                  Administrative Instruction on the “Guidelines for the
-                  Publication of Maps” and should serve global mapping purposes
-                  as opposed to local mapping. The scale is unspecific for the
-                  United Nations Geodata simplified and is suitable for
-                  generalized world maps and web-maps.
-                  <br />
-                  <br />
                   <span className="font-bold">Terms of use</span>
-                  <br />
-                  <br />
-                  The boundaries and names shown and the designations used on
-                  this map do not imply official endorsement or acceptance by
-                  the United Nations. (short form)
                   <br />
                   <br />
                   The designations employed and the presentation of material on

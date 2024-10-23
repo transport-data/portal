@@ -10,8 +10,6 @@ import {
 } from "@heroicons/react/20/solid";
 import { Tooltip } from "flowbite-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React from "react";
 
 export default function DatasetSearchItem({
   tags,
@@ -34,19 +32,16 @@ export default function DatasetSearchItem({
     })
     .replace(",", "");
 
-  const router = useRouter();
-
   const filteredFrequency =
     frequencies
       .find((x: any) => x.name === frequency)
       ?.display_name?.toLowerCase() || "";
 
   return (
-    <div
+    <Link
+      href={`/${organization.title}/${name}`}
       id={`dataset-search-item-${title}`}
-      className="flex w-full cursor-pointer gap-5"
-      onClick={() => router.push(`/${organization.title}/${name}`)}
-    >
+      className="flex w-full cursor-pointer gap-5">
       <Tooltip
         placement="bottom"
         className="max-w-[192px] bg-[#1F2A37] "
@@ -209,6 +204,6 @@ export default function DatasetSearchItem({
           )}
         </Tooltip>
       </div>
-    </div>
+    </Link>
   );
 }
