@@ -112,7 +112,7 @@ export default ({
         />
       </div>
       <div className="order-3 w-full sm:order-2 md:max-w-[556px] xl:max-w-[700px]">
-        <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
+        <h3 className="mb-4 text-sm font-semibold">Status</h3>
         <section className="flex flex-col gap-4">
           {isLoading ? (
             <DatasetsCardsLoading />

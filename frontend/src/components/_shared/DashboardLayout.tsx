@@ -72,20 +72,20 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
           },
         ]
       : []),
-    {
-      title: "Settings",
-      id: "settings",
-      href: "/dashboard/settings",
-    },
     ...(isSysAdmin || adminOrgs.length || editorOrgs.length
       ? [
           {
-            title: "Datasets approvals",
+            title: "Datasets Approvals",
             id: "datasets-approvals",
             href: "/dashboard/datasets-approvals",
           },
         ]
       : []),
+    {
+      title: "Settings",
+      id: "settings",
+      href: "/dashboard/settings",
+    },
   ];
   return (
     <>
