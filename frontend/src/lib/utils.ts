@@ -22,6 +22,7 @@ export const formatIcon = (format: string) => {
     'json': '/images/fileIcons/json.png',
     'pdf': '/images/fileIcons/pdf.png',
     'xls': '/images/fileIcons/xls.png',
+    'xlsx': '/images/fileIcons/xls.png',
     'xml': '/images/fileIcons/xml.png',
     'mp4': '/images/fileIcons/mp4.png',
     'avi': '/images/fileIcons/mp4.png',
