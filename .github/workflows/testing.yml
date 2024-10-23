@@ -3,7 +3,7 @@ on:
   push:
     paths-ignore:
       - 'docs/**'
-      - './README.MD'
+      - './README.md'
       - './.gitignore'
     branches:
       - main
