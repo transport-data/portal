@@ -127,6 +127,7 @@ export default ({
                   const canEdit = role === "admin" || role === "editor";
                   return (
                     <DashboardDatasetCard
+                      removeIcon
                       datasetRequest
                       key={x.id}
                       {...(x as Dataset)}

@@ -27,6 +27,7 @@ import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 type DatasetCardProps = Dataset & {
   canEdit?: boolean;
   datasetRequest?: boolean;
+  removeIcon?: boolean;
 };
 
 export const DatasetsCardsLoading = ({ length = 3 }: { length?: number }) =>
@@ -46,6 +47,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
     tdc_category,
     datasetRequest,
     title,
+    removeIcon,
     tags,
     metadata_modified,
     frequency,
@@ -86,13 +88,15 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
 
   return (
     <div className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6">
-      <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
-        <Badge
-          className="flex h-8 w-8 items-center justify-center pl-1.5 pr-1.5"
-          icon={badgeIcon}
-          variant={badgeVariant}
-        />
-      </div>
+      {!removeIcon && (
+        <div className="flex h-8 w-8 flex-col items-center gap-32 lg:flex-row lg:gap-8">
+          <Badge
+            className="flex h-8 w-8 items-center justify-center pl-1.5 pr-1.5"
+            icon={badgeIcon}
+            variant={badgeVariant}
+          />
+        </div>
+      )}
 
       <div className="w-full space-y-2 text-sm">
         <div className="flex flex-col justify-between gap-1 lg:flex-row lg:items-center lg:gap-4">
