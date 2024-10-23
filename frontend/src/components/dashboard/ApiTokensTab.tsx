@@ -88,7 +88,7 @@ export default ({
         </Button>
       </div>
       <div>
-        {paginatedData &&
+        {paginatedData && paginatedData.length > 0 ? (
           paginatedData.map((token: any, index: number) => (
             <div
               key={token.id}
@@ -132,7 +132,12 @@ export default ({
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className="flex justify-center">
+            <h2 className="text-lg">No Api Keys Found</h2>
+          </div>
+        )}
       </div>
       {isNewTokenModalOpen && (
         <NewTokenModal
@@ -185,30 +190,32 @@ export default ({
           </div>
         </div>
       )}
-      <Pagination className="mt-2">
-        <PaginationContent>
-          <PaginationPrevious
-            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-            disabled={currentPage === 1}
-          />
-          {Array.from({ length: totalPages }, (_, index) => (
-            <PaginationItem key={index}>
-              <PaginationLink
-                isActive={index + 1 === currentPage}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationNext
-            onClick={() =>
-              setCurrentPage(Math.min(currentPage + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-          />
-        </PaginationContent>
-      </Pagination>
+      {paginatedData && paginatedData.length > 0 && (
+        <Pagination className="mt-2">
+          <PaginationContent>
+            <PaginationPrevious
+              onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+              disabled={currentPage === 1}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={index + 1 === currentPage}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage(Math.min(currentPage + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            />
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };
