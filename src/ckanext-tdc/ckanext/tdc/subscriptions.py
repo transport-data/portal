@@ -64,8 +64,6 @@ def package_changed(sender: str, **kwargs):
 
 
 def _notify_approval_action_via_email(context, data_dict):
-    if os.environ.get('CKAN__CYPRESS__RUNNING', False):
-        return
     # TODO: what if it's a patch?
     # identify if it's a patch and get the entire package
     approval_status = data_dict.get("approval_status")
