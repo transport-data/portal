@@ -271,7 +271,7 @@ export const userRouter = createTRPCRouter({
     .input(z.object({ dataset: z.string() }))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const apiKey = env.SYS_ADMIN_API_KEY;
       const list = await getDatasetFollowersList({ apiKey, id: input.dataset });
 
       return list?.some((follower) => follower.id === user?.id);
@@ -281,7 +281,7 @@ export const userRouter = createTRPCRouter({
     .input(z.object({ org: z.string() }))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
-      const apiKey = user.apikey;
+      const apiKey = env.SYS_ADMIN_API_KEY;
       const list = await getOrgFollowersList({ apiKey, id: input.org });
 
       return list?.some((follower) => follower.id === user?.id);
@@ -291,12 +291,12 @@ export const userRouter = createTRPCRouter({
     .input(z.array(z.string()))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
-      const apiKey = user.apikey;
-      const list = await getGroupFollowersList({ apiKey, groups: input });
-
-      return list.map((g) => ({
-        id: g.id,
-        following: g.followers?.some((follower) => follower.id === user?.id),
-      }));
+      const apiKey = env.SYS_ADMIN_API_KEY;
+      const list = await getGroupFollowersList({ apiKey, groups:input });
+      return list.map( (g)=>({
+          id: g.id,
+          following: g.followers?.some(follower => follower.id === user?.id)
+         }
+      ))
     }),
 });
