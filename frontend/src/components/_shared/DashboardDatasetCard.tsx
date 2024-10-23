@@ -253,7 +253,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
               <span className="hidden xl:block">•</span>
               <span className="flex items-center gap-1">
                 <RegionIcon />
-                <span key={`group-${countryOrRegionName}`}></span>
+                <span key={`group-${countryOrRegionName}`}>{countryOrRegionName}</span>
               </span>
             </>
           )}
