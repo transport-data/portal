@@ -33,7 +33,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y xvfb && npx playwright install-deps
       - name: Set up Docker Containers
         run: |
-          docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+          docker compose -f docker-compose.dev.yml --env-file .env up --build -d
       - name: Create sysadmin API for Authorization
         run: bash ./scripts/cypress_setup.sh
       - name: Print Logs
