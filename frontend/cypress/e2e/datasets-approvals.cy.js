@@ -103,6 +103,10 @@ const editorUser = describe("Dataset Approval", () => {
     cy.get("#rejectDatasetMessage").type(rejectMessage);
     cy.get("#confirmReject").click();
 
+
+    // TODO this doesn't work in the actions environment because the CKAN throws an error trying to send an email to the admin org, 
+    // breaking the reject flow
+
     // cy.get("div").contains("h2", privateDatasetTitle).should("exist");
     // cy.get("div").contains("Rejected").should("exist");
 
