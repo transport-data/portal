@@ -47,7 +47,7 @@ export const EditDatasetForm: React.FC<{ initialValues: Dataset }> = ({
         onSubmit={formObj.handleSubmit((data) => {
           setDatasetEdited(data.name);
           //Required to remove regions from the data object, so ckan can set them automatically
-          const _data = omit(data, ['regions'])
+          data.regions = [];
           editDataset.mutate(_data);
         })}
       >
