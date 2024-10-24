@@ -289,11 +289,11 @@ def package_update(up_func, context, data_dict):
 
 
 # TODO: is overriding package_update enough?
-# @tk.chained_action
-# def package_patch(up_func, context, data_dict):
-#     _before_dataset_create_or_update(context, data_dict, is_update=True)
-#     result = up_func(context, data_dict)
-#     return result
+@tk.chained_action
+def package_patch(up_func, context, data_dict):
+    _fix_geographies_field(data_dict)
+    result = up_func(context, data_dict)
+    return result
 
 
 def _control_archived_datasets_visibility(data_dict):
