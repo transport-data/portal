@@ -166,15 +166,16 @@ export const userRouter = createTRPCRouter({
     )
     .query(async ({ ctx }) => {
       const activities = await CkanRequest.get<
-        CkanResponse<
-          Array<
+        CkanResponse<{
+          count: number;
+          results: Array<
             Activity & {
               data?: {
                 package?: { title?: string; approval_status: ApprovalStatus };
               };
             }
-          >
-        >
+          >;
+        }>
       >(`tdc_dashboard_activity_list`, {
         apiKey: ctx.session.user.apikey,
       });

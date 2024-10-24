@@ -175,14 +175,36 @@ def dashboard_activity_list(
     after=None,
     user_permission_labels=None,
     activity_type='',
-    action: str = ""
+    action: str = "",
+    query: str = ""
 ):
     q = None
 
     if activity_type:
-        q = _dashboard_filter_activity_query(activity_type, approval_status=action)
+        q = _dashboard_filter_activity_query(
+            activity_type, approval_status=action)
     else:
         q = _dashboard_activity_query(user_id)
+
+    if query:
+        from sqlalchemy import or_
+        q = (
+            q.join(
+                model.User, core_model_activity.Activity.user_id == model.User.id
+            ).filter(
+                or_(
+                    model.User.name.ilike('%{}%'.format(query)),
+                    (
+                        text("data::json->'package'->>'title' ilike :title")
+                        .params(title="%{}%".format(query))
+                    ),
+                    (
+                        text("data::json->'group'->>'title' ilike :title")
+                        .params(title="%{}%".format(query))
+                    )
+                )
+            )
+        )
 
     q = core_model_activity._filter_activitites_from_users(q)
 
@@ -235,11 +257,13 @@ def dashboard_activity_list_action(
     before = data_dict.get("before")
     after = data_dict.get("after")
     action = None
+    query = None
     activity_type = None
 
     extras = data_dict.get("__extras")
     if extras:
         action = extras.get("action")
+        query = extras.get("query")
         activity_type = extras.get("status", None)
 
     activity_objects = dashboard_activity_list(
@@ -250,7 +274,8 @@ def dashboard_activity_list_action(
         after=after,
         user_permission_labels=_get_user_permission_labels(context),
         action=action,
-        activity_type=activity_type
+        activity_type=activity_type,
+        query=query,
     )
 
     activity_dicts = core_model_activity.activity_list_dictize(
