@@ -64,111 +64,14 @@ export default () => {
     setCurrentPage(1);
   }, [categoryFilter, actionsFilter, searchText]);
 
-  const { data: activities, isLoading } =
+  const { data: searchResults, isLoading } =
     api.user.listDashboardActivities.useQuery();
 
-  const preprocessedActivities = activities?.map((activity: any) => {
-    return {
-      ...activity,
-      "data.group.title": activity.data?.group?.title || "",
-      "data.group.name": activity.data?.group?.name || "",
-      "data.package.name": activity.data?.package?.name || "",
-      "data.package.title": activity.data?.package?.title || "",
-      "data.actor": activity.data?.actor || "",
-    };
-  });
-
-  const miniSearch = useMemo(() => {
-    const search = new MiniSearch({
-      fields: [
-        "data.group.title",
-        "data.group.name",
-        "data.package.name",
-        "data.package.title",
-        "data.actor",
-      ],
-      storeFields: ["id", "timestamp", "user_id", "activity_type", "data"],
-    });
-    search.addAll(preprocessedActivities || []);
-    return search;
-  }, [preprocessedActivities]);
-
-  const searchResults = useMemo(() => {
-    const filteredActivites =
-      categoryFilter === "All"
-        ? activities
-        : activities?.filter((item) =>
-            categoryFilter === "Organizations"
-              ? item.activity_type?.includes("organization")
-              : categoryFilter === "Datasets"
-              ? item.activity_type?.includes("package")
-              : categoryFilter === "Datasets approvals"
-              ? ["reviewed", "pending", "rejected", "approved"].some((x) =>
-                  item.activity_type?.includes(x)
-                )
-              : true
-          );
-    const actionFilteredActivities =
-      actionsFilter === "All"
-        ? filteredActivites
-        : filteredActivites?.filter((item) =>
-            actionsFilter === "deleted"
-              ? item.activity_type?.includes("deleted")
-              : actionsFilter === "updated"
-              ? item.activity_type?.includes("changed")
-              : actionsFilter === "created"
-              ? item.activity_type?.includes("new")
-              : actionsFilter === "requested"
-              ? ["reviewed", "pending"].includes(
-                  item.data?.package?.approval_status || ""
-                )
-              : actionsFilter === "approved"
-              ? item.data?.package?.approval_status?.includes("approved")
-              : actionsFilter === "rejected"
-              ? item.data?.package?.approval_status?.includes("rejected")
-              : true
-          );
-    if (!searchText) {
-      return actionFilteredActivities;
-    }
-
-    return miniSearch.search(searchText, { prefix: true }).map((result) => {
-      const searchedActivities = filteredActivites?.find(
-        (g) => g.id === result.id
-      );
-      return searchedActivities as NewsFeedCardProps;
-    });
-  }, [searchText, activities, miniSearch, categoryFilter, actionsFilter]);
-
-  const sortedResults = useMemo(() => {
-    if (sortOrder === "latest") {
-      return searchResults
-        ?.slice()
-        .sort(
-          (a, b) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        );
-    } else {
-      return searchResults
-        ?.slice()
-        .sort(
-          (a, b) =>
-            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
-    }
-  }, [searchResults, sortOrder]);
-
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return sortedResults?.slice(startIndex, endIndex);
-  }, [sortedResults, currentPage, itemsPerPage]);
-
   const groupedActivities = useMemo(() => {
-    return groupByDate(paginatedData || []);
-  }, [paginatedData]);
+    return groupByDate(searchResults || []);
+  }, [searchResults]);
 
-  const totalPages = Math.ceil((searchResults?.length || 0) / itemsPerPage);
+  const totalPages = Math.ceil((searchResults?.count || 0) / itemsPerPage);
 
   return (
     <div>

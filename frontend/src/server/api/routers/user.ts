@@ -160,41 +160,45 @@ export const userRouter = createTRPCRouter({
       const users = await getUsersById({ ids: input.ids, apiKey });
       return users;
     }),
-  listDashboardActivities: protectedProcedure.query(async ({ ctx }) => {
-    const activities = await CkanRequest.get<
-      CkanResponse<
-        Array<
-          Activity & {
-            data?: {
-              package?: { title?: string; approval_status: ApprovalStatus };
-            };
-          }
-        >
-      >
-    >(`tdc_dashboard_activity_list`, {
-      apiKey: ctx.session.user.apikey,
-    });
-
-    activities.result = await Promise.all(
-      activities.result.map(async (a) => {
-        if (
-          a.activity_type === "new package" ||
-          a.activity_type === "changed package"
-        ) {
-          const dataset = await CkanRequest.get<CkanResponse<Dataset>>(
-            `package_show?id=${a.object_id}`,
-            {
-              apiKey: ctx.session.user.apikey,
+  listDashboardActivities: protectedProcedure
+    .input(
+      z.object({ limit: z.number().default(10), offset: z.number().default(0) })
+    )
+    .query(async ({ ctx }) => {
+      const activities = await CkanRequest.get<
+        CkanResponse<
+          Array<
+            Activity & {
+              data?: {
+                package?: { title?: string; approval_status: ApprovalStatus };
+              };
             }
-          );
-          return { ...a, packageData: dataset.result };
-        }
-        return a;
-      })
-    );
+          >
+        >
+      >(`tdc_dashboard_activity_list`, {
+        apiKey: ctx.session.user.apikey,
+      });
 
-    return activities.result;
-  }),
+      activities.result = await Promise.all(
+        activities.result.map(async (a) => {
+          if (
+            a.activity_type === "new package" ||
+            a.activity_type === "changed package"
+          ) {
+            const dataset = await CkanRequest.get<CkanResponse<Dataset>>(
+              `package_show?id=${a.object_id}`,
+              {
+                apiKey: ctx.session.user.apikey,
+              }
+            );
+            return { ...a, packageData: dataset.result };
+          }
+          return a;
+        })
+      );
+
+      return activities.result;
+    }),
   list: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
     const apiKey = user.apikey;
@@ -346,11 +350,10 @@ export const userRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = env.SYS_ADMIN_API_KEY;
-      const list = await getGroupFollowersList({ apiKey, groups:input });
-      return list.map( (g)=>({
-          id: g.id,
-          following: g.followers?.some(follower => follower.id === user?.id)
-         }
-      ))
+      const list = await getGroupFollowersList({ apiKey, groups: input });
+      return list.map((g) => ({
+        id: g.id,
+        following: g.followers?.some((follower) => follower.id === user?.id),
+      }));
     }),
 });
