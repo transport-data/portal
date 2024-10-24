@@ -818,3 +818,37 @@ def dataset_approval_update(context, data_dict):
     context["ignore_activity_signal"] = True
 
     package_patch_action(context, package_patch_dict)
+
+
+
+def user_following_groups(context, data_dict):
+
+    user_id = context.get('auth_user_obj').id if 'auth_user_obj' in context else context.get('user')
+    
+    if not user_id:
+        raise logic.NotAuthorized('User must be logged in to check followed groups')
+
+    group_list = data_dict.get('group_list')
+
+    if not group_list:
+        raise ValidationError('Missing required parameter: group_list')
+
+    followed_groups = []
+
+    for group_id in group_list:
+        try:
+            # Use the existing 'group_follower_list' action to get followers of the group
+            result = get_action('group_follower_list')(context, {'id': group_id})
+
+            # Check if the user is a follower of this group
+            if any(follower['id'] == user_id for follower in result):
+                followed_groups.append(group_id)
+
+        except logic.NotFound:
+            # Handle cases where the group is not found
+            continue
+
+    return {
+        'user_id': user_id,
+        'followed_groups': followed_groups
+    }

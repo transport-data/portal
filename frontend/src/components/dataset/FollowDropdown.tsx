@@ -38,8 +38,6 @@ export default function FollowDropdown({
 }) {
   const utils = api.useUtils();
 
-  console.log(geographies);
-
   const { data: followingDataset } = api.user.isFollowingDataset.useQuery({
     dataset: dataset.id,
   });
@@ -91,8 +89,6 @@ export default function FollowDropdown({
     geographiesFollowingCount +
     (followingDataset ? 1 : 0) +
     (followingOrganization ? 1 : 0);
-
-  console.log(followingGeographies);
 
   return (
     <TooltipProvider delayDuration={100}>

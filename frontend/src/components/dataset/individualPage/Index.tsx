@@ -42,8 +42,6 @@ export default function IndexDatasetPage({
   ];
   const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
   const overviewTab = !!dataset.introduction_text;
-  console.log(locationsGroup);
-  console.log(dataset);
   return (
     <>
       <Head>
