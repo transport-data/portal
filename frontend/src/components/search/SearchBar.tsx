@@ -336,7 +336,10 @@ export default function SearchBar() {
                         className="block"
                       >
                         {data?.datasets?.map((dataset, index) => (
-                          <SearchDatasetItem {...dataset} />
+                          <SearchDatasetItem
+                            key={`search-dataset-${index}`}
+                            {...dataset}
+                          />
                         ))}
                       </CommandGroup>
                     )}
@@ -391,7 +394,7 @@ export default function SearchBar() {
                               <CommandListHeader title="Recent searches" />
                             }
                           >
-                            {storedSearches.map((recent) => {
+                            {storedSearches.map((recent, z) => {
                               const badge =
                                 recent.facetValue && recent.facetName
                                   ? `${recent.facetName}: ${recent.facetValue}`
@@ -425,6 +428,7 @@ export default function SearchBar() {
                                   text={text}
                                   icon={icon}
                                   context={context}
+                                  key={`stored-item-${z}`}
                                 />
                               );
                             })}

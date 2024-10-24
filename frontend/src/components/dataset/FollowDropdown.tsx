@@ -38,6 +38,8 @@ export default function FollowDropdown({
 }) {
   const utils = api.useUtils();
 
+  console.log(geographies);
+
   const { data: followingDataset } = api.user.isFollowingDataset.useQuery({
     dataset: dataset.id,
   });
@@ -113,7 +115,10 @@ export default function FollowDropdown({
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="follow-content w-56" align="end">
+        <DropdownMenuContent
+          className="follow-content max-h-[300px] w-56 overflow-auto"
+          align="end"
+        >
           <DropdownMenuCheckboxItem
             checked={followingDataset}
             onSelect={(event) => {
@@ -201,7 +206,7 @@ const DropdownGeoGroup = ({
           });
         }}
       >
-        <span className="font-semibold">{group.title}</span>
+        <span className="">{group.title}</span>
       </DropdownMenuCheckboxItem>
       {group.children.length > 0 && (
         <div>

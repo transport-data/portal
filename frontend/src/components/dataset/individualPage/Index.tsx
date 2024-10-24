@@ -42,7 +42,8 @@ export default function IndexDatasetPage({
   ];
   const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
   const overviewTab = !!dataset.introduction_text;
-
+  console.log(locationsGroup);
+  console.log(dataset);
   return (
     <>
       <Head>
@@ -211,11 +212,15 @@ export default function IndexDatasetPage({
                     }}
                     organization={dataset.organization}
                     geographies={locationsGroup
-                      ?.filter((item) => dataset.regions?.includes(item.name))
+                      ?.filter((item) =>
+                        dataset.groups?.map((g) => g.name)?.includes(item.name)
+                      )
                       .map((item) => ({
                         ...item,
                         children: item.children.filter((child) =>
-                          dataset.geographies?.includes(child.name)
+                          dataset.groups
+                            ?.map((g) => g.name)
+                            ?.includes(child.name)
                         ),
                       }))}
                   />
