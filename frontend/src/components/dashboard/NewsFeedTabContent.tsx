@@ -4,21 +4,35 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@components/ui/pagination";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { DocumentReportIcon } from "@lib/icons";
+import { cn } from "@lib/utils";
 import { Activity } from "@portaljs/ckan";
+import {
+  dashboardActivityAction,
+  SearchNewsfeedActivityType,
+} from "@schema/user.schema";
 import { api } from "@utils/api";
 import { format } from "date-fns";
-import { Building, CircleCheck, Database } from "lucide-react";
-import MiniSearch from "minisearch";
-import { useEffect, useMemo, useState } from "react";
+import {
+  Building,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  Database,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import DashboardNewsFeedCard, {
   DashboardNewsfeedCardProps,
 } from "./DashboardNewsFeedCard";
+
+export type SearchNewsfeedPageOnChange = (
+  data: {
+    value: string[] | boolean | string | number | undefined;
+    key: keyof SearchNewsfeedActivityType;
+  }[]
+) => void;
 
 const groupByDate = (activities: Activity[]) => {
   return activities.reduce((groups: any, activity: Activity) => {
@@ -44,44 +58,41 @@ export interface NewsFeedCardProps {
   activity_type: string;
 }
 export default () => {
-  const actionsFilterOptions = [
-    "All",
-    "created",
-    "deleted",
-    "updated",
-    "rejected",
-    "approved",
-    "requested",
-  ];
-  const [searchText, setSearchText] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All");
-  const [actionsFilter, setActionsFilter] = useState("All");
-  const [sortOrder, setSortOrder] = useState("latest");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchFilter, setSearchFilter] = useState<SearchNewsfeedActivityType>(
+    {}
+  );
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [categoryFilter, actionsFilter, searchText]);
+  const { data: { results: searchResults, count } = {}, isLoading } =
+    api.user.listDashboardActivities.useQuery(searchFilter);
 
-  const { data: searchResults, isLoading } =
-    api.user.listDashboardActivities.useQuery();
+  api.user.listDashboardActivities.useQuery({
+    ...searchFilter,
+    offset: (currentPage + 1) * 9,
+  });
 
   const groupedActivities = useMemo(() => {
     return groupByDate(searchResults || []);
   }, [searchResults]);
 
-  const totalPages = Math.ceil((searchResults?.count || 0) / itemsPerPage);
+  const pages = new Array(Math.ceil((count || 0) / 9)).fill(0);
+
+  const onChange: SearchNewsfeedPageOnChange = (data) => {
+    setSearchFilter((oldValue) => {
+      const updatedValue: any = { ...oldValue, offset: 0 };
+      data.forEach((x) => (updatedValue[x.key] = x.value));
+      return updatedValue;
+    });
+    setCurrentPage(0);
+  };
 
   return (
     <div>
       <NewsFeedSearchFilters
-        setSearchText={setSearchText}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        actionsFilter={actionsFilter}
-        setActionsFilter={setActionsFilter}
-        actionsFilterOptions={actionsFilterOptions}
+        onChange={onChange}
+        sortOrder={searchFilter.sort || "latest"}
+        actionsFilter={searchFilter.action || "All"}
+        actionsFilterOptions={dashboardActivityAction}
       />
       <div className="mt-6 flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
         <div className="space-y-6">
@@ -108,8 +119,30 @@ export default () => {
                 value: "Datasets approvals",
               },
             ]}
-            onSelectedItem={(option) => setCategoryFilter(option)}
-            selected={categoryFilter}
+            onSelectedItem={(option) =>
+              onChange([
+                {
+                  key: "activityType",
+                  value:
+                    option === "Datasets approvals"
+                      ? "approval"
+                      : option === "Datasets"
+                      ? "dataset"
+                      : option === "Organizations"
+                      ? "organization"
+                      : "",
+                },
+              ])
+            }
+            selected={
+              searchFilter.activityType === "approval"
+                ? "Datasets approvals"
+                : searchFilter.activityType === "dataset"
+                ? "Datasets"
+                : searchFilter.activityType === "organization"
+                ? "Organizations"
+                : "All"
+            }
             title="Categories"
           />
           <div className="lg:hidden">
@@ -121,7 +154,7 @@ export default () => {
           <section className="flex flex-col gap-4">
             {isLoading ? (
               <div>Loading</div>
-            ) : paginatedData?.length || 0 > 0 ? (
+            ) : Object.values(groupedActivities).flat().length ? (
               Object.entries(groupedActivities).map(([date, activities]) => (
                 <div className="rounded border bg-white px-4 pt-4" key={date}>
                   <h4 className="mb-5 font-semibold">{date}</h4>{" "}
@@ -136,30 +169,78 @@ export default () => {
               <div>No News Found</div>
             )}
           </section>
-          <Pagination className="mt-2">
-            <PaginationContent>
-              <PaginationPrevious
-                onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-                disabled={currentPage === 1}
-              />
-              {Array.from({ length: totalPages }, (_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    isActive={index + 1 === currentPage}
-                    onClick={() => setCurrentPage(index + 1)}
+          {pages.length ? (
+            <Pagination className="mx-0 mt-8 justify-start">
+              <PaginationContent>
+                <PaginationItem>
+                  <button
+                    disabled={currentPage === 0}
+                    aria-label="Go to previous page"
+                    className={cn(
+                      "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                      "rounded-s-lg px-2",
+                      currentPage === 0 ? "cursor-not-allowed" : ""
+                    )}
+                    onClick={() => {
+                      setSearchFilter((oldV) => ({
+                        ...oldV,
+                        offset: (currentPage - 1) * 9,
+                      }));
+                      setCurrentPage((oldV) => oldV - 1);
+                    }}
                   >
-                    {index + 1}
-                  </PaginationLink>
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
                 </PaginationItem>
-              ))}
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage(Math.min(currentPage + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              />
-            </PaginationContent>
-          </Pagination>
+                {pages.map((x, i) =>
+                  i > currentPage + 2 || i < currentPage - 2 ? null : (
+                    <PaginationItem key={`pagination-item-${i}`}>
+                      <button
+                        disabled={currentPage === i}
+                        onClick={() => {
+                          setSearchFilter((oldV) => ({
+                            ...oldV,
+                            offset: i * 9,
+                          }));
+                          setCurrentPage(i);
+                        }}
+                        className={cn(
+                          `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
+                          currentPage === i ? "cursor-auto bg-gray-100" : ""
+                        )}
+                      >
+                        {i + 1}
+                      </button>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem>
+                  <button
+                    disabled={currentPage === pages.length - 1}
+                    aria-label="Go to next page"
+                    onClick={() => {
+                      setSearchFilter((oldV) => ({
+                        ...oldV,
+                        offset: (currentPage + 1) * 9,
+                      }));
+                      setCurrentPage((oldV) => oldV + 1);
+                    }}
+                    className={cn(
+                      "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                      "rounded-e-lg px-2",
+                      currentPage === pages.length - 1
+                        ? "cursor-not-allowed"
+                        : ""
+                    )}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          ) : (
+            <></>
+          )}
         </div>
         <div className="hidden lg:block">
           <Guidelines />

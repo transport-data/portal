@@ -7,11 +7,12 @@ import CkanRequest, { CkanRequestError } from "@datopian/ckan-api-client-js";
 import { env } from "@env.mjs";
 import { ApprovalStatus } from "@interfaces/ckan/dataset.interface";
 import { type User } from "@interfaces/ckan/user.interface";
-import { type Activity, type Dataset } from "@portaljs/ckan";
+import { type Activity } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
 import { OnboardingSchema } from "@schema/onboarding.schema";
 import {
   CKANUserSchema,
+  SearchNewsfeedActivitySchema,
   UserInviteSchema,
   UserSchema,
 } from "@schema/user.schema";
@@ -25,16 +26,16 @@ import {
   requestOrganizationOwner,
 } from "@utils/organization";
 import {
+  createApiToken,
   createUser,
   deleteUsers,
   generateUserApiKey,
+  getApiTokens,
   getUserFollowee,
   getUsersById,
   inviteUser,
   listUsers,
   patchUser,
-  getApiTokens,
-  createApiToken,
   revokeApiToken,
 } from "@utils/user";
 import { z } from "zod";
@@ -161,45 +162,46 @@ export const userRouter = createTRPCRouter({
       return users;
     }),
   listDashboardActivities: protectedProcedure
-    .input(
-      z.object({ limit: z.number().default(10), offset: z.number().default(0) })
-    )
-    .query(async ({ ctx }) => {
-      const activities = await CkanRequest.get<
-        CkanResponse<{
-          count: number;
-          results: Array<
-            Activity & {
-              data?: {
-                package?: { title?: string; approval_status: ApprovalStatus };
-              };
+    .input(SearchNewsfeedActivitySchema)
+    .query(
+      async ({
+        ctx,
+        input: { query, limit, offset, action, activityType, sort },
+      }) => {
+        action = !action || action === "All" ? "" : action;
+        activityType = activityType ?? "";
+        query = query ?? "";
+        limit = limit ?? 10;
+        offset = offset ?? 0;
+        sort = sort ?? "latest";
+        return (
+          await CkanRequest.get<
+            CkanResponse<{
+              count: number;
+              results: Array<
+                Activity & {
+                  data?: {
+                    package?: {
+                      title?: string;
+                      approval_status: ApprovalStatus;
+                    };
+                  };
+                }
+              >;
+            }>
+          >(
+            `tdc_dashboard_activity_list?limit=${limit}&offset=${offset}&query=${query}&action=${action}&status=${activityType}&${
+              sort === "oldest"
+                ? `after=${new Date(1600, 1, 1).toTimeString()}`
+                : ""
+            }`,
+            {
+              apiKey: ctx.session.user.apikey,
             }
-          >;
-        }>
-      >(`tdc_dashboard_activity_list`, {
-        apiKey: ctx.session.user.apikey,
-      });
-
-      activities.result = await Promise.all(
-        activities.result.map(async (a) => {
-          if (
-            a.activity_type === "new package" ||
-            a.activity_type === "changed package"
-          ) {
-            const dataset = await CkanRequest.get<CkanResponse<Dataset>>(
-              `package_show?id=${a.object_id}`,
-              {
-                apiKey: ctx.session.user.apikey,
-              }
-            );
-            return { ...a, packageData: dataset.result };
-          }
-          return a;
-        })
-      );
-
-      return activities.result;
-    }),
+          )
+        ).result;
+      }
+    ),
   list: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
     const apiKey = user.apikey;

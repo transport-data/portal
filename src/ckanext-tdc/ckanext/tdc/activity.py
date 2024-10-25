@@ -15,156 +15,50 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _group_activity_query(group_id):
-    groups = core_model_activity._to_list(group_id)
-    q = (
-        model.Session.query(core_model_activity.Activity)
-        .outerjoin(model.Member, core_model_activity.Activity.object_id == model.Member.table_id)
-        .outerjoin(model.Group, core_model_activity.Activity.object_id == model.Group.id)
-        .outerjoin(
-            model.Package,
-            and_(
-                model.Package.id == model.Member.table_id,
-                model.Package.private == False,  # noqa
-            ),
-        )
-        .filter(
-            or_(
-                # active dataset in the group
-                and_(
-                    model.Member.group_id.in_(groups),
-                    model.Member.state == "active",
-                    model.Package.state == "active",
-                ),
-                # deleted dataset in the group
-                and_(
-                    model.Member.group_id.in_(groups),
-                    model.Member.state == "deleted",
-                    model.Package.state == "deleted",
-                ),
-                # (we want to avoid showing changes to an active dataset that
-                # was once in this group)
-                # activity the the group itself
-                and_(
-                    core_model_activity.Activity.object_id.in_(groups),
-                    or_(
-                        model.Group.id is None,
-                        model.Group.type != "geography"
-                    )
-                ),
-            )
-        )
-    )
+def _filter_activities(activity_type=None, status=None):
+    if not activity_type and not status:
+        return None
 
-    return q
-
-
-def _activities_from_groups_followed_by_user_query(
-    user_id: str, limit: int
-):
-    # Get a list of the group's that the user is following.
-    follower_objects = model.UserFollowingGroup.followee_list(user_id)
-    if not follower_objects:
-        # Return a query with no results.
-        return model.Session.query(core_model_activity.Activity).filter(text("0=1"))
-
-    return core_model_activity._activities_limit(
-        _group_activity_query(
-            [follower.object_id for follower in follower_objects]),
-        limit)
-
-
-def _activities_from_everything_followed_by_user_query(
-    user_id: str, limit: int = 0
-):
-    q1 = core_model_activity._activities_from_users_followed_by_user_query(
-        user_id, limit)
-    q2 = core_model_activity._activities_from_datasets_followed_by_user_query(
-        user_id, limit)
-    q3 = _activities_from_groups_followed_by_user_query(user_id, limit)
-    return core_model_activity._activities_union_all(q1, q2, q3)
-
-
-def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=None):
-    # The user that will receive this notification is the
-    # user that triggered the approval request
-    q = (
-        model.Session.query(core_model_activity.Activity)
-        .outerjoin(model.User, model.User.id == text("data::json->'package'->>'approval_requested_by'"))
-        .outerjoin(model.Member, and_(
-            model.Member.capacity == "admin",
-            model.Member.table_name == "user",
-            model.Member.table_id == user_id
-        ))
-        .filter(core_model_activity.Activity.activity_type == "reviewed package")
-        .filter(
-            or_(
-                text("data::json->'package'->>'approval_requested_by' = :user_id"),
-                text(
-                    "data::json->'package'->>'contributors' LIKE '%' || :user_id || '%'"),
-                text("data::json->'package'->>'owner_org'") == model.Member.group_id,
-            )
-        )
-        .params(user_id=user_id)
-    )
-
-    if approval_status is not None:
-        q = (
-            q.filter(
-                text("data::json->'package'->>'approval_status' = :approval_status"))
-            .params(approval_status=approval_status)
-        )
-
-    return core_model_activity._activities_limit(q, limit)
-
-
-def _filter_activities(activity_type, status=None):
-    if activity_type == 'organization':
-        q = (
-            model.Session.query(core_model_activity.Activity)
-            .filter(core_model_activity.Activity.activity_type.ilike("{} organization".format(status or '').strip()))
-        )
-    elif activity_type == 'approval':
-        q = (
-            model.Session.query(core_model_activity.Activity)
-            .filter(core_model_activity.Activity.activity_type.ilike("reviewed package"))
-        )
-        if status is not None:
+    if activity_type:
+        if activity_type == 'organization':
             q = (
-                q.filter(
-                    text("data::json->'package'->>'approval_status' ilike :approval_status"))
+                model.Session.query(core_model_activity.Activity)
+                .filter(core_model_activity.Activity.activity_type.ilike("%{} organization%".format(status or '').strip()))
+            )
+        elif activity_type == 'approval':
+            q = (
+                model.Session.query(core_model_activity.Activity)
+                .filter(core_model_activity.Activity.activity_type.ilike("reviewed package"))
+            )
+            if status is not None:
+                q = (
+                    q.filter(
+                        text("data::json->'package'->>'approval_status' ilike :approval_status"))
+                    .params(approval_status="%{}%".format(status))
+                )
+        elif activity_type == 'dataset':
+            q = (
+                model.Session.query(core_model_activity.Activity)
+                .filter(and_(
+                        core_model_activity.Activity.activity_type.ilike(
+                            "%{} package%".format(status or '').strip()),
+                        core_model_activity.Activity.activity_type.not_ilike(
+                            "%reviewed package%")
+                        )
+                        )
+            )
+    elif status:
+        q = (
+            model.Session.query(core_model_activity.Activity)
+            .filter(
+                or_(
+                    core_model_activity.Activity.activity_type.ilike("%{}%".format(status or ''))),
+                text("data::json->'package'->>'approval_status' ilike :approval_status")
                 .params(approval_status="%{}%".format(status))
             )
-    elif activity_type == 'dataset':
-        q = (
-            model.Session.query(core_model_activity.Activity)
-            .filter(core_model_activity.Activity.activity_type.ilike("{} package".format(status or '').strip()))
         )
 
     return q
-
-
-def _dashboard_filter_activity_query(activity_type, approval_status=None):
-    q1 = _filter_activities(
-        activity_type, status=approval_status)
-
-    return core_model_activity._activities_union_all(q1)
-
-
-def _dashboard_activity_query(user_id: str, limit: int = 0):
-    q1 = core_model_activity._user_activity_query(user_id, limit)
-    q2 = _activities_from_everything_followed_by_user_query(user_id, limit)
-    q3 = _activities_from_dataset_approval_workflow(user_id, limit)
-
-    default_query = (
-        core_model_activity._activities_union_all(q1, q2)
-        .filter(core_model_activity.Activity.activity_type != "reviewed package")
-    )
-
-    query_with_approval = core_model_activity._activities_union_all(
-        default_query, q3)
-
-    return query_with_approval
 
 
 def dashboard_activity_list(
@@ -178,38 +72,56 @@ def dashboard_activity_list(
     action: str = "",
     query: str = ""
 ):
-    q = None
-
-    if activity_type:
-        q = _dashboard_filter_activity_query(
-            activity_type, approval_status=action)
-    else:
-        q = _dashboard_activity_query(user_id)
-
-    if query:
-        from sqlalchemy import or_
-        q = (
-            q.join(
-                model.User, core_model_activity.Activity.user_id == model.User.id
-            ).filter(
-                or_(
-                    model.User.name.ilike('%{}%'.format(query)),
-                    (
-                        text("data::json->'package'->>'title' ilike :title")
-                        .params(title="%{}%".format(query))
-                    ),
-                    (
-                        text("data::json->'group'->>'title' ilike :title")
-                        .params(title="%{}%".format(query))
-                    )
-                )
-            )
-        )
-
+    q = core_model_activity._dashboard_activity_query(user_id)
     q = core_model_activity._filter_activitites_from_users(q)
-
     q = core_model_activity._filter_activities_by_permission_labels(
         q, user_permission_labels)
+
+    if activity_type or action:
+        q = core_model_activity._activities_union_all(
+            core_model_activity._activities_limit(
+                _filter_activities(activity_type, action), limit, offset),
+            q
+        )
+
+    if query:
+        q = core_model_activity._activities_union_all(
+            core_model_activity._activities_limit(
+                (
+                    model.Session.query(core_model_activity.Activity)
+                    .filter(
+                        and_(
+                            or_(
+                                (
+                                    text(
+                                        "data::json->'package'->>'title' ilike :title")
+                                    .params(title="%{}%".format(query))
+                                ),
+                                (
+                                    text(
+                                        "data::json->'package'->>'name' ilike :title")
+                                    .params(title="%{}%".format(query))
+                                ),
+                                (
+                                    text("data::json->>'actor' ilike :autor")
+                                    .params(autor="%{}%".format(query))
+                                ),
+                                (
+                                    text(
+                                        "data::json->'group'->>'title' ilike :title")
+                                    .params(title="%{}%".format(query))
+                                ),
+                                (
+                                    text(
+                                        "data::json->'group'->>'name' ilike :title")
+                                    .params(title="%{}%".format(query))
+                                )
+                            )
+                        )
+                    )
+                ), limit, offset),
+            q
+        )
 
     if after:
         q = q.filter(core_model_activity.Activity.timestamp > after)
