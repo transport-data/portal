@@ -88,7 +88,7 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
     # user that triggered the approval request
     q = (
             model.Session.query(core_model_activity.Activity)
-            .outerjoin(model.User, model.User.id == text("data::json->'package'->>'approval_requested_by'"))
+            .outerjoin(model.User, model.User.id == user_id)
             .outerjoin(model.Member, and_(
                 model.Member.capacity == "admin",
                 model.Member.table_name == "user",
@@ -100,10 +100,13 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
                     text("data::json->'package'->>'approval_requested_by' = :user_id"),
                     text("data::json->'package'->>'contributors' LIKE '%' || :user_id || '%'"),
                     text("data::json->'package'->>'owner_org'") == model.Member.group_id,
+                    and_(model.User.id == user_id, model.User.sysadmin == True)
                 )
             )
             .params(user_id=user_id)
     )
+
+    log.error(q)
 
     if approval_status is not None:
         q = (
