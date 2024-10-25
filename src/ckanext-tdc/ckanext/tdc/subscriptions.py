@@ -64,8 +64,6 @@ def package_changed(sender: str, **kwargs):
 
 
 def _notify_approval_action_via_email(context, data_dict):
-    # TODO: what if it's a patch?
-    # identify if it's a patch and get the entire package
     approval_status = data_dict.get("approval_status")
     contributors = data_dict.get("contributors", [])
 
@@ -85,8 +83,13 @@ def _notify_approval_action_via_email(context, data_dict):
     member_list = member_list_action(privileged_context, member_list_data_dict)
     member_id_list = [member[0] for member in member_list]
 
-    # Send emails to all contributors and admins
-    user_id_list = list(set(contributors + member_id_list))
+    sysadmins = model.Session.query(model.User).filter(
+        model.User.sysadmin.is_(True),
+        model.User.state == u'active').all()
+    sysadmins_id_list = [sysadmin.id for sysadmin in sysadmins]
+
+    # Send emails to all contributors, admins and sysadmins
+    user_id_list = list(set(contributors + member_id_list + sysadmins_id_list))
 
     feedback = data_dict.get("approval_message")
 
@@ -97,25 +100,33 @@ def _notify_approval_action_via_email(context, data_dict):
     for id in user_id_list:
         user = model.User.get(id)
 
-        user_is_admin = id in member_id_list 
-        user_is_contributor = id in contributors
+        if user.email:
+            user_is_admin = id in member_id_list 
+            user_is_contributor = id in contributors
+            user_is_sysadmin = id in sysadmins_id_list
 
-        reason = ""
-        if user_is_admin:
-            reason = "You are receiving this notification because you have the permission to approve or reject datasets in this organization."
-        elif user_is_contributor:
-            reason = "You are receiving this notification because you are one of the contributors of the dataset."
+            reason = ""
+            if user_is_admin:
+                reason = "You are receiving this notification because you have the permission to approve or reject datasets in this organization."
+            elif user_is_contributor:
+                reason = "You are receiving this notification because you are one of the contributors of the dataset."
+            elif user_is_sysadmin:
+                reason = "You are receiving this notification because you are a sysadmin."
 
-        frontend_url = tk.config.get('ckan.frontend_portal_url', None)
-        site_url = "{}/dashboard/datasets-approvals".format(frontend_url)
+            frontend_url = tk.config.get('ckan.frontend_portal_url', None)
+            site_url = "{}/dashboard/datasets-approvals".format(frontend_url)
 
-        send_email(
-            "dataset_approval_{}".format(approval_status),
-            user.email,
-            from_user,
-            site_url=site_url,
-            org_title=owner_org_dict.title,
-            dataset_title=data_dict.get("title"),
-            reason=reason,
-            feedback=feedback
-        )
+            try:
+                send_email(
+                    "dataset_approval_{}".format(approval_status),
+                    user.email,
+                    from_user,
+                    site_url=site_url,
+                    org_title=owner_org_dict.title,
+                    dataset_title=data_dict.get("title"),
+                    reason=reason,
+                    feedback=feedback
+                )
+            except Exception as e:
+                log.error("Failed to send approval notification to {}".format(user.email))
+                log.error(e)
