@@ -113,8 +113,9 @@ const EditDatasetDashboard: NextPage<{
           data.title ?? data.name
         } dataset`,
       });
-      if (isUserAdminOfTheDatasetOrg) await router.push("/dashboard/datasets");
-      await router.push("/dashboard/datasets-approvals");
+      if (fromDatasetsRequests)
+        await router.push("/dashboard/datasets-approvals");
+      else await router.push("/dashboard/datasets");
     },
     onError: (error) => {
       setErrorMessage(error.message);
