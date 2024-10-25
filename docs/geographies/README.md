@@ -313,3 +313,12 @@ The following geographies are created by default when `create-default-geographie
 | ton   | Tonga                                                | country        | 776      | oce           | TO   |
 | vut   | Vanuatu                                              | country        | 548      | oce           | VU   |
 | nfk   | Norfolk Island                                       | country        | 574      | oce           | NF   |
+
+
+## Edit countries
+
+To edit any country you must be signed in on the [DMS](https://ckan.tdc.dev.datopian.com/user/login) and access this URL with the iso3 of the country that you want to edit https://ckan.tdc.dev.datopian.com/group/edit/\<iso3 of the country>
+
+e.g.: https://ckan.tdc.dev.datopian.com/group/edit/dza
+
+NOTE: Avoid changing the country name, as this can cause unexpected behavior in applications.
