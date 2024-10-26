@@ -113,8 +113,6 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
             .params(user_id=user_id)
     )
 
-    log.error(q)
-
     if approval_status is not None:
         q = (
             q.filter(text("data::json->'package'->>'approval_status' = :approval_status"))
