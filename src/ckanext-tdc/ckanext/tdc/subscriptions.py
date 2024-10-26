@@ -65,7 +65,9 @@ def package_changed(sender: str, **kwargs):
 
 def _notify_approval_action_via_email(context, data_dict):
     approval_status = data_dict.get("approval_status")
-    contributors = data_dict.get("contributors", [])
+    contributors = data_dict.get("current_approval_contributors", [])
+    if approval_status == "approved":
+        contributors = data_dict.get("previous_approval_contributors", [])
 
     from_user = None
     if approval_status == "pending":
@@ -101,7 +103,7 @@ def _notify_approval_action_via_email(context, data_dict):
         user = model.User.get(id)
 
         if user.email:
-            user_is_admin = id in member_id_list 
+            user_is_admin = id in member_id_list
             user_is_contributor = id in contributors
             user_is_sysadmin = id in sysadmins_id_list
 

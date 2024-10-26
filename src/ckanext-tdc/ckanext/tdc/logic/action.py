@@ -225,6 +225,8 @@ def _fix_approval_workflow(context, data_dict, is_update):
     user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if not user_is_admin:
+        current_approval_contributors = dataset.get("current_approval_contributors", [])
+        data_dict["current_approval_contributors"] = list(set([user_id] + current_approval_contributors))
         if is_private is False:
             data_dict["private"] = True
             data_dict["approval_status"] = "pending"
@@ -247,6 +249,11 @@ def _fix_approval_workflow(context, data_dict, is_update):
                 data_dict.pop("approval_status")
             if "approval_requested_by" in data_dict:
                 data_dict.pop("approval_requested_by")
+
+    clear_current_approval_contributors = context.get("clear_current_approval_contributors", False)
+    if clear_current_approval_contributors:
+        data_dict["previous_approval_contributors"] = data_dict.get("current_approval_contributors", [])
+        data_dict["current_approval_contributors"] = []
 
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
@@ -806,6 +813,7 @@ def dataset_approval_update(context, data_dict):
         package_patch_dict["private"] = False
         package_patch_dict["approval_message"] = None
         package_patch_dict["approval_status"] = "approved"
+        context["clear_current_approval_contributors"] = True
 
     if status == "rejected":
         package_patch_dict["private"] = True

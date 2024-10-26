@@ -98,7 +98,14 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
             .filter(
                 or_(
                     text("data::json->'package'->>'approval_requested_by' = :user_id"),
-                    text("data::json->'package'->>'contributors' LIKE '%' || :user_id || '%'"),
+                    and_(
+                        text("data::json->'package'->>'approval_status' = 'approved'"),
+                        text("data::json->'package'->>'previous_approval_contributors' LIKE '%' || :user_id || '%'")
+                    ),
+                    and_(
+                        text("data::json->'package'->>'approval_status' in ('pending', 'rejected')"),
+                        text("data::json->'package'->>'current_approval_contributors' LIKE '%' || :user_id || '%'")
+                    ),
                     text("data::json->'package'->>'owner_org'") == model.Member.group_id,
                     and_(model.User.id == user_id, model.User.sysadmin == True)
                 )
