@@ -353,4 +353,19 @@ export const userRouter = createTRPCRouter({
          }
       ))
     }),
+
+    followedGroups: protectedProcedure
+    .input(z.array(z.string()))
+    .query(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      //const apiKey = env.SYS_ADMIN_API_KEY;
+      const data = await CkanRequest.post<CkanResponse<string[]>>(
+        `user_following_groups`, {
+          json: {
+            group_list:input
+          },
+        }
+      )
+      return data.result
+    }),
 });

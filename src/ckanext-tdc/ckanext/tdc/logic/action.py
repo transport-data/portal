@@ -848,7 +848,4 @@ def user_following_groups(context, data_dict):
             # Handle cases where the group is not found
             continue
 
-    return {
-        'user_id': user_id,
-        'followed_groups': followed_groups
-    }
+    return followed_groups
