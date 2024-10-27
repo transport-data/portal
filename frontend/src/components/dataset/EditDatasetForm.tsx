@@ -7,6 +7,7 @@ import { Button } from "@components/ui/button";
 import { useState } from "react";
 import { api } from "@utils/api";
 import { ErrorAlert } from "@components/_shared/Alerts";
+import { omit } from 'remeda'
 
 import notify from "@utils/notify";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
@@ -45,7 +46,9 @@ export const EditDatasetForm: React.FC<{ initialValues: Dataset }> = ({
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={formObj.handleSubmit((data) => {
           setDatasetEdited(data.name);
-          editDataset.mutate(data);
+          //Required to remove regions from the data object, so ckan can set them automatically
+          data.regions = [];
+          editDataset.mutate(_data);
         })}
       >
         <DatasetForm formObj={formObj} />

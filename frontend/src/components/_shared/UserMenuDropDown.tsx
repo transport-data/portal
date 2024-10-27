@@ -37,7 +37,7 @@ export default function UserMenuDropdown({
   return (
     <div
       ref={dropdownRef}
-      className="absolute left-3 top-10 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+      className="absolute right-0 top-10 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
     >
       <div
         className="py-1"
