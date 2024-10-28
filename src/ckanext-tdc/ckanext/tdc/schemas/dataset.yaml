@@ -289,6 +289,8 @@ dataset_fields:
   label: Previous approval contributors
   preset: multiple_text
   output_validators: scheming_load_json
+  form_snippet: null
+  validators: ignore_missing scheming_multiple_text
 
 resource_fields:
 
