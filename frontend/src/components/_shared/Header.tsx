@@ -121,7 +121,7 @@ export default function Header({
             </div>
           </div>
 
-          <div className="hidden sm:ml-6 sm:items-center lg:flex">
+          <div className="ml-auto mr-[12px] flex sm:items-center">
             {status === "loading" ? (
               <div className="flex items-center gap-4">
                 <Skeleton className="h-[20px] w-[20px]"></Skeleton>
