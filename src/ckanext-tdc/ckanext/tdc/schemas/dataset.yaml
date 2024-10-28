@@ -275,12 +275,22 @@ dataset_fields:
 - field_name: approval_requested_by
   label: Approval requested by
 
-# TODO: maybe it would be interesting to show the newsfeed
-# notifications only to the users that contributed before
-# the last approval
-# - field_name: approval_contributors
-#   label: Approval contributors
-#   preset: multiple_text
+- field_name: current_approval_contributors
+  label: Current approval contributors
+  preset: multiple_text
+  output_validators: scheming_load_json
+  form_snippet: null
+  validators: ignore_missing scheming_multiple_text
+
+# NOTE: when the dataset is approved, the list of contributors
+# has to be reset, but there still must be a way to find out
+# who were the contributors when approval is "approved"
+- field_name: previous_approval_contributors
+  label: Previous approval contributors
+  preset: multiple_text
+  output_validators: scheming_load_json
+  form_snippet: null
+  validators: ignore_missing scheming_multiple_text
 
 resource_fields:
 
