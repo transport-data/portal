@@ -14,4 +14,4 @@ token=$(docker exec ckan-tdc-dev ckan -c ckan.ini user token add ckan_admin cypr
 
 # Replace the token placeholder with the generated token
 sed -i "s/CKAN_API_TOKEN/$token/g" ../frontend/cypress.config.js
-sed -i "s/CKAN_API_TOKEN/$token/g" ../.env.example
+sed -i "s/CKAN_API_TOKEN/$token/g" ../frontend/.env.example

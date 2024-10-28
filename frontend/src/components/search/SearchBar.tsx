@@ -16,6 +16,7 @@ import { Badge } from "@components/ui/badge";
 import { useRouter } from "next/router";
 import { api } from "@utils/api";
 import Link from "next/link";
+import searchbarConfig from "@data/searchbar.config.json";
 
 interface FacetValueProps {
   display_name: string;
@@ -67,13 +68,13 @@ export default function SearchBar() {
     regions: {
       name: "in",
       queryParam: "region",
-      description: "a region, country or a city",
+      description: searchbarConfig.regions.description,
       options: data?.facets?.regions?.items,
       isMultiple: true,
     },
     startYear: {
       name: "after",
-      description: "referencing data after an year",
+      description: searchbarConfig.startYear.description,
       options: (data?.facets?.temporal_coverage_start?.items as any[])
         ?.map((d: any) => ({
           ...d,
@@ -87,7 +88,7 @@ export default function SearchBar() {
     },
     endYear: {
       name: "before",
-      description: "referencing data before an year",
+      description: searchbarConfig.endYear.description,
       options: (data?.facets?.temporal_coverage_end?.items as any[])
         ?.map((d: any) => ({
           ...d,
@@ -101,19 +102,19 @@ export default function SearchBar() {
     },
     sectors: {
       name: "sector",
-      description: "road, rail, aviation, water transportation",
+      description: searchbarConfig.sectors.description,
       options: data?.facets?.sectors?.items,
       isMultiple: true,
     },
     modes: {
       name: "mode",
-      description: "car, 2W, 3W, multi-modal etc.",
+      description: searchbarConfig.modes.description,
       options: data?.facets?.modes?.items,
       isMultiple: true,
     },
     services: {
       name: "service",
-      description: "passenger or freight",
+      description: searchbarConfig.services.description,
       options: data?.facets?.services?.items,
       isMultiple: true,
     },
@@ -336,7 +337,10 @@ export default function SearchBar() {
                         className="block"
                       >
                         {data?.datasets?.map((dataset, index) => (
-                          <SearchDatasetItem {...dataset} />
+                          <SearchDatasetItem
+                            key={`search-dataset-${index}`}
+                            {...dataset}
+                          />
                         ))}
                       </CommandGroup>
                     )}
@@ -391,7 +395,7 @@ export default function SearchBar() {
                               <CommandListHeader title="Recent searches" />
                             }
                           >
-                            {storedSearches.map((recent) => {
+                            {storedSearches.map((recent, z) => {
                               const badge =
                                 recent.facetValue && recent.facetName
                                   ? `${recent.facetName}: ${recent.facetValue}`
@@ -425,6 +429,7 @@ export default function SearchBar() {
                                   text={text}
                                   icon={icon}
                                   context={context}
+                                  key={`stored-item-${z}`}
                                 />
                               );
                             })}
