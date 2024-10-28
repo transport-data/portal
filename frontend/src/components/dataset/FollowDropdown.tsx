@@ -47,19 +47,7 @@ export default function FollowDropdown({
       org: organization?.id ?? "",
     });
 
-  /* const { data: followingGeographies } =
-    api.user.isFollowingGeographies.useQuery(
-      Array.from(
-        new Set(
-          geographies?.flatMap((parent) => [
-            parent.id,
-            ...parent.children.map((child) => child.id),
-          ])
-        )
-      )
-    );*/
-
-  const { data: followedGroups } = api.user.followedGroups.useQuery(
+  const { data: followedGroups } = api.user.isFollowingGeographies.useQuery(
     Array.from(
       new Set(
         geographies?.flatMap((parent) => [
@@ -91,35 +79,14 @@ export default function FollowDropdown({
   const followingAny =
     followingDataset ||
     followingOrganization ||
-    followedGroups?.some((item: string) =>
-      geographies?.map((g) => g.id)?.includes(item)
-    );
+    (followedGroups && followedGroups?.length > 0);
 
-  const geographiesFollowingCount =
-    followedGroups?.filter((item) =>
-      geographies?.map((g) => g.id)?.includes(item)
-    ).length ?? 0;
+  const geographiesFollowingCount = followedGroups ? followedGroups.length : 0;
 
   const followingCount =
     geographiesFollowingCount +
     (followingDataset ? 1 : 0) +
     (followingOrganization ? 1 : 0);
-
-  /**
-     * 
-     *  const followingAny =
-    followingDataset ||
-    followingOrganization ||
-    followingGeographies?.some((item) => item.following === true);
-
-  const geographiesFollowingCount =
-    followingGeographies?.filter((item) => item.following === true).length ?? 0;
-
-  const followingCount =
-    geographiesFollowingCount +
-    (followingDataset ? 1 : 0) +
-    (followingOrganization ? 1 : 0);
-     */
 
   return (
     <TooltipProvider delayDuration={100}>
@@ -215,9 +182,9 @@ const DropdownGeoGroup = ({
   group: GroupTree;
   onChange: Function;
 }) => {
-  const groupChecked =
-    followingGeographies?.find((g: any) => g.id === group.id)?.following ??
-    false;
+  const groupChecked = followingGeographies?.find((g: string) => g === group.id)
+    ? true
+    : false;
   return (
     <div>
       <DropdownMenuCheckboxItem

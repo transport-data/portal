@@ -822,13 +822,19 @@ def dataset_approval_update(context, data_dict):
 
 
 def user_following_groups(context, data_dict):
+    """
+    Returns a list of group IDs the user is following within a given array of group-ids.
 
-    user_id = context.get('auth_user_obj').id if 'auth_user_obj' in context else context.get('user')
-    
-    if not user_id:
-        raise logic.NotAuthorized('User must be logged in to check followed groups')
-
+    :param context: CKAN context object
+    :param data_dict: Dictionary containing 'group_list' and 'user_id'
+    :returns: List of group IDs the user is following
+    :raises ValidationError: If 'user_id' or 'group_list' is missing
+    """
     group_list = data_dict.get('group_list')
+    user_id = data_dict.get('user_id')
+
+    if not user_id:
+        raise ValidationError('Missing required parameter: user_id')
 
     if not group_list:
         raise ValidationError('Missing required parameter: group_list')
@@ -837,15 +843,19 @@ def user_following_groups(context, data_dict):
 
     for group_id in group_list:
         try:
-            # Use the existing 'group_follower_list' action to get followers of the group
+            # Fetch followers of the group
             result = get_action('group_follower_list')(context, {'id': group_id})
 
-            # Check if the user is a follower of this group
+            # Add group to the list if the user is following it
             if any(follower['id'] == user_id for follower in result):
                 followed_groups.append(group_id)
 
         except logic.NotFound:
-            # Handle cases where the group is not found
+            # Continue if the group does not exist
+            continue
+        except Exception as e:
+            # Optional: Log or handle other exceptions
+            log.error(f"Error processing group {group_id}: {str(e)}")
             continue
 
     return followed_groups

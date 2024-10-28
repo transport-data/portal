@@ -341,27 +341,17 @@ export const userRouter = createTRPCRouter({
       return list?.some((follower) => follower.id === user?.id);
     }),
 
-  isFollowingGeographies: protectedProcedure
+
+    isFollowingGeographies: protectedProcedure
     .input(z.array(z.string()))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = env.SYS_ADMIN_API_KEY;
-      const list = await getGroupFollowersList({ apiKey, groups:input });
-      return list.map( (g)=>({
-          id: g.id,
-          following: g.followers?.some(follower => follower.id === user?.id)
-         }
-      ))
-    }),
-
-    followedGroups: protectedProcedure
-    .input(z.array(z.string()))
-    .query(async ({ input, ctx }) => {
-      const user = ctx.session.user;
-      //const apiKey = env.SYS_ADMIN_API_KEY;
       const data = await CkanRequest.post<CkanResponse<string[]>>(
         `user_following_groups`, {
+          apiKey: apiKey,
           json: {
+            user_id: user.id,
             group_list:input
           },
         }
