@@ -21,6 +21,9 @@ The portal's home page consists of the following sections and features:
 Introduction section to the portal that includes the following features:
 ![Hero section](hero.png)
 
+See how to configure how to include image/video here:
+https://github.com/transport-data/tdc-data-portal/tree/main/docs/home-page#featured-asset
+
 #### Dataset Search
 
 Click [here](../search-bar-component) for more detailed documentation on the search bar.
@@ -38,6 +41,9 @@ Allows the configuration of the element that appears to the right of the Hero, w
   }
 }
 ```
+
+- Default image dimension: **540x405px**
+- Image format: **jpg | png**
 
 ### Recently Added Datasets
 

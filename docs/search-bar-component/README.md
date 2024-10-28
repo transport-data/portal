@@ -1,9 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [Searchbar Component](#searchbar-component)
-    - [How it works](#how-it-works)
+  - [How it works](#how-it-works)
   - [Available Filters](#available-filters)
   - [Example of search with applied filter](#example-of-search-with-applied-filter)
   - [Search without applying filters](#search-without-applying-filters)
@@ -53,6 +54,45 @@ Pressing `Enter` or clicking the search button will redirect the user to the `/s
 **Service:** Filter datasets by service type
 
 - metadata field: **services**
+
+### How to edit filters description
+
+Go to `/frontend/data/searchbar.config.json` and edit filter **description** as wanted.
+
+**it is important not to change the object keys name (regions, startYear, endYear, sectors, modes, services)**
+
+```json
+{
+  "regions": {
+    "name": "in",
+    "description": "filter for regions"
+  },
+  "startYear": {
+    "name": "after",
+    "description": "referencing data after a selected year"
+  },
+  "endYear": {
+    "name": "before",
+    "description": "referencing data before a selected year"
+  },
+  "sectors": {
+    "name": "sector",
+    "description": "road, rail, aviation, water transportation"
+  },
+  "modes": {
+    "name": "mode",
+    "description": "cars, cycling, heavy rail"
+  },
+  "services": {
+    "name": "service",
+    "description": "passenger or freight"
+  }
+}
+```
+
+**name**: filter name
+
+**description**: filter description
 
 ## Example of search with applied filter
 

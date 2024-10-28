@@ -9,6 +9,7 @@
     - [Delete default geographies](#delete-default-geographies)
     - [List default geographies](#list-default-geographies)
   - [List of default geographies](#list-of-default-geographies)
+  - [Edit geographies](#edit-geographies)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -315,10 +316,10 @@ The following geographies are created by default when `create-default-geographie
 | nfk   | Norfolk Island                                       | country        | 574      | oce           | NF   |
 
 
-## Edit countries
+## Edit geographies
 
-To edit any country you must be signed in on the [DMS](https://ckan.tdc.dev.datopian.com/user/login) and access this URL with the iso3 of the country that you want to edit https://ckan.tdc.dev.datopian.com/group/edit/\<iso3 of the country>
+To edit any geography you must be signed in on the [DMS](https://ckan.tdc.dev.datopian.com/user/login) and access this URL with the iso3 of the geography that you want to edit https://ckan.tdc.dev.datopian.com/group/edit/\<iso3 of the geography>
 
 e.g.: https://ckan.tdc.dev.datopian.com/group/edit/dza
 
-NOTE: Avoid changing the country name, as this can cause unexpected behavior in applications.
+NOTE: Avoid changing the geography name, as this can cause unexpected behavior in applications.

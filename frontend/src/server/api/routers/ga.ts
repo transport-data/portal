@@ -6,6 +6,7 @@ import { z } from "zod";
 
 export const googleAnalyticsRouter = createTRPCRouter({
   getVisitorStats: publicProcedure.query(async ({ input }) => {
+    if(process.env.NODE_ENV === "development") return [];
     try {
       const propertyId = env.GA_PROPERTY_ID;
       const privateKey = Buffer.from(env.GA_PRIVATE_KEY, "base64")
@@ -106,6 +107,10 @@ export const googleAnalyticsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      if(process.env.NODE_ENV === "development") return {
+        lastSixMonths: null,
+        total: null,
+      };
       try {
         const propertyId = env.GA_PROPERTY_ID;
         const privateKey = Buffer.from(env.GA_PRIVATE_KEY, "base64")
