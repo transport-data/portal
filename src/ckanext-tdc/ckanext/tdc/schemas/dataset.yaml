@@ -279,6 +279,8 @@ dataset_fields:
   label: Current approval contributors
   preset: multiple_text
   output_validators: scheming_load_json
+  form_snippet: null
+  validators: ignore_missing scheming_multiple_text
 
 # NOTE: when the dataset is approved, the list of contributors
 # has to be reset, but there still must be a way to find out
