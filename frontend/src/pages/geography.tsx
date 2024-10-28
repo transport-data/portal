@@ -174,7 +174,6 @@ export default function DatasetsPage({
           });
 
           map.on("mouseenter", x.id, () => {
-            map.setPaintProperty(lineLayerId, "line-color", fillColor);
             map.getCanvas().style.cursor = "pointer";
           });
 
