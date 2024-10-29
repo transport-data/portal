@@ -88,7 +88,7 @@ export default function DateQuickFilterDropdown({
                     { value: undefined, key: filterEndFieldName },
                   ]);
                 }}
-                className="max-w-fit cursor-pointer"
+                className="max-w-fit text-sm cursor-pointer"
               >
                 Clear filter
               </span>
@@ -131,7 +131,7 @@ export default function DateQuickFilterDropdown({
                 id="years-covered-search-button"
                 disabled={!endYear && !startYear}
                 className={cn(
-                  "ml-auto cursor-pointer text-[#006064] font-semibold",
+                  "ml-auto cursor-pointer text-sm text-[#006064] font-semibold",
                   !endYear && !startYear ? "cursor-not-allowed opacity-60" : ""
                 )}
                 onClick={() =>
