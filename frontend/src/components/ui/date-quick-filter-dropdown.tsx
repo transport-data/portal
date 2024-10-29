@@ -110,7 +110,7 @@ export default function DateQuickFilterDropdown({
                 openTo="year"
                 views={["year"]}
                 yearsOrder="desc"
-                sx={{ maxWidth: 150 }}
+                sx={{ maxWidth: 105 }}
               />
               <span>—</span>
               <DatePicker
@@ -122,14 +122,16 @@ export default function DateQuickFilterDropdown({
                 views={["year"]}
                 yearsOrder="desc"
                 sx={{
-                  maxWidth: 150,
+                  maxWidth: 105,
                 }}
               />
+            </div>
+            <div className="flex justify-end">
               <button
                 id="years-covered-search-button"
                 disabled={!endYear && !startYear}
                 className={cn(
-                  "ml-auto cursor-pointer text-[#006064]",
+                  "ml-auto cursor-pointer text-[#006064] font-semibold",
                   !endYear && !startYear ? "cursor-not-allowed opacity-60" : ""
                 )}
                 onClick={() =>
