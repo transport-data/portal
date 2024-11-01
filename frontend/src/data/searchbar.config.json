@@ -1,0 +1,26 @@
+{
+  "regions": {
+    "name": "in",
+    "description": "filter for regions"
+  },
+  "startYear": {
+    "name": "after",
+    "description": "referencing data after a selected year"
+  },
+  "endYear": {
+    "name": "before",
+    "description": "referencing data before a selected year"
+  },
+  "sectors": {
+    "name": "sector",
+    "description": "road, rail, aviation, water transportation"
+  },
+  "modes": {
+    "name": "mode",
+    "description": "cars, cycling, heavy rail"
+  },
+  "services": {
+    "name": "service",
+    "description": "passenger or freight"
+  }
+}

@@ -1,3 +1,4 @@
+import searchbarConfig from "../../src/data/searchbar.config.json"
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
@@ -78,7 +79,7 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="in:a region, country or a city"]`).click();
+		cy.get(`[data-value="in:${searchbarConfig.regions.description}"]`).click();
 		cy.get(`[data-value="in: Asia"]`).click();
 
 		input.type( datasetTitle, { delay: 0 });
@@ -105,7 +106,7 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="in:a region, country or a city"]`).click();
+		cy.get(`[data-value="in:${searchbarConfig.regions.description}"]`).click();
 		cy.get(`[data-value="in: Asia"]`).click();
 
 		input.type( 'Recent Search Test', { delay: 0 });
