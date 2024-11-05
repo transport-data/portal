@@ -232,7 +232,7 @@ const CreateDatasetDashboard: NextPage = () => {
                       className="w-fit"
                       onClick={() => send("prev")}
                     >
-                      Prev
+                      Previous
                     </Button>
                     <SaveDraftButton callback={() => handleSaveDraft()} />
                     <Button
@@ -269,7 +269,7 @@ const CreateDatasetDashboard: NextPage = () => {
                       variant="secondary"
                       onClick={() => send("prev")}
                     >
-                      Prev
+                      Previous
                     </Button>
                     <SaveDraftButton callback={() => handleSaveDraft()} />
                     <LoaderButton
