@@ -26,6 +26,7 @@ import { useMemo, useState } from "react";
 import DashboardNewsFeedCard, {
   DashboardNewsfeedCardProps,
 } from "./DashboardNewsFeedCard";
+import { Skeleton } from "@components/ui/skeleton";
 
 export type SearchNewsfeedPageOnChange = (
   data: {
@@ -34,8 +35,18 @@ export type SearchNewsfeedPageOnChange = (
   }[]
 ) => void;
 
-const groupByDate = (activities: Activity[]) => {
-  return activities.reduce((groups: any, activity: Activity) => {
+const groupByDate = (
+  activities: Activity[],
+  sort: "latest" | "oldest" = "latest"
+) => {
+  const sortedActivities = activities.sort((a, b) => {
+    if (sort === "latest") {
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    } else {
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    }
+  });
+  return sortedActivities.reduce((groups: any, activity: Activity) => {
     if (activity?.timestamp) {
       const formattedDate = format(
         new Date(activity?.timestamp),
@@ -74,7 +85,7 @@ export default () => {
   });
 
   const groupedActivities = useMemo(() => {
-    return groupByDate(searchResults || []);
+    return groupByDate(searchResults || [], searchFilter.sort);
   }, [searchResults]);
 
   const pages = new Array(Math.ceil((count || 0) / limit)).fill(0);
@@ -155,7 +166,19 @@ export default () => {
           <h3 className="mb-4 text-sm font-semibold">Timeline</h3>
           <section className="flex flex-col gap-4">
             {isLoading ? (
-              <div>Loading</div>
+              <>
+                {[...Array(2)].map((_, index) => (
+                  <Skeleton
+                    className="flex h-[100px] w-full items-center gap-3 rounded border bg-white px-4 "
+                    key={index}
+                  >
+                    <Skeleton className="h-[48px] w-[48px] rounded-full" />
+                    <div className="block w-full md:w-[70%]">
+                      <Skeleton className="block h-[24px] w-full" />
+                    </div>
+                  </Skeleton>
+                ))}
+              </>
             ) : Object.values(groupedActivities).flat().length ? (
               Object.entries(groupedActivities).map(([date, activities]) => (
                 <div className="rounded border bg-white px-4 pt-4" key={date}>
@@ -168,7 +191,7 @@ export default () => {
                 </div>
               ))
             ) : (
-              <div>No News Found</div>
+              <div className="text-sm">No news found...</div>
             )}
           </section>
           {pages.length ? (
