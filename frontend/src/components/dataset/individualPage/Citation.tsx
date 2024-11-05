@@ -79,16 +79,16 @@ export function Citation({
                 className={cn(
                   "overflow-hidden text-sm font-normal leading-tight text-gray-500"
                 )}
+                dangerouslySetInnerHTML={{ __html: option.content }}
               >
-                {option.content}
               </p>
             ) : (
               <pre
                 className={cn(
                   "overflow-hidden text-sm font-normal leading-tight text-gray-500"
                 )}
+                dangerouslySetInnerHTML={{ __html: option.content }}
               >
-                {option.content}
               </pre>
             )}
           </div>

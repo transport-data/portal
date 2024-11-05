@@ -337,7 +337,7 @@ export function GeneralForm({
         <RTEForm
           disabled={disabled}
           name="overview_text"
-          placeholder="Write a overview description of this dataset"
+          placeholder="Write a more detailed description of the dataset (optional)"
           formObj={formObj}
         />
       </div>

@@ -42,7 +42,6 @@ export default function IndexDatasetPage({
   ];
   const datasetsTab = dataset.resources.some((r) => !!r.datastore_active);
   const overviewTab = !!dataset.introduction_text;
-
   return (
     <>
       <Head>
@@ -79,7 +78,7 @@ export default function IndexDatasetPage({
             </div>
             <div className="mt-6 pb-16 md:flex md:items-center md:justify-between">
               <div className="min-w-0 flex-1">
-                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
+                <h2 className="text-2xl font-bold text-gray-900 h-auto sm:text-5xl sm:tracking-tight">
                   {dataset.title || dataset.name}
                 </h2>
                 {dataset.tdc_category === "tdc_harmonized" && (
@@ -211,11 +210,15 @@ export default function IndexDatasetPage({
                     }}
                     organization={dataset.organization}
                     geographies={locationsGroup
-                      ?.filter((item) => dataset.regions?.includes(item.name))
+                      ?.filter((item) =>
+                        dataset.groups?.map((g) => g.name)?.includes(item.name)
+                      )
                       .map((item) => ({
                         ...item,
                         children: item.children.filter((child) =>
-                          dataset.geographies?.includes(child.name)
+                          dataset.groups
+                            ?.map((g) => g.name)
+                            ?.includes(child.name)
                         ),
                       }))}
                   />

@@ -225,6 +225,8 @@ def _fix_approval_workflow(context, data_dict, is_update):
     user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if not user_is_admin:
+        current_approval_contributors = dataset.get("current_approval_contributors", [])
+        data_dict["current_approval_contributors"] = list(set([user_id] + current_approval_contributors))
         if is_private is False:
             data_dict["private"] = True
             data_dict["approval_status"] = "pending"
@@ -247,6 +249,11 @@ def _fix_approval_workflow(context, data_dict, is_update):
                 data_dict.pop("approval_status")
             if "approval_requested_by" in data_dict:
                 data_dict.pop("approval_requested_by")
+
+    clear_current_approval_contributors = context.get("clear_current_approval_contributors", False)
+    if clear_current_approval_contributors:
+        data_dict["previous_approval_contributors"] = data_dict.get("current_approval_contributors", [])
+        data_dict["current_approval_contributors"] = []
 
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
@@ -806,6 +813,7 @@ def dataset_approval_update(context, data_dict):
         package_patch_dict["private"] = False
         package_patch_dict["approval_message"] = None
         package_patch_dict["approval_status"] = "approved"
+        context["clear_current_approval_contributors"] = True
 
     if status == "rejected":
         package_patch_dict["private"] = True
@@ -818,3 +826,44 @@ def dataset_approval_update(context, data_dict):
     context["ignore_activity_signal"] = True
 
     package_patch_action(context, package_patch_dict)
+
+
+
+def user_following_groups(context, data_dict):
+    """
+    Returns a list of group IDs the user is following within a given array of group-ids.
+
+    :param context: CKAN context object
+    :param data_dict: Dictionary containing 'group_list' and 'user_id'
+    :returns: List of group IDs the user is following
+    :raises ValidationError: If 'user_id' or 'group_list' is missing
+    """
+    group_list = data_dict.get('group_list')
+    user_id = data_dict.get('user_id')
+
+    if not user_id:
+        raise ValidationError('Missing required parameter: user_id')
+
+    if not group_list:
+        raise ValidationError('Missing required parameter: group_list')
+
+    followed_groups = []
+
+    for group_id in group_list:
+        try:
+            # Fetch followers of the group
+            result = get_action('group_follower_list')(context, {'id': group_id})
+
+            # Add group to the list if the user is following it
+            if any(follower['id'] == user_id for follower in result):
+                followed_groups.append(group_id)
+
+        except logic.NotFound:
+            # Continue if the group does not exist
+            continue
+        except Exception as e:
+            # Optional: Log or handle other exceptions
+            log.error(f"Error processing group {group_id}: {str(e)}")
+            continue
+
+    return followed_groups

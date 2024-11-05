@@ -3,6 +3,7 @@ import { defineConfig } from "cypress";
 export default defineConfig({
   chromeWebSecurity: false,
   pageLoadTimeout: 120000,
+  defaultCommandTimeout: 60000,
   experimentalMemoryManagement: true,
   env: {
     FRONTEND_URL: "",

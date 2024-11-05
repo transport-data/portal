@@ -22,32 +22,33 @@ def resource_create(context, data_dict):
 
 
 def package_update(context, data_dict):
-    package_id = data_dict.get("id")
-    user_id = current_user.id
+    if not tk.current_user.is_anonymous:
+        package_id = data_dict.get("id")
+        user_id = current_user.id
 
-    approval_status = data_dict.get("approval_status")
-    owner_org = data_dict.get("owner_org")
+        approval_status = data_dict.get("approval_status")
+        owner_org = data_dict.get("owner_org")
 
-    ignore_approval_status = context.get("ignore_approval_status")
+        ignore_approval_status = context.get("ignore_approval_status")
 
-    if not approval_status or not owner_org:
-        package_show_action = tk.get_action("package_show")
-        package_show_dict = {"id": package_id}
-        privileged_context = {"ignore_auth": True}
+        if not approval_status or not owner_org:
+            package_show_action = tk.get_action("package_show")
+            package_show_dict = {"id": package_id}
+            privileged_context = {"ignore_auth": True}
 
-        dataset = package_show_action(privileged_context, package_show_dict)
+            dataset = package_show_action(privileged_context, package_show_dict)
 
-        if not approval_status:
-            approval_status = dataset.get("approval_status")
+            if not approval_status:
+                approval_status = dataset.get("approval_status")
 
-        if not owner_org:
-            owner_org = dataset.get("owner_org")
+            if not owner_org:
+                owner_org = dataset.get("owner_org")
 
-    user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
+        user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
-    if not user_is_admin and approval_status == "pending" and not ignore_approval_status:
-        return {"success": False,
-                "message": "User cannot update pending dataset"}
+        if not user_is_admin and approval_status == "pending" and not ignore_approval_status:
+            return {"success": False,
+                    "message": "User cannot update pending dataset"}
 
     return core_package_update(context, data_dict)
 

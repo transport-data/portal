@@ -350,6 +350,14 @@ snap-tabs {
   }
 }
 
+input.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedEnd {
+  font-size: 14px;
+}
+
+label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-sizeMedium.MuiInputLabel-outlined {
+  font-size: 14px;
+}
+
 .blur-on-left {
   gap: 20px;
   -webkit-mask: linear-gradient(90deg, white 80%, transparent);

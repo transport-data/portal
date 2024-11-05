@@ -9,6 +9,7 @@
     - [Delete default geographies](#delete-default-geographies)
     - [List default geographies](#list-default-geographies)
   - [List of default geographies](#list-of-default-geographies)
+  - [Edit geographies](#edit-geographies)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -313,3 +314,14 @@ The following geographies are created by default when `create-default-geographie
 | ton   | Tonga                                                | country        | 776      | oce           | TO   |
 | vut   | Vanuatu                                              | country        | 548      | oce           | VU   |
 | nfk   | Norfolk Island                                       | country        | 574      | oce           | NF   |
+
+
+## Edit geographies
+
+To edit any geography you must be signed in on the [DMS](https://ckan.tdc.dev.datopian.com/user/login) and access this URL with the iso3 of the geography that you want to edit https://ckan.tdc.dev.datopian.com/group/edit/`<iso3 of the geography>`
+
+e.g.: https://ckan.tdc.dev.datopian.com/group/edit/dza
+
+NOTE: Avoid changing the geography URL field, as this can cause unexpected behavior in applications.
+
+![URL field](https://private-user-images.githubusercontent.com/57202549/380808420-78e101d5-45c4-4f7d-ad7b-2993374b38b8.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzA3MzQ2MTksIm5iZiI6MTczMDczNDMxOSwicGF0aCI6Ii81NzIwMjU0OS8zODA4MDg0MjAtNzhlMTAxZDUtNDVjNC00ZjdkLWFkN2ItMjk5MzM3NGIzOGI4LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDExMDQlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQxMTA0VDE1MzE1OVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWIxZjlmNzdlNzBmODZlMTQ4MzVlYWVjZTAxMjQzZTRkOTExYjI3NDdkYWRiN2JlOWQxM2IxYjExZjZhMzMyMDAmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.NOnkMegHYDnZfm7nz29DZ1KdJCoD0Aq7YN-mVtsF-do)

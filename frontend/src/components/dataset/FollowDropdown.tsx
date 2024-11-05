@@ -47,17 +47,16 @@ export default function FollowDropdown({
       org: organization?.id ?? "",
     });
 
-  const { data: followingGeographies } =
-    api.user.isFollowingGeographies.useQuery(
-      Array.from(
-        new Set(
-          geographies?.flatMap((parent) => [
-            parent.id,
-            ...parent.children.map((child) => child.id),
-          ])
-        )
+  const { data: followedGroups } = api.user.isFollowingGeographies.useQuery(
+    Array.from(
+      new Set(
+        geographies?.flatMap((parent) => [
+          parent.id,
+          ...parent.children.map((child) => child.id),
+        ])
       )
-    );
+    )
+  );
 
   const followDataset = api.dataset.follow.useMutation({
     onSuccess: () => {
@@ -80,17 +79,14 @@ export default function FollowDropdown({
   const followingAny =
     followingDataset ||
     followingOrganization ||
-    followingGeographies?.some((item) => item.following === true);
+    (followedGroups && followedGroups?.length > 0);
 
-  const geographiesFollowingCount =
-    followingGeographies?.filter((item) => item.following === true).length ?? 0;
+  const geographiesFollowingCount = followedGroups ? followedGroups.length : 0;
 
   const followingCount =
     geographiesFollowingCount +
     (followingDataset ? 1 : 0) +
     (followingOrganization ? 1 : 0);
-
-  console.log(followingGeographies);
 
   return (
     <TooltipProvider delayDuration={100}>
@@ -113,7 +109,10 @@ export default function FollowDropdown({
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="follow-content w-56" align="end">
+        <DropdownMenuContent
+          className="follow-content max-h-[300px] w-56 overflow-auto"
+          align="end"
+        >
           <DropdownMenuCheckboxItem
             checked={followingDataset}
             onSelect={(event) => {
@@ -160,7 +159,7 @@ export default function FollowDropdown({
               <DropdownMenuSeparator />
               {geographies?.map((geo) => (
                 <DropdownGeoGroup
-                  followingGeographies={followingGeographies}
+                  followingGeographies={followedGroups}
                   key={geo.id}
                   group={geo}
                   onChange={followGeography.mutate}
@@ -183,9 +182,9 @@ const DropdownGeoGroup = ({
   group: GroupTree;
   onChange: Function;
 }) => {
-  const groupChecked =
-    followingGeographies?.find((g: any) => g.id === group.id)?.following ??
-    false;
+  const groupChecked = followingGeographies?.find((g: string) => g === group.id)
+    ? true
+    : false;
   return (
     <div>
       <DropdownMenuCheckboxItem
@@ -201,14 +200,16 @@ const DropdownGeoGroup = ({
           });
         }}
       >
-        <span className="font-semibold">{group.title}</span>
+        <span className="">{group.title}</span>
       </DropdownMenuCheckboxItem>
       {group.children.length > 0 && (
         <div>
           {group.children.map((child) => {
-            const childChecked =
-              followingGeographies?.find((g: any) => g.id === child.id)
-                ?.following ?? false;
+            const childChecked = followingGeographies?.find(
+              (g: string) => g === child.id
+            )
+              ? true
+              : false;
             return (
               <div key={child.id}>
                 <DropdownMenuCheckboxItem

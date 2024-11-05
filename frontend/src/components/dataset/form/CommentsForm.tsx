@@ -12,13 +12,13 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
-import {
-  CalendarIcon
-} from "@heroicons/react/20/solid";
+import { CalendarIcon } from "@heroicons/react/20/solid";
 import { cn } from "@lib/utils";
 import { DatasetFormType } from "@schema/dataset.schema";
 import { format } from "date-fns";
 import { useFieldArray, useFormContext } from "react-hook-form";
+import { DefaultTooltip } from "@components/ui/tooltip";
+import { Trash2 } from "lucide-react";
 
 export function CommentsForm({ disabled }: any) {
   const { control, register } = useFormContext<DatasetFormType>();
@@ -56,18 +56,32 @@ export function CommentsForm({ disabled }: any) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={control}
-              name={`comments.${index}.comment`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Comment" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
+            <div className="flex items-center justify-between gap-2">
+              <FormField
+                control={control}
+                name={`comments.${index}.comment`}
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Input placeholder="Comment" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DefaultTooltip content="Remove source">
+                <Button
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed", 'hidden md:flex')}
+                  onClick={() => remove(index)}
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </DefaultTooltip>
+            </div>{" "}
             <FormField
               control={control}
               name={`comments.${index}.date`}
@@ -108,6 +122,18 @@ export function CommentsForm({ disabled }: any) {
                 </FormItem>
               )}
             />
+              <DefaultTooltip content="Remove comment">
+                <Button
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed", 'md:hidden')}
+                  onClick={() => remove(index)}
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </DefaultTooltip>
           </div>
         </>
       ))}

@@ -4,6 +4,7 @@ import sys
 from urllib.parse import urljoin
 import os
 from dotenv import load_dotenv
+import time
 
 load_dotenv()              
 # CKAN Configuration
@@ -56,7 +57,8 @@ def create_resource_local_file(dataset_name,resource_name):
     headers = {
         'Authorization': API_KEY,
     }
-
+    if "/" in resource_name:
+        resource_name = resource_name.split("/")[1]
     # Set up the data and file to be sent in the request
     data = {
         'package_id': dataset_name,  # Dataset ID
@@ -64,7 +66,7 @@ def create_resource_local_file(dataset_name,resource_name):
         'format': 'csv',          # Optional: Format of the file
         'resource_type': 'data'
     }
-
+    
     # Read the file in binary mode
     with open(FILE_PATH, 'rb') as file:
         files = {
@@ -73,7 +75,7 @@ def create_resource_local_file(dataset_name,resource_name):
 
         # Send the POST request
         resp = requests.post(endpoint, headers=headers, data=data, files=files)
-
+    file.close()
     # Check response
     if resp.status_code == 200:
         print('Resource created successfully:', resp.json())
@@ -113,7 +115,7 @@ def create_resource_local_file_with_format(dataset_name,resource_name,resource_f
     if resp.status_code == 200:
         print('Resource created successfully:', resp.json())
     else:
-        print('Error creating resource:', resp.text)
+        print('Error creating resource:', resp.text())
 # Our World in Data - Road Travel
 def dataset_1(org_id, dataset_title, resource_name):
     '''
@@ -121,7 +123,6 @@ def dataset_1(org_id, dataset_title, resource_name):
     '''
     
     dataset_name = dataset_title.lower().replace(' ', '-')
-    print(dataset_name)
     data = {
         'title': dataset_title,  # Replace with your actual dataset title
         'name': dataset_name,    # Replace with your actual dataset name
@@ -169,7 +170,7 @@ def dataset_1(org_id, dataset_title, resource_name):
         headers=headers
     )
     
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code==409:
         print('Dataset created successfully:', response.json())
         create_resource_local_file(dataset_name, resource_name)
     else:
@@ -223,7 +224,7 @@ def dataset_2(org_id, dataset_title, resource_name):
         headers=headers
     )
     
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 409:
         print('Dataset created successfully:', response.json())
         create_resource_local_file(dataset_name, resource_name)
     else:
@@ -316,9 +317,11 @@ def dataset_4(org_id, dataset_title, resource_name):
             json=data,
             headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
         )
-        response.raise_for_status()  # Raises an error for HTTP errors
-        print('Dataset created successfully:', response.json())
-        create_resource_local_file(data['name'], resource_name)
+        if response.status_code == 200 or response.status_code == 409:
+            print('Dataset created successfully:', response.json())
+            create_resource_local_file(data['name'], resource_name)
+        else:
+            print('Error creating dataset:', response.text)
     except Exception as e:
         print('Error creating dataset:', str(e))
 # Our World in Data - Aviation
@@ -1972,7 +1975,9 @@ def dataset_46(org_id, dataset_title, resource_url):
         print(response.text)
         response.raise_for_status()  # Raises an error for HTTP errors
         print('Dataset created successfully:', response.json())
-        create_resource_remote_url(data['name'], resource_url)
+        filename = resource_url.split('/')[-1]  
+        resource_name = filename.split('.')[0] 
+        create_resource_remote_url(data['name'], resource_url,resource_name)
     except Exception as e:
         print('Error creating dataset:', str(e)) 
 def dataset_47(org_id, dataset_title, resource_url):
@@ -2013,7 +2018,9 @@ def dataset_47(org_id, dataset_title, resource_url):
         print(response.text)
         response.raise_for_status()  # Raises an error for HTTP errors
         print('Dataset created successfully:', response.json())
-        create_resource_remote_url(data['name'], resource_url)
+        filename = resource_url.split('/')[-1]  
+        resource_name = filename.split('.')[0] 
+        create_resource_remote_url(data['name'], resource_url,resource_name)
     except Exception as e:
         print('Error creating dataset:', str(e)) 
 def dataset_48(org_id, dataset_title):
@@ -2651,7 +2658,6 @@ def dataset_62(org_id, dataset_title, resource_name):
             json=data,
             headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
         )
-        response.raise_for_status()  # Raises an error for HTTP errors
         print('Dataset created successfully:', response.json())
         create_resource_local_file(data['name'], resource_name)
     except Exception as e:
@@ -2692,7 +2698,6 @@ def dataset_63(org_id, dataset_title, resource_name):
             json=data,
             headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
         )
-        response.raise_for_status()  # Raises an error for HTTP errors
         print('Dataset created successfully:', response.json())
         create_resource_local_file(data['name'], resource_name)
     except Exception as e:
@@ -12403,7 +12408,7 @@ def dataset_276(org_id, dataset_title):
         'geographies': ['arg','aus','bra','can','chl','chn','egy','fra','deu','ind','idn','ita','jpn','kor','mys','mex','per','phl','rus','zaf','tur','ukr','gbr','usa'],
         'tdc_category': 'public',
         'sources': [
-            {'title': 'iea (gfei)', 'url': 'https://www.iea.org/data-and-statistics/data-tools/global-fuel-economy-initiative-2021-data-explorer'}
+            {'title': 'Global Fuel Economy Initiative', 'url': 'https://www.globalfueleconomy.org/'}
         ],
         'language': 'en',
         'sectors': ['road'],
@@ -12411,8 +12416,8 @@ def dataset_276(org_id, dataset_title):
         'services': ['passenger','freight'],
         'frequency': 'as_needed',
         'indicators': 'Vehicle Sales',
-        'data_provider': 'iea (gfei)',
-        'url': 'https://www.iea.org/data-and-statistics/data-tools/global-fuel-economy-initiative-2021-data-explorer',
+        'data_provider': 'gfei',
+        'url': 'https://www.globalfueleconomy.org/',
         'data_access': 'publicly available',
         'units': ['#'],
         'dimensioning': 'powertrain, kerb weight, CO2 emission class'
@@ -12427,7 +12432,7 @@ def dataset_276(org_id, dataset_title):
         response.raise_for_status()  # Raises an error for HTTP errors
         print('Dataset created successfully:', response.json())
         data_dict = {
-            'Vehicle Sales': 'https://www.iea.org/data-and-statistics/data-tools/global-fuel-economy-initiative-2021-data-explorer'
+            'Vehicle Sales': 'https://zenodo.org/records/10148349'
         }
         for key, value in data_dict.items():
             resource_name = key
@@ -12449,7 +12454,7 @@ def dataset_277(org_id, dataset_title):
         'geographies': ['arg','aus','bra','can','chl','chn','egy','fra','deu','ind','idn','ita','jpn','kor','mys','mex','per','phl','rus','zaf','tur','ukr','gbr','usa'],
         'tdc_category': 'public',
         'sources': [
-            {'title': 'iea (gfei)', 'url': 'https://www.iea.org/data-and-statistics/data-tools/global-fuel-economy-initiative-2021-data-explorer'}
+            {'title': 'Global Fuel Economy Initiative', 'url': 'https://www.globalfueleconomy.org/'}
         ],
         'language': 'en',
         'sectors': ['road'],
@@ -12457,8 +12462,8 @@ def dataset_277(org_id, dataset_title):
         'services': ['passenger','freight'],
         'frequency': 'as_needed',
         'indicators': 'Fuel consumption',
-        'data_provider': 'iea (gfei)',
-        'url': 'https://www.iea.org/data-and-statistics/data-tools/global-fuel-economy-initiative-2021-data-explorer',
+        'data_provider': 'gfei',
+        'url': 'https://www.globalfueleconomy.org/',
         'data_access': 'publicly available',
         'units': ['lge/100km'],
         'dimensioning': 'passenger cars by vehicle type, by powertrain technology'
@@ -12473,7 +12478,7 @@ def dataset_277(org_id, dataset_title):
         response.raise_for_status()  # Raises an error for HTTP errors
         print('Dataset created successfully:', response.json())
         data_dict = {
-            'Fuel consumption': 'https://www.iea.org/data-and-statistics/data-tools/global-fuel-economy-initiative-2021-data-explorer'
+            'Fuel consumption': 'https://zenodo.org/records/10148349'
         }
         for key, value in data_dict.items():
             resource_name = key
@@ -13724,150 +13729,6221 @@ def dataset_304(org_id, dataset_title):
             create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
     except Exception as e:
         print('Error creating dataset:', str(e))
+def dataset_305(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'transport activity, emissions, air quality, road safety). All major mobility modes (e.g. aviation, bus rapid transit, cycling, rail, road transport, shipping, walking',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2021-01-01',
+        'temporal_coverage_end': '2023-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'Transport Knowledge Base', 'url': 'https://tcc-gsr.com/3rd-edition-transport-knowledge-base-trakb/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'transport activity',
+        'data_provider': 'SLOCAT',
+        'url': 'https://slocat.net/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Transport Knowledge Base': 'https://tcc-gsr.com/trakb_version_0-4/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+# SDG
+def dataset_306(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Death rate due to road traffic injuries',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2021-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Health Organization (WHO)', 'url': 'https://www.who.int/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Death rate due to road traffic injuries',
+        'data_provider': 'UN SDG Indicator Database',
+        'url': 'https://unstats.un.org/sdgs/dataportal/database',
+        'data_access': 'publicly available',
+        'units': ['rate per 100,000 population'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Indicator 3.6.1': 'https://unstats.un.org/sdgs/dataportal/database'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_307(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Death rate due to road traffic injuries',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2022-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'International Civil Aviation organisation (ICAO)', 'url': 'https://www.icao.int/Pages/default.aspx'},
+            {'title': 'United Nations Conference on Trade and Development (UNCTAD)', 'url': 'https://unctad.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight volume',
+        'data_provider': 'UN SDG Indicator Database',
+        'url': 'https://unstats.un.org/sdgs/dataportal/database',
+        'data_access': 'publicly available',
+        'units': ['tkm'],
+        'dimensioning': 'by mode of transport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Indicator 9.1.2': 'https://unstats.un.org/sdgs/dataportal/database'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_308(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Death rate due to road traffic injuries',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2022-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'International Civil Aviation organisation (ICAO)', 'url': 'https://www.icao.int/Pages/default.aspx'},
+            {'title': 'United Nations Conference on Trade and Development (UNCTAD)', 'url': 'https://unctad.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger volume',
+        'data_provider': 'UN SDG Indicator Database',
+        'url': 'https://unstats.un.org/sdgs/dataportal/database',
+        'data_access': 'publicly available',
+        'units': ['passenger kilometers'],
+        'dimensioning': 'by mode of transport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Indicator 9.1.2': 'https://unstats.un.org/sdgs/dataportal/database'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_309(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight loaded and uloaded',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'International Civil Aviation organisation (ICAO)', 'url': 'https://www.icao.int/Pages/default.aspx'},
+            {'title': 'United Nations Conference on Trade and Development (UNCTAD)', 'url': 'https://unctad.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight loaded and uloaded',
+        'data_provider': 'UN SDG Indicator Database',
+        'url': 'https://unstats.un.org/sdgs/dataportal/database',
+        'data_access': 'publicly available',
+        'units': ['metric tons'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Indicator 9.1.2': 'https://unstats.un.org/sdgs/dataportal/database'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_310(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight loaded and uloaded',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2012-01-01',
+        'temporal_coverage_end': '2023-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'UN-Habitat', 'url': 'https://unhabitat.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Proportion of population that has convenient access to public transport',
+        'data_provider': 'UN SDG Indicator Database',
+        'url': 'https://unstats.un.org/sdgs/dataportal/database',
+        'data_access': 'publicly available',
+        'units': ['Percentage'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Indicator 11.2.1': 'https://unstats.un.org/sdgs/dataportal/database'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+# IRF
+def dataset_311(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Road Network length - By Road types',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Road Network length',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['km'],
+        'dimensioning': 'By Road types'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Road Network length': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_312(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Road vehicle mileage - By vehicle types; by road types',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Road vehicle mileage',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['vkm/year'],
+        'dimensioning': 'By vehicle types; by road types'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Road vehicle mileage': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_313(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight ton-kilometer - Freight Transport by mode',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight ton-kilometer',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['tkm/year'],
+        'dimensioning': 'Freight Transport by mode'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Freight ton-kilometer': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_314(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passenger Person-kilometer - Passenger transport by mode & by road',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger Person-kilometer',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['pkm/year'],
+        'dimensioning': 'Passenger transport by mode & by road'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Passenger Person-kilometer': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_315(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle fleet - by vehicle type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle fleet',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['number'],
+        'dimensioning': 'by vehicle type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Vehicle fleet': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_316(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Fuel Prices - Diesel & super gas price',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Fuel Prices',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['USD/litre'],
+        'dimensioning': 'Diesel & super gas price'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Fuel Prices': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_317(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Energy consumption - by sector; gas & diesel oil consumption',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Energy consumption',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['tonnes of oil equivalent','tonnes'],
+        'dimensioning': 'by sector; gas & diesel oil consumption'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Energy consumption': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_318(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Road Accidents on roads - persons killed by road type, by road user, by sex, by vehicle type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Road Accidents on roads',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['#'],
+        'dimensioning': 'persons killed by road type, by road user, by sex, by vehicle type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Road Accidents on roads': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_319(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Number of vehicles produced - by new&used imports, by vehicle type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Number of vehicles produced',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['#'],
+        'dimensioning': 'by new&used imports, by vehicle type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Number of vehicles produced': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_320(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle Fleet - by new&used imports, by vehicle type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle Fleet',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['#'],
+        'dimensioning': 'by new&used imports, by vehicle type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Vehicle Fleet': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_321(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Number of vehicles exported - by new&used imports, by vehicle type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Number of vehicles exported',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['#'],
+        'dimensioning': 'by new&used imports, by vehicle type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Number of vehicles exported': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_322(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Road expenditures and revenues - by source, by type of spend',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Road expenditures and revenues',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['USD'],
+        'dimensioning': 'by source, by type of spend'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Road expenditures and revenues': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_323(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'CO2 emissions transport sector - inland transport CO2 emissions by mode (road, rail, waterways)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2015-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['worldwide'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRF', 'url': 'https://www.irf.global/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'CO2 emissions transport sector',
+        'data_provider': 'IRF',
+        'url': 'https://www.irf.global/',
+        'data_access': 'publicly available',
+        'units': ['tonnes/year'],
+        'dimensioning': 'inland transport CO2 emissions by mode (road, rail, waterways)'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'CO2 emissions transport sector': 'https://worldroadstatistics.org/get-data/'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+# ATO
+def dataset_324(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passengers Kilometer Travel - Railways',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passengers Kilometer Travel - Railways',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': ['pkm'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_325(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km for Railways',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km for Railways',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': ['Tonne-km'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_326(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Efficiency of Train Services',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Efficiency of Train Services',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_327(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Land Transport Passenger Kilometers Travel',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail','road'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Land Transport Passenger Kilometers Travel',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_328(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Land Transport Freight Kilometers Travel',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail','road'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Land Transport Freight Kilometers Travel',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_329(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passengers Kilometer Travel - HSR',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Passengers Kilometer Travel - HSR',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_330(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passengers Kilometer Travel - Domestic Aviation',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passengers Kilometer Travel - Domestic Aviation',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_331(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Air transport, carrier departures',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Air transport, carrier departures',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_332(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Aviation International Passenger Kilometers',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['international-aviation'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Aviation International Passenger Kilometers',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_333(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Aviation Trips per capita',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['international-aviation'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Aviation Trips per capita',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_334(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Aviation Trips per capita -2030 Forecast (BAU)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['international-aviation'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Aviation Trips per capita -2030 Forecast (BAU)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_335(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Aviation Total Passenger Kilometers',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['international-aviation'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Aviation Total Passenger Kilometers',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_336(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km for Aviation (Domestic)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km for Aviation (Domestic)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_337(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km for Aviation (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation','international-aviation'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km for Aviation (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_338(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Efficiency of air transport services',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation','international-aviation'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Efficiency of air transport services',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_339(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passengers Kilometer Travel - Bus',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passengers Kilometer Travel - Bus',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_340(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passengers Kilometer Travel - Roads',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['cycling','two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passengers Kilometer Travel - Roads',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_341(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Motorised Two Wheeler Sales',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Motorised Two Wheeler Sales',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_342(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Motorised Three Wheeler Sales',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Motorised Three Wheeler Sales',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_343(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'LDV Sales',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['cars'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'LDV Sales',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_344(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Vehicle sales (motorised)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Vehicle sales (motorised)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_345(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Commercial Vehicle Sales (motorised)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Commercial Vehicle Sales (motorised)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_346(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle registration (Motorised 2W)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle registration (Motorised 2W)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_347(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle registration (Motorised 3W)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle registration (Motorised 3W)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_348(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle registration (LDV)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['cars'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle registration (LDV)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_349(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle registration (Bus)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle registration (Bus)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_350(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Vehicle registration (Others)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Vehicle registration (Others)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_351(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Vehicle registration',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Vehicle registration',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_352(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Vehicle Registration',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Vehicle Registration',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_353(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Motorisation Index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Motorisation Index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_354(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'LDV Motorisation Index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['cars'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'LDV Motorisation Index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_355(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Two and Three Wheelers Motorisation Index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Two and Three Wheelers Motorisation Index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_356(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Bus Motorisation Index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['bus'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Bus Motorisation Index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_357(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Vehicles Motorisation Index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Vehicles Motorisation Index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_358(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km for Roads',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km for Roads',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_359(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Passengers Kilometer Travel - Waterways/shipping',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passengers Kilometer Travel - Waterways/shipping',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_360(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km for Waterways/shipping (Domestic)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km for Waterways/shipping (Domestic)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': ['Tonne-km'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_361(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km for Waterways/shipping (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km for Waterways/shipping (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': ['Tonne-km'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_362(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Port call and performance statistics',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Port call and performance statistics',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_363(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Container port traffic (TEU)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Container port traffic (TEU)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_364(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Merchant fleet by country of beneficial ownership, annual',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Merchant fleet by country of beneficial ownership, annual',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_365(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Efficiency of seaport services',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Efficiency of seaport services',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_366(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Passenger Kilometer Travel (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Passenger Kilometer Travel (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_367(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Passenger Kilometer Travel/Capita (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Passenger Kilometer Travel/Capita (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_368(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Passenger Kilometer Travel/GDP (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Passenger Kilometer Travel/GDP (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_369(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Passenger Kilometer Travel Mode Share (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Passenger Kilometer Travel Mode Share (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_370(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight Transport - Tonne-km (Total) (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport - Tonne-km (Total) (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_371(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight tonne-km/GDP (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight tonne-km/GDP (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_372(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Freight tonne-km/capita (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight tonne-km/capita (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_373(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Total Freight Kilometer Travel Mode Share (Domestic+International)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Total Freight Kilometer Travel Mode Share (Domestic+International)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_374(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Internet shoppers as a share of Population',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Internet shoppers as a share of Population',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_375(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Internet shoppers as a share of Population (Female)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Internet shoppers as a share of Population (Female)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_376(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'UNCTAD B2C E-commerce index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'UNCTAD B2C E-commerce index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_377(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Logistics Performance Index',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Logistics Performance Index',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_378(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Domestic LPI',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Domestic LPI',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_379(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Percent Of Firms Identifying Transportation As A Major Constraint - Services',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Percent Of Firms Identifying Transportation As A Major Constraint - Services',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_380(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&',''),
+        'notes': 'Percent of firms choosing transportation as their biggest obstacle - Manufacturing',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Percent of firms choosing transportation as their biggest obstacle - Manufacturing',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_381(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Transport services (% of service imports, BoP)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Transport services (% of service imports, BoP)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_382(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Transport services (% of service exports, BoP)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Transport services (% of service exports, BoP)',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_383(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Import of Transport Services',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Import of Transport Services',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_384(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Export of Transport Services',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2018-01-01',
+        'temporal_coverage_end': '2018-01-01',
+        'geographies': ['afg', 'arm', 'aus', 'aze', 'bgd', 'btn', 'brn', 'khm', 'chn', 'cxr', 'cck', 'cok', 'fji', 'geo', 'hkg', 'ind', 'idn', 'irn', 'irq', 'isr', 'jpn', 'kaz', 'kir', 'prk', 'kor', 'kgz', 'lao', 'lbn', 'mac', 'mys', 'mdv', 'mhl', 'mmr', 'npl', 'nru', 'nzl', 'pak', 'plw', 'png', 'phl', 'wsm', 'sgp', 'slb', 'lka', 'syr', 'tjk', 'tha', 'tls', 'ton', 'tkm', 'tuv', 'uzb', 'vut', 'vnm', 'yem'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ATO', 'url': 'https://asiantransportoutlook.com/snd/'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Export of Transport Services',
+        'data_provider': 'Asian Transport Outlook',
+        'url': 'https://asiantransportoutlook.com/snd/',
+        'data_access': 'publicly available',
+        'units': [''],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'Infrastructure (INF)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(INFRASTRUCTURE%20(INF)).xlsx',
+            'Transport Activity & Services (TAS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(TRANSPORT%20ACTIVITY%20%26%20SERVICES%20(TAS)).xlsx',
+            'Access & Connectivity (ACC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ACCESS%20%26%20CONNECTIVITY%20(ACC)).xlsx',
+            'Road Safety (RSA)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(ROAD%20SAFETY%20(RSA)).xlsx',
+            'Air Pollution & Health (APH)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(AIR%20POLLUTION%20%26%20HEALTH%20(APH)).xlsx',
+            'Climate Change (CLC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(CLIMATE%20CHANGE%20(CLC)).xlsx',
+            'Socio-Economic (SEC)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Transport Policy (POL)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(SOCIO-ECONOMIC%20(SEC)).xlsx',
+            'Miscellaneous (MIS)': 'https://asiantransportoutlook.com/exportdl/?orig=1&filename=ATO%20Workbook%20(MISCELLANEOUS%20(MIS)).xlsx'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='xlsx'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+#ITF-OECD
+def dataset_385(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Transport Infrastructure Expenditures (capital value, investment, maintenance)',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1995-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['eur'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF questionnaire', 'url': 'https://www.itf-oecd.org/itf-statistics-questionnaires'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Transport Infrastructure Expenditures (capital value, investment, maintenance)',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['Currency'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_386(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'infrastructure investment',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'infrastructure investment',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['per GDP or in constant USD per inhabitant'],
+        'dimensioning': 'infrastructure investment'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_387(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Freight Transport activity share - Share of transport mode in total inland freight transport',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight Transport activity share',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of transport mode in total inland freight transport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_388(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Passenger Transport activity share - Share of rail passenger transport in total inland passenger transport',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger Transport activity share',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of rail passenger transport in total inland passenger transport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_389(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Transport household expenditure - Share of household expenditure mode in total household expenditure for transport',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Transport household expenditure',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of household expenditure mode in total household expenditure for transport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_390(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Transport GHG emissions - Transport GHG emissions',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IEA', 'url': 'https://www.iea.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Transport GHG emissions',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['tonnes/ 1mio. Units of current USD GDP','tonnes/inhabitant'],
+        'dimensioning': 'Transport GHG emissions'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_391(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Share of CO2 emissions from road/domestic aviation/rail in total CO2 emission - Share of CO2 emissions from road/domestic aviation/rail in total CO2 emission',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IEA', 'url': 'https://www.iea.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Share of CO2 emissions from road/domestic aviation/rail in total CO2 emission',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of CO2 emissions from road/domestic aviation/rail in total CO2 emission'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_392(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Share of CO2 emissions from transport in total CO2 emissions - Share of CO2 emissions from transport in total CO2 emissions',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IEA', 'url': 'https://www.iea.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Share of CO2 emissions from transport in total CO2 emissions',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of CO2 emissions from transport in total CO2 emissions'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_393(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Modal Split - Share of trips by mode; Trips by mode',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['ind'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Modal Split',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['Percentage','Number'],
+        'dimensioning': 'Share of trips by mode; Trips by mode'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_394(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Passenger transport activiity - Transport activities by mode',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['ind'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger transport activiity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['PKM'],
+        'dimensioning': 'Transport activities by mode'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_395(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Freight transport activity',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight transport activity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['TKM'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_396(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Fuel consumption',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Fuel consumption',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['litres'],
+        'dimensioning': 'Fuel consumption'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_397(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'CO2 emission transport',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'CO2 emission transport',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['tonnes'],
+        'dimensioning': 'Emissions'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_398(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Public transport access',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Public transport access',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['VKM by bus/inhabitant'],
+        'dimensioning': 'Public transport access'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_399(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Air pollutants emissions - Sulphur Oxides, Nitrogen Oxides, PM10, PM2.5, Carbon Monoxide, Non-methane volatile organic compounds',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1990-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'UNECE-EMEP emissions database', 'url': 'https://aarhusclearinghouse.unece.org/resources/uneceemep-activity-data-and-emission-database'}
+        ],
+        'language': 'en',
+        'sectors': ['all'],
+        'modes': ['all'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Air pollutants emissions',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['tonnes'],
+        'dimensioning': 'Sulphur Oxides, Nitrogen Oxides, PM10, PM2.5, Carbon Monoxide, Non-methane volatile organic compounds'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_400(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Freight transport activity',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1970-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['eur'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF transport statistics based on transport ministries, statistical offices', 'url': 'https://www.itf-oecd.org/transport-data-and-statistics'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight transport activity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['TKM','EU (twenty foot equivalent unit)','TKM per 1000 units of current USD GDP'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_401(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Road injuries/ casualties - Road injury crashes, road casualties',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1970-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'Survey Trends in the Transport Sector', 'url': 'https://www.oecd-ilibrary.org/transport/trends-in-the-transport-sector_19991223'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Road injuries/ casualties',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['number'],
+        'dimensioning': 'Road injury crashes, road casualties'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_402(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'New vehicle registration - first registrations of brand new road vehicles',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1975-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'New vehicle registration',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['#/1000 inhabitants','#/1 Mio. units of current USD GDP'],
+        'dimensioning': 'first registrations of brand new road vehicles'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_403(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Inland total, by passenger cars and buses&coaches',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1970-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['eur'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'Survey Trends in the Transport Sector', 'url': 'https://www.oecd-ilibrary.org/transport/trends-in-the-transport-sector_19991223'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger Transport activity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['PKM'],
+        'dimensioning': 'Inland total, by passenger cars and buses&coaches'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_404(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'vehicle fleet - passenger cars, road motor vehicles, motorcycles, goods road motor vehicles, ',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1995-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'vehicle fleet',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['#/1000 inhabitants','#/1 Mio. units of current USD GDP'],
+        'dimensioning': 'passenger cars, road motor vehicles, motorcycles, goods road motor vehicles'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_405(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Density of road - Density of road and rail lines',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'UIC', 'url': 'https://uic.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Density of road',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['km / 100 sq. Km'],
+        'dimensioning': 'Density of road and rail lines'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_406(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Share of motorways/urban roads in total road network',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'IRTAD database (ITF)', 'url': 'https://www.itf-oecd.org/irtad-road-safety-database#:~:text=The%20IRTAD%20database%20contains%20validated,country%20and%20year%20from%201970.'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Share of motorways/urban roads in total road network',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of motorways/urban roads in total road network'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_407(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Mileage',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Mileage',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['VKM / 1000 units of current USD GDP','1000 VKM / road motor vehicle'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_408(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Fuel demand - Motor fuel deliveries',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Fuel demand',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['tonnes per 1mio. Units of currents USD GDP/ inhabitant/ road motor vehicle'],
+        'dimensioning': 'Motor fuel deliveries'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_409(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'vehicle fleet  - Vehicles by type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'vehicle fleet',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['#'],
+        'dimensioning': 'Vehicles by type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_410(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'length of road infrastructure  - length of road network/footpaths/bike lanes',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'length of road infrastructure',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['KM'],
+        'dimensioning': 'length of road network/footpaths/bike lanes'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_411(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Road density',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Road density',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['KM'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_412(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Passenger vehicle load Factor - Load Factor by vehicle type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger vehicle load Factor',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['persons'],
+        'dimensioning': 'Load Factor by vehicle type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_413(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Number of passenger trips',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Number of passenger trips',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['number','KM'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_414(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Average trip length',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Average trip length',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['KM'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_415(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'vehicle fleet - Vehicle and fuel type',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2010-01-01',
+        'temporal_coverage_end': '2050-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'ITF', 'url': 'https://www.itf-oecd.org/'},
+            {'title': 'The Energy Resources Institue (TERI)', 'url': 'https://www.teriin.org/'},
+            {'title': 'Indian Urban Mobility Database (IUMD) ', 'url': 'https://www.urbanmobilityindia.in/Symposium/GeneralInfo.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['road'],
+        'modes': ['two-three-wheelers','cars','private-cars','taxis','truck','bus'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'vehicle fleet',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['number'],
+        'dimensioning': 'Vehicle and fuel type'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_416(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Freight transport activity',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1970-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['eur'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF transport statistics based on transport ministries, statistical offices', 'url': 'https://www.itf-oecd.org/transport-data-and-statistics'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['heavy-rail','high-speed-rail','transit-rail'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight transport activity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['TKM','TEU (twenty foot equivalent unit)','TKM per 1000 units of current USD GDP'],
+        'dimensioning': ''
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_417(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Passenger Transport activity - Inland passenger transport by Rail',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1970-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['eur'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'Survey Trends in the Transport Sector', 'url': 'https://www.oecd-ilibrary.org/transport/trends-in-the-transport-sector_19991223'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['heavy-rail','high-speed-rail','transit-rail'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Passenger Transport activity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['PKM'],
+        'dimensioning': 'Inland passenger transport by Rail'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_418(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'loading capacity - Rail freight loading capacity',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1995-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'UIC', 'url': 'https://uic.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['heavy-rail','high-speed-rail','transit-rail'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'loading capacity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['#/1000 inhabitants','#/1 Mio. units of current USD GDP'],
+        'dimensioning': 'Rail freight loading capacity'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_419(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Density rail lines - Density of road and rail lines',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'UIC', 'url': 'https://uic.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['heavy-rail','high-speed-rail','transit-rail'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Density rail lines',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['km / 100 sq. Km'],
+        'dimensioning': 'Density of road and rail lines'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_420(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Share of electrified/high-speed rail ines in total rail network',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'UIC', 'url': 'https://uic.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['rail'],
+        'modes': ['heavy-rail','high-speed-rail','transit-rail'],
+        'services': ['passenger'],
+        'frequency': 'as_needed',
+        'indicators': 'Share of electrified/high-speed rail ines in total rail network',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'Share of electrified/high-speed rail ines in total rail network'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_421(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Freight transport activity - tkm for Coastal Shipping Containers transport, inland waterways freight transport',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1970-01-01',
+        'temporal_coverage_end': '2021-01-01',
+        'geographies': ['eur'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ITF transport statistics based on transport ministries, statistical offices', 'url': 'https://www.itf-oecd.org/transport-data-and-statistics'}
+        ],
+        'language': 'en',
+        'sectors': ['water'],
+        'modes': ['coastal-shipping','inland-shipping','international-maritime'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Freight transport activity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['TKM','TEU (twenty foot equivalent unit)','TKM per 1000 units of current USD GDP'],
+        'dimensioning': 'tkm for Coastal Shipping Containers transport, inland waterways freight transport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_422(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'seat capacity - Available seat capacity for scheduled flight',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1995-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'UIC', 'url': 'https://uic.org/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation','international-aviation'],
+        'services': ['freight'],
+        'frequency': 'as_needed',
+        'indicators': 'seat capacity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['#/1000 inhabitants','#/1 Mio. units of current USD GDP','seats-km / 1000 units of current USD GDP'],
+        'dimensioning': 'Available seat capacity for scheduled flight'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_423(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Share of set capacity - share of international seats-km in total seats-km',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '1995-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'ICAO', 'url': 'https://www.icao.int/Pages/default.aspx'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation','international-aviation'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Share of set capacity',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['%'],
+        'dimensioning': 'share of international seats-km in total seats-km'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
+def dataset_424(org_id, dataset_title):
+    
+    data = {
+        'title': dataset_title,
+        'name': dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','').replace('&','').replace('%',''),
+        'notes': 'Airport density',
+        'license_id': 'CC-BY-4.0',
+        'owner_org': org_id,
+        'temporal_coverage_start': '2000-01-01',
+        'temporal_coverage_end': '2020-01-01',
+        'geographies': ['aus', 'aut', 'bel', 'can', 'chl', 'col', 'cze', 'dnk', 'est', 'fin', 'fra', 'deu', 'grc', 'hun', 'isl', 'irl', 'isr', 'ita', 'jpn', 'kor', 'lva', 'ltu', 'lux', 'mex', 'nld', 'nzl', 'nor', 'pol', 'prt', 'svk', 'svn', 'esp', 'swe', 'che', 'tur', 'gbr', 'usa'],
+        'tdc_category': 'public',
+        'sources': [
+            {'title': 'World Bank', 'url': 'https://data.worldbank.org/'},
+            {'title': 'Flightglobal', 'url': 'https://www.flightglobal.com/'}
+        ],
+        'language': 'en',
+        'sectors': ['aviation'],
+        'modes': ['domestic-aviation','international-aviation'],
+        'services': ['passenger','freight'],
+        'frequency': 'as_needed',
+        'indicators': 'Airport density',
+        'data_provider': 'ITF-OECD',
+        'url': 'https://stats.oecd.org/index.aspx?lang=en',
+        'data_access': 'publicly available',
+        'units': ['# / 1 Mio. inhabitants','# / 100.000 sq. KM'],
+        'dimensioning': 'Airport'
+    }
+
+    try:
+        response = requests.post(
+            urljoin(CKAN_URL, '/api/3/action/package_create'),
+            json=data,
+            headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
+        )
+        response.raise_for_status()  # Raises an error for HTTP errors
+        print('Dataset created successfully:', response.json())
+        data_dict = {
+            'OECD.Stat': 'https://stats.oecd.org/index.aspx?lang=en'
+        }
+        for key, value in data_dict.items():
+            resource_name = key
+            resource = value
+            resource_format='webpage'
+            create_resource_remote_url_with_format(data['name'], resource, resource_name, resource_format)
+    except Exception as e:
+        print('Error creating dataset:', str(e))
 if __name__ == '__main__':
-    #dataset_1('transport-data-commons', 'New passenger vehicle registrations by type Norway', 'Our World in Data/new-vehicles-type-area.csv')
-    #dataset_2('transport-data-commons', 'Share of new passenger vehicles that are battery electric 2019', 'Our World in Data/share-vehicle-electric.csv')
-    #dataset_3('transport-data-commons', 'Average carbon intensity of new passenger vehicles 2019', 'Our World in Data/carbon-new-passenger-vehicles.csv')
-    #dataset_4('transport-data-commons', 'Fuel economy of new passenger vehicles 2019', 'Our World in Data/fuel-efficiency-new-vehicles.csv')
-    #dataset_5('transport-data-commons', 'Global airline passenger capacity and traffic', 'Our World in Data/airline-capacity-and-traffic.csv')
-    #dataset_6('transport-data-commons', 'Share of airline seats filled by passengers', 'Our World in Data/airline-passenger-load-factor.csv')
-    #dataset_7('transport-data-commons', 'Per capita CO₂ emissions from domestic aviation 2018', 'Our World in Data/per-capita-co2-domestic-aviation.csv')
-    #dataset_8('transport-data-commons', 'CO₂ emissions from domestic air travel 2018', 'Our World in Data/co2-emissions-domestic-aviation.csv')
-    #dataset_9('transport-data-commons', 'Share of global CO₂ emissions from domestic air travel 2018', 'Our World in Data/share-global-co2-domestic-aviation.csv')
-    #dataset_10('transport-data-commons', 'Per capita CO₂ emissions from international aviation 2018', 'Our World in Data/per-capita-co2-international-aviation.csv')
-    #dataset_11('transport-data-commons', 'CO₂ emissions from international aviation 2018', 'Our World in Data/co2-international-aviation.csv')
-    #dataset_12('transport-data-commons', 'Share of global CO₂ emissions from international aviation, 2018', 'Our World in Data/share-co2-international-aviation.csv')
-    #dataset_13('transport-data-commons', 'Per capita CO₂ emissions from international passenger flights, tourism-adjusted, 2018', 'Our World in Data/per-capita-co2-international-flights-adjusted.csv')
-    #dataset_14('transport-data-commons', 'Per capita CO₂ emissions from commercial aviation, tourism-adjusted, 2018', 'Our World in Data/per-capita-co2-aviation-adjusted.csv')
-    #dataset_15('transport-data-commons', 'Per capita CO₂ emissions from aviation, 2018', 'Our World in Data/per-capita-co2-aviation.csv')
-    #dataset_16('transport-data-commons', 'CO₂ emissions from aviation, 2018', 'Our World in Data/co2-emissions-aviation.csv')
-    #dataset_17('transport-data-commons', 'Share of global CO₂ emissions from aviation, 2018', 'Our World in Data/share-co2-emissions-aviation.csv')
-    #dataset_18('transport-data-commons', 'Per capita domestic aviation passenger kilometers, 2018', 'Our World in Data/per-capita-domestic-aviation-km.csv')
-    #dataset_19('transport-data-commons', 'Share of global domestic aviation passenger kilometers, 2018', 'Our World in Data/share-global-domestic-aviation-km.csv')
-    #dataset_20('transport-data-commons', 'Total domestic aviation passenger kilometers, 2018', 'Our World in Data/total-domestic-aviation-km.csv')
-    #dataset_21('transport-data-commons', 'Per capita international aviation passenger kilometers, 2018', 'Our World in Data/per-capita-international-aviation-km.csv')
-    #dataset_22('transport-data-commons', 'Share of global passenger kilometers from international aviation, 2018', 'Our World in Data/share-international-aviation-km.csv')
-    #dataset_23('transport-data-commons', 'Total passenger kilometers from international aviation, 2018', 'Our World in Data/passenger-km-international-aviation.csv')
-    #dataset_24('transport-data-commons', 'Per capita passenger kilometers from air travel, 2018', 'Our World in Data/per-capita-km-aviation.csv')
-    #dataset_25('transport-data-commons', 'Share of global passenger kilometers from air travel, 2018', 'Our World in Data/share-km-aviation.csv')
-    #dataset_26('transport-data-commons', 'Total passenger kilometers from air travel, 2018', 'Our World in Data/total-aviation-km.csv')
-    #dataset_27('transport-data-commons', 'Tonne-kilometers of air freight, 2021', 'Our World in Data/air-transport-freight-ton-km.csv')
-    #dataset_28('transport-data-commons', 'Passenger-kilometers by rail, 2021', 'Our World in Data/railways-passengers-carried-passenger-km.csv')
-    #dataset_29('transport-data-commons', 'Energy intensity of transport per passenger-kilometer, 2018', 'Our World in Data/energy-intensity-transport.csv')
-    #dataset_30('transport-data-commons', 'Per capita CO₂ emissions from transport, 2020', 'Our World in Data/per-capita-co2-transport.csv')
-    #dataset_31('transport-data-commons', 'CO₂ emissions from transport, 2020', 'Our World in Data/co2-emissions-transport.csv')
-    #dataset_32('transport-data-commons', 'Domestic aviation country emissions', 'Climatetrace/domestic-aviation_country_emissions.csv')
-    #dataset_33('transport-data-commons', 'International aviation country emissions', 'Climatetrace/international-aviation_country_emissions.csv')
-    #dataset_34('transport-data-commons', 'Other transport country emissions', 'Climatetrace/other-transport_country_emissions.csv')
-    #dataset_35('transport-data-commons', 'Railways country emissions', 'Climatetrace/railways_country_emissions.csv')
-    #dataset_36('transport-data-commons', 'Road transportation country emissions', 'Climatetrace/road-transportation_country_emissions.csv')
-    #dataset_37('transport-data-commons', 'Domestic shipping country emissions', 'Climatetrace/domestic-shipping_country_emissions.csv')
-    #dataset_38('transport-data-commons', 'International shipping country emissions', 'Climatetrace/international-shipping_country_emissions.csv')
-    #dataset_39('transport-data-commons', 'Air transport, registered carrier departures worldwide', 'World Bank/API_IS_AIR_DPRT_DS2_en_csv_v2_3415031.csv')
-    #dataset_40('transport-data-commons', 'Air transport, freight (million ton-km)', 'World Bank/API_IS_AIR_GOOD_MT_K1_DS2_en_csv_v2_3401747.csv')
-    #dataset_41('transport-data-commons', 'Air transport, passengers carried', 'World Bank/API_IS_AIR_PSGR_DS2_en_csv_v2_3401550.csv')
-    #dataset_42('transport-data-commons', 'Rail lines (total route-km)', 'World Bank/API_IS_RRS_TOTL_KM_DS2_en_csv_v2_3434344.csv')
-    #dataset_43('transport-data-commons', 'Railways, goods transported (million ton-km)', 'World Bank/API_IS_RRS_GOOD_MT_K6_DS2_en_csv_v2_3434337.csv')
-    #dataset_44('transport-data-commons', 'Railways, passengers carried (million passenger-km)', 'World Bank/API_IS_RRS_PASG_KM_DS2_en_csv_v2_3434340.csv')
-    #dataset_45('transport-data-commons', 'Container port traffic (TEU: 20 foot equivalent units)', 'World Bank/API_IS_SHP_GOOD_TU_DS2_en_csv_v2_3434242.csv')
-    #dataset_46('transport-data-commons', 'Global Sales Statistics 2019-2023', 'https://www.oica.net/wp-content/uploads/total_sales_2023.xlsx')
-    #dataset_47('transport-data-commons', 'Motorization rate 2020 - WORLDWIDE', 'https://www.oica.net/wp-content/uploads/Total-World-vehicles-in-use-2020.xlsx')
-    #dataset_48('transport-data-commons', '2023 production statistics')
-    #dataset_49('transport-data-commons', 'VEHICLES IN USE EUROPE 2022', 'https://www.acea.auto/files/ACEA-report-vehicles-in-use-europe-2022.pdf')
-    #dataset_50('transport-data-commons', 'NEW CAR REGISTRATIONS, EUROPEAN UNION IN JULY 2024', 'https://www.acea.auto/files/Press_release_car_registrations_July_2024.pdf')
-    #dataset_51('transport-data-commons', 'NEW COMMERCIAL VEHICLE REGISTRATIONS, EUROPEAN UNION H1 2024', 'https://www.acea.auto/files/Press_release_commercial_vehicle_registrations_H1-2024.pdf')
-    #dataset_52('transport-data-commons', 'NEW CAR REGISTRATIONS BY FUEL TYPE, EUROPEAN UNION IN Q4 2022', 'https://www.acea.auto/files/20230201_PRPC-fuel_Q4-2022_FINAL-1.pdf')
-    #dataset_53('transport-data-commons', 'NEW BUS, TRUCK AND VAN REGISTRATIONS BY FUEL TYPE, EUROPEAN UNION 2022')
-    #dataset_54('transport-data-commons', 'CO2 emissions from car production in the EU', 'https://www.acea.auto/figure/co2-emissions-from-car-production-in-eu')
-    #dataset_55('transport-data-commons', 'Energy consumption during car production in the EU', 'https://www.acea.auto/figure/energy-consumption-during-car-production-in-eu')
-    #dataset_56('transport-data-commons', 'Water used in car production in the EU', 'https://www.acea.auto/figure/water-used-in-car-production-in-eu')
-    #dataset_57('transport-data-commons', 'Waste from car production in the EU', 'https://www.acea.auto/figure/waste-from-car-production-in-eu')
-    #dataset_58('transport-data-commons', 'Transport Starter Data Kit - PKM', 'https://zenodo.org/records/10406893/files/TSDK_ALL.xlsx')
-    #dataset_59('transport-data-commons', 'Transport Starter Data Kit - TKM', 'https://zenodo.org/records/10406893/files/TSDK_ALL.xlsx')
-    #dataset_60('transport-data-commons', 'Transport Starter Data Kit - Quantity', 'https://zenodo.org/records/10406893/files/TSDK_ALL.xlsx')
-    #dataset_61('transport-data-commons', 'Rail accidents by type of accident', 'EUROSTAT/tran_sf_railac_linear.csv')
-    #dataset_62('transport-data-commons', 'Rail accidents victims by type of accident and category of persons involved', 'EUROSTAT/tran_sf_railvi_linear.csv')
-    #dataset_63('transport-data-commons', 'Rail accidents involving the transport of dangerous goods', 'EUROSTAT/tran_sf_raildg_linear.csv')
-    #dataset_64('transport-data-commons', 'Suicides involving railways', 'EUROSTAT/tran_sf_railsu_linear.csv')
-    #dataset_65('transport-data-commons', 'Length of railway tracks by electrification of tracks', 'EUROSTAT/rail_if_tracks_linear.csv' )
-    #dataset_66('transport-data-commons', 'Length of railway lines by number of tracks and electrification of lines', 'EUROSTAT/rail_if_line_tr_linear.csv')
-    #dataset_67('transport-data-commons', 'Length of electrified and non-electrified railway lines by track gauge', 'EUROSTAT/rail_if_line_ga_linear.csv')
-    #dataset_68('transport-data-commons', 'Length of electric and non-electric railway lines by nature of transport', 'EUROSTAT/rail_if_line_na_linear.csv')
-    #dataset_69('transport-data-commons', 'Length of electrified railway lines by type of current', 'EUROSTAT/rail_if_electri_linear.csv')
-    #dataset_70('transport-data-commons', 'Length of railway lines by maximum permitted speed', 'EUROSTAT/rail_if_line_sp_linear.csv')
-    #dataset_71('transport-data-commons', 'Length of railway lines equipped with the railway traffic management system by type of signalling', 'EUROSTAT/rail_if_traff_linear.csv')
-    #dataset_72('transport-data-commons', 'Level crossings by type', 'EUROSTAT/rail_if_lvlcros_linear.csv')
-    #dataset_73('transport-data-commons', 'Passengers transported', 'EUROSTAT/rail_pa_total_linear.csv')
-    #dataset_74('transport-data-commons', 'International transport of passengers from the reporting country to the country of disembarkation', 'EUROSTAT/rail_pa_intgong_linear.csv')
-    #dataset_75('transport-data-commons', 'International transport of passengers from the country of embarkation to the reporting country', 'EUROSTAT/rail_pa_intcmng_linear.csv')
-    #dataset_76('transport-data-commons', 'Passenger transport by type of transport (detailed reporting only)', 'EUROSTAT/rail_pa_typepas_linear.csv')
-    #dataset_77('transport-data-commons', 'Passengers transported by type of train speed', 'EUROSTAT/rail_pa_speed_linear.csv')
-    #dataset_78('transport-data-commons', 'Goods transported', 'EUROSTAT/rail_go_total_linear.csv')
-    #dataset_79('transport-data-commons', 'International transport of goods from the loading country to the reporting country', 'EUROSTAT/rail_go_intcmgn_linear.csv')
-    #dataset_80('transport-data-commons', 'International transport of goods from the reporting country to the unloading country', 'EUROSTAT/rail_go_intgong_linear.csv')
-    #dataset_81('transport-data-commons', 'Locomotives and railcars by source of energy', 'EUROSTAT/rail_eq_locon_linear.csv')
-    #dataset_82('transport-data-commons', 'Tractive power of locomotives and railcars by source of energy', 'EUROSTAT/rail_eq_locop_linear.csv')
-    #dataset_83('transport-data-commons', 'Passenger railway vehicles, by type of vehicle', 'EUROSTAT/rail_eq_pa_nty_linear.csv')
-    #dataset_84('transport-data-commons', 'Passenger railway vehicles by category of vehicle (until 2012)', 'EUROSTAT/rail_eq_pa_nca_linear.csv')
-    #dataset_85('transport-data-commons', 'Seat capacity of passenger railway vehicles by type of vehicles', 'EUROSTAT/rail_eq_pa_cty_linear.csv')
-    #dataset_86('transport-data-commons', 'Seat/berth capacity of passenger railway vehicles', 'EUROSTAT/rail_eq_pa_csb_linear.csv')
-    #dataset_87('transport-data-commons', 'Wagons and their load capacity by type of wagons', 'EUROSTAT/rail_eq_wagon_linear.csv')
-    #dataset_88('transport-data-commons', 'Trainsets and capacity by type of speed', 'EUROSTAT/rail_eq_trset_linear.csv')
-    #dataset_89('transport-data-commons', 'National and international railway passengers transport by loading/unloading NUTS 2 region', 'EUROSTAT/tran_r_rapa_linear.csv')
-    #dataset_90('transport-data-commons', 'Passenger cars in accompanied passenger car railway transport, by type of transport', 'EUROSTAT/rail_pa_nbcar_linear.csv')
-    #dataset_91('transport-data-commons', 'Passengers in accompanied passenger car railway transport, by type of transport', 'EUROSTAT/rail_pa_nbpass_linear.csv')
-    #dataset_92('transport-data-commons', 'Goods transported by type of transport', 'EUROSTAT/rail_go_typepas_linear.csv')
-    #dataset_93('transport-data-commons', 'Goods transported by group of goods - from 2008 onwards based on NST 2007', 'EUROSTAT/rail_go_grpgood_linear.csv')
-    #dataset_94('transport-data-commons', 'Goods transported by group of goods - until 2007 based on NST/R', 'EUROSTAT/rail_go_grgood7_linear.csv')
-    #dataset_95('transport-data-commons', 'Goods transported by type of consignment', 'EUROSTAT/rail_go_total_linear.csv')
-    #dataset_96('transport-data-commons', 'Transit transport of goods by loading and unloading countries', 'EUROSTAT/rail_go_trsorde_linear.csv')
-    #dataset_97('transport-data-commons', 'National and international railway goods transport by loading/unloading NUTS 2 region', 'EUROSTAT/tran_r_rago_linear.csv')
-    #dataset_98('transport-data-commons', 'Transport of dangerous goods', 'EUROSTAT/rail_go_dnggood_linear.csv')
-    #dataset_99('transport-data-commons', 'Goods transported in intermodal transport units', 'EUROSTAT/rail_go_contwgt_linear.csv')
-    #dataset_100('transport-data-commons', 'Empty and loaded intermodal transport units', 'EUROSTAT/rail_go_itu_linear.csv')
-    #dataset_101('transport-data-commons', 'Train traffic performance by train category and source of energy', 'EUROSTAT/rail_tf_traveh_linear.csv')
-    #dataset_102('transport-data-commons', 'Passenger train traffic performance by type of train speed', 'EUROSTAT/rail_tf_passmov_linear.csv')
-    #dataset_103('transport-data-commons', 'Hauled railway vehicle traffic performance by train category and source of energy (gross tkm hauled)', 'EUROSTAT/rail_tf_haulmov_linear.csv')
-    #dataset_104('transport-data-commons', 'Hauled railway vehicle traffic performance by type of railway vehicle', 'EUROSTAT/rail_tf_hautype_linear.csv')
-    #dataset_105('transport-data-commons', 'Train traffic on the rail network')
-    #dataset_106('transport-data-commons', 'Persons killed in road accidents by age, sex and category of persons involved')
-    #dataset_107('transport-data-commons', 'Persons killed in road accidents by type of road')
-    #dataset_108('transport-data-commons', 'Persons killed in road accidents by type of vehicle')
-    #dataset_109('transport-data-commons', 'Modal split of inland freight transport')
-    #dataset_110('transport-data-commons', 'Modal split of inland passenger transport')
-    #dataset_111('transport-data-commons', 'Length of motorways and e-roads')
-    #dataset_112('transport-data-commons', 'Length of state, provincial and communal roads')
-    #dataset_113('transport-data-commons', 'Length of other roads within/outside built-up areas')
-    #dataset_114('transport-data-commons', 'Length of paved and unpaved roads')
-    #dataset_115('transport-data-commons', 'Road transport equipment - stock of vehicles')
-    #dataset_116('transport-data-commons', 'Road transport equipment - load capacities')
-    #dataset_117('transport-data-commons', 'Road transport equipment - new registration - stock of vehicles')
-    #dataset_118('transport-data-commons', 'Road transport equipment - new registration - load capacities')
-    #dataset_119('transport-data-commons', 'Road traffic activity')
-    #dataset_120('transport-data-commons', 'Road transport measurement - passengers')
-    #dataset_121('transport-data-commons', 'Road transport measurement - freight')
-    #dataset_122('transport-data-commons', 'Air transport safety')
-    #dataset_123('transport-data-commons', 'Air transport infrastructure - commercial airports')
-    #dataset_124('transport-data-commons', 'Air transport equipment')
-    #dataset_125('transport-data-commons', 'Overview of the air passenger transport by country and airports')
-    #dataset_126('transport-data-commons', 'National air passenger transport by country and airports')
-    #dataset_127('transport-data-commons', 'Overview of the freight and mail air transport by country and airports')
-    #dataset_128('transport-data-commons', 'National freight and mail air transport by country and airports')
-    #dataset_129('transport-data-commons', 'Air transport performance - passengers')
-    #dataset_130('transport-data-commons', 'Air transport performance - freight and mail')
-    #dataset_131('transport-data-commons', 'Maritime transport safety')
-    #dataset_132('transport-data-commons', 'Maritime transport - goods - detailed annual and quarterly results')
-    #dataset_133('transport-data-commons', 'Maritime transport - passengers - detailed annual and quarterly results')
-    #dataset_134('transport-data-commons', 'Maritime vessels movements')
-    #dataset_135('transport-data-commons', 'Inland waterways transport infrastructure')
-    #dataset_136('transport-data-commons', 'Inland waterways transport equipment')
-    #dataset_137('transport-data-commons', 'Inland waterways transport measurement - goods - annual data transport')
-    #dataset_138('transport-data-commons', 'Inland waterways transport measurement - goods - annual data - container')
-    #dataset_139('transport-data-commons', 'Inland waterways transport measurement - goods - annual data - Vessel')
-    #dataset_140('transport-data-commons', 'Intermodal transport - unitisation in freight transport')
-    #dataset_141('transport-data-commons','Index of inland transport performance per GDP unit - freight')
-    #dataset_142('transport-data-commons','Modal split of transport')
-    #dataset_143('transport-data-commons','Index of inland transport performance per GDP unit - passenger')
+    #dataset_1('our-world-in-data', 'New passenger vehicle registrations by type Norway', 'Our World in Data/new-vehicles-type-area.csv')
+    #dataset_2('our-world-in-data', 'Share of new passenger vehicles that are battery electric 2019', 'Our World in Data/share-vehicle-electric.csv')
+    #dataset_3('our-world-in-data', 'Average carbon intensity of new passenger vehicles 2019', 'Our World in Data/carbon-new-passenger-vehicles.csv')
+    #dataset_4('our-world-in-data', 'Fuel economy of new passenger vehicles 2019', 'Our World in Data/fuel-efficiency-new-vehicles.csv')
+    #dataset_5('our-world-in-data', 'Global airline passenger capacity and traffic', 'Our World in Data/airline-capacity-and-traffic.csv')
+    #dataset_6('our-world-in-data', 'Share of airline seats filled by passengers', 'Our World in Data/airline-passenger-load-factor.csv')
+    #dataset_7('our-world-in-data', 'Per capita CO₂ emissions from domestic aviation 2018', 'Our World in Data/per-capita-co2-domestic-aviation.csv')
+    #dataset_8('our-world-in-data', 'CO₂ emissions from domestic air travel 2018', 'Our World in Data/co2-emissions-domestic-aviation.csv')
+    #dataset_9('our-world-in-data', 'Share of global CO₂ emissions from domestic air travel 2018', 'Our World in Data/share-global-co2-domestic-aviation.csv')
+    #dataset_10('our-world-in-data', 'Per capita CO₂ emissions from international aviation 2018', 'Our World in Data/per-capita-co2-international-aviation.csv')
+    #dataset_11('our-world-in-data', 'CO₂ emissions from international aviation 2018', 'Our World in Data/co2-international-aviation.csv')
+    #dataset_12('our-world-in-data', 'Share of global CO₂ emissions from international aviation, 2018', 'Our World in Data/share-co2-international-aviation.csv')
+    #dataset_13('our-world-in-data', 'Per capita CO₂ emissions from international passenger flights, tourism-adjusted, 2018', 'Our World in Data/per-capita-co2-international-flights-adjusted.csv')
+    #dataset_14('our-world-in-data', 'Per capita CO₂ emissions from commercial aviation, tourism-adjusted, 2018', 'Our World in Data/per-capita-co2-aviation-adjusted.csv')
+    #dataset_15('our-world-in-data', 'Per capita CO₂ emissions from aviation, 2018', 'Our World in Data/per-capita-co2-aviation.csv')
+    #dataset_16('our-world-in-data', 'CO₂ emissions from aviation, 2018', 'Our World in Data/co2-emissions-aviation.csv')
+    #dataset_17('our-world-in-data', 'Share of global CO₂ emissions from aviation, 2018', 'Our World in Data/share-co2-emissions-aviation.csv')
+    #dataset_18('our-world-in-data', 'Per capita domestic aviation passenger kilometers, 2018', 'Our World in Data/per-capita-domestic-aviation-km.csv')
+    #dataset_19('our-world-in-data', 'Share of global domestic aviation passenger kilometers, 2018', 'Our World in Data/share-global-domestic-aviation-km.csv')
+    #dataset_20('our-world-in-data', 'Total domestic aviation passenger kilometers, 2018', 'Our World in Data/total-domestic-aviation-km.csv')
+    #dataset_21('our-world-in-data', 'Per capita international aviation passenger kilometers, 2018', 'Our World in Data/per-capita-international-aviation-km.csv')
+    #dataset_22('our-world-in-data', 'Share of global passenger kilometers from international aviation, 2018', 'Our World in Data/share-international-aviation-km.csv')
+    #dataset_23('our-world-in-data', 'Total passenger kilometers from international aviation, 2018', 'Our World in Data/passenger-km-international-aviation.csv')
+    #dataset_24('our-world-in-data', 'Per capita passenger kilometers from air travel, 2018', 'Our World in Data/per-capita-km-aviation.csv')
+    #dataset_25('our-world-in-data', 'Share of global passenger kilometers from air travel, 2018', 'Our World in Data/share-km-aviation.csv')
+    #dataset_26('our-world-in-data', 'Total passenger kilometers from air travel, 2018', 'Our World in Data/total-aviation-km.csv')
+    #dataset_27('our-world-in-data', 'Tonne-kilometers of air freight, 2021', 'Our World in Data/air-transport-freight-ton-km.csv')
+    #dataset_28('our-world-in-data', 'Passenger-kilometers by rail, 2021', 'Our World in Data/railways-passengers-carried-passenger-km.csv')
+    #dataset_29('our-world-in-data', 'Energy intensity of transport per passenger-kilometer, 2018', 'Our World in Data/energy-intensity-transport.csv')
+    #dataset_30('our-world-in-data', 'Per capita CO₂ emissions from transport, 2020', 'Our World in Data/per-capita-co2-transport.csv')
+    #dataset_31('our-world-in-data', 'CO₂ emissions from transport, 2020', 'Our World in Data/co2-emissions-transport.csv')
+    #dataset_32('climate-trace', 'Domestic aviation country emissions', 'Climatetrace/domestic-aviation_country_emissions.csv')
+    #dataset_33('climate-trace', 'International aviation country emissions', 'Climatetrace/international-aviation_country_emissions.csv')
+    #dataset_34('climate-trace', 'Other transport country emissions', 'Climatetrace/other-transport_country_emissions.csv')
+    #dataset_35('climate-trace', 'Railways country emissions', 'Climatetrace/railways_country_emissions.csv')
+    #dataset_36('climate-trace', 'Road transportation country emissions', 'Climatetrace/road-transportation_country_emissions.csv')
+    #dataset_37('climate-trace', 'Domestic shipping country emissions', 'Climatetrace/domestic-shipping_country_emissions.csv')
+    #dataset_38('climate-trace', 'International shipping country emissions', 'Climatetrace/international-shipping_country_emissions.csv')
+    #dataset_39('world-bank', 'Air transport, registered carrier departures worldwide', 'World Bank/API_IS_AIR_DPRT_DS2_en_csv_v2_3415031.csv')
+    #dataset_40('world-bank', 'Air transport, freight (million ton-km)', 'World Bank/API_IS_AIR_GOOD_MT_K1_DS2_en_csv_v2_3401747.csv')
+    #dataset_41('world-bank', 'Air transport, passengers carried', 'World Bank/API_IS_AIR_PSGR_DS2_en_csv_v2_3401550.csv')
+    #dataset_42('world-bank', 'Rail lines (total route-km)', 'World Bank/API_IS_RRS_TOTL_KM_DS2_en_csv_v2_3434344.csv')
+    #dataset_43('world-bank', 'Railways, goods transported (million ton-km)', 'World Bank/API_IS_RRS_GOOD_MT_K6_DS2_en_csv_v2_3434337.csv')
+    #dataset_44('world-bank', 'Railways, passengers carried (million passenger-km)', 'World Bank/API_IS_RRS_PASG_KM_DS2_en_csv_v2_3434340.csv')
+    #dataset_45('world-bank', 'Container port traffic (TEU: 20 foot equivalent units)', 'World Bank/API_IS_SHP_GOOD_TU_DS2_en_csv_v2_3434242.csv')
+    #dataset_46('oica', 'Global Sales Statistics 2019-2023', 'https://www.oica.net/wp-content/uploads/total_sales_2023.xlsx')
+    #dataset_47('oica', 'Motorization rate 2020 - WORLDWIDE', 'https://www.oica.net/wp-content/uploads/Total-World-vehicles-in-use-2020.xlsx')
+    #dataset_48('oica', '2023 production statistics')
+    #dataset_49('acea', 'VEHICLES IN USE EUROPE 2022', 'https://www.acea.auto/files/ACEA-report-vehicles-in-use-europe-2022.pdf')
+    #dataset_50('acea', 'NEW CAR REGISTRATIONS, EUROPEAN UNION IN JULY 2024', 'https://www.acea.auto/files/Press_release_car_registrations_July_2024.pdf')
+    #dataset_51('acea', 'NEW COMMERCIAL VEHICLE REGISTRATIONS, EUROPEAN UNION H1 2024', 'https://www.acea.auto/files/Press_release_commercial_vehicle_registrations_H1-2024.pdf')
+    #dataset_52('acea', 'NEW CAR REGISTRATIONS BY FUEL TYPE, EUROPEAN UNION IN Q4 2022', 'https://www.acea.auto/files/20230201_PRPC-fuel_Q4-2022_FINAL-1.pdf')
+    #dataset_53('acea', 'NEW BUS, TRUCK AND VAN REGISTRATIONS BY FUEL TYPE, EUROPEAN UNION 2022')
+    #dataset_54('acea', 'CO2 emissions from car production in the EU', 'https://www.acea.auto/figure/co2-emissions-from-car-production-in-eu')
+    #dataset_55('acea', 'Energy consumption during car production in the EU', 'https://www.acea.auto/figure/energy-consumption-during-car-production-in-eu')
+    #dataset_56('acea', 'Water used in car production in the EU', 'https://www.acea.auto/figure/water-used-in-car-production-in-eu')
+    #dataset_57('acea', 'Waste from car production in the EU', 'https://www.acea.auto/figure/waste-from-car-production-in-eu')
+    #dataset_58('ccg', 'Transport Starter Data Kit - PKM', 'https://zenodo.org/records/10406893/files/TSDK_ALL.xlsx')
+    #dataset_59('ccg', 'Transport Starter Data Kit - TKM', 'https://zenodo.org/records/10406893/files/TSDK_ALL.xlsx')
+    #dataset_60('ccg', 'Transport Starter Data Kit - Quantity', 'https://zenodo.org/records/10406893/files/TSDK_ALL.xlsx')
+    #dataset_61('eurostat', 'Rail accidents by type of accident', 'EUROSTAT/tran_sf_railac_linear.csv')
+    #dataset_62('eurostat', 'Rail accidents victims by type of accident and category of persons involved', 'EUROSTAT/tran_sf_railvi_linear.csv')
+    #dataset_63('eurostat', 'Rail accidents involving the transport of dangerous goods', 'EUROSTAT/tran_sf_raildg_linear.csv')
+    #dataset_64('eurostat', 'Suicides involving railways', 'EUROSTAT/tran_sf_railsu_linear.csv')
+    #dataset_65('eurostat', 'Length of railway tracks by electrification of tracks', 'EUROSTAT/rail_if_tracks_linear.csv' )
+    #dataset_66('eurostat', 'Length of railway lines by number of tracks and electrification of lines', 'EUROSTAT/rail_if_line_tr_linear.csv')
+    #dataset_67('eurostat', 'Length of electrified and non-electrified railway lines by track gauge', 'EUROSTAT/rail_if_line_ga_linear.csv')
+    #dataset_68('eurostat', 'Length of electric and non-electric railway lines by nature of transport', 'EUROSTAT/rail_if_line_na_linear.csv')
+    #dataset_69('eurostat', 'Length of electrified railway lines by type of current', 'EUROSTAT/rail_if_electri_linear.csv')
+    #dataset_70('eurostat', 'Length of railway lines by maximum permitted speed', 'EUROSTAT/rail_if_line_sp_linear.csv')
+    #dataset_71('eurostat', 'Length of railway lines equipped with the railway traffic management system by type of signalling', 'EUROSTAT/rail_if_traff_linear.csv')
+    #dataset_72('eurostat', 'Level crossings by type', 'EUROSTAT/rail_if_lvlcros_linear.csv')
+    #dataset_73('eurostat', 'Passengers transported', 'EUROSTAT/rail_pa_total_linear.csv')
+    #dataset_74('eurostat', 'International transport of passengers from the reporting country to the country of disembarkation', 'EUROSTAT/rail_pa_intgong_linear.csv')
+    #dataset_75('eurostat', 'International transport of passengers from the country of embarkation to the reporting country', 'EUROSTAT/rail_pa_intcmng_linear.csv')
+    #dataset_76('eurostat', 'Passenger transport by type of transport (detailed reporting only)', 'EUROSTAT/rail_pa_typepas_linear.csv')
+    #dataset_77('eurostat', 'Passengers transported by type of train speed', 'EUROSTAT/rail_pa_speed_linear.csv')
+    #dataset_78('eurostat', 'Goods transported', 'EUROSTAT/rail_go_total_linear.csv')
+    #dataset_79('eurostat', 'International transport of goods from the loading country to the reporting country', 'EUROSTAT/rail_go_intcmgn_linear.csv')
+    #dataset_80('eurostat', 'International transport of goods from the reporting country to the unloading country', 'EUROSTAT/rail_go_intgong_linear.csv')
+    #dataset_81('eurostat', 'Locomotives and railcars by source of energy', 'EUROSTAT/rail_eq_locon_linear.csv')
+    #dataset_82('eurostat', 'Tractive power of locomotives and railcars by source of energy', 'EUROSTAT/rail_eq_locop_linear.csv')
+    #dataset_83('eurostat', 'Passenger railway vehicles, by type of vehicle', 'EUROSTAT/rail_eq_pa_nty_linear.csv')
+    #dataset_84('eurostat', 'Passenger railway vehicles by category of vehicle (until 2012)', 'EUROSTAT/rail_eq_pa_nca_linear.csv')
+    #dataset_85('eurostat', 'Seat capacity of passenger railway vehicles by type of vehicles', 'EUROSTAT/rail_eq_pa_cty_linear.csv')
+    #dataset_86('eurostat', 'Seat/berth capacity of passenger railway vehicles', 'EUROSTAT/rail_eq_pa_csb_linear.csv')
+    #dataset_87('eurostat', 'Wagons and their load capacity by type of wagons', 'EUROSTAT/rail_eq_wagon_linear.csv')
+    #dataset_88('eurostat', 'Trainsets and capacity by type of speed', 'EUROSTAT/rail_eq_trset_linear.csv')
+    #dataset_89('eurostat', 'National and international railway passengers transport by loading/unloading NUTS 2 region', 'EUROSTAT/tran_r_rapa_linear.csv')
+    #dataset_90('eurostat', 'Passenger cars in accompanied passenger car railway transport, by type of transport', 'EUROSTAT/rail_pa_nbcar_linear.csv')
+    #dataset_91('eurostat', 'Passengers in accompanied passenger car railway transport, by type of transport', 'EUROSTAT/rail_pa_nbpass_linear.csv')
+    #dataset_92('eurostat', 'Goods transported by type of transport', 'EUROSTAT/rail_go_typepas_linear.csv')
+    #dataset_93('eurostat', 'Goods transported by group of goods - from 2008 onwards based on NST 2007', 'EUROSTAT/rail_go_grpgood_linear.csv')
+    #dataset_94('eurostat', 'Goods transported by group of goods - until 2007 based on NST/R', 'EUROSTAT/rail_go_grgood7_linear.csv')
+    #dataset_95('eurostat', 'Goods transported by type of consignment', 'EUROSTAT/rail_go_total_linear.csv')
+    #dataset_96('eurostat', 'Transit transport of goods by loading and unloading countries', 'EUROSTAT/rail_go_trsorde_linear.csv')
+    #dataset_97('eurostat', 'National and international railway goods transport by loading/unloading NUTS 2 region', 'EUROSTAT/tran_r_rago_linear.csv')
+    #dataset_98('eurostat', 'Transport of dangerous goods', 'EUROSTAT/rail_go_dnggood_linear.csv')
+    #dataset_99('eurostat', 'Goods transported in intermodal transport units', 'EUROSTAT/rail_go_contwgt_linear.csv')
+    #dataset_100('eurostat', 'Empty and loaded intermodal transport units', 'EUROSTAT/rail_go_itu_linear.csv')
+    #dataset_101('eurostat', 'Train traffic performance by train category and source of energy', 'EUROSTAT/rail_tf_traveh_linear.csv')
+    #dataset_102('eurostat', 'Passenger train traffic performance by type of train speed', 'EUROSTAT/rail_tf_passmov_linear.csv')
+    #dataset_103('eurostat', 'Hauled railway vehicle traffic performance by train category and source of energy (gross tkm hauled)', 'EUROSTAT/rail_tf_haulmov_linear.csv')
+    #dataset_104('eurostat', 'Hauled railway vehicle traffic performance by type of railway vehicle', 'EUROSTAT/rail_tf_hautype_linear.csv')
+    #dataset_105('eurostat', 'Train traffic on the rail network')
+    #dataset_106('eurostat', 'Persons killed in road accidents by age, sex and category of persons involved')
+    #dataset_107('eurostat', 'Persons killed in road accidents by type of road')
+    #dataset_108('eurostat', 'Persons killed in road accidents by type of vehicle')
+    #dataset_109('eurostat', 'Modal split of inland freight transport')
+    #dataset_110('eurostat', 'Modal split of inland passenger transport')
+    #dataset_111('eurostat', 'Length of motorways and e-roads')
+    #dataset_112('eurostat', 'Length of state, provincial and communal roads')
+    #dataset_113('eurostat', 'Length of other roads within/outside built-up areas')
+    #dataset_114('eurostat', 'Length of paved and unpaved roads')
+    #dataset_115('eurostat', 'Road transport equipment - stock of vehicles')
+    #dataset_116('eurostat', 'Road transport equipment - load capacities')
+    #dataset_117('eurostat', 'Road transport equipment - new registration - stock of vehicles')
+    #dataset_118('eurostat', 'Road transport equipment - new registration - load capacities')
+    #dataset_119('eurostat', 'Road traffic activity')
+    #dataset_120('eurostat', 'Road transport measurement - passengers')
+    #dataset_121('eurostat', 'Road transport measurement - freight')
+    #dataset_122('eurostat', 'Air transport safety')
+    #dataset_123('eurostat', 'Air transport infrastructure - commercial airports')
+    #dataset_124('eurostat', 'Air transport equipment')
+    #dataset_125('eurostat', 'Overview of the air passenger transport by country and airports')
+    #dataset_126('eurostat', 'National air passenger transport by country and airports')
+    #dataset_127('eurostat', 'Overview of the freight and mail air transport by country and airports')
+    #dataset_128('eurostat', 'National freight and mail air transport by country and airports')
+    #dataset_129('eurostat', 'Air transport performance - passengers')
+    #dataset_130('eurostat', 'Air transport performance - freight and mail')
+    #dataset_131('eurostat', 'Maritime transport safety')
+    #dataset_132('eurostat', 'Maritime transport - goods - detailed annual and quarterly results')
+    #dataset_133('eurostat', 'Maritime transport - passengers - detailed annual and quarterly results')
+    #dataset_134('eurostat', 'Maritime vessels movements')
+    #dataset_135('eurostat', 'Inland waterways transport infrastructure')
+    #dataset_136('eurostat', 'Inland waterways transport equipment')
+    #dataset_137('eurostat', 'Inland waterways transport measurement - goods - annual data transport')
+    #dataset_138('eurostat', 'Inland waterways transport measurement - goods - annual data - container')
+    #dataset_139('eurostat', 'Inland waterways transport measurement - goods - annual data - Vessel')
+    #dataset_140('eurostat', 'Intermodal transport - unitisation in freight transport')
+    #dataset_141('eurostat','Index of inland transport performance per GDP unit - freight')
+    #dataset_142('eurostat','Modal split of transport')
+    #dataset_143('eurostat','Index of inland transport performance per GDP unit - passenger')
     #dataset_144('transport-data-commons', 'Freight transport activity - Domestic coastal shipping, inland waterways - JRC-IDEES')	
     #dataset_145('transport-data-commons', 'Load factor - Domestic coastal shipping, inland waterways - JRC-IDEES')	
     #dataset_146('transport-data-commons', 'Passenger transport activity - Domestic, international -intra-EU, international-extra-EU - JRC-IDEES')	
@@ -13918,117 +19994,234 @@ if __name__ == '__main__':
     #dataset_191('transport-data-commons', 'New vehicles test cycle efficiency - road - JRC-IDEES')
     #dataset_192('transport-data-commons', 'Stock test cycle emission intensity - road - JRC-IDEES')
     #dataset_193('transport-data-commons', 'New vehicles test cycle emission intensity - road - JRC-IDEES')
-    #dataset_194('transport-data-commons', 'Vehicle Fuel Economy Data & CO2 emissions - road - kapsarc')
-    #dataset_195('transport-data-commons', 'CO2 emissions from passenger cars - road - kapsarc')
-    #dataset_196('transport-data-commons', 'Number of vehicles in use - road - kapsarc')
-    #dataset_197('transport-data-commons', 'Vehicles registerd on the road - road - kapsarc')
-    #dataset_198('transport-data-commons', 'Road Network - road - kapsarc')
-    #dataset_199('transport-data-commons', 'Distance between main cities - road - kapsarc')
-    #dataset_200('transport-data-commons', 'New passenger car registrations - road - kapsarc')
-    #dataset_201('transport-data-commons', 'New road vehicle registrations - road - kapsarc')
-    #dataset_202('transport-data-commons', 'Road vehicle fleet - road - kapsarc')
-    #dataset_203('transport-data-commons', 'Passenger vehicle fleet - road - kapsarc')
-    #dataset_204('transport-data-commons', 'Share of road transport - road - kapsarc')
-    #dataset_205('transport-data-commons', 'Lenght of roads inside cities - road - kapsarc')
-    #dataset_206('transport-data-commons', 'Registered motor vehicles - road - kapsarc')
-    #dataset_207('transport-data-commons', 'Total road length - road - kapsarc')
-    #dataset_208('transport-data-commons', 'Vehicle fleet - road - kapsarc')
-    #dataset_209('transport-data-commons', 'Registered vehicles  - road - kapsarc')
-    #dataset_210('transport-data-commons', 'Length of paved road - road - kapsarc')
-    #dataset_211('transport-data-commons', 'Passenger transport activity - rail - kapsarc')
-    #dataset_212('transport-data-commons', 'Freight transport activity - rail - kapsarc')
-    #dataset_213('transport-data-commons', 'Freight transport activity - eurostat - rail - kapsarc')
-    #dataset_214('transport-data-commons', 'Passenger transport activity - eurostat - rail - kapsarc')
-    #dataset_215('transport-data-commons', 'Rolling Stock - rail - kapsarc')
-    #dataset_216('transport-data-commons', 'Passenger transport activity - passengers carried - rail - kapsarc')
-    #dataset_217('transport-data-commons', 'Distance between railway stations - rail - kapsarc')
-    #dataset_218('transport-data-commons', 'Number of locomotives and cars - rail - kapsarc')
-    #dataset_219('transport-data-commons', 'Passenger & Cargo Traffic - air - kapsarc')
-    #dataset_220('transport-data-commons', 'Passenger activity - air - kapsarc')
-    #dataset_221('transport-data-commons', 'Freight activity - air - kapsarc')
-    #dataset_222('transport-data-commons', 'Air traffic - air - kapsarc')
-    #dataset_223('transport-data-commons', 'Number of airplanes - air - kapsarc')
-    #dataset_224('transport-data-commons', 'Cargo loaded/unloaded - water - kapsarc')
-    #dataset_225('transport-data-commons', 'Volume of seaports exports - water - kapsarc')
-    #dataset_226('transport-data-commons', 'Merchant fleet - water - kapsarc')
-    #dataset_227('transport-data-commons', 'Freight transport activity - water - kapsarc')
-    #dataset_228('transport-data-commons', 'Freight transport activity - tankers - water - kapsarc')
-    #dataset_229('transport-data-commons', 'Modal split of freight transport - intermodal - kapsarc')
-    #dataset_230('transport-data-commons', 'Passenger transport - intermodal - kapsarc')
-    #dataset_231('transport-data-commons', 'Passenger, Freight and container transport - intermodal - kapsarc')
-    #dataset_232('transport-data-commons', 'Petroleum production and consumption - intermodal - ornl')
-    #dataset_233('transport-data-commons', 'Transportation petroleum consumption - intermodal - ornl')
-    #dataset_234('transport-data-commons', 'Energy consumption - intermodal - ornl')
-    #dataset_235('transport-data-commons', 'Fuel production, import, consumption - intermodal - ornl')
-    #dataset_236('transport-data-commons', 'Transport energy/fuel consumption - intermodal - ornl')
-    #dataset_237('transport-data-commons', 'Passenger travel activity - intermodal - ornl')
-    #dataset_238('transport-data-commons', 'Energy intensity - intermodal - ornl')
-    #dataset_239('transport-data-commons', 'Carbon content - intermodal - ornl')
-    #dataset_240('transport-data-commons', 'CO2 emissions - intermodal - ornl')
-    #dataset_241('transport-data-commons', 'Carbon coefficients - intermodal - ornl')
-    #dataset_242('transport-data-commons', 'Freight transport activity - intermodal - ornl')
-    #dataset_243('transport-data-commons', 'Average mile per freight trip - intermodal - ornl')
-    #dataset_244('transport-data-commons', 'Average trip length - intermodal - ornl')
-    #dataset_245('transport-data-commons', 'Emission of air pollutants - intermodal - ornl')
-    #dataset_246('transport-data-commons', 'Vehicle Fleet (also intermodal) - road - ornl')
-    #dataset_247('transport-data-commons', 'Modal split - road - ornl')
-    #dataset_248('transport-data-commons', 'Travel activity (also intermodal) - road - ornl')
-    #dataset_249('transport-data-commons', 'Fuel use & fuel economy (also intermodal) - road - ornl')
-    #dataset_250('transport-data-commons', 'Fuel economy comparison - road - ornl')
-    #dataset_251('transport-data-commons', 'Production shares - road - ornl')
-    #dataset_252('transport-data-commons', 'Technology penetration - road - ornl')
-    #dataset_253('transport-data-commons', 'Average material consumption - road - ornl')
-    #dataset_254('transport-data-commons', 'Refueling stations - road - ornl')
-    #dataset_255('transport-data-commons', 'Emission standards - road - ornl')
-    #dataset_256('transport-data-commons', 'Driving cycle attributes - road - ornl')
-    #dataset_257('transport-data-commons', 'Diesel share - road - ornl')
-    #dataset_258('transport-data-commons', 'Carshare members - road - ornl')
-    #dataset_259('transport-data-commons', 'Car operating costs - road - ornl')
-    #dataset_260('transport-data-commons', 'Fuel costs - road - ornl')
-    #dataset_261('transport-data-commons', 'Production weighted Carbon footprint - road - ornl')
-    #dataset_262('transport-data-commons', 'Load factor - road - ornl')
-    #dataset_263('transport-data-commons', 'Fleet - rail - ornl')
-    #dataset_264('transport-data-commons', 'Average trip length - rail - ornl')
-    #dataset_265('transport-data-commons', 'Traffic activity - rail - ornl')
-    #dataset_266('transport-data-commons', 'Energy intensity - rail - ornl')
-    #dataset_267('transport-data-commons', 'Fuel use - rail - ornl')
-    #dataset_268('transport-data-commons', 'Fleet - water - ornl')
-    #dataset_269('transport-data-commons', 'Energy use - water - ornl')
-    #dataset_270('transport-data-commons', 'Freight activity - water - ornl')
-    #dataset_271('transport-data-commons', 'Fuel use - water - ornl')
-    #dataset_272('transport-data-commons', 'Fleet - air - ornl')
-    #dataset_273('transport-data-commons', 'Travel activity - air - ornl')
-    #dataset_274('transport-data-commons', 'Energy use - air - ornl')
-    #dataset_275('transport-data-commons', 'Fuel use - air - ornl')
-    #dataset_276('transport-data-commons', 'Vehicle Sales - road - gfei')
-    #dataset_277('transport-data-commons', 'Fuel consumption - road - gfei')
-    #dataset_278('transport-data-commons', 'Infrastructre length - road - unece')
-    #dataset_279('transport-data-commons', 'Vehicle fleet and new registrations - road - unece')
-    #dataset_280('transport-data-commons', 'Traffic motor vehicle movements - road - unece')
-    #dataset_281('transport-data-commons', 'Freight transport - road - unece')
-    #dataset_282('transport-data-commons', 'Passenger transport - road - unece')
-    #dataset_283('transport-data-commons', 'Safety, accidents, fatalities, and injuries - road - unece')
-    #dataset_284('transport-data-commons', 'Infrastructure length - rail - unece')
-    #dataset_285('transport-data-commons', 'Transport equipment - rail - unece')
-    #dataset_286('transport-data-commons', 'Traffic train movements - rail - unece')
-    #dataset_287('transport-data-commons', 'Freight transport - rail - unece')
-    #dataset_288('transport-data-commons', 'Passenger transport- rail - unece')
-    #dataset_289('transport-data-commons', 'Safety, accidents, fatalities, and injuries - rail - unece')
-    #dataset_290('transport-data-commons', 'Infrastructure navigable river length - water - unece')
-    #dataset_291('transport-data-commons', 'Vessels - water - unece')
-    #dataset_292('transport-data-commons', 'Freight transport - water - unece')
-    #dataset_293('transport-data-commons', 'Passenger transport - rail - unece')
-    #dataset_294('transport-data-commons', 'Number of vehicles registered - road - caf')
-    #dataset_295('transport-data-commons', 'Number of vehicles registered 2nd - road - caf')
-    #dataset_296('transport-data-commons', 'Number of vehicles per inhabitant - road - caf')
-    #dataset_297('transport-data-commons', 'Number of vehicles per inhabitant 2nd - road - caf')
-    #dataset_298('transport-data-commons', 'Number of public transit vehicles registered - road - caf')
-    #dataset_299('transport-data-commons', 'Number of trips per person per day - road - caf')
-    #dataset_300('transport-data-commons', 'Modal Split - road - caf')
-    #dataset_301('transport-data-commons', 'CO2 emissions - rail - uic')
-    #dataset_302('transport-data-commons', 'Total emissions - rail - uic')
-    #dataset_303('transport-data-commons', 'Energy consumption - rail - uic')
-    #dataset_304('transport-data-commons', 'Air pollutants emissions - rail - uic')
-    
-    
-    
+    #dataset_194('kapsarc', 'Vehicle Fuel Economy Data & CO2 emissions - road - kapsarc')
+    #dataset_195('kapsarc', 'CO2 emissions from passenger cars - road - kapsarc')
+    #dataset_196('kapsarc', 'Number of vehicles in use - road - kapsarc')
+    #dataset_197('kapsarc', 'Vehicles registerd on the road - road - kapsarc')
+    #dataset_198('kapsarc', 'Road Network - road - kapsarc')
+    #dataset_199('kapsarc', 'Distance between main cities - road - kapsarc')
+    #dataset_200('kapsarc', 'New passenger car registrations - road - kapsarc')
+    #dataset_201('kapsarc', 'New road vehicle registrations - road - kapsarc')
+    #dataset_202('kapsarc', 'Road vehicle fleet - road - kapsarc')
+    #dataset_203('kapsarc', 'Passenger vehicle fleet - road - kapsarc')
+    #dataset_204('kapsarc', 'Share of road transport - road - kapsarc')
+    #dataset_205('kapsarc', 'Lenght of roads inside cities - road - kapsarc')
+    #dataset_206('kapsarc', 'Registered motor vehicles - road - kapsarc')
+    #dataset_207('kapsarc', 'Total road length - road - kapsarc')
+    #dataset_208('kapsarc', 'Vehicle fleet - road - kapsarc')
+    #dataset_209('kapsarc', 'Registered vehicles  - road - kapsarc')
+    #dataset_210('kapsarc', 'Length of paved road - road - kapsarc')
+    #dataset_211('kapsarc', 'Passenger transport activity - rail - kapsarc')
+    #dataset_212('kapsarc', 'Freight transport activity - rail - kapsarc')
+    #dataset_213('kapsarc', 'Freight transport activity - eurostat - rail - kapsarc')
+    #dataset_214('kapsarc', 'Passenger transport activity - eurostat - rail - kapsarc')
+    #dataset_215('kapsarc', 'Rolling Stock - rail - kapsarc')
+    #dataset_216('kapsarc', 'Passenger transport activity - passengers carried - rail - kapsarc')
+    #dataset_217('kapsarc', 'Distance between railway stations - rail - kapsarc')
+    #dataset_218('kapsarc', 'Number of locomotives and cars - rail - kapsarc')
+    #dataset_219('kapsarc', 'Passenger & Cargo Traffic - air - kapsarc')
+    #dataset_220('kapsarc', 'Passenger activity - air - kapsarc')
+    #dataset_221('kapsarc', 'Freight activity - air - kapsarc')
+    #dataset_222('kapsarc', 'Air traffic - air - kapsarc')
+    #dataset_223('kapsarc', 'Number of airplanes - air - kapsarc')
+    #dataset_224('kapsarc', 'Cargo loaded/unloaded - water - kapsarc')
+    #dataset_225('kapsarc', 'Volume of seaports exports - water - kapsarc')
+    #dataset_226('kapsarc', 'Merchant fleet - water - kapsarc')
+    #dataset_227('kapsarc', 'Freight transport activity - water - kapsarc')
+    #dataset_228('kapsarc', 'Freight transport activity - tankers - water - kapsarc')
+    #dataset_229('kapsarc', 'Modal split of freight transport - intermodal - kapsarc')
+    #dataset_230('kapsarc', 'Passenger transport - intermodal - kapsarc')
+    #dataset_231('kapsarc', 'Passenger, Freight and container transport - intermodal - kapsarc')
+    #dataset_232('oak-ridge-national-laboratory', 'Petroleum production and consumption - intermodal - ornl')
+    #dataset_233('oak-ridge-national-laboratory', 'Transportation petroleum consumption - intermodal - ornl')
+    #dataset_234('oak-ridge-national-laboratory', 'Energy consumption - intermodal - ornl')
+    #dataset_235('oak-ridge-national-laboratory', 'Fuel production, import, consumption - intermodal - ornl')
+    #dataset_236('oak-ridge-national-laboratory', 'Transport energy/fuel consumption - intermodal - ornl')
+    #dataset_237('oak-ridge-national-laboratory', 'Passenger travel activity - intermodal - ornl')
+    #dataset_238('oak-ridge-national-laboratory', 'Energy intensity - intermodal - ornl')
+    #dataset_239('oak-ridge-national-laboratory', 'Carbon content - intermodal - ornl')
+    #dataset_240('oak-ridge-national-laboratory', 'CO2 emissions - intermodal - ornl')
+    #dataset_241('oak-ridge-national-laboratory', 'Carbon coefficients - intermodal - ornl')
+    #dataset_242('oak-ridge-national-laboratory', 'Freight transport activity - intermodal - ornl')
+    #dataset_243('oak-ridge-national-laboratory', 'Average mile per freight trip - intermodal - ornl')
+    #dataset_244('oak-ridge-national-laboratory', 'Average trip length - intermodal - ornl')
+    #dataset_245('oak-ridge-national-laboratory', 'Emission of air pollutants - intermodal - ornl')
+    #dataset_246('oak-ridge-national-laboratory', 'Vehicle Fleet (also intermodal) - road - ornl')
+    #dataset_247('oak-ridge-national-laboratory', 'Modal split - road - ornl')
+    #dataset_248('oak-ridge-national-laboratory', 'Travel activity (also intermodal) - road - ornl')
+    #dataset_249('oak-ridge-national-laboratory', 'Fuel use & fuel economy (also intermodal) - road - ornl')
+    #dataset_250('oak-ridge-national-laboratory', 'Fuel economy comparison - road - ornl')
+    #dataset_251('oak-ridge-national-laboratory', 'Production shares - road - ornl')
+    #dataset_252('oak-ridge-national-laboratory', 'Technology penetration - road - ornl')
+    #dataset_253('oak-ridge-national-laboratory', 'Average material consumption - road - ornl')
+    #dataset_254('oak-ridge-national-laboratory', 'Refueling stations - road - ornl')
+    #dataset_255('oak-ridge-national-laboratory', 'Emission standards - road - ornl')
+    #dataset_256('oak-ridge-national-laboratory', 'Driving cycle attributes - road - ornl')
+    #dataset_257('oak-ridge-national-laboratory', 'Diesel share - road - ornl')
+    #dataset_258('oak-ridge-national-laboratory', 'Carshare members - road - ornl')
+    #dataset_259('oak-ridge-national-laboratory', 'Car operating costs - road - ornl')
+    #dataset_260('oak-ridge-national-laboratory', 'Fuel costs - road - ornl')
+    #dataset_261('oak-ridge-national-laboratory', 'Production weighted Carbon footprint - road - ornl')
+    #dataset_262('oak-ridge-national-laboratory', 'Load factor - road - ornl')
+    #dataset_263('oak-ridge-national-laboratory', 'Fleet - rail - ornl')
+    #dataset_264('oak-ridge-national-laboratory', 'Average trip length - rail - ornl')
+    #dataset_265('oak-ridge-national-laboratory', 'Traffic activity - rail - ornl')
+    #dataset_266('oak-ridge-national-laboratory', 'Energy intensity - rail - ornl')
+    #dataset_267('oak-ridge-national-laboratory', 'Fuel use - rail - ornl')
+    #dataset_268('oak-ridge-national-laboratory', 'Fleet - water - ornl')
+    #dataset_269('oak-ridge-national-laboratory', 'Energy use - water - ornl')
+    #dataset_270('oak-ridge-national-laboratory', 'Freight activity - water - ornl')
+    #dataset_271('oak-ridge-national-laboratory', 'Fuel use - water - ornl')
+    #dataset_272('oak-ridge-national-laboratory', 'Fleet - air - ornl')
+    #dataset_273('oak-ridge-national-laboratory', 'Travel activity - air - ornl')
+    #dataset_274('oak-ridge-national-laboratory', 'Energy use - air - ornl')
+    #dataset_275('oak-ridge-national-laboratory', 'Fuel use - air - ornl')
+    #dataset_276('global-fuel-economy-initiative', 'Vehicle Sales - road - gfei')
+    #dataset_277('global-fuel-economy-initiative', 'Fuel consumption - road - gfei')
+    #dataset_278('unece', 'Infrastructre length - road - unece')
+    #dataset_279('unece', 'Vehicle fleet and new registrations - road - unece')
+    #dataset_280('unece', 'Traffic motor vehicle movements - road - unece')
+    #dataset_281('unece', 'Freight transport - road - unece')
+    #dataset_282('unece', 'Passenger transport - road - unece')
+    #dataset_283('unece', 'Safety, accidents, fatalities, and injuries - road - unece')
+    #dataset_284('unece', 'Infrastructure length - rail - unece')
+    #dataset_285('unece', 'Transport equipment - rail - unece')
+    #dataset_286('unece', 'Traffic train movements - rail - unece')
+    #dataset_287('unece', 'Freight transport - rail - unece')
+    #dataset_288('unece', 'Passenger transport- rail - unece')
+    #dataset_289('unece', 'Safety, accidents, fatalities, and injuries - rail - unece')
+    #dataset_290('unece', 'Infrastructure navigable river length - water - unece')
+    #dataset_291('unece', 'Vessels - water - unece')
+    #dataset_292('unece', 'Freight transport - water - unece')
+    #dataset_293('unece', 'Passenger transport - rail - unece')
+    #dataset_294('caf-urban-mobility-observatory', 'Number of vehicles registered - road - caf')
+    #dataset_295('caf-urban-mobility-observatory', 'Number of vehicles registered 2nd - road - caf')
+    #dataset_296('caf-urban-mobility-observatory', 'Number of vehicles per inhabitant - road - caf')
+    #dataset_297('caf-urban-mobility-observatory', 'Number of vehicles per inhabitant 2nd - road - caf')
+    #dataset_298('caf-urban-mobility-observatory', 'Number of public transit vehicles registered - road - caf')
+    #dataset_299('caf-urban-mobility-observatory', 'Number of trips per person per day - road - caf')
+    #dataset_300('caf-urban-mobility-observatory', 'Modal Split - road - caf')
+    #dataset_301('international-union-of-railways', 'CO2 emissions - rail - uic')
+    #dataset_302('international-union-of-railways', 'Total emissions - rail - uic')
+    #dataset_303('international-union-of-railways', 'Energy consumption - rail - uic')
+    #dataset_304('international-union-of-railways', 'Air pollutants emissions - rail - uic')
+    #dataset_305('slocat', 'Transport Knowledge Base - all - slocat')
+    #dataset_306('un-sdg-indicator-database', 'Death rate due to road traffic injuries - road - sdg')
+    #dataset_307('un-sdg-indicator-database', 'Freight volume - all - sdg')
+    #dataset_308('un-sdg-indicator-database', 'Passenger volume - all - sdg')
+    #dataset_309('un-sdg-indicator-database', 'Freight loaded and uloaded - water - sdg')
+    #dataset_310('un-sdg-indicator-database', 'Proportion of population that has convenient access to public transport - all - sdg')
+    #dataset_311('international-road-federation', 'Road Network length - road - irf')
+    #dataset_312('international-road-federation', 'Road vehicle mileage - road - irf')
+    #dataset_313('international-road-federation', 'Freight ton-kilometer - road - irf')
+    #dataset_314('international-road-federation', 'Passenger Person-kilometer - road - irf')
+    #dataset_315('international-road-federation', 'Vehicle fleet - road - irf')
+    #dataset_316('international-road-federation', 'Fuel Prices - road - irf')
+    #dataset_317('international-road-federation', 'Energy consumption - road - irf')
+    #dataset_318('international-road-federation', 'Road Accidents on roads - road - irf')
+    #dataset_319('international-road-federation', 'Number of vehicles produced - road - irf')
+    #dataset_320('international-road-federation', 'Vehicle Fleet new - road - irf')
+    #dataset_321('international-road-federation', 'Number of vehicles exported - road - irf')
+    #dataset_322('international-road-federation', 'Road expenditures and revenues - road - irf')
+    #dataset_323('international-road-federation', 'CO2 emissions transport sector - all - irf')
+    #dataset_324('asian-transport-outlook', 'Passengers Kilometer Travel - rail - ato')
+    #dataset_325('asian-transport-outlook', 'Freight Transport - rail - ato')
+    #dataset_326('asian-transport-outlook', 'Efficiency of Train Services - rail - ato')
+    #dataset_327('asian-transport-outlook', 'Land Transport Passenger Kilometers Travel - rail - ato')
+    #dataset_328('asian-transport-outlook', 'Land Transport Freight Kilometers Travel - rail - ato')
+    #dataset_329('asian-transport-outlook', 'Passengers Kilometer Travel - HSR - rail - ato')
+    #dataset_330('asian-transport-outlook', 'Passengers Kilometer Travel - Domestic Aviation - air - ato')
+    #dataset_331('asian-transport-outlook', 'Air transport carrier departures - air - ato')
+    #dataset_332('asian-transport-outlook', 'Aviation International Passenger Kilometers - air - ato')
+    #dataset_333('asian-transport-outlook', 'Aviation Trips per capita - air - ato')
+    #dataset_334('asian-transport-outlook', 'Aviation Trips per capita -2030 Forecast (BAU) - air - ato')
+    #dataset_335('asian-transport-outlook', 'Aviation Total Passenger Kilometers - air - ato')
+    #dataset_336('asian-transport-outlook', 'Freight Transport - Tonne-km for Aviation - air - ato')
+    #dataset_337('asian-transport-outlook', 'Freight Transport - Tonne-km for Aviation international - air - ato')
+    #dataset_338('asian-transport-outlook', 'Efficiency of air transport services - air - ato')
+    #dataset_339('asian-transport-outlook', 'Passengers Kilometer Travel - Bus - road - ato')
+    #dataset_340('asian-transport-outlook', 'Passengers Kilometer Travel - Roads - road - ato')
+    #dataset_341('asian-transport-outlook', 'Motorised Two Wheeler Sales - road - ato')
+    #dataset_342('asian-transport-outlook', 'Motorised Three Wheeler Sales - road - ato')
+    #dataset_343('asian-transport-outlook', 'LDV Sales - road - ato')
+    #dataset_344('asian-transport-outlook', 'Total Vehicle sales (motorised) - road - ato')
+    #dataset_345('asian-transport-outlook', 'Commercial Vehicle Sales (motorised) - road - ato')
+    #dataset_346('asian-transport-outlook', 'Vehicle registration (Motorised 2W) - road - ato')
+    #dataset_347('asian-transport-outlook', 'Vehicle registration (Motorised 3W) - road - ato')
+    #dataset_348('asian-transport-outlook', 'Vehicle registration (LDV) - road - ato')
+    #dataset_349('asian-transport-outlook', 'Vehicle registration (Bus) - road - ato')
+    #dataset_350('asian-transport-outlook', 'Vehicle registration (Others) - road - ato')
+    #dataset_351('asian-transport-outlook', 'Freight Vehicle registration - road - ato')
+    #dataset_352('asian-transport-outlook', 'Total Vehicle Registration - road - ato')
+    #dataset_353('asian-transport-outlook', 'Motorisation Index - road - ato')
+    #dataset_354('asian-transport-outlook', 'LDV Motorisation Index - road - ato')
+    #dataset_355('asian-transport-outlook', 'Two and Three Wheelers Motorisation Index - road - ato')
+    #dataset_356('asian-transport-outlook', 'Bus Motorisation Index - road - ato')
+    #dataset_357('asian-transport-outlook', 'Freight Vehicles Motorisation Index - road - ato')
+    #dataset_358('asian-transport-outlook', 'Freight Transport - Tonne-km for Roads - road - ato')
+    #dataset_359('asian-transport-outlook', 'Passengers Kilometer Travel - water - ato')
+    #dataset_360('asian-transport-outlook', 'Freight Transport - Domestic - water - ato')
+    #dataset_361('asian-transport-outlook', 'Freight Transport - International - water - ato')
+    #dataset_362('asian-transport-outlook', 'Port call and performance statistics - water - ato')
+    #dataset_363('asian-transport-outlook', 'Container port traffic (TEU) - water - ato')
+    #dataset_364('asian-transport-outlook', 'Merchant fleet by country of beneficial ownership, annual - water - ato')
+    #dataset_365('asian-transport-outlook', 'Efficiency of seaport services - water - ato')
+    #dataset_366('asian-transport-outlook', 'Total Passenger Kilometer Travel - all - ato')
+    #dataset_367('asian-transport-outlook', 'Total Passenger Kilometer Travel/Capita - all - ato')
+    #dataset_368('asian-transport-outlook', 'Total Passenger Kilometer Travel/GDP - all - ato')
+    #dataset_369('asian-transport-outlook', 'Total Passenger Kilometer Travel Mode Share - all - ato')
+    #dataset_370('asian-transport-outlook', 'Freight Transport - Tonne-km (Total) - all - ato')
+    #dataset_371('asian-transport-outlook', 'Freight tonne-km/GDP - all - ato')
+    #dataset_372('asian-transport-outlook', 'Freight tonne-km/capita - all - ato')
+    #dataset_373('asian-transport-outlook', 'Total Freight Kilometer Travel Mode Share - all - ato')
+    #dataset_374('asian-transport-outlook', 'Internet shoppers as a share of Population - all - ato')
+    #dataset_375('asian-transport-outlook', 'Internet shoppers as a share of Population (Female) - all - ato')
+    #dataset_376('asian-transport-outlook', 'UNCTAD B2C E-commerce index - all - ato')
+    #dataset_377('asian-transport-outlook', 'Logistics Performance Index - all - ato')
+    #dataset_378('asian-transport-outlook', 'Domestic LPI - all - ato')
+    #dataset_379('asian-transport-outlook', 'Percent Of Firms Identifying Transportation As A Major Constraint - Services - all - ato')
+    #dataset_380('asian-transport-outlook', 'Percent of firms choosing transportation as their biggest obstacle - Manufacturing - all - ato')
+    #dataset_381('asian-transport-outlook', 'Transport services (% of service imports, BoP) - all - ato')
+    #dataset_382('asian-transport-outlook', 'Transport services (% of service exports, BoP) - all - ato')
+    #dataset_383('asian-transport-outlook', 'Import of Transport Services - all - ato')
+    #dataset_384('asian-transport-outlook', 'Export of Transport Services - all - ato')
+    #dataset_385('itf-oecd', 'Transport Infrastructure Expenditures (capital value, investment, maintenance) - all - itf-oecd')
+    #dataset_386('itf-oecd', 'Infrastructure investment - all - itf-oecd')
+    #dataset_387('itf-oecd', 'Freight Transport activity share - all - itf-oecd')
+    #dataset_388('itf-oecd', 'Passenger Transport activity share - all - itf-oecd')
+    #dataset_389('itf-oecd', 'Transport household expenditure - all - itf-oecd')
+    #dataset_390('itf-oecd', 'Transport GHG emissions - all - itf-oecd')
+    #dataset_391('itf-oecd', 'Share of CO2 emissions from road/domestic aviation/rail in total CO2 emission - all - itf-oecd')
+    #dataset_392('itf-oecd', 'Share of CO2 emissions from transport in total CO2 emissions - all - itf-oecd')
+    #dataset_393('itf-oecd', 'Modal Split - all - itf-oecd')
+    #dataset_394('itf-oecd', 'Passenger transport activiity - IND - all - itf-oecd')
+    #dataset_395('itf-oecd', 'Freight transport activity - all - itf-oecd')
+    #dataset_396('itf-oecd', 'Fuel consumption - all - itf-oecd')
+    #dataset_397('itf-oecd', 'CO2 emission transport - all - itf-oecd')
+    #dataset_398('itf-oecd', 'Public transport access - all - itf-oecd')
+    #dataset_399('itf-oecd', 'Air pollutants emissions - all - itf-oecd')
+    #dataset_400('itf-oecd', 'Freight transport activity - road - itf-oecd')
+    #dataset_401('itf-oecd', 'Road injuries/ casualties - road - itf-oecd')
+    #dataset_402('itf-oecd', 'New vehicle registration - road - itf-oecd')
+    #dataset_403('itf-oecd', 'Passenger Transport activity - road - itf-oecd')
+    #dataset_404('itf-oecd', 'Vehicle fleet - road - itf-oecd')
+    #dataset_405('itf-oecd', 'Density of road - road - itf-oecd')
+    #dataset_406('itf-oecd', 'Share of motorways/urban roads in total road network - road - itf-oecd')
+    #dataset_407('itf-oecd', 'Mileage - road - itf-oecd')
+    #dataset_408('itf-oecd', 'Fuel demand - road - itf-oecd')
+    #dataset_409('itf-oecd', 'Vehicle fleet - vehicles by type  - road - itf-oecd')
+    #dataset_410('itf-oecd', 'Length of road infrastructure - road - itf-oecd')
+    #dataset_411('itf-oecd', 'Road density - road - itf-oecd')
+    #dataset_412('itf-oecd', 'Passenger vehicle load Factor - road - itf-oecd')
+    #dataset_413('itf-oecd', 'Number of passenger trips - road - itf-oecd')
+    #dataset_414('itf-oecd', 'Average trip length - road - itf-oecd')
+    #dataset_415('itf-oecd', 'Vehicle fleet - vehicle and fuel type - road - itf-oecd')
+    #dataset_416('itf-oecd', 'Freight transport activity - rail - itf-oecd')
+    #dataset_417('itf-oecd', 'Passenger Transport activity - rail - itf-oecd')
+    #dataset_418('itf-oecd', 'Loading capacity - rail - itf-oecd')
+    #dataset_419('itf-oecd', 'Density rail lines - rail - itf-oecd')
+    #dataset_420('itf-oecd', 'Share of electrified/high-speed rail ines in total rail network - rail - itf-oecd')
+    #dataset_421('itf-oecd', 'Freight transport activity - water - itf-oecd')
+    #dataset_422('itf-oecd', 'Seat capacity - avia - itf-oecd')
+    #dataset_423('itf-oecd', 'Share of set capacity - avia - itf-oecd')
+    #dataset_424('itf-oecd', 'Airport density - avia - itf-oecd')
