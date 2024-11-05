@@ -122,7 +122,7 @@ export function CommentsForm({ disabled }: any) {
                 </FormItem>
               )}
             />
-              <DefaultTooltip content="Remove source">
+              <DefaultTooltip content="Remove comment">
                 <Button
                   disabled={disabled}
                   className={cn(disabled && "cursor-not-allowed", 'md:hidden')}
