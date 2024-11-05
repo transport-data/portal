@@ -348,11 +348,19 @@ const EditDatasetDashboard: NextPage<{
                       type="button"
                       className="w-full"
                       onClick={async () => {
-                        await form.trigger();
-                        if (checkDisableNext()) {
+                        const next = await form.trigger();
+                        if (form.watch("temporal_coverage_start") > form.watch("temporal_coverage_end")) {
+                          form.setError("temporal_coverage_end", {
+                            type: "manual",
+                            message: "End date should be greater than start date",
+                          });
                           return;
                         }
-                        return send("next");
+                        if (next && checkDisableNext()) {
+                          return;
+                        } else {
+                          return send("next");
+                        }
                       }}
                     >
                       Next

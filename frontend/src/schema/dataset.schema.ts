@@ -75,6 +75,7 @@ export const DatasetSchemaPartial = z.object({
 
 export const DatasetSchema = DatasetSchemaPartial.refine(
   (data) => {
+    console.log(data.temporal_coverage_start, data.temporal_coverage_end)
     if (data.temporal_coverage_start > data.temporal_coverage_end) {
       return false;
     }
