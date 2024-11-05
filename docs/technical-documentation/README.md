@@ -7,23 +7,23 @@
 - [How to report issues](#how-to-report-issues)
 - [How to keep updated with the next features](#how-to-keep-updated-with-the-next-features)
 - [How the portal works](#how-the-portal-works)
-  - [Home page](#home-page)
-  - [Partners page](#partners-page)
-  - [Datasets' browse page](#datasets-browse-page)
-  - [Geography page](#geography-page)
-  - [Datasets page](#datasets-page)
-  - [About Us page](#about-us-page)
-  - [Events page](#events-page)
-  - [FAQ page](#faq-page)
-  - [Dashboard - Newsfeed page](#dashboard---newsfeed-page)
-  - [Dashboard - My Datasets page](#dashboard---my-datasets-page)
-  - [Dashboard - My Organisation page](#dashboard---my-organisation-page)
-  - [Dashboard - Topics page](#dashboard---topics-page)
-  - [Dashboard - Organizations page](#dashboard---organizations-page)
-  - [Dashboard - Datasets Approvals page](#dashboard---datasets-approvals-page)
-  - [Add Dataset page](#add-dataset-page)
-  - [Edit Dataset page](#edit-dataset-page)
-  - [Dataset Details page](#dataset-details-page)
+    - [Home page](#home-page)
+    - [Partners page](#partners-page)
+    - [Datasets' browse page](#datasets-browse-page)
+    - [Geography page](#geography-page)
+    - [Datasets page](#datasets-page)
+    - [About Us page](#about-us-page)
+    - [Events page](#events-page)
+    - [FAQ page](#faq-page)
+    - [Dashboard - Newsfeed page](#dashboard---newsfeed-page)
+    - [Dashboard - My Datasets page](#dashboard---my-datasets-page)
+    - [Dashboard - My Organisation page](#dashboard---my-organisation-page)
+    - [Dashboard - Topics page](#dashboard---topics-page)
+    - [Dashboard - Organizations page](#dashboard---organizations-page)
+    - [Dashboard - Datasets Approvals page](#dashboard---datasets-approvals-page)
+    - [Add Dataset page](#add-dataset-page)
+    - [Edit Dataset page](#edit-dataset-page)
+    - [Dataset Details page](#dataset-details-page)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -59,8 +59,7 @@ The testimonials section of this page uses the [MarkdownDB](https://github.com/d
 
 #### Onboarding page
 
-The first step of this page uses the [`follow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) and the unfollow uses the [`unfollow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/unfollow_group) to follow the locations (which are groups under the hood on CKAN and are named as [geography](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml) for the project), topics, and organizations.
-
+The first step of this page uses the [`follow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) and the unfollow uses the [`unfollow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/unfollow_group) to follow the locations (which are groups under the hood on CKAN and are named as [geography](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml) for the project), topics, and organizations. When a user follows a group the application will present the activities related to this group on the newsfeed tab.
 
 #### Partners page
 
@@ -118,12 +117,12 @@ e.g.:
 
 ```json
 {
-  "type": "topic",
-  "name": "topic name",
-  "title": "topic title",
-  "notes": "topic description",
-  "url": "URL with the image of the topic",
-  "groups": [{ "name": "name of the parent topic if wanted" }]
+  "type": "topic",
+  "name": "topic name",
+  "title": "topic title",
+  "notes": "topic description",
+  "url": "URL with the image of the topic",
+  "groups": [{ "name": "name of the parent topic if wanted" }]
 }
 ```
 
