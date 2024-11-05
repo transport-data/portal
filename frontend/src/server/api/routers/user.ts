@@ -200,7 +200,7 @@ export const userRouter = createTRPCRouter({
           >(
             `tdc_dashboard_activity_list?limit=${limit}&offset=${offset}&query=${query}&action=${action}&status=${activityType}&${
               sort === "oldest"
-                ? `after=${new Date(1600, 1, 1).toTimeString()}`
+                ? `after=${new Date(1600, 1, 1).getTime() / 1000}`
                 : ""
             }`,
             {
