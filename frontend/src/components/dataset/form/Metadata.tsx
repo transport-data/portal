@@ -941,7 +941,7 @@ export function MetadataForm({ disabled }: any) {
                 <Input
                   disabled={disabled}
                   className={cn(disabled && "cursor-not-allowed")}
-                  placeholder="Data Provider..."
+                  placeholder="Data Access..."
                   {...field}
                 />
               </FormControl>

@@ -1,5 +1,5 @@
 import z from "zod";
-const emptyStringToUndefined = z.literal('').transform(() => undefined)
+const emptyStringToUndefined = z.literal("").transform(() => undefined);
 
 export const ResourceSchema = z.object({
   id: z.string().optional(),
@@ -12,7 +12,7 @@ export const ResourceSchema = z.object({
   url: z.string().url(),
 });
 
-export const DatasetSchema = z.object({
+export const DatasetSchemaPartial = z.object({
   id: z.string(),
   name: z
     .string()
@@ -26,9 +26,11 @@ export const DatasetSchema = z.object({
   owner_org: z.string({ description: "Organization is required" }),
   topics: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),
-  tags: z.array(z.object({
-    name: z.string()
-  })),
+  tags: z.array(
+    z.object({
+      name: z.string(),
+    })
+  ),
   userRepresents: z.boolean().default(false),
   sources: z.array(
     z.object({
@@ -61,19 +63,35 @@ export const DatasetSchema = z.object({
   url: z.string().url().optional().or(emptyStringToUndefined),
   data_provider: z.string().optional().or(emptyStringToUndefined),
   data_access: z.string().optional().or(emptyStringToUndefined),
-  state:z.string().optional().default(""),
-  related_datasets: z.array(z.object({
-    name: z.string(),
-    title: z.string()
-  })),
+  state: z.string().optional().default(""),
+  related_datasets: z.array(
+    z.object({
+      name: z.string(),
+      title: z.string(),
+    })
+  ),
   resources: z.array(ResourceSchema),
 });
 
-export const DraftDatasetSchema = DatasetSchema.partial().extend({
-  name:z.string(),
-  notes:z.string(),
-  owner_org:z.string(),
-  tdc_category:z.string().default("public")
+export const DatasetSchema = DatasetSchemaPartial.refine(
+  (data) => {
+    console.log(data.temporal_coverage_start, data.temporal_coverage_end)
+    if (data.temporal_coverage_start > data.temporal_coverage_end) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Temporal coverage start date must be before end date",
+    path: ["temporal_coverage_start"],
+  }
+);
+
+export const DraftDatasetSchema = DatasetSchemaPartial.partial().extend({
+  name: z.string(),
+  notes: z.string(),
+  owner_org: z.string(),
+  tdc_category: z.string().default("public"),
 });
 
 export const SearchDatasetSchema = z.object({
@@ -81,7 +99,7 @@ export const SearchDatasetSchema = z.object({
     .array(
       z.object({
         values: z.array(z.string()),
-        key: z.string()
+        key: z.string(),
       })
     )
     .optional(),
@@ -110,7 +128,7 @@ export const SearchDatasetSchema = z.object({
   type: z.array(z.string()).optional(),
   private: z.boolean().optional(),
   includeDrafts: z.boolean().optional(),
-  contributors: z.array( z.string() ).optional()
+  contributors: z.array(z.string()).optional(),
 });
 
 export type DatasetSchemaType = {
@@ -132,18 +150,18 @@ export type DatasetField = {
 };
 
 export type License = {
-  domain_content: string
-  id: string
-  domain_data: string
-  domain_software: string
-  family: string
-  is_generic: string
-  od_conformance: string
-  osd_conformance: string
-  maintainer: string
-  status: string
-  url: string
-  title: string
+  domain_content: string;
+  id: string;
+  domain_data: string;
+  domain_software: string;
+  family: string;
+  is_generic: string;
+  od_conformance: string;
+  osd_conformance: string;
+  maintainer: string;
+  status: string;
+  url: string;
+  title: string;
 };
 
 export type SearchDatasetType = z.infer<typeof SearchDatasetSchema>;

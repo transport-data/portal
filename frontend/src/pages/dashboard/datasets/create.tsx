@@ -132,6 +132,7 @@ const CreateDatasetDashboard: NextPage = () => {
       })
       .with("metadata", () => {
         const errorPaths = Object.keys(form.formState.errors);
+      console.log('FORM ERRORS', form.formState.errors)
         return [
           "sources",
           "language",
@@ -231,7 +232,7 @@ const CreateDatasetDashboard: NextPage = () => {
                       className="w-fit"
                       onClick={() => send("prev")}
                     >
-                      Prev
+                      Previous
                     </Button>
                     <SaveDraftButton callback={() => handleSaveDraft()} />
                     <Button
@@ -239,10 +240,19 @@ const CreateDatasetDashboard: NextPage = () => {
                       className="w-full"
                       onClick={async () => {
                         await form.trigger();
-                        if (checkDisableNext()) {
+                        const next = await form.trigger();
+                        if (form.watch("temporal_coverage_start") > form.watch("temporal_coverage_end")) {
+                          form.setError("temporal_coverage_end", {
+                            type: "manual",
+                            message: "End date should be greater than start date",
+                          });
                           return;
                         }
-                        return send("next");
+                        if (!next && checkDisableNext()) {
+                          return;
+                        } else {
+                          return send("next");
+                        }
                       }}
                     >
                       Next
@@ -259,7 +269,7 @@ const CreateDatasetDashboard: NextPage = () => {
                       variant="secondary"
                       onClick={() => send("prev")}
                     >
-                      Prev
+                      Previous
                     </Button>
                     <SaveDraftButton callback={() => handleSaveDraft()} />
                     <LoaderButton
