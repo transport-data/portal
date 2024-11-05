@@ -9,6 +9,9 @@ import { createTRPCNext } from "@trpc/next";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
 import { type AppRouter } from "@/server/api/root";
+import { MutationCache, QueryCache } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { signOut } from "next-auth/react";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
@@ -26,6 +29,26 @@ export const api = createTRPCNext<AppRouter>({
        * @see https://trpc.io/docs/data-transformers
        */
       transformer: superjson,
+
+      queryClientConfig: {
+        
+        queryCache: new QueryCache({
+            onError: (error) => {
+                verifyAuthorizationError(error)
+            },
+            onSuccess: (r) => {
+                verifyAuthorizationError(r)
+            },
+        }),
+        mutationCache: new MutationCache({
+            onError: (error) => {
+                verifyAuthorizationError(error)
+            },
+            onSuccess: (r) => {
+                verifyAuthorizationError(r)
+            },
+        }),
+    },
 
       /**
        * Links used to determine request flow from client to server.
@@ -51,6 +74,22 @@ export const api = createTRPCNext<AppRouter>({
    */
   ssr: false,
 });
+
+function verifyAuthorizationError(response: any) {
+  console.log("verify session::");
+  console.log(response)
+  if (
+      response?.data?.stack?.includes('Access denied') ||
+      response?.error?.message?.includes('Access denied')
+  ) {
+      toast('Your session is no longer valid, please sign in again.', {
+          type: 'warning',
+      })
+      setTimeout(() => {
+          signOut()
+      }, 3000)
+  }
+}
 
 /**
  * Inference helper for inputs.
