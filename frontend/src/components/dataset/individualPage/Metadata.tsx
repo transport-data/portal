@@ -18,6 +18,16 @@ import { slugify } from "@lib/utils";
 import { ScrollArea } from "@components/ui/scroll-area";
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
+  const { data: geographies } = api.group.tree.useQuery({
+    type: "geography",
+  });
+  const datasetRegion = !dataset.regions
+    ? null
+    : dataset.regions.length === 0
+    ? null
+    : dataset.regions.length === 1
+    ? (dataset.regions[0] as string)
+    : "Worldwide";
   return (
     <div className="min-h-[500px] bg-gray-50">
       <div className="container grid py-8 lg:grid-cols-2">
@@ -48,10 +58,17 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             <dt className="text-sm font-medium leading-6 text-primary">
               Keywords
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              {dataset.tags?.map((t) => t.display_name ?? t.name).join(", ") ??
-                "-"}
-            </dd>
+            {dataset.tags && dataset.tags.length > 0 ? (
+              <dd className="mt-1 flex flex-wrap text-sm leading-6 gap-2 text-gray-500 sm:mt-2">
+                {dataset.tags?.map((t) => (
+                  <Badge variant="info">{t.display_name ?? t.name}</Badge>
+                )) ?? "-"}
+              </dd>
+            ) : (
+              <dd className="mt-1 flex flex-wrap text-sm leading-6 text-gray-500 sm:mt-2">
+                -
+              </dd>
+            )}
           </div>
           <div className="border-t border-gray-100 px-4 sm:col-span-1 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-primary">
@@ -111,9 +128,30 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               Last updated date
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              {dataset.metadata_modified &&
-                new Date(dataset.metadata_modified).toDateString()}
+              {dataset.metadata_modified && (
+                <>
+                  {prettifyDateString(dataset.metadata_modified.split('T')[0] ?? '')}
+                </>
+              )}
             </dd>
+          </div>
+          <div className="border-t border-gray-100 px-4 sm:col-span-1 sm:px-0">
+            <dt className="text-sm font-medium leading-6 text-primary">
+              Region
+            </dt>
+            {datasetRegion && geographies && (
+              <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
+                {datasetRegion &&
+                geographies.find((g) => g.name === datasetRegion)?.title
+                  ? geographies.find((g) => g.name === datasetRegion)?.title
+                  : "Worldwide"}
+              </dd>
+            )}
+            {!datasetRegion && (
+              <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
+                -
+              </dd>
+            )}
           </div>
           <div className="border-t border-gray-100 px-4 sm:col-span-1 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-primary">
@@ -164,11 +202,11 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   dataset.creator_user?.fullname ??
                   dataset.creator_user?.name ??
                   "TDC"
-                }. ${
+                }. (${
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
-                    : "(n.d)"
-                }.${dataset.title ?? dataset.name} [Data set]. ${
+                    : "n.d"
+                }). <i> ${dataset.title ?? dataset.name}</i> [Data set]. ${
                   dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
@@ -181,7 +219,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   dataset.creator_user?.fullname ??
                   dataset.creator_user?.name ??
                   "TDC"
-                }.${dataset.title ?? dataset.name}, ${
+                }. <i>${dataset.title ?? dataset.name}</i>, ${
                   dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
@@ -198,7 +236,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   dataset.creator_user?.fullname ??
                   dataset.creator_user?.name ??
                   "TDC"
-                }. ${dataset.title ?? dataset.name}. ${
+                }. <i>${dataset.title ?? dataset.name}</i>. ${
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
                     : "(n.d)"
@@ -215,11 +253,11 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   dataset.creator_user?.fullname ??
                   dataset.creator_user?.name ??
                   "TDC"
-                }. ${
+                }. (${
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
-                    : "(n.d)"
-                }.${dataset.title ?? dataset.name}. Available at: ${
+                    : "n.d"
+                }). '${dataset.title ?? dataset.name}'. Available at: ${
                   typeof window !== "undefined" && window.location.href
                 }`,
               },

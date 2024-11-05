@@ -9,6 +9,8 @@ import {
 import { Input } from "@components/ui/input";
 import { Button } from "@components/ui/button";
 import { cn } from "@lib/utils";
+import { DefaultTooltip } from "@components/ui/tooltip";
+import { Trash2 } from "lucide-react";
 
 export function SourcesForm({ disabled }: { disabled?: boolean }) {
   const { control, register } = useFormContext<DatasetFormType>();
@@ -46,23 +48,37 @@ export function SourcesForm({ disabled }: { disabled?: boolean }) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={control}
-              name={`sources.${index}.url`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={disabled}
-                      className={cn(disabled && "cursor-not-allowed")}
-                      placeholder="Link (Optional)"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center gap-2 justify-between">
+              <FormField
+                control={control}
+                name={`sources.${index}.url`}
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Input
+                        disabled={disabled}
+                        className={cn(disabled && "cursor-not-allowed", 'w-full')}
+                        placeholder="Link (Optional)"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DefaultTooltip content="Remove source">
+                <Button
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed")}
+                  onClick={() => remove(index)}
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </DefaultTooltip>
+            </div>
           </div>
         </>
       ))}

@@ -342,7 +342,7 @@ const EditDatasetDashboard: NextPage<{
                       className="w-full"
                       onClick={() => send("prev")}
                     >
-                      Prev
+                      Previous
                     </Button>
                     <Button
                       type="button"
@@ -370,7 +370,7 @@ const EditDatasetDashboard: NextPage<{
                       className="w-full"
                       onClick={() => send("prev")}
                     >
-                      Prev
+                      Previous
                     </Button>
                     <LoaderButton
                       disabled={disabledForm}

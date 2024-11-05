@@ -32,6 +32,8 @@ const isDownloadable = (url: string) => {
   const urlParts = _url.pathname.split("/");
   const lastPart = urlParts[urlParts.length - 1];
   if (!lastPart) return false;
+  if (lastPart.includes('.aspx')) return false
+  if (lastPart.includes('.html')) return false
   return lastPart.includes(".");
 };
 
