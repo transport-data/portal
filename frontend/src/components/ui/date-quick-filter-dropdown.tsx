@@ -110,7 +110,7 @@ export default function DateQuickFilterDropdown({
                 openTo="year"
                 views={["year"]}
                 yearsOrder="desc"
-                sx={{ maxWidth: 105 }}
+                sx={{ maxWidth: 95 }}
               />
               <span>—</span>
               <DatePicker
@@ -122,7 +122,7 @@ export default function DateQuickFilterDropdown({
                 views={["year"]}
                 yearsOrder="desc"
                 sx={{
-                  maxWidth: 105,
+                  maxWidth: 95,
                 }}
               />
             </div>
