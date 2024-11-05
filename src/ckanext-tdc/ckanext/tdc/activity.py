@@ -208,7 +208,7 @@ def dashboard_activity_list_action(
                     package["approval_requested_by_user_data"] = get_user_name_and_picture(
                         approval_requested_by)
 
-    return {'results': activity_dicts, 'count': count, 'action': action}
+    return {'results': activity_dicts, 'count': count}
 
 
 def _dashboard_activity_query(user_id: str, limit: int = 0, activity_type=None, status=None):
@@ -464,8 +464,6 @@ def _package_activity_query(package_id, activity_type=None, status=None):
 
 
 def _filter_by_action_activity_type_and_status(q, activity_type=None, status=None):
-    log.info(status)
-
     if not activity_type and not status:
         return q
 
