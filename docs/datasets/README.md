@@ -6,6 +6,7 @@
   - [Create Dataset](#create-dataset)
   - [Edit Dataset](#edit-dataset)
   - [List and Search of Datasets](#list-and-search-of-datasets)
+  - [Datasets Page](#datasets-page)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

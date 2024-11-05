@@ -163,9 +163,9 @@ export default ({
               onClick={() => setIsConfirmationModalOpen(false)}
               className="absolute right-2 top-2"
             >
-              ✖️
+              ✖️ {/* TODO REMOVE THIS CHARACTER FROM HERE AND USE A ICON COMPONENT */}
             </button>
-            <h3 className="mb-4">Are you sure you want to revoke Token</h3>
+            <h3 className="mb-4">Are you sure you want to revoke the token</h3>
             <Button
               type="button"
               onClick={() => {

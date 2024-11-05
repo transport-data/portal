@@ -1,11 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
-
 - [Searchbar Component](#searchbar-component)
-  - [How it works](#how-it-works)
+    - [How it works](#how-it-works)
   - [Available Filters](#available-filters)
+    - [How to edit filters description](#how-to-edit-filters-description)
   - [Example of search with applied filter](#example-of-search-with-applied-filter)
   - [Search without applying filters](#search-without-applying-filters)
   - [Recent Searches](#recent-searches)
