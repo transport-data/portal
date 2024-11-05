@@ -17,10 +17,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _filter_activities(activity_type=None, status=None):
-    return _filter_by_action_activity_type_and_status(q, activity_type, status)
-
-
 def dashboard_activity_list(
     user_id: str,
     limit: int,
@@ -32,50 +28,10 @@ def dashboard_activity_list(
     action: str = "",
     query: str = ""
 ):
-    q = _dashboard_activity_query(user_id, limit, activity_type, action)
+    q = _dashboard_activity_query(user_id, limit, activity_type, action, query)
     q = _filter_activitites_from_users(q)
     q = _filter_activities_by_permission_labels(
         q, user_permission_labels)
-
-
-    if query:
-        q = _activities_union_all(
-            _activities_limit(
-                (
-                    model.Session.query(core_model_activity.Activity)
-                    .filter(
-                        and_(
-                            or_(
-                                (
-                                    text(
-                                        "data::json->'package'->>'title' ilike :title")
-                                    .params(title="%{}%".format(query))
-                                ),
-                                (
-                                    text(
-                                        "data::json->'package'->>'name' ilike :title")
-                                    .params(title="%{}%".format(query))
-                                ),
-                                (
-                                    text("data::json->>'actor' ilike :autor")
-                                    .params(autor="%{}%".format(query))
-                                ),
-                                (
-                                    text(
-                                        "data::json->'group'->>'title' ilike :title")
-                                    .params(title="%{}%".format(query))
-                                ),
-                                (
-                                    text(
-                                        "data::json->'group'->>'name' ilike :title")
-                                    .params(title="%{}%".format(query))
-                                )
-                            )
-                        )
-                    )
-                ), limit, offset),
-            q
-        )
 
     if after:
         q = q.filter(core_model_activity.Activity.timestamp > after)
@@ -211,23 +167,72 @@ def dashboard_activity_list_action(
     return {'results': activity_dicts, 'count': count}
 
 
-def _dashboard_activity_query(user_id: str, limit: int = 0, activity_type=None, status=None):
+def _activities_from_dataset_approval_workflow(user_id, limit, activity_type=None, status=None, query=None):
+    # The user that will receive this notification is the
+    # user that triggered the approval request
+    q = (
+        model.Session.query(core_model_activity.Activity)
+        .outerjoin(model.User, model.User.id == user_id)
+        .outerjoin(model.Member, and_(
+            model.Member.capacity == "admin",
+            model.Member.table_name == "user",
+            model.Member.table_id == user_id
+        ))
+        .filter(core_model_activity.Activity.activity_type == "reviewed package")
+        .filter(
+            or_(
+                text("data::json->'package'->>'approval_requested_by' = :user_id"),
+                and_(
+                    text("data::json->'package'->>'approval_status' = 'approved'"),
+                    text(
+                        "data::json->'package'->>'previous_approval_contributors' LIKE '%' || :user_id || '%'")
+                ),
+                and_(
+                    text(
+                        "data::json->'package'->>'approval_status' in ('pending', 'rejected')"),
+                    text(
+                        "data::json->'package'->>'current_approval_contributors' LIKE '%' || :user_id || '%'")
+                ),
+                text("data::json->'package'->>'owner_org'") == model.Member.group_id,
+                and_(model.User.id == user_id, model.User.sysadmin == True)
+            )
+        )
+        .params(user_id=user_id)
+    )
+
+    return core_model_activity._activities_limit(
+        _filter_by_action_activity_type_and_status(q, activity_type, status, query), limit)
+
+
+def _dashboard_activity_query(user_id: str, limit: int = 0, activity_type=None, status=None, query=None):
     """Return an SQLAlchemy query for user_id's dashboard activity stream."""
-    q1 = _user_activity_query(user_id, limit, activity_type, status)
-    q2 = _activities_from_everything_followed_by_user_query(user_id, limit, activity_type, status)
-    return _activities_union_all(q1, q2)
+    q1 = _user_activity_query(user_id, limit, activity_type, status, query)
+    q2 = _activities_from_everything_followed_by_user_query(
+        user_id, limit, activity_type, status, query)
+    q3 = _activities_from_dataset_approval_workflow(
+        user_id, limit, activity_type, status, query)
+
+    default_query = (
+        core_model_activity._activities_union_all(q1, q2)
+        .filter(core_model_activity.Activity.activity_type != "reviewed package")
+    )
+
+    query_with_approval = core_model_activity._activities_union_all(
+        default_query, q3)
+
+    return query_with_approval
 
 
 def _activities_from_everything_followed_by_user_query(
-    user_id: str, limit: int = 0, activity_type=None, status=None
+    user_id: str, limit: int = 0, activity_type=None, status=None, query=None
 ):
     """Return a query for all activities from everything user_id follows."""
     q1 = _activities_from_users_followed_by_user_query(
-        user_id, limit, activity_type, status)
+        user_id, limit, activity_type, status, query)
     q2 = _activities_from_datasets_followed_by_user_query(
-        user_id, limit, activity_type, status)
+        user_id, limit, activity_type, status, query)
     q3 = _activities_from_groups_followed_by_user_query(
-        user_id, limit, activity_type, status)
+        user_id, limit, activity_type, status, query)
     return _activities_union_all(q1, q2, q3)
 
 
@@ -284,12 +289,12 @@ def _activity_stream_get_filtered_users() -> list[str]:
 
 
 def _user_activity_query(
-        user_id, limit: int, activity_type=None, status=None):
+        user_id, limit: int, activity_type=None, status=None, query=None):
     """Return an SQLAlchemy query for all activities from or about user_id."""
     q1 = _activities_limit(_activities_from_user_query(
-        user_id, activity_type, status), limit)
+        user_id, activity_type, status, query), limit)
     q2 = _activities_limit(_activities_about_user_query(
-        user_id, activity_type, status), limit)
+        user_id, activity_type, status, query), limit)
     return _activities_union_all(q1, q2)
 
 
@@ -318,24 +323,24 @@ def _activities_limit(
     return q
 
 
-def _activities_from_user_query(user_id, activity_type=None, status=None):
+def _activities_from_user_query(user_id, activity_type=None, status=None, query=None):
     """Return an SQLAlchemy query for all activities from user_id."""
     q = model.Session.query(core_model_activity.Activity)
     q = q.filter(core_model_activity.Activity.user_id.in_(_to_list(user_id)))
 
-    return _filter_by_action_activity_type_and_status(q, activity_type, status)
+    return _filter_by_action_activity_type_and_status(q, activity_type, status, query)
 
 
-def _activities_about_user_query(user_id, activity_type=None, status=None):
+def _activities_about_user_query(user_id, activity_type=None, status=None, query=None):
     """Return an SQLAlchemy query for all activities about user_id."""
     q = model.Session.query(core_model_activity.Activity)
     q = q.filter(core_model_activity.Activity.object_id.in_(_to_list(user_id)))
 
-    return _filter_by_action_activity_type_and_status(q, activity_type, status)
+    return _filter_by_action_activity_type_and_status(q, activity_type, status, query)
 
 
 def _activities_from_datasets_followed_by_user_query(
-    user_id: str, limit: int, activity_type=None, status=None
+    user_id: str, limit: int, activity_type=None, status=None, query=None
 ):
     """Return a query for all activities from datasets that user_id follows."""
     # Get a list of the datasets that the user is following.
@@ -346,12 +351,12 @@ def _activities_from_datasets_followed_by_user_query(
 
     return _activities_limit(
         _package_activity_query(
-            [follower.object_id for follower in follower_objects], activity_type, status),
+            [follower.object_id for follower in follower_objects], activity_type, status, query),
         limit)
 
 
 def _activities_from_users_followed_by_user_query(
-    user_id: str, limit: int, activity_type=None, status=None
+    user_id: str, limit: int, activity_type=None, status=None, query=None
 ):
     """Return a query for all activities from users that user_id follows."""
 
@@ -363,11 +368,11 @@ def _activities_from_users_followed_by_user_query(
 
     return _user_activity_query(
         [follower.object_id for follower in follower_objects],
-        limit, activity_type, status)
+        limit, activity_type, status, query)
 
 
 def _activities_from_groups_followed_by_user_query(
-    user_id: str, limit: int, activity_type=None, status=None
+    user_id: str, limit: int, activity_type=None, status=None, query=None
 ):
     """Return a query for all activities about groups the given user follows.
 
@@ -384,22 +389,16 @@ def _activities_from_groups_followed_by_user_query(
 
     return _activities_limit(
         _group_activity_query(
-            [follower.object_id for follower in follower_objects], activity_type, status),
+            [follower.object_id for follower in follower_objects], activity_type, status, query),
         limit)
 
 
-def _group_activity_query(group_id, activity_type=None, status=None):
-    """Return an SQLAlchemy query for all activities about group_id.
-
-    Returns a query for all activities whose object is either the group itself
-    or one of the group's datasets.
-
-    """
-
-    groups = _to_list(group_id)
+def _group_activity_query(group_id, activity_type=None, status=None, query=None):
+    groups = core_model_activity._to_list(group_id)
     q = (
         model.Session.query(core_model_activity.Activity)
         .outerjoin(model.Member, core_model_activity.Activity.object_id == model.Member.table_id)
+        .outerjoin(model.Group, core_model_activity.Activity.object_id == model.Group.id)
         .outerjoin(
             model.Package,
             and_(
@@ -408,11 +407,6 @@ def _group_activity_query(group_id, activity_type=None, status=None):
             ),
         )
         .filter(
-            # We only care about activity either on the group itself or on
-            # packages within that group.  FIXME: This means that activity that
-            # occured while a package belonged to a group but was then removed
-            # will not show up. This may not be desired but is consistent with
-            # legacy behaviour.
             or_(
                 # active dataset in the group
                 and_(
@@ -429,12 +423,18 @@ def _group_activity_query(group_id, activity_type=None, status=None):
                 # (we want to avoid showing changes to an active dataset that
                 # was once in this group)
                 # activity the the group itself
-                core_model_activity.Activity.object_id.in_(groups),
+                and_(
+                    core_model_activity.Activity.object_id.in_(groups),
+                    or_(
+                        model.Group.id is None,
+                        model.Group.type != "geography"
+                    )
+                ),
             )
         )
     )
 
-    return _filter_by_action_activity_type_and_status(q, activity_type, status)
+    return _filter_by_action_activity_type_and_status(q, activity_type, status, query)
 
 
 def _activities_union_all(*qlist):
@@ -455,15 +455,15 @@ def _to_list(vals):
     return [vals]
 
 
-def _package_activity_query(package_id, activity_type=None, status=None):
+def _package_activity_query(package_id, activity_type=None, status=None, query=None):
     """Return an SQLAlchemy query for all activities about package_id."""
     q = model.Session.query(core_model_activity.Activity)\
         .filter(core_model_activity.Activity.object_id.in_(_to_list(package_id)))
 
-    return _filter_by_action_activity_type_and_status(q, activity_type, status)
+    return _filter_by_action_activity_type_and_status(q, activity_type, status, query)
 
 
-def _filter_by_action_activity_type_and_status(q, activity_type=None, status=None):
+def _filter_by_action_activity_type_and_status(q, activity_type=None, status=None, query=None):
     if not activity_type and not status:
         return q
 
@@ -478,12 +478,6 @@ def _filter_by_action_activity_type_and_status(q, activity_type=None, status=Non
                 q.filter(core_model_activity.Activity.activity_type.ilike(
                     "reviewed package"))
             )
-            # if status is not None:
-            #     q = (
-            #         q.filter(
-            #             text("data::json->'package'->>'approval_status' ilike :approval_status"))
-            #         .params(approval_status="%{}%".format(status))
-            #     )
         elif activity_type == 'dataset':
             q = (
                 q.filter(and_(
@@ -496,15 +490,56 @@ def _filter_by_action_activity_type_and_status(q, activity_type=None, status=Non
             )
 
     if status:
-        q = (
-            q.filter(
-                or_(
+        if status == 'rejected' or status == 'approved' or status == 'pending':
+            q = (
+                q.filter(and_(
                     core_model_activity.Activity.activity_type.ilike(
-                        "%{}".format(status or '')),
-                    text(
-                        "data::json->'package'->>'approval_status' ilike :approval_status")
+                        "reviewed package"),
+                    text("data::json->'package'->>'approval_status' ilike :approval_status"))
+                    .params(approval_status="%{}%".format(status)
+                            )
                 )
-                .params(approval_status="%{}%".format(status))
+            )
+        else:
+            q = (
+                q.filter(
+                    or_(
+                        core_model_activity.Activity.activity_type.ilike(
+                            "%{}%".format(status or '')),
+
+                        text(
+                            "data::json->'package'->>'approval_status' ilike :approval_status")
+                    )
+                    .params(approval_status="%{}%".format(status))
+                )
+            )
+    if query:
+        q = q.filter(
+            or_(
+                    (
+                        text(
+                            "data::json->'package'->>'title' ilike :title")
+                        .params(title="%{}%".format(query))
+                    ),
+                (
+                        text(
+                            "data::json->'package'->>'name' ilike :title")
+                        .params(title="%{}%".format(query))
+                    ),
+                (
+                        text("data::json->>'actor' ilike :autor")
+                        .params(autor="%{}%".format(query))
+                    ),
+                (
+                        text(
+                            "data::json->'group'->>'title' ilike :title")
+                        .params(title="%{}%".format(query))
+                    ),
+                (
+                        text(
+                            "data::json->'group'->>'name' ilike :title")
+                        .params(title="%{}%".format(query))
+                    )
             )
         )
 

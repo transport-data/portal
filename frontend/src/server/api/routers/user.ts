@@ -169,6 +169,14 @@ export const userRouter = createTRPCRouter({
         input: { query, limit, offset, action, activityType, sort },
       }) => {
         action = !action || action === "All" ? "" : action;
+        action =
+          action === "updated"
+            ? "changed"
+            : action === "created"
+            ? "new"
+            : action === "requested"
+            ? "pending"
+            : action;
         activityType = activityType ?? "";
         query = query ?? "";
         limit = limit ?? 10;
@@ -348,21 +356,21 @@ export const userRouter = createTRPCRouter({
       return list?.some((follower) => follower.id === user?.id);
     }),
 
-
-    isFollowingGeographies: protectedProcedure
+  isFollowingGeographies: protectedProcedure
     .input(z.array(z.string()))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = env.SYS_ADMIN_API_KEY;
       const data = await CkanRequest.post<CkanResponse<string[]>>(
-        `user_following_groups`, {
+        `user_following_groups`,
+        {
           apiKey: apiKey,
           json: {
             user_id: user.id,
-            group_list:input
+            group_list: input,
           },
         }
-      )
-      return data.result
+      );
+      return data.result;
     }),
 });
