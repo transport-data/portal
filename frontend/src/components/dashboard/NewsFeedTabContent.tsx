@@ -58,24 +58,26 @@ export interface NewsFeedCardProps {
   activity_type: string;
 }
 export default () => {
+  const limit = 9;
   const [currentPage, setCurrentPage] = useState(0);
-  const [searchFilter, setSearchFilter] = useState<SearchNewsfeedActivityType>(
-    {}
-  );
+  const [searchFilter, setSearchFilter] = useState<SearchNewsfeedActivityType>({
+    limit,
+  });
 
   const { data: { results: searchResults, count } = {}, isLoading } =
     api.user.listDashboardActivities.useQuery(searchFilter);
 
   api.user.listDashboardActivities.useQuery({
     ...searchFilter,
-    offset: (currentPage + 1) * 9,
+    offset: (currentPage + 1) * limit,
+    limit,
   });
 
   const groupedActivities = useMemo(() => {
     return groupByDate(searchResults || []);
   }, [searchResults]);
 
-  const pages = new Array(Math.ceil((count || 0) / 9)).fill(0);
+  const pages = new Array(Math.ceil((count || 0) / limit)).fill(0);
 
   const onChange: SearchNewsfeedPageOnChange = (data) => {
     setSearchFilter((oldValue) => {
@@ -184,7 +186,7 @@ export default () => {
                     onClick={() => {
                       setSearchFilter((oldV) => ({
                         ...oldV,
-                        offset: (currentPage - 1) * 9,
+                        offset: (currentPage - 1) * limit,
                       }));
                       setCurrentPage((oldV) => oldV - 1);
                     }}
@@ -200,7 +202,7 @@ export default () => {
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
-                            offset: i * 9,
+                            offset: i * limit,
                           }));
                           setCurrentPage(i);
                         }}
@@ -221,7 +223,7 @@ export default () => {
                     onClick={() => {
                       setSearchFilter((oldV) => ({
                         ...oldV,
-                        offset: (currentPage + 1) * 9,
+                        offset: (currentPage + 1) * limit,
                       }));
                       setCurrentPage((oldV) => oldV + 1);
                     }}

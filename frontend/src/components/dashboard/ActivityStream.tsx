@@ -3,8 +3,8 @@ import { api } from "@utils/api";
 import { Activity, Dataset } from "@portaljs/ckan";
 
 export default function ActivityStream() {
-  const { data: activities, error: activitiesError } =
-    api.user.listDashboardActivities.useQuery();
+  const { data: { results: activities, count } = {}, error: activitiesError } =
+    api.user.listDashboardActivities.useQuery({});
 
   const usersIds = new Set((activities ?? []).map((a) => a.user_id));
   const { data: users } = api.user.getUsersByIds.useQuery({
