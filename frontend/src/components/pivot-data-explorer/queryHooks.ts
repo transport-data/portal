@@ -21,17 +21,20 @@ export type DataResponse = CkanResponse<{
   fields: Array<Record<string, any>>;
 }>;
 
-const ckanUrl = env.NEXT_PUBLIC_CKAN_URL
+const ckanUrl = env.NEXT_PUBLIC_CKAN_URL;
 
 export function useFields(resourceId: string) {
   return useQuery({
     queryKey: ["fields", resourceId],
     queryFn: async () => {
-      const fieldsRes = await fetch(`${ckanUrl}/api/3/action/datastore_search?resource_id=${resourceId}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const fieldsRes = await fetch(
+        `${ckanUrl}/api/3/action/datastore_search?resource_id=${resourceId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const fields: CkanResponse<{
         fields: Array<{
           id: string;
@@ -51,6 +54,39 @@ export function useFields(resourceId: string) {
         })),
       };
     },
+  });
+}
+
+export function usePossibleValues(
+  resourceId: string,
+  column: string,
+  enabled = false
+) {
+  return useQuery({
+    queryKey: ["possibleValues", resourceId, column],
+    queryFn: async () => {
+      const possibleValuesRes = await fetch(
+        `${ckanUrl}/api/3/action/datastore_search_sql?sql=SELECT \"${column}\" as columnname, count(distinct \"${column}\") as count FROM \"${resourceId}\" GROUP BY \"${column}\"`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const fields: DataResponse = await possibleValuesRes.json();
+
+      console.log("FIELDS", fields);
+      return fields.result.records
+        .map((field) => ({
+          key: `${field.columnname}`,
+          name: `${field.columnname}`,
+          type: typeof field.columnname === "string" ? "string" : "number",
+          default: "",
+          count: field.count,
+        }))
+        .filter((field) => field.key);
+    },
+    enabled,
   });
 }
 
@@ -109,35 +145,26 @@ export function useNumberOfRows({
 
 export function useTableData({
   resourceId,
-  pagination,
-  columns,
-  sorting,
+  pivotColumns,
+  column,
+  row,
+  value,
   enabled = true,
   filters,
   columnsType,
 }: {
   resourceId: string;
-  pagination: PaginationState;
-  columns: string[];
-  sorting: ColumnSort[];
-  enabled?: boolean;
+  pivotColumns: string[];
+  column: string;
+  row: string;
+  value: string;
   filters: ColumnFilter[];
+  enabled?: boolean;
   columnsType: string;
 }) {
   return useQuery({
-    queryKey: ["query", resourceId, pagination, columns, sorting, filters],
+    queryKey: ["query", resourceId, pivotColumns, row, value, filters],
     queryFn: async () => {
-      console.log('FILTERS', filters)
-      const paginationSql = `LIMIT ${
-        pagination.pageSize
-      } OFFSET ${pagination.pageIndex * pagination.pageSize}`;
-      const sortSql =
-        sorting.length > 0
-          ? "ORDER BY " +
-            sorting
-              .map((sort) => `"${sort.id}" ${sort.desc ? "DESC" : "ASC"}`)
-              .join(", ")
-          : "";
       const filtersSql =
         filters.length > 0
           ? "WHERE " +
@@ -156,11 +183,14 @@ export function useTableData({
               )
               .join(" AND ")
           : "";
-      console.log('FILTERS SQL', filtersSql)
-      const parsedColumns = columns.map((column) => `"${column}"`);
-      const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
-        " , "
-      )} FROM "${resourceId}" ${filtersSql} ${sortSql} ${paginationSql}`;
+      const cases = pivotColumns
+        .map((c) =>
+          columnsType === "text"
+            ? `SUM(CASE WHEN \"${column}\"  = '${c}' THEN \"${value}\" ELSE 0 END) as "${c}" `
+            : `SUM(CASE WHEN \"${column}\"  = ${c} THEN \"${value}\" ELSE 0 END) as "${c}" `
+        )
+        .join(", ");
+      const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT \"${row}\", ${cases} FROM "${resourceId}" ${filtersSql} GROUP BY \"${row}\"`;
       const tableDataRes = await fetch(url, {
         headers: {
           "Content-Type": "application/json",

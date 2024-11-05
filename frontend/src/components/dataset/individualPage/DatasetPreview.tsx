@@ -1,4 +1,4 @@
-import { DataExplorer } from "@components/data-explorer/DataExplorer";
+import { DataExplorer } from "@components/pivot-data-explorer/DataExplorer";
 import {
   Select,
   SelectContent,

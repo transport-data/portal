@@ -101,18 +101,7 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
     sorting,
     columns: columns.map((c) => c.key),
     filters: filteredColumns,
-  });
-
-  const _prefetchData = useTableData({
-    resourceId,
-    pagination: {
-      pageIndex: pagination.pageIndex + 1,
-      pageSize: pagination.pageSize,
-    },
-    sorting,
-    filters: filteredColumns,
-    columns: columns.map((c) => c.key),
-    enabled: !isLoading,
+    columnsType: columns[0]?.type ?? 'string',
   });
 
   const data = useMemo(() => tableData ?? [], [tableData]);
