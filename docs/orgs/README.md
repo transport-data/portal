@@ -46,6 +46,8 @@ To add a new member, simply click on "Add another member", select the user and t
 
 ![Members management addition](./members-add.png)
 
+Note that if the user you want to invite doesn't have a portal account yet, you can simply type the user's email address in the input and click add. This will send an email to the new portal user with an invitation link to join the portal, and upon accepting the invitation by clicking the link and signing up with GitHub, the user will already be a member of the organization to which he was initially added.
+
 ## List and Search Organizations
 To view the Organizations list, you can go to `/dashboard/organizations`.
 Sysadmin users can view all organizations.
