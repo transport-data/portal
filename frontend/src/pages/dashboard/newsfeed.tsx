@@ -18,11 +18,11 @@ export async function getServerSideProps(context: any) {
     ["admin", "editor"].includes(x.capacity)
   );
 
-  if (!session?.user.sysadmin && !adminOrEditorUserOrgs.length) {
+  /*if (!session?.user.sysadmin && !adminOrEditorUserOrgs.length) {
     return {
       notFound: true,
     };
-  }
+  }*/
 
   return {
     props: {
