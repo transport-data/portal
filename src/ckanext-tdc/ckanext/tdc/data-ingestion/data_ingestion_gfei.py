@@ -63,7 +63,7 @@ def dataset_publish_1(org_id, dataset_title):
         'geographies': ['arg','aus','bra','can','chl','chn','egy','fra','deu','ind','idn','ita','jpn','kor','mys','mex','per','phl','rus','zaf','tur','ukr','gbr','usa'],
         'tdc_category': 'public',
         'sources': [
-            {'title': 'Global Fuel Economy Initiative', 'url': 'https://www.globalfueleconomy.org/'}
+            {'title': 'zenodo', 'url': 'https://zenodo.org/records/10148349'}
         ],
         'language': 'en',
         'sectors': ['road'],
@@ -135,7 +135,7 @@ def dataset_publish_2(org_id, dataset_title):
         'geographies': ['arg','aus','bra','can','chl','chn','egy','fra','deu','ind','idn','ita','jpn','kor','mys','mex','per','phl','rus','zaf','tur','ukr','gbr','usa'],
         'tdc_category': 'public',
         'sources': [
-            {'title': 'Global Fuel Economy Initiative', 'url': 'https://www.globalfueleconomy.org/'}
+            {'title': 'zenodo', 'url': 'https://zenodo.org/records/10148349'}
         ],
         'language': 'en',
         'sectors': ['road'],
