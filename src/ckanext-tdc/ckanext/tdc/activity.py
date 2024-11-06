@@ -464,8 +464,22 @@ def _package_activity_query(package_id, activity_type=None, status=None, query=N
 
 
 def _filter_by_action_activity_type_and_status(q, activity_type=None, status=None, query=None):
-    if not activity_type and not status:
-        return q
+    if not activity_type and not status and not query:
+        q = (
+            q.filter(
+                or_(
+                    core_model_activity.Activity.activity_type.ilike(
+                        "%organization%"),
+                    core_model_activity.Activity.activity_type.ilike(
+                        "%package%"),
+
+                    core_model_activity.Activity.activity_type.ilike(
+                        "%group%"),
+                    core_model_activity.Activity.activity_type.ilike(
+                        "%user%"),
+                )
+            )
+        )
 
     if activity_type:
         if activity_type == 'organization':
@@ -525,21 +539,21 @@ def _filter_by_action_activity_type_and_status(q, activity_type=None, status=Non
                         text(
                             "data::json->'package'->>'name' ilike :title")
                         .params(title="%{}%".format(query))
-                    ),
+                        ),
                 (
                         text("data::json->>'actor' ilike :autor")
                         .params(autor="%{}%".format(query))
-                    ),
+                        ),
                 (
                         text(
                             "data::json->'group'->>'title' ilike :title")
                         .params(title="%{}%".format(query))
-                    ),
+                        ),
                 (
                         text(
                             "data::json->'group'->>'name' ilike :title")
                         .params(title="%{}%".format(query))
-                    )
+                        )
             )
         )
 
