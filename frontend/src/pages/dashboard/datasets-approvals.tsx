@@ -2,7 +2,7 @@ import type { InferGetServerSidePropsType, NextPage } from "next";
 import { NextSeo } from "next-seo";
 
 import DashboardLayout from "@components/_shared/DashboardLayout";
-import MyDatasetsRequestsTabContent from "@components/dashboard/MyDatasetsRequestsTabContent";
+import MyDatasetsRequestsTabContent from "@components/dashboard/DatasetsApprovalTabContent";
 import { getServerAuthSession } from "@server/auth";
 import { listUserOrganizations } from "@utils/organization";
 

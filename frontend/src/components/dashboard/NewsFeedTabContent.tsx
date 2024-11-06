@@ -68,7 +68,13 @@ export interface NewsFeedCardProps {
   user_id: string;
   activity_type: string;
 }
-export default () => {
+export default ({
+  isSysAdmin,
+  adminOrEditorUserOrgs,
+}: {
+  isSysAdmin: boolean,
+  adminOrEditorUserOrgs: Map<string, 'admin' | 'editor'>;
+}) => {
   const limit = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const [searchFilter, setSearchFilter] = useState<SearchNewsfeedActivityType>({
@@ -185,7 +191,12 @@ export default () => {
                   <h4 className="mb-5 font-semibold">{date}</h4>{" "}
                   {(activities as DashboardNewsfeedCardProps[])?.map(
                     (activity) => (
-                      <DashboardNewsFeedCard {...activity} key={activity.id} />
+                      <DashboardNewsFeedCard
+                        {...activity}
+                        adminOrEditorUserOrgs={adminOrEditorUserOrgs}
+                        isSysAdmin={isSysAdmin}
+                        key={activity.id}
+                      />
                     )
                   )}
                 </div>
