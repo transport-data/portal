@@ -41,7 +41,7 @@ export default function DatasetSearchItem({
     <Link
       href={`/${organization.title}/${name}`}
       id={`dataset-search-item-${title}`}
-      className="flex w-full cursor-pointer gap-5">
+      className="flex w-fit cursor-pointer gap-5">
       <Tooltip
         placement="bottom"
         className="max-w-[192px] bg-[#1F2A37] "
