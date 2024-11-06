@@ -1,26 +1,41 @@
+import { SearchNewsfeedPageOnChange } from "@components/dashboard/NewsFeedTabContent";
 import SimpleSearchInput from "@components/ui/simple-search-input";
+import { useEffect, useState } from "react";
 
 export default function NewsFeedSearchFilters({
-  setSearchText,
   sortOrder,
-  setSortOrder,
   actionsFilter,
-  setActionsFilter,
+  onChange,
   actionsFilterOptions,
 }: {
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
-  sortOrder: string;
-  setSortOrder: React.Dispatch<React.SetStateAction<string>>;
+  onChange: SearchNewsfeedPageOnChange;
+  sortOrder: "latest" | "oldest";
   actionsFilter: string;
-  setActionsFilter: React.Dispatch<React.SetStateAction<string>>;
-  actionsFilterOptions: string[];
+  actionsFilterOptions: any[];
 }) {
+  const [searchTerm, setSearchTerm] = useState<string | undefined>();
+  const [debouncedTerm, setDebouncedTerm] = useState(searchTerm);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    onChange([{ key: "query", value: debouncedTerm }]);
+  }, [debouncedTerm]);
+
   return (
     <div className="grid grid-cols-12 gap-2 xl:max-h-[36px] ">
       <div className="col-span-12 xl:col-span-6">
         <SimpleSearchInput
           placeholder="Search by dataset title, organization title or activity actor"
-          onTextInput={(x) => setSearchText(x)}
+          onTextInput={(x) => setSearchTerm(x)}
         />
       </div>
       <div className="col-span-12 xl:col-span-3">
@@ -44,7 +59,14 @@ export default function NewsFeedSearchFilters({
             id="states"
             className="remove-input-ring block w-full rounded-lg rounded-e-lg border-0 bg-white p-0 pl-[3px]
             text-sm text-gray-900 ring-0 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 "
-            onChange={(e) => setSortOrder(e.target.value)}
+            onChange={(e) =>
+              onChange([
+                {
+                  key: "sort",
+                  value: e.target.value as any,
+                },
+              ])
+            }
           >
             <option value="latest" selected={sortOrder === "latest"}>
               Latest activity
@@ -78,7 +100,14 @@ export default function NewsFeedSearchFilters({
             name="filter"
             className="remove-input-ring block w-full rounded-lg rounded-e-lg border-0 bg-white p-0 pl-[3px]
             text-sm text-gray-900 ring-0 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 "
-            onChange={(e) => setActionsFilter(e.target.value)}
+            onChange={(e) =>
+              onChange([
+                {
+                  key: "action",
+                  value: e.target.value,
+                },
+              ])
+            }
             value={actionsFilter}
           >
             {actionsFilterOptions &&
