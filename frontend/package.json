@@ -91,6 +91,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "cookies-next": "^4.3.0",
     "crypto": "^1.0.1",
     "crypto-hash": "^2.0.1",
     "date-fns": "^3.6.0",

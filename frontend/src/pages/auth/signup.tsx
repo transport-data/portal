@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { SingInLayout } from "@components/_shared/SignInLayout";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type UserFormType, UserSchema } from "@schema/user.schema";
-import { api } from "@utils/api";
 import type { GetServerSideProps } from "next";
 import { getCsrfToken, signIn } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import { deleteCookie, setCookie } from "cookies-next";
+import { useEffect } from "react";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const csrfToken = await getCsrfToken(context);
@@ -19,26 +17,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<UserFormType & { confirm: string }>({
-    resolver: zodResolver(UserSchema),
-  });
+  const router = useRouter();
+  const query = router.query;
 
-  const createUser = api.user.createUser.useMutation({
-    onSuccess: async () => {
-      await signIn("credentials", {
-        callbackUrl: "/onboarding",
-        username: watch("name"),
-        password: watch("password"),
-      });
-    },
-    onError: (error) => setErrorMessage(error.message),
-  });
+  useEffect(() => {
+    deleteCookie("invite_id");
+  }, []);
 
   return (
     <>
@@ -55,11 +39,17 @@ export default function SignUpPage({ csrfToken }: { csrfToken: string }) {
           <div>
             <div className="mt-6 grid grid-cols-1 gap-4">
               <a
-                onClick={() =>
+                onClick={() => {
+                  if ("invite_id" in query) {
+                    setCookie("invite_id", query["invite_id"], {
+                      maxAge: 60 * 15,
+                    });
+                  }
+
                   signIn("github", {
                     callbackUrl: "/onboarding",
-                  })
-                }
+                  });
+                }}
                 className="col-span-12 flex w-full cursor-pointer items-center justify-center gap-3 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent md:col-span-6"
               >
                 <svg
