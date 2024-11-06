@@ -2,7 +2,7 @@ FROM viderum/ckan:v2.11.0
 
 ENV CKAN_INI /srv/app/production.ini
 
-ENV CKANEXT_TDC_HASH 54d88610c867a5abd8fc7800ce2583c7884135a0
+ENV CKANEXT_TDC_HASH e8b226af3b3236c755eb3ef2d2c2565480d268af
 
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming' && \
