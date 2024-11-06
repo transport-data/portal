@@ -74,6 +74,7 @@ export default ({
                   <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {filteredOrgs.map((org: any) => (
                       <ComboboxOption
+                        disabled={org?.is_user_member}
                         key={org.id}
                         value={org}
                         className="group relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-500 hover:bg-[#E5E7EB]"
@@ -81,7 +82,12 @@ export default ({
                         <div className="flex items-center gap-3.5">
                           <Building size={14} />
                           <span className="block truncate group-data-[selected]:font-semibold">
-                            {org.display_name}
+                            {org.display_name}{" "}
+                            {org?.is_user_member && (
+                              <span className="opacity-75">
+                                (Already a member of this organisation)
+                              </span>
+                            )}
                           </span>
                         </div>
                       </ComboboxOption>

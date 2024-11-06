@@ -79,7 +79,7 @@ export const userRouter = createTRPCRouter({
 
       if (!input.existingUser) {
         const newUser = await CkanRequest.post<CkanResponse<User>>(
-          `user_invite`,
+          `github_user_invite`,
           {
             apiKey: user.apikey,
             json: {
@@ -100,15 +100,16 @@ export const userRouter = createTRPCRouter({
           );
         }
 
-        const userApiToken: string = await CkanRequest.post(
-          `user_generate_apikey`,
-          {
-            apiKey: env.SYS_ADMIN_API_KEY,
-            json: { id: newUser.result.id },
-          }
-        );
-        if (!userApiToken)
-          throw new Error("Could not generate api token for user");
+        // TODO: is this needed? It's throwing errors. Action doesn't exist.
+        // const userApiToken: string = await CkanRequest.post(
+        //   `user_generate_apikey`,
+        //   {
+        //     apiKey: env.SYS_ADMIN_API_KEY,
+        //     json: { id: newUser.result.id },
+        //   }
+        // );
+        // if (!userApiToken)
+        //   throw new Error("Could not generate api token for user");
 
         return newUser.result;
       } else if (input.existingUser) {

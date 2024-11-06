@@ -12,7 +12,7 @@ import type { Organization as OrganizationDefault } from "@portaljs/ckan";
   include_private: z.boolean().optional()
 });*/
 
-const emptyStringToUndefined = z.literal('').transform(() => undefined)
+const emptyStringToUndefined = z.literal("").transform(() => undefined);
 
 export const OrganizationSchema = z.object({
   id: z.string().optional(),
@@ -20,7 +20,7 @@ export const OrganizationSchema = z.object({
     .string()
     .regex(
       /^[^\(\) +]+$/,
-      "The name cant have spaces nor the dot(.) character, it needs to be URL Compatible"
+      "The name cant have spaces nor the dot(.) character, it needs to be URL Compatible",
     ),
   title: z.string(),
   description: z.string().default(""),
@@ -28,8 +28,10 @@ export const OrganizationSchema = z.object({
   parent: z.string().optional(),
   image_url: z.string().default(""),
   email: z.string().email().optional().or(emptyStringToUndefined),
-  url: z.string().url().optional().or(emptyStringToUndefined)
+  url: z.string().url().optional().or(emptyStringToUndefined),
 });
 
 export type OrganizationFormType = z.infer<typeof OrganizationSchema>;
-export type Organization = OrganizationDefault & { groups: Array<{ id: string; name: string }> };
+export type Organization = OrganizationDefault & {
+  is_user_member?: boolean;
+} & { groups: Array<{ id: string; name: string }> };
