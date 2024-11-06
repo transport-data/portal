@@ -59,7 +59,7 @@ The testimonials section of this page uses the [MarkdownDB](https://github.com/d
 
 #### Onboarding page
 
-The first step of this page uses the [`follow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) and the unfollow uses the [`unfollow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/unfollow_group) to follow the locations (which are groups under the hood on CKAN and are named as [geography](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml) for the project), topics, and organizations. When a user follows a group the application will present the activities related to this group on the newsfeed tab.
+The first step of this page uses the [`follow_group endpoint`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) to follow the [locations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml), [topics](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml), and [organizations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml) (the three are treated as groups under the hood to CKAN). When a user follows a group the application will present the activities related to this group on the newsfeed tab.
 
 #### Partners page
 
