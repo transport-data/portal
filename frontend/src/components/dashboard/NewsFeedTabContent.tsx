@@ -72,8 +72,8 @@ export default ({
   isSysAdmin,
   adminOrEditorUserOrgs,
 }: {
-  isSysAdmin: boolean,
-  adminOrEditorUserOrgs: Map<string, 'admin' | 'editor'>;
+  isSysAdmin: boolean;
+  adminOrEditorUserOrgs: Map<string, "admin" | "editor">;
 }) => {
   const limit = 9;
   const [currentPage, setCurrentPage] = useState(0);
@@ -229,7 +229,16 @@ export default ({
                   </button>
                 </PaginationItem>
                 {pages.map((x, i) =>
-                  i > currentPage + 2 || i < currentPage - 2 ? null : (
+                  i >
+                    currentPage +
+                      (0 === currentPage ? 4 : 1 === currentPage ? 3 : 2) ||
+                  i <
+                    currentPage -
+                      (0 === currentPage
+                        ? 4
+                        : 1 === currentPage
+                        ? 3
+                        : 2) ? null : (
                     <PaginationItem key={`pagination-item-${i}`}>
                       <button
                         disabled={currentPage === i}
