@@ -208,6 +208,14 @@ export async function searchDatasets<T = Dataset>({
     queryParams.push(`include_private=${true}`);
   }
 
+  if(options.showArchived) {
+    queryParams.push(`include_archived=${true}`);
+  }
+  
+  if(options.includeDrafts) {
+    queryParams.push(`include_drafts=${true}`);
+  }
+
   if (queryParams?.length) {
     endpoint += `?${queryParams.join("&")}`;
   }
@@ -215,9 +223,6 @@ export async function searchDatasets<T = Dataset>({
   if (options.facetsFields) {
     endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000&facet.mincount=0`;
   }
-
-  endpoint += `&include_archived=${!!options.showArchived}`;
-  endpoint += `&include_drafts=${!!options.includeDrafts}`;
 
   const headers: any = {};
   if (apiKey) {
