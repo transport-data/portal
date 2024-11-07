@@ -86,3 +86,33 @@ export const MemberEditSchema = z.object({
 });
 
 export type MemberEditFormType = z.infer<typeof MemberEditSchema>;
+
+export const dashboardActivityAction: [string, ...string[]] = [
+  "All",
+  "created",
+  "deleted",
+  "updated",
+  "rejected",
+  "approved",
+  "requested",
+];
+
+export const dashboardActivityTypes: [string, ...string[]] = [
+  "",
+  "organization",
+  "dataset",
+  "approval",
+];
+
+export const SearchNewsfeedActivitySchema = z.object({
+  limit: z.number().default(10).optional(),
+  offset: z.number().default(0).optional(),
+  query: z.string().default("").optional(),
+  action: z.enum(dashboardActivityAction).default("All").optional(),
+  sort: z.enum(["latest", "oldest"]).default("latest").optional(),
+  activityType: z.enum(dashboardActivityTypes).default("All").optional(),
+});
+
+export type SearchNewsfeedActivityType = z.infer<
+  typeof SearchNewsfeedActivitySchema
+>;

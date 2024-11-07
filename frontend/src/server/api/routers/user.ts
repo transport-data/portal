@@ -7,11 +7,12 @@ import CkanRequest, { CkanRequestError } from "@datopian/ckan-api-client-js";
 import { env } from "@env.mjs";
 import { ApprovalStatus } from "@interfaces/ckan/dataset.interface";
 import { type User } from "@interfaces/ckan/user.interface";
-import { type Activity, type Dataset } from "@portaljs/ckan";
+import { type Activity } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
 import { OnboardingSchema } from "@schema/onboarding.schema";
 import {
   CKANUserSchema,
+  SearchNewsfeedActivitySchema,
   UserInviteSchema,
   UserSchema,
 } from "@schema/user.schema";
@@ -25,16 +26,16 @@ import {
   requestOrganizationOwner,
 } from "@utils/organization";
 import {
+  createApiToken,
   createUser,
   deleteUsers,
   generateUserApiKey,
+  getApiTokens,
   getUserFollowee,
   getUsersById,
   inviteUser,
   listUsers,
   patchUser,
-  getApiTokens,
-  createApiToken,
   revokeApiToken,
 } from "@utils/user";
 import { z } from "zod";
@@ -78,7 +79,7 @@ export const userRouter = createTRPCRouter({
 
       if (!input.existingUser) {
         const newUser = await CkanRequest.post<CkanResponse<User>>(
-          `user_invite`,
+          `github_user_invite`,
           {
             apiKey: user.apikey,
             json: {
@@ -99,15 +100,16 @@ export const userRouter = createTRPCRouter({
           );
         }
 
-        const userApiToken: string = await CkanRequest.post(
-          `user_generate_apikey`,
-          {
-            apiKey: env.SYS_ADMIN_API_KEY,
-            json: { id: newUser.result.id },
-          }
-        );
-        if (!userApiToken)
-          throw new Error("Could not generate api token for user");
+        // TODO: is this needed? It's throwing errors. Action doesn't exist.
+        // const userApiToken: string = await CkanRequest.post(
+        //   `user_generate_apikey`,
+        //   {
+        //     apiKey: env.SYS_ADMIN_API_KEY,
+        //     json: { id: newUser.result.id },
+        //   }
+        // );
+        // if (!userApiToken)
+        //   throw new Error("Could not generate api token for user");
 
         return newUser.result;
       } else if (input.existingUser) {
@@ -160,41 +162,55 @@ export const userRouter = createTRPCRouter({
       const users = await getUsersById({ ids: input.ids, apiKey });
       return users;
     }),
-  listDashboardActivities: protectedProcedure.query(async ({ ctx }) => {
-    const activities = await CkanRequest.get<
-      CkanResponse<
-        Array<
-          Activity & {
-            data?: {
-              package?: { title?: string; approval_status: ApprovalStatus };
-            };
-          }
-        >
-      >
-    >(`tdc_dashboard_activity_list`, {
-      apiKey: ctx.session.user.apikey,
-    });
-
-    activities.result = await Promise.all(
-      activities.result.map(async (a) => {
-        if (
-          a.activity_type === "new package" ||
-          a.activity_type === "changed package"
-        ) {
-          const dataset = await CkanRequest.get<CkanResponse<Dataset>>(
-            `package_show?id=${a.object_id}`,
+  listDashboardActivities: protectedProcedure
+    .input(SearchNewsfeedActivitySchema)
+    .query(
+      async ({
+        ctx,
+        input: { query, limit, offset, action, activityType, sort },
+      }) => {
+        action = !action || action === "All" ? "" : action;
+        action =
+          action === "updated"
+            ? "changed"
+            : action === "created"
+            ? "new"
+            : action === "requested"
+            ? "pending"
+            : action;
+        activityType = activityType ?? "";
+        query = query ?? "";
+        limit = limit ?? 10;
+        offset = offset ?? 0;
+        sort = sort ?? "latest";
+        return (
+          await CkanRequest.get<
+            CkanResponse<{
+              count: number;
+              results: Array<
+                Activity & {
+                  data?: {
+                    package?: {
+                      title?: string;
+                      approval_status: ApprovalStatus;
+                    };
+                  };
+                }
+              >;
+            }>
+          >(
+            `tdc_dashboard_activity_list?limit=${limit}&offset=${offset}&query=${query}&action=${action}&status=${activityType}&${
+              sort === "oldest"
+                ? `after=${new Date(1600, 1, 1).getTime() / 1000}`
+                : ""
+            }`,
             {
               apiKey: ctx.session.user.apikey,
             }
-          );
-          return { ...a, packageData: dataset.result };
-        }
-        return a;
-      })
-    );
-
-    return activities.result;
-  }),
+          )
+        ).result;
+      }
+    ),
   list: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
     const apiKey = user.apikey;
@@ -341,21 +357,21 @@ export const userRouter = createTRPCRouter({
       return list?.some((follower) => follower.id === user?.id);
     }),
 
-
-    isFollowingGeographies: protectedProcedure
+  isFollowingGeographies: protectedProcedure
     .input(z.array(z.string()))
     .query(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = env.SYS_ADMIN_API_KEY;
       const data = await CkanRequest.post<CkanResponse<string[]>>(
-        `user_following_groups`, {
+        `user_following_groups`,
+        {
           apiKey: apiKey,
           json: {
             user_id: user.id,
-            group_list:input
+            group_list: input,
           },
         }
-      )
-      return data.result
+      );
+      return data.result;
     }),
 });

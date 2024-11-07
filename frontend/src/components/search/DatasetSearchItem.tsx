@@ -20,6 +20,7 @@ export default function DatasetSearchItem({
   title,
   name,
   organization,
+  private: isPrivate,
   id,
   tdc_category,
 }: any) {
@@ -39,9 +40,10 @@ export default function DatasetSearchItem({
 
   return (
     <Link
-      href={`/${organization.title}/${name}`}
+      href={`/${organization?.title}/${name}${isPrivate ? "/private" : ""}`}
       id={`dataset-search-item-${title}`}
-      className="flex w-full cursor-pointer gap-5">
+      className="flex w-fit cursor-pointer gap-5"
+    >
       <Tooltip
         placement="bottom"
         className="max-w-[192px] bg-[#1F2A37] "
@@ -115,7 +117,7 @@ export default function DatasetSearchItem({
           <div className="flex flex-col flex-wrap gap-[8px] text-xs font-medium text-gray-500 sm:flex-row sm:items-center">
             <div className="flex gap-[4px]">
               <BuildingLibraryIcon width={14} />
-              {organization.title || organization.name}
+              {organization?.title || organization?.name}
             </div>
             <div className="hidden sm:block">•</div>
             <div className="flex gap-[4px]">

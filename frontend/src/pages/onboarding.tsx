@@ -16,13 +16,16 @@ import { ReactNode, useEffect, useState, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { listGroups } from "@utils/group";
-import { listOrganizations } from "@utils/organization";
+import { listOrganizations, listUserOrganizations } from "@utils/organization";
 import { api } from "@utils/api";
 import { toast } from "@/components/ui/use-toast";
 import React from "react";
+import { deleteCookie } from "cookies-next";
+import { getServerAuthSession } from "@server/auth";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
+  const session = await getServerAuthSession(context);
   const apiKey = (context as any).session?.apiKey || "";
   const topicsData = await listGroups({
     type: "topic",
@@ -38,6 +41,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       includeUsers: false,
     },
   });
+  try {
+    const userOrganizations = await listUserOrganizations({
+      apiKey,
+      id: session?.user?.id || "",
+    });
+
+    const userOrganizationsIds = userOrganizations.map((o) => o.id);
+
+    organizationsData.forEach((o) => {
+      if (userOrganizationsIds.includes(o.id)) {
+          o.is_user_member = true
+      }
+    });
+  } catch (e) {
+    console.error(e);
+  }
   return {
     props: {
       csrfToken: csrfToken ? csrfToken : "",
@@ -95,6 +114,7 @@ export default function LoginPage({
   });
 
   useEffect(() => {
+    deleteCookie("invite_id");
     setIsSmallScreen(window.innerWidth < 1457);
   }, []);
 
@@ -105,7 +125,7 @@ export default function LoginPage({
           name: loc.display_name,
           selected: false,
         }))
-      : []
+      : [],
   );
 
   const [organizations, setOrganizations] = useState(
@@ -115,7 +135,7 @@ export default function LoginPage({
           name: org.display_name,
           selected: false,
         }))
-      : []
+      : [],
   );
 
   const [topics, setTopics] = useState(
@@ -125,7 +145,7 @@ export default function LoginPage({
           name: topic.display_name,
           selected: false,
         }))
-      : []
+      : [],
   );
 
   const [stepNumber, setStep] = useState(0);
@@ -136,10 +156,10 @@ export default function LoginPage({
   ];
 
   const [paragraphText, setParagraphText] = useState<string | ReactNode>(
-    "The changes appear as a running list on your dashboard."
+    "The changes appear as a running list on your dashboard.",
   );
   const [subtitleText, setSubtitleText] = useState(
-    "Track the changes being made to the data you are interested in."
+    "Track the changes being made to the data you are interested in.",
   );
 
   useEffect(() => {
@@ -152,7 +172,7 @@ export default function LoginPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "geography" &&
-                followee.dict.id === loc.id
+                followee.dict.id === loc.id,
             ),
           }))
         : [];
@@ -162,7 +182,7 @@ export default function LoginPage({
             name: org.display_name,
             selected: userFollowee.some(
               (followee: any) =>
-                followee.type === "organization" && followee.dict.id === org.id
+                followee.type === "organization" && followee.dict.id === org.id,
             ),
           }))
         : [];
@@ -174,7 +194,7 @@ export default function LoginPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "topic" &&
-                followee.dict.id === topic.id
+                followee.dict.id === topic.id,
             ),
           }))
         : [];
@@ -209,7 +229,7 @@ export default function LoginPage({
           >
             Reach out
           </Button>
-        </>
+        </>,
       );
       if (watch("isNewOrganizationSelected")) {
         setDisableButton(
@@ -217,7 +237,7 @@ export default function LoginPage({
             watch("newOrganizationName") &&
             watch("newOrganizationDescription") &&
             watch("confirmThatItParticipatesOfTheOrg")
-          )
+          ),
         );
       } else {
         setDisableButton(
@@ -225,16 +245,16 @@ export default function LoginPage({
             watch("orgInWhichItParticipates") &&
             watch("messageToParticipateOfTheOrg") &&
             watch("confirmThatItParticipatesOfTheOrg")
-          )
+          ),
         );
       }
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
-        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
+        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future.",
       );
       setDisableButton(
-        !(watch("newUsersEmailsToInvite") && watch("messageToInviteNewUsers"))
+        !(watch("newUsersEmailsToInvite") && watch("messageToInviteNewUsers")),
       );
     } else {
       setDisableButton(false);
@@ -405,8 +425,8 @@ export default function LoginPage({
               {stepNumber === 0
                 ? "You can always do this later."
                 : stepNumber === 1
-                ? "Don’t want to share data?"
-                : "Don’t want to submit form?"}{" "}
+                  ? "Don’t want to share data?"
+                  : "Don’t want to submit form?"}{" "}
               <span
                 onClick={() => skipStep()}
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"

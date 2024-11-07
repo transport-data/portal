@@ -8,7 +8,7 @@ from ckanext.activity.logic import schema
 from ckanext.activity.model import activity as core_model_activity
 from ckanext.activity.logic.action import _get_user_permission_labels
 
-from sqlalchemy import text, and_, or_
+from sqlalchemy import text, and_, or_, JSON
 import datetime
 import logging
 
@@ -77,8 +77,10 @@ def _activities_from_groups_followed_by_user_query(
 def _activities_from_everything_followed_by_user_query(
     user_id: str, limit: int = 0
 ):
-    q1 = core_model_activity._activities_from_users_followed_by_user_query(user_id, limit)
-    q2 = core_model_activity._activities_from_datasets_followed_by_user_query(user_id, limit)
+    q1 = core_model_activity._activities_from_users_followed_by_user_query(
+        user_id, limit)
+    q2 = core_model_activity._activities_from_datasets_followed_by_user_query(
+        user_id, limit)
     q3 = _activities_from_groups_followed_by_user_query(user_id, limit)
     return core_model_activity._activities_union_all(q1, q2, q3)
 
@@ -87,35 +89,39 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
     # The user that will receive this notification is the
     # user that triggered the approval request
     q = (
-            model.Session.query(core_model_activity.Activity)
-            .outerjoin(model.User, model.User.id == user_id)
-            .outerjoin(model.Member, and_(
-                model.Member.capacity == "admin",
-                model.Member.table_name == "user",
-                model.Member.table_id == user_id
-            ))
-            .filter(core_model_activity.Activity.activity_type == "reviewed package")
-            .filter(
-                or_(
-                    text("data::json->'package'->>'approval_requested_by' = :user_id"),
-                    and_(
-                        text("data::json->'package'->>'approval_status' = 'approved'"),
-                        text("data::json->'package'->>'previous_approval_contributors' LIKE '%' || :user_id || '%'")
-                    ),
-                    and_(
-                        text("data::json->'package'->>'approval_status' in ('pending', 'rejected')"),
-                        text("data::json->'package'->>'current_approval_contributors' LIKE '%' || :user_id || '%'")
-                    ),
-                    text("data::json->'package'->>'owner_org'") == model.Member.group_id,
-                    and_(model.User.id == user_id, model.User.sysadmin == True)
-                )
+        model.Session.query(core_model_activity.Activity)
+        .outerjoin(model.User, model.User.id == user_id)
+        .outerjoin(model.Member, and_(
+            model.Member.capacity == "admin",
+            model.Member.table_name == "user",
+            model.Member.table_id == user_id
+        ))
+        .filter(core_model_activity.Activity.activity_type == "reviewed package")
+        .filter(
+            or_(
+                text("data::json->'package'->>'approval_requested_by' = :user_id"),
+                and_(
+                    text("data::json->'package'->>'approval_status' = 'approved'"),
+                    text(
+                        "data::json->'package'->>'previous_approval_contributors' LIKE '%' || :user_id || '%'")
+                ),
+                and_(
+                    text(
+                        "data::json->'package'->>'approval_status' in ('pending', 'rejected')"),
+                    text(
+                        "data::json->'package'->>'current_approval_contributors' LIKE '%' || :user_id || '%'")
+                ),
+                text("data::json->'package'->>'owner_org'") == model.Member.group_id,
+                and_(model.User.id == user_id, model.User.sysadmin == True)
             )
-            .params(user_id=user_id)
+        )
+        .params(user_id=user_id)
     )
 
     if approval_status is not None:
         q = (
-            q.filter(text("data::json->'package'->>'approval_status' = :approval_status"))
+            q.filter(
+                text("data::json->'package'->>'approval_status' = :approval_status"))
             .params(approval_status=approval_status)
         )
 
@@ -123,7 +129,8 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
 
 
 def _dashboard_approval_activity_query(user_id: str, limit: int = 0, approval_status=None):
-    q1 = _activities_from_dataset_approval_workflow(user_id, limit, approval_status=approval_status)
+    q1 = _activities_from_dataset_approval_workflow(
+        user_id, limit, approval_status=approval_status)
 
     return core_model_activity._activities_union_all(q1)
 
@@ -138,7 +145,8 @@ def _dashboard_activity_query(user_id: str, limit: int = 0):
         .filter(core_model_activity.Activity.activity_type != "reviewed package")
     )
 
-    query_with_approval = core_model_activity._activities_union_all(default_query, q3)
+    query_with_approval = core_model_activity._activities_union_all(
+        default_query, q3)
 
     return query_with_approval
 
@@ -150,18 +158,16 @@ def dashboard_activity_list(
     before=None,
     after=None,
     user_permission_labels=None,
-    mode="newsfeed",
-    approval_status=None
+    activity_type='',
+    action: str = "",
+    query: str = ""
 ):
-
-    if mode == "approval":
-        q = _dashboard_approval_activity_query(user_id, approval_status=approval_status)
-    else:
-        q = _dashboard_activity_query(user_id)
-
+    q = _dashboard_activity_query(user_id)
     q = core_model_activity._filter_activitites_from_users(q)
-
-    q = core_model_activity._filter_activities_by_permission_labels(q, user_permission_labels)
+    q = core_model_activity._filter_activities_by_permission_labels(
+        q, user_permission_labels)
+    q = _filter_by_action_activity_type_status_and_query(
+        q, activity_type, action, query)
 
     if after:
         q = q.filter(core_model_activity.Activity.timestamp > after)
@@ -174,7 +180,10 @@ def dashboard_activity_list(
         q = q.order_by(core_model_activity.Activity.timestamp)
     else:
         # type_ignore_reason: incomplete SQLAlchemy types
-        q = q.order_by(core_model_activity.Activity.timestamp.desc())  # type: ignore
+        # type: ignore
+        q = q.order_by(core_model_activity.Activity.timestamp.desc())
+
+    count = q.count()
 
     if offset:
         q = q.offset(offset)
@@ -187,7 +196,7 @@ def dashboard_activity_list(
     if revese_order:
         results.reverse()
 
-    return results
+    return {'results': results, 'count': count}
 
 
 @validate(schema.default_dashboard_activity_list_schema)
@@ -205,13 +214,16 @@ def dashboard_activity_list_action(
     limit = data_dict["limit"]  # defaulted, limited & made an int by schema
     before = data_dict.get("before")
     after = data_dict.get("after")
+    action = None
+    query = None
+    activity_type = None
 
-    mode = "newsfeed"
-    approval_status = None
     extras = data_dict.get("__extras")
+
     if extras:
-        mode = extras.get("mode", "newsfeed")
-        approval_status = extras.get("approval_status", None)
+        action = extras.get("action")
+        query = extras.get("query")
+        activity_type = extras.get("status", None)
 
     activity_objects = dashboard_activity_list(
         user_id,
@@ -220,13 +232,16 @@ def dashboard_activity_list_action(
         before=before,
         after=after,
         user_permission_labels=_get_user_permission_labels(context),
-        mode=mode,
-        approval_status=approval_status
+        action=action,
+        activity_type=activity_type,
+        query=query,
     )
 
     activity_dicts = core_model_activity.activity_list_dictize(
-        activity_objects, context
+        activity_objects.get('results'), context
     )
+
+    count = activity_objects.get('count')
 
     # Mark the new (not yet seen by user) activities.
     strptime = datetime.datetime.strptime
@@ -282,6 +297,76 @@ def dashboard_activity_list_action(
                 package = data["package"]
                 approval_requested_by = package.get("approval_requested_by")
                 if approval_requested_by:
-                    package["approval_requested_by_user_data"] = get_user_name_and_picture(approval_requested_by)
+                    package["approval_requested_by_user_data"] = get_user_name_and_picture(
+                        approval_requested_by)
 
-    return activity_dicts
+    return {'results': activity_dicts, 'count': count}
+
+
+def _filter_by_action_activity_type_status_and_query(q, activity_type=None, status=None, query=None):
+    if activity_type:
+        if activity_type == 'organization':
+            q = (
+                q.filter(core_model_activity.Activity.activity_type.ilike(
+                    "%{} organization%".format(status or '').strip()))
+            )
+        elif activity_type == 'approval':
+            q = (
+                q.filter(core_model_activity.Activity.activity_type.ilike(
+                    "reviewed package"))
+            )
+        elif activity_type == 'dataset':
+            q = (
+                q.filter(and_(
+                    core_model_activity.Activity.activity_type.ilike(
+                        "%{} package%".format(status or '').strip()),
+                    core_model_activity.Activity.activity_type.not_ilike(
+                        "%reviewed package%")
+                )
+                )
+            )
+
+    if status:
+        if status == 'rejected' or status == 'approved' or status == 'pending':
+            q = (
+                q.filter(and_(
+                    core_model_activity.Activity.activity_type.ilike(
+                        "reviewed package"),
+                    (
+                        core_model_activity.Activity.data.cast(JSON).op(
+                            '->')('package').op('->>')('approval_status') == status
+                    )
+                )
+                )
+            )
+        else:
+            q = (
+                q.filter(
+                    core_model_activity.Activity.activity_type.ilike(
+                        "%{}%".format(status or ''))
+                    .params(approval_status="%{}%".format(status))
+                )
+            )
+    if query:
+        q = q.filter(
+            or_(
+                (
+                    core_model_activity.Activity.data.cast(JSON).op(
+                        '->')('package').op('->>')('title').ilike(f'%{query}%')
+                ),
+                (
+                    core_model_activity.Activity.data.cast(JSON).op(
+                        '->')('actor').op('->>')('name').ilike(f'%{query}%')
+                ),
+                (
+                    core_model_activity.Activity.data.cast(JSON).op(
+                        '->')('group').op('->>')('title').ilike(f'%{query}%')
+                ),
+                (
+                    core_model_activity.Activity.data.cast(JSON).op(
+                        '->')('group').op('->>')('name').ilike(f'%{query}%')
+                ),
+            )
+        )
+
+    return q

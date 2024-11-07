@@ -8,6 +8,9 @@ import os.path as path
 
 from sqlalchemy import func
 from jinja2 import Environment, FileSystemLoader
+from socket import error as socket_error
+
+import ckan
 from ckan.common import _, config, current_user
 from ckan.plugins import toolkit as tk
 import ckan.lib.authenticator as authenticator
@@ -16,6 +19,8 @@ import ckan.lib.mailer as mailer
 from ckan.logic.action.create import _get_random_username_from_email
 from ckan.lib.base import render
 import ckan.logic as logic
+import ckan.lib.dictization.model_dictize as model_dictize
+import ckan.lib.helpers as h
 
 from ckanext.scheming import helpers as scheming_helpers
 from ckanext.tdc.conversions import converters
@@ -27,6 +32,8 @@ log = logging.getLogger(__name__)
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
+_validate = ckan.lib.navl.dictization_functions.validate
+
 
 cwd = path.abspath(path.dirname(__file__))
 template_dir = path.join(cwd, '../templates/emails/')
@@ -311,7 +318,7 @@ def _control_archived_datasets_visibility(data_dict):
         if "fq" not in data_dict:
             data_dict["fq"] = ""
 
-        data_dict["fq"] += " -is_archived:(true)"
+        data_dict["fq"] += " is_archived:(false)"
 
     if "include_archived" in data_dict:
         del data_dict["include_archived"]
@@ -485,6 +492,7 @@ def user_login(context, data_dict):
             email = data_dict['email']
             model = context['model']
             context['ignore_auth'] = True
+            invite_id = data_dict.get("invite_id", None)
 
             validated_token = validate_github_token(token)
 
@@ -492,6 +500,28 @@ def user_login(context, data_dict):
 
             if not user_id or not validated_token:
                 return generic_error_message
+
+            if invite_id:
+                invited_ckan_user_q = session.query(model.User).filter(model.User.reset_key == invite_id)
+                invited_ckan_user = invited_ckan_user_q.first()
+                if not invited_ckan_user:
+                    # TODO: throw invalid invite error
+                    return generic_error_message
+
+                email_already_used = session.query(model.User).filter(
+                        model.User.email == email,
+                        model.User.state == 'active').all()
+
+                if len(email_already_used) > 0:
+                    # TODO: throw invalid invite due to GitHub account already used
+                    # in another CKAN account
+                    return generic_error_message
+
+                # Email adress is available and invite is valid
+                invited_ckan_user.email = email
+                invited_ckan_user.reset_key = mailer.make_key()
+                invited_ckan_user.state = 'active'
+                model.repo.commit_and_remove()
 
             user = session.query(model.User).filter(func.lower(
                 model.User.email) == func.lower(email)).first()
@@ -518,8 +548,6 @@ def user_login(context, data_dict):
                         'state': 'active',
                     },
                 )
-                log.info(user)
-
             else:
                 user = user.as_dict()
 
@@ -867,3 +895,97 @@ def user_following_groups(context, data_dict):
             continue
 
     return followed_groups
+
+
+def get_invite_body(user,
+                    group_dict = None,
+                    role = None):
+    frontend_url = tk.config.get('ckan.frontend_portal_url', None)
+    extra_vars = {
+        'reset_link': "{}/auth/signup?invite_id={}".format(frontend_url, user.reset_key),
+        'site_title': config.get('ckan.site_title'),
+        'site_url': config.get('ckan.site_url'),
+        'user_name': user.name,
+    }
+
+    if role:
+        extra_vars['role_name'] = h.roles_translated().get(role, _(role))
+    if group_dict:
+        group_type = (_('organization') if group_dict['is_organization']
+                      else _('group'))
+        extra_vars['group_type'] = group_type
+        extra_vars['group_title'] = group_dict.get('title')
+
+    return render_html_template('github_user_invite_template.html', extra_vars)
+
+
+def send_invite(
+        user,
+        group_dict = None,
+        role = None):
+    mailer.create_reset_key(user)
+    body = get_invite_body(user, group_dict, role)
+    extra_vars = {
+        'site_title': config.get('ckan.site_title')
+    }
+    subject = render('emails/github_user_invite_subject.txt', extra_vars)
+
+    # Make sure we only use the first line
+    subject = subject.split('\n')[0]
+
+    # TODO: implement non-html body
+    mailer.mail_recipient(user.display_name, user.email, subject, "Invite", body_html=body)
+
+
+# Imported from ckan core user_invite
+def github_user_invite(context, data_dict):
+    tk.check_access('user_invite', context, data_dict)
+
+    schema = context.get('schema',
+                         logic.schema.default_user_invite_schema())
+    data, errors = _validate(data_dict, schema, context)
+    if errors:
+        raise ValidationError(errors)
+
+    model = context['model']
+    group = model.Group.get(data['group_id'])
+    if not group:
+        raise logic.NotFound()
+
+    name = _get_random_username_from_email(data['email'])
+
+    data['name'] = name
+    # send the proper schema when creating a user from here
+    # so the password field would be ignored.
+    invite_schema = ckan.logic.schema.create_user_for_user_invite_schema()
+
+    data['state'] = model.State.PENDING
+    user_dict = get_action('user_create')(
+        {**context, "schema": invite_schema, "ignore_auth": True},
+        data)
+    user = model.User.get(user_dict['id'])
+    assert user
+    member_dict = {
+        'username': user.id,
+        'id': data['group_id'],
+        'role': data['role']
+    }
+
+    org_or_group = 'organization' if group.is_organization else 'group'
+    get_action(f'{org_or_group}_member_create')(context, member_dict)
+    group_dict = get_action(f'{org_or_group}_show')(
+        context, {'id': data['group_id']})
+
+    try:
+        send_invite(user, group_dict, data['role'])
+    except (socket_error, mailer.MailerException) as error:
+        # Email could not be sent, delete the pending user
+
+        get_action('user_delete')(context, {'id': user.id})
+
+        message = _(
+            'Error sending the invite email, '
+            'the user was not created: {0}').format(error)
+        raise ValidationError(message)
+
+    return model_dictize.user_dictize(user, context)

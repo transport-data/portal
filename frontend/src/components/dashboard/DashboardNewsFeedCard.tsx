@@ -1,10 +1,13 @@
 import { ApprovalStatus } from "@interfaces/ckan/dataset.interface";
+import { Organization } from "@schema/organization.schema";
 import { api } from "@utils/api";
 import { EyeOff, Globe, Building, Database, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export interface DashboardNewsfeedCardProps {
   id: string;
+  isSysAdmin: boolean;
+  adminOrEditorUserOrgs: Map<string, "admin" | "editor">;
   timestamp: string;
   user_id: string;
   object_id?: string;
@@ -13,6 +16,8 @@ export interface DashboardNewsfeedCardProps {
   data?: {
     group?: {
       title?: string;
+      id?: string;
+      name?: string;
       state?: string;
     };
     package?: {
@@ -20,6 +25,7 @@ export interface DashboardNewsfeedCardProps {
       approval_status?: ApprovalStatus | "reviewed";
       title?: string;
       private?: boolean;
+      organization?: Organization;
       state?: string;
     };
     actor?: string;
@@ -28,6 +34,7 @@ export interface DashboardNewsfeedCardProps {
 
 export default (activity: DashboardNewsfeedCardProps) => {
   const { data: sessionData } = useSession();
+  const { adminOrEditorUserOrgs, isSysAdmin } = activity;
   const user_id = sessionData?.user?.id;
 
   const activitySegments = activity.activity_type?.split(" ");
@@ -78,21 +85,46 @@ export default (activity: DashboardNewsfeedCardProps) => {
     actor = activity?.user_data?.name;
   } else if (activity?.data?.actor) {
     actor = activity.data.actor;
+  } else if (typeof activity?.user_data === "string") {
+    actor = activity?.user_data;
   }
   let linkHref = "";
   let linkTitle: string | undefined = "";
   switch (activityTarget) {
     case "dataset":
-      linkHref = `/dashboard/datasets/${activity.data?.package?.name}/edit`;
+      const role = adminOrEditorUserOrgs.get(
+        activity.data?.package?.organization?.id || ""
+      );
+
+      if (role || isSysAdmin) {
+        linkHref = `/dashboard/datasets/${activity.data?.package?.name}/edit`;
+      } else {
+        linkHref = `/${activity.data?.package?.organization?.name}/${
+          activity.data?.package?.name
+        }${
+          activity.data?.package?.private ||
+          activity.data?.package?.state === "draft"
+            ? "/private"
+            : ""
+        }`;
+      }
       linkTitle = activity.data?.package?.title;
       break;
     case "organization":
       linkTitle = activity.data?.group?.title;
-      linkHref = "/dashboard/organizations";
+      if (isSysAdmin) {
+        linkHref = `/dashboard/organizations/${activity.data?.group?.id}/edit`;
+      } else {
+        linkHref = `/search?query=${activity.data?.group?.id}`;
+      }
       break;
     case "group":
       linkTitle = activity.data?.group?.title;
-      linkHref = "/dashboard/topics";
+      if (isSysAdmin) {
+        linkHref = `/dashboard/topics/${activity.data?.group?.id}/edit`;
+      } else {
+        linkHref = `/search?topic=${activity.data?.group?.id}`;
+      }
       break;
   }
   const fullText = `${actionText} ${activityTarget}`;

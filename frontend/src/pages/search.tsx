@@ -334,6 +334,24 @@ export default function DatasetSearch({
     }
   }, [searchFilter]);
 
+  const totalPages = Math.ceil(datasetCount || 0 / 9);
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const halfRange = Math.floor(5 / 2);
+    let start = Math.max(currentPage - halfRange, 1);
+    let end = Math.min(start + 4, totalPages);
+
+    if (end - start < 4) {
+      start = Math.max(end - 4, 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
+  };
+
   return (
     <>
       <Head>
@@ -596,7 +614,20 @@ export default function DatasetSearch({
                         </button>
                       </PaginationItem>
                       {pages.map((x, i) =>
-                        i > currentPage + 2 || i < currentPage - 2 ? null : (
+                        i >
+                          currentPage +
+                            (0 === currentPage
+                              ? 4
+                              : 1 === currentPage
+                              ? 3
+                              : 2) ||
+                        i <
+                          currentPage -
+                            (0 === currentPage
+                              ? 4
+                              : 1 === currentPage
+                              ? 3
+                              : 2) ? null : (
                           <PaginationItem key={`pagination-item-${i}`}>
                             <button
                               disabled={currentPage === i}
