@@ -318,7 +318,7 @@ def _control_archived_datasets_visibility(data_dict):
         if "fq" not in data_dict:
             data_dict["fq"] = ""
 
-        data_dict["fq"] += " is_archived:(false)"
+        data_dict["fq"] += " -is_archived:(true)"
 
     if "include_archived" in data_dict:
         del data_dict["include_archived"]
