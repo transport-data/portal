@@ -188,10 +188,6 @@ export async function searchDatasets<T = Dataset>({
     );
   }
 
-  if (options.private || options.includePrivate) {
-    fqAr.push(buildOrFq("private", [`${true}`]));
-  }
-
   if (fqAr?.length) {
     queryParams.push(`fq=${fqAr.join("+")}`);
   }
