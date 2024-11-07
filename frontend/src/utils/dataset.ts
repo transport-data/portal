@@ -224,7 +224,6 @@ export async function searchDatasets<T = Dataset>({
     endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000&facet.mincount=0`;
   }
 
-  console.log(endpoint)
   const headers: any = {};
   if (apiKey) {
     headers["Authorization"] = apiKey;
