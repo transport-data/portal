@@ -7,25 +7,25 @@
 - [How to report issues](#how-to-report-issues)
 - [How to keep updated with the next features](#how-to-keep-updated-with-the-next-features)
 - [How the portal works](#how-the-portal-works)
-    - [Home page](#home-page)
-    - [Onboarding page](#onboarding-page)
-    - [Partners page](#partners-page)
-    - [Datasets' browse page](#datasets-browse-page)
-    - [Geography page](#geography-page)
-    - [Datasets page](#datasets-page)
-    - [About Us page](#about-us-page)
-    - [Events page](#events-page)
-    - [FAQ page](#faq-page)
-    - [Dashboard - Newsfeed page](#dashboard---newsfeed-page)
-    - [Dashboard - My Datasets page](#dashboard---my-datasets-page)
-    - [Dashboard - My Organisation page](#dashboard---my-organisation-page)
-    - [Dashboard - Topics page](#dashboard---topics-page)
-    - [Dashboard - Organizations page](#dashboard---organizations-page)
-    - [Dashboard - Datasets Approvals page](#dashboard---datasets-approvals-page)
-    - [Dashboard - Settings page](#dashboard---settings-page)
-    - [Add Dataset page](#add-dataset-page)
-    - [Edit Dataset page](#edit-dataset-page)
-    - [Dataset Details page](#dataset-details-page)
+  - [Home page](#home-page)
+  - [Onboarding page](#onboarding-page)
+  - [Partners page](#partners-page)
+  - [Datasets' browse page](#datasets-browse-page)
+  - [Geography page](#geography-page)
+  - [Datasets page](#datasets-page)
+  - [About Us page](#about-us-page)
+  - [Events page](#events-page)
+  - [FAQ page](#faq-page)
+  - [Dashboard - Newsfeed page](#dashboard---newsfeed-page)
+  - [Dashboard - My Datasets page](#dashboard---my-datasets-page)
+  - [Dashboard - My Organisation page](#dashboard---my-organisation-page)
+  - [Dashboard - Topics page](#dashboard---topics-page)
+  - [Dashboard - Organizations page](#dashboard---organizations-page)
+  - [Dashboard - Datasets Approvals page](#dashboard---datasets-approvals-page)
+  - [Dashboard - Settings page](#dashboard---settings-page)
+  - [Add Dataset page](#add-dataset-page)
+  - [Edit Dataset page](#edit-dataset-page)
+  - [Dataset Details page](#dataset-details-page)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -84,9 +84,10 @@ Request used to get the all the user [organizations](https://github.com/transpor
 The first step of this page uses the [`follow_group endpoint`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) to follow the [locations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml), [topics](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml), and [organizations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml) (all three are treated as groups under the hood to CKAN). When a user follows a group the application will present the activities related to this group on the [newsfeed tab](#dashboard---newsfeed-page).
 
 The JSON used to follow a topic, organization, or a geography is:
+
 ```json
 {
-  "id": "id of the group that you want to follow or unfollow",
+  "id": "id of the group that you want to follow or unfollow"
 }
 ```
 
@@ -379,16 +380,18 @@ This page uses the [`package_show`](https://docs.ckan.org/en/2.11/api/index.html
 Example of a request to the package_show endpoint: [https://ckan.tdc.dev.datopian.com//api/3/action/package_show?id=\<id of the dataset\>]()
 
 The following button for the dataset uses the [`follow_dataset`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_dataset) and the unfollow uses the [`unfollow_dataset`](https://ckan.tdc.dev.datopian.com/api/3/action/unfollow_dataset) both use the JSON below to follow or unfollow the dataset:
+
 ```json
 {
-  "id": "id of the dataset that you want to follow or unfollow",
+  "id": "id of the dataset that you want to follow or unfollow"
 }
 ```
 
 The following button for the organization, regions, and countries uses the [`follow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) and the unfollow uses the [`unfollow_group`](https://ckan.tdc.dev.datopian.com/api/3/action/unfollow_group) both use the JSON below to follow or unfollow the geography:
+
 ```json
 {
-  "id": "id of the geography that you want to follow or unfollow",
+  "id": "id of the geography that you want to follow or unfollow"
 }
 ```
 
