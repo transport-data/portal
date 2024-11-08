@@ -30,10 +30,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const topicsData = await listGroups({
     type: "topic",
     apiKey,
+    limit: 350,
   });
   const locationData = await listGroups({
     apiKey,
     type: "geography",
+    limit: 350,
   });
   const organizationsData = await listOrganizations({
     input: {
