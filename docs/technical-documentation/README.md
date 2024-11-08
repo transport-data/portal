@@ -195,7 +195,7 @@ This page is accessible just for sys admins users, to present the data of this p
 
 To the creation flow by clicking in the `+ Add New` button we use the [`group_create`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.group_create) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml) being mandatory send an extra field named `type` with a string `topic` in the request, if you want to add parents topics to this topic you can send one more extra field called `groups` with an array of objects with the `name` of the parent group inside.
 
-e.g.:
+Example of a POST request to the `group_create` endpoint:
 
 ```json
 {
@@ -208,9 +208,33 @@ e.g.:
 }
 ```
 
-To the edit flow by clicking on a topic card we use the [`group_edit`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.edit.group_edit) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml) being mandatory send an extra field named `type` with a string `topic` in the request, if you want to add or remove parents topics from this topic you can send one more extra field called `groups` with an array of objects with the `name` of the parent group inside.
+To the edit flow by clicking on a topic card we use the [`group_patch`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.edit.group_patch) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml) being mandatory send an extra field named `type` with a string `topic` in the request, if you want to add or remove parents topics from this topic you can send one more extra field called `groups` with an array of objects with the `name` of the parent group inside.
+
+<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
+
+Example of a POST request to the `group_patch` endpoint:
+
+```json
+{
+  "id": "id of the topic that you want to edit",
+  "type": "topic",
+  "name": "topic name",
+  "title": "topic title",
+  "notes": "topic description",
+  "url": "URL with the image of the topic",
+  "groups": [{ "name": "name of the parent topic if wanted" }]
+}
+```
 
 To delete a topic we use the [`group_delete`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.group_delete) endpoint and send the id of the topic to be deleted.
+
+Example of a POST request to the `group_delete` endpoint:
+
+```json
+{
+  "id": "id of the group that you want to delete"
+}
+```
 
 #### Dashboard - Organizations page
 
@@ -218,11 +242,54 @@ This page is restricted to logged-in users only.
 
 To present the data of this page we get all the [organizations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml) available using the [`organization_list_for_user` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/organization_list_for_user?include_dataset_count=true&limit=1000) and use the `package_count` field of the group to present the number of datasets linked to the topic.
 
+Request used to get the all the user [organizations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml): [https://ckan.tdc.dev.datopian.com/api/3/action/organization_list_for_user?id=\<user id\>&limit=1000]()
+
 To the creation flow the user must be a sys admin and click on the `+ Add New` button, we use the [`organization_create`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.organization_create) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml), if you want to add parents organizations to this organization you can send one more extra field called `groups` with an array of objects with the `name` of the parent organization inside.
 
-To the edit flow by clicking on an organization card we use the [`organization_edit`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.edit.organization_edit) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml), if you want to add or remove parents organizations from this organization you can send one more extra field called `groups` with an array of objects with the `name` of the parent organization inside.
+Example of the body of the [`organization_create`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.organization_create) endpoint:
+
+```json
+{
+  "name": "organization-name",
+  "title": "Title of the org",
+  "description": "description of the org",
+  "image_display_url": "image of the org URL",
+  "parent": "name of the parent org if there is one",
+  "image_url": "image of the org URL",
+  "email": "organization email",
+  "groups": [{ "name": "name of the parent org if there is one" }]
+}
+```
+
+To the edit flow by clicking on an organization card we use the [`organization_patch`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.organization_patch) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml), if you want to add or remove parents organizations from this organization you can send one more extra field called `groups` with an array of objects with the `name` of the parent organization inside.
+
+<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
+
+Example of the body of the [`organization_patch`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.organization_patch) endpoint:
+
+```json
+{
+  "id":"id of the organization that you want to edit",
+  "name": "organization-name",
+  "title": "Title of the org",
+  "description": "description of the org",
+  "image_display_url": "image of the org URL",
+  "parent": "name of the parent org if there is one",
+  "image_url": "image of the org URL",
+  "email": "organization email",
+  "groups": [{ "name": "name of the parent org if there is one" }]
+}
+```
 
 To delete an organization we use the [`organization_delete`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.organization_delete) endpoint and send the id of the organization to be deleted.
+
+Example of a POST request to the `organization_delete` endpoint:
+
+```json
+{
+  "id": "id of the organization that you want to delete"
+}
+```
 
 #### Dashboard - Datasets Approvals page
 
@@ -271,7 +338,7 @@ Request used to get the all the user [organizations](https://github.com/transpor
 
 Request used to get the [geographies](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml): [https://ckan.tdc.dev.datopian.com/api/3/action/group_list?&all_fields=True&include_extras=True&type=geography&limit=350]()
 
-Example of a post request to the `package_create` endpoint:
+Example of a POST request to the `package_create` endpoint:
 
 ```json
 {
@@ -322,9 +389,9 @@ Request used to get the all the user [organizations](https://github.com/transpor
 
 Request used to get the [geographies](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml): [https://ckan.tdc.dev.datopian.com/api/3/action/group_list?&all_fields=True&include_extras=True&type=geography&limit=350]()
 
-Note: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
+<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
 
-Example of a post request to the `package_patch` endpoint:
+Example of a POST request to the `package_patch` endpoint:
 
 ```json
 {
@@ -365,7 +432,7 @@ Example of a post request to the `package_patch` endpoint:
 
 To delete the dataset, we use the [`package_delete`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.package_delete) endpoint and send the dataset's ID.
 
-Example of a post request to the `package_delete` endpoint:
+Example of a POST request to the `package_delete` endpoint:
 
 ```json
 {
