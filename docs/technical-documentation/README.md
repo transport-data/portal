@@ -7,31 +7,31 @@
 - [How to report issues](#how-to-report-issues)
 - [How to keep updated with the next features](#how-to-keep-updated-with-the-next-features)
 - [How the portal works](#how-the-portal-works)
-  - [Home page](#home-page)
-  - [Onboarding page](#onboarding-page)
-  - [Partners page](#partners-page)
-  - [Datasets' browse page](#datasets-browse-page)
-  - [Geography page](#geography-page)
-  - [Datasets page](#datasets-page)
-  - [About Us page](#about-us-page)
-  - [Events page](#events-page)
-  - [FAQ page](#faq-page)
-  - [Dashboard - Newsfeed page](#dashboard---newsfeed-page)
-  - [Dashboard - My Datasets page](#dashboard---my-datasets-page)
-  - [Dashboard - My Organisation page](#dashboard---my-organisation-page)
-  - [Dashboard - Topics page](#dashboard---topics-page)
-  - [Dashboard - Organizations page](#dashboard---organizations-page)
-  - [Dashboard - Datasets Approvals page](#dashboard---datasets-approvals-page)
-  - [Dashboard - Settings page](#dashboard---settings-page)
-  - [Add Dataset page](#add-dataset-page)
-  - [Edit Dataset page](#edit-dataset-page)
-  - [Dataset Details page](#dataset-details-page)
+    - [Home page](#home-page)
+    - [Onboarding page](#onboarding-page)
+    - [Partners page](#partners-page)
+    - [Datasets' browse page](#datasets-browse-page)
+    - [Geography page](#geography-page)
+    - [Datasets page](#datasets-page)
+    - [About Us page](#about-us-page)
+    - [Events page](#events-page)
+    - [FAQ page](#faq-page)
+    - [Dashboard - Newsfeed page](#dashboard---newsfeed-page)
+    - [Dashboard - My Datasets page](#dashboard---my-datasets-page)
+    - [Dashboard - My Organisation page](#dashboard---my-organisation-page)
+    - [Dashboard - Topics page](#dashboard---topics-page)
+    - [Dashboard - Organizations page](#dashboard---organizations-page)
+    - [Dashboard - Datasets Approvals page](#dashboard---datasets-approvals-page)
+    - [Dashboard - Settings page](#dashboard---settings-page)
+    - [Add Dataset page](#add-dataset-page)
+    - [Edit Dataset page](#edit-dataset-page)
+    - [Dataset Details page](#dataset-details-page)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Technologies used
 
-The technologies used in this project and their documentation to maintain the project are [CKAN](https://docs.ckan.org/en/2.11/) as backend, [Next.js](https://nextjs.org/docs) for the frontend application, [Cypress](https://docs.cypress.io/app/get-started/why-cypress) to do the End-to-End tests, [MarkdownDB](https://github.com/datopian/markdowndb?tab=readme-ov-file#markdowndb) for rendering static pages based on the markdown format, [Apache Solr](https://solr.apache.org/guide/solr/latest/getting-started/introduction.html) to index the packages and allow the users to make queries on the data faster, [PostgreSQL](https://www.postgresql.org/docs/) as the CKAN database, [DataPusher+](https://github.com/dathere/datapusher-plus?tab=readme-ov-file#datapusher) to make structured resources queryable via SQL, [Docker](https://docs.docker.com/) to containerize the CKAN, Datapusher+, and Solr that are running in [Kubernetes](https://kubernetes.io/docs/home/).
+The technologies used in this project and their documentation to maintain the project are [CKAN](https://docs.ckan.org/en/2.11/) as backend, [Next.js](https://nextjs.org/docs) for the frontend application, [PortalJS]() to get types, interfaces, already implemented requests to CKAN, and integration with MarkdownDB easily, [Cypress](https://docs.cypress.io/app/get-started/why-cypress) to do the End-to-End tests, [MarkdownDB](https://github.com/datopian/markdowndb?tab=readme-ov-file#markdowndb) for rendering static pages based on the markdown format, [Apache Solr](https://solr.apache.org/guide/solr/latest/getting-started/introduction.html) to index the packages and allow the users to make queries on the data faster, [PostgreSQL](https://www.postgresql.org/docs/) as the CKAN database, [DataPusher+](https://github.com/dathere/datapusher-plus?tab=readme-ov-file#datapusher) to make structured resources queryable via SQL, [Docker](https://docs.docker.com/) to containerize the CKAN, Datapusher+, and Solr that are running in [Kubernetes](https://kubernetes.io/docs/home/).
 
 ## How to run and build the project locally
 
@@ -83,7 +83,7 @@ Request used to get the all the user [organizations](https://github.com/transpor
 
 The first step of this page uses the [`follow_group endpoint`](https://ckan.tdc.dev.datopian.com/api/3/action/follow_group) to follow the [locations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml), [topics](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml), and [organizations](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml) (all three are treated as groups under the hood to CKAN). When a user follows a group the application will present the activities related to this group on the [newsfeed tab](#dashboard---newsfeed-page).
 
-The JSON used to follow a topic, organization, or a geography is:
+The JSON used to follow a topic, organization, or geography is:
 
 ```json
 {
@@ -95,26 +95,26 @@ In the second step, we have two ways to go:
 
 1. Request to participate in an existing organisation:
 
-   - This section uses the custom [`request_organization_owner` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_organization_owner) created for this flow that receives a JSON in the body of the POST request:
+- This section uses the custom [`request_organization_owner` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_organization_owner) created for this flow that receives a JSON in the body of the POST request:
 
-     ```json
-     {
-       "id": "id of the organization that you want to participate",
-       "message": "message to the organization's admins"
-     }
-     ```
+```json
+{
+  "id": "id of the organization that you want to participate",
+  "message": "message to the organization's admins"
+}
+```
 
 2. Request the creation of a new organization:
 
-   - This section uses the custom [`request_new_organization` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_new_organization) created for this flow that receives a JSON in the body of the POST request:
+- This section uses the custom [`request_new_organization` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_new_organization) created for this flow that receives a JSON in the body of the POST request:
 
-     ```json
-     {
-       "org_name": "the org name",
-       "org_description": "description of the new org",
-       "dataset_description": "message to the sys admin approve your new organization"
-     }
-     ```
+```json
+{
+  "org_name": "the org name",
+  "org_description": "description of the new org",
+  "dataset_description": "message to the sys admin approve your new organization"
+}
+```
 
 The third step uses the custom [`invite_user_to_tdc` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/invite_user_to_tdc) created for this flow that receives a JSON in the body of the POST request:
 
@@ -210,7 +210,7 @@ Example of a POST request to the `group_create` endpoint:
 
 To the edit flow by clicking on a topic card we use the [`group_patch`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.edit.group_patch) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/topic.yaml) being mandatory send an extra field named `type` with a string `topic` in the request, if you want to add or remove parents topics from this topic you can send one more extra field called `groups` with an array of objects with the `name` of the parent group inside.
 
-<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
+<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload, and the CKAN will ignore it.
 
 Example of a POST request to the `group_patch` endpoint:
 
@@ -263,13 +263,13 @@ Example of the body of the [`organization_create`](https://docs.ckan.org/en/2.11
 
 To the edit flow by clicking on an organization card we use the [`organization_patch`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.organization_patch) endpoint using the fields present [here](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/organization.yaml), if you want to add or remove parents organizations from this organization you can send one more extra field called `groups` with an array of objects with the `name` of the parent organization inside.
 
-<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
+<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload, and the CKAN will ignore it.
 
 Example of the body of the [`organization_patch`](https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.organization_patch) endpoint:
 
 ```json
 {
-  "id":"id of the organization that you want to edit",
+  "id": "id of the organization that you want to edit",
   "name": "organization-name",
   "title": "Title of the org",
   "description": "description of the org",
@@ -321,8 +321,8 @@ Example of the body of the [`user_patch`](https://docs.ckan.org/en/2.11/api/inde
 
 ```json
 {
-  "id": "<user id that you want to add or remove the sysadmin role>",
-  "sysadmin": <true or false>
+  "id": "<user id that you want to add or remove the sysadmin role>",
+  "sysadmin": <true or false>
 }
 ```
 
@@ -342,38 +342,38 @@ Example of a POST request to the `package_create` endpoint:
 
 ```json
 {
-  "id": "generated UUID",
-  "name": "dataset name",
-  "title": "dataset title",
-  "notes": "<p>Description as HTML</p>",
-  "overview_text": "<p>Overview text as HTML</p>",
-  "owner_org": "id of the organization that this dataset belongs to",
-  "topics": ["any topics that you want to add"],
-  "is_archived": false or true,
-  "tags": ["any tags that you want to add"],
-  "userRepresents": false or true,
-  "sources": ["any sources that you want to add"],
-  "comments": ["any comments that you want to add"],
-  "language": "iso 639-1 of the language of you dataset",
-  "frequency": "frequency",
-  "tdc_category": "tdc category",
-  "modes": ["any modes that you want to add"],
-  "services": ["any services that you want to add"],
-  "sectors": ["any sectors that you want to add"],
-  "temporal_coverage_start": "YYYY-MM-DD",
-  "temporal_coverage_end": "YYYY-MM-DD",
-  "geographies": ["iso3 of the countries or regions that you want to add"],
-  "license_id": "any licenses that you want to add",
-  "private": true or false,
-  "indicators": ["any indicators that you want to add"],
-  "units": ["any units that you want to add"],
-  "dimensioning": "any dimensioning that you want to add",
-  "url": "any URL",
-  "data_provider": "any data provider that you want to add",
-  "data_access": "any data access that you want to add",
-  "state": "active",
-  "related_datasets": ["any datasets that you want to relate to this one"],
-  "resources": ["any resources that you want to add"]
+  "id": "generated UUID",
+  "name": "dataset name",
+  "title": "dataset title",
+  "notes": "<p>Description as HTML</p>",
+  "overview_text": "<p>Overview text as HTML</p>",
+  "owner_org": "id of the organization that this dataset belongs to",
+  "topics": ["any topics that you want to add"],
+  "is_archived": false or true,
+  "tags": ["any tags that you want to add"],
+  "userRepresents": false or true,
+  "sources": ["any sources that you want to add"],
+  "comments": ["any comments that you want to add"],
+  "language": "iso 639-1 of the language of you dataset",
+  "frequency": "frequency",
+  "tdc_category": "tdc category",
+  "modes": ["any modes that you want to add"],
+  "services": ["any services that you want to add"],
+  "sectors": ["any sectors that you want to add"],
+  "temporal_coverage_start": "YYYY-MM-DD",
+  "temporal_coverage_end": "YYYY-MM-DD",
+  "geographies": ["iso3 of the countries or regions that you want to add"],
+  "license_id": "any licenses that you want to add",
+  "private": true or false,
+  "indicators": ["any indicators that you want to add"],
+  "units": ["any units that you want to add"],
+  "dimensioning": "any dimensioning that you want to add",
+  "url": "any URL",
+  "data_provider": "any data provider that you want to add",
+  "data_access": "any data access that you want to add",
+  "state": "active",
+  "related_datasets": ["any datasets that you want to relate to this one"],
+  "resources": ["any resources that you want to add"]
 }
 ```
 
@@ -389,44 +389,44 @@ Request used to get the all the user [organizations](https://github.com/transpor
 
 Request used to get the [geographies](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml): [https://ckan.tdc.dev.datopian.com/api/3/action/group_list?&all_fields=True&include_extras=True&type=geography&limit=350]()
 
-<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload and the CKAN will ignore it.
+<b>Note</b>: this endpoint is a patch, if you don't want to edit a specific field don't send it in the payload, and the CKAN will ignore it.
 
 Example of a POST request to the `package_patch` endpoint:
 
 ```json
 {
-  "id": "id of the dataset that you want to edit",
-  "name": "dataset name",
-  "title": "dataset title",
-  "notes": "<p>Description as HTML</p>",
-  "overview_text": "<p>Overview text as HTML</p>",
-  "owner_org": "id of the organization that this dataset belongs to",
-  "topics": ["any topics that you want to add"],
-  "is_archived": false or true,
-  "tags": ["any tags that you want to add"],
-  "userRepresents": false or true,
-  "sources": ["any sources that you want to add"],
-  "comments": ["any comments that you want to add"],
-  "language": "iso 639-1 of the language of you dataset",
-  "frequency": "frequency",
-  "tdc_category": "tdc category",
-  "modes": ["any modes that you want to add"],
-  "services": ["any services that you want to add"],
-  "sectors": ["any sectors that you want to add"],
-  "temporal_coverage_start": "YYYY-MM-DD",
-  "temporal_coverage_end": "YYYY-MM-DD",
-  "geographies": ["iso3 of the countries or regions that you want to add"],
-  "license_id": "any licenses that you want to add",
-  "private": true or false,
-  "indicators": ["any indicators that you want to add"],
-  "units": ["any units that you want to add"],
-  "dimensioning": "any dimensioning that you want to add",
-  "url": "any URL",
-  "data_provider": "any data provider that you want to add",
-  "data_access": "any data access that you want to add",
-  "state": "active",
-  "related_datasets": ["any datasets that you want to relate to this one"],
-  "resources": ["any resources that you want to add"]
+  "id": "id of the dataset that you want to edit",
+  "name": "dataset name",
+  "title": "dataset title",
+  "notes": "<p>Description as HTML</p>",
+  "overview_text": "<p>Overview text as HTML</p>",
+  "owner_org": "id of the organization that this dataset belongs to",
+  "topics": ["any topics that you want to add"],
+  "is_archived": false or true,
+  "tags": ["any tags that you want to add"],
+  "userRepresents": false or true,
+  "sources": ["any sources that you want to add"],
+  "comments": ["any comments that you want to add"],
+  "language": "iso 639-1 of the language of you dataset",
+  "frequency": "frequency",
+  "tdc_category": "tdc category",
+  "modes": ["any modes that you want to add"],
+  "services": ["any services that you want to add"],
+  "sectors": ["any sectors that you want to add"],
+  "temporal_coverage_start": "YYYY-MM-DD",
+  "temporal_coverage_end": "YYYY-MM-DD",
+  "geographies": ["iso3 of the countries or regions that you want to add"],
+  "license_id": "any licenses that you want to add",
+  "private": true or false,
+  "indicators": ["any indicators that you want to add"],
+  "units": ["any units that you want to add"],
+  "dimensioning": "any dimensioning that you want to add",
+  "url": "any URL",
+  "data_provider": "any data provider that you want to add",
+  "data_access": "any data access that you want to add",
+  "state": "active",
+  "related_datasets": ["any datasets that you want to relate to this one"],
+  "resources": ["any resources that you want to add"]
 }
 ```
 
@@ -464,7 +464,7 @@ The following button for the organization, regions, and countries uses the [`fol
 
 The counting of downloads information is gotten from google analytics API.
 
-To present the data on the table with sorting, filtering and all the features available for structured data we use the [`datastore_search`](https://docs.ckan.org/en/2.9/maintaining/datastore.html#ckanext.datastore.logic.action.datastore_search) and the [`datastore_search_sql`](https://docs.ckan.org/en/2.9/maintaining/datastore.html#ckanext.datastore.logic.action.datastore_search_sql) endpoints.
+To present the data on the table with sorting, filtering, and all the features available for structured data we use the [`datastore_search`](https://docs.ckan.org/en/2.9/maintaining/datastore.html#ckanext.datastore.logic.action.datastore_search) and the [`datastore_search_sql`](https://docs.ckan.org/en/2.9/maintaining/datastore.html#ckanext.datastore.logic.action.datastore_search_sql) endpoints.
 
 Example of a request to the datastore_search endpoint: [https://ckan.tdc.dev.datopian.com//api/3/action/datastore_search?resource_id=\<id of a resource uploaded to datastore\>]()
 
