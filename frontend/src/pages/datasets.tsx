@@ -45,20 +45,25 @@ export default function DatasetsPage({
   topics,
 }: //trpcState,
 InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
-  const { data: listOfTopics } = api.group.list.useQuery(
-    {
-      type: "topic",
-      showGeographyShapes: false,
-    },
-    {
-      initialData: topics,
-    }
-  );
-  const { data: tdcHarmonizedDatasets } = api.dataset.search.useQuery({
-    limit: 10,
-    tdc_category: "tdc_harmonized",
-  });
-  const { data: gaData } = api.ga.getVisitorStats.useQuery();
+  const { data: listOfTopics, isLoading: isLoadingGroup } =
+    api.group.list.useQuery(
+      {
+        type: "topic",
+        showGeographyShapes: false,
+      },
+      {
+        initialData: topics,
+      }
+    );
+  const { data: tdcHarmonizedDatasets, isLoading: isLoadingHarmonized } =
+    api.dataset.search.useQuery({
+      limit: 10,
+      tdc_category: "tdc_harmonized",
+    });
+  const { data: gaData, isLoading: isLoadingStats } =
+    api.ga.getVisitorStats.useQuery();
+
+  const isCardsLoading = isLoadingStats || isLoadingStats || isLoadingGroup;
   return (
     <>
       <Head>
@@ -85,13 +90,15 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
           <div className="pb-[96px] pt-[80px]">
             <div className="grid auto-rows-fr grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
-                {gaData && (
+                {gaData ? (
                   <img
                     src="/images/icons/group-mostviewed.png"
                     width={48}
                     height={48}
                     alt="TDC Most Viewed Logo"
                   />
+                ) : (
+                  <Skeleton className="radius-sm block min-h-[48px] w-[48px]" />
                 )}
                 <div className="flex h-full flex-col justify-between">
                   <div className="flex flex-col gap-4">
@@ -100,7 +107,7 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                         Most Viewed
                       </span>
                     ) : (
-                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-6 w-24" />
                     )}
                     <ul className="flex flex-col gap-[12px]">
                       {gaData ? (
@@ -117,27 +124,31 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                         </>
                       ) : (
                         [0, 1, 2, 3].map((i) => (
-                          <Skeleton key={i} className="h-4 w-12" />
+                          <Skeleton key={i} className="h-4 w-[60%]" />
                         ))
                       )}
                     </ul>
                   </div>
-                  <Link
-                    className="text-sm font-medium text-accent"
-                    href="/search"
-                  >
-                    Show all
-                  </Link>
+                  {!isCardsLoading && (
+                    <Link
+                      className="text-sm font-medium text-accent"
+                      href="/search"
+                    >
+                      Show all
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
-                {tdcHarmonizedDatasets && (
+                {tdcHarmonizedDatasets ? (
                   <img
                     src="/images/icons/group-hamornised.png"
                     width={48}
                     height={48}
                     alt="TDC Harmonized Logo"
                   />
+                ) : (
+                  <Skeleton className="radius-sm block min-h-[48px] w-[48px]" />
                 )}
                 <div className="flex h-full flex-col justify-between">
                   <div className="flex flex-col gap-4">
@@ -146,7 +157,7 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                         TDC Harmonized
                       </span>
                     ) : (
-                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-6 w-28" />
                     )}
                     <ul className="flex flex-col gap-[12px]">
                       {tdcHarmonizedDatasets ? (
@@ -163,23 +174,45 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                         </>
                       ) : (
                         [0, 1, 2, 3].map((i) => (
-                          <Skeleton key={i} className="h-4 w-12" />
+                          <Skeleton key={i} className="h-[20px] w-[60%]" />
                         ))
                       )}
                     </ul>
                   </div>
-                  <Link
-                    id="show_all_tdc_harmonized"
-                    className="text-sm font-medium text-accent"
-                    href="/search?tdc_category=tdc_harmonized"
-                  >
-                    Show all
-                  </Link>
+                  {!isCardsLoading && (
+                    <Link
+                      id="show_all_tdc_harmonized"
+                      className="text-sm font-medium text-accent"
+                      href="/search?tdc_category=tdc_harmonized"
+                    >
+                      Show all
+                    </Link>
+                  )}
                 </div>
               </div>
-              {listOfTopics?.map((group) => (
-                <TopicCard key={group.id} group={group} />
-              ))}
+              {!isCardsLoading || !listOfTopics ? (
+                listOfTopics?.map((group) => (
+                  <TopicCard
+                    key={group.id}
+                    group={group}
+                    isCardsLoading={isCardsLoading}
+                  />
+                ))
+              ) : (
+                <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
+                  <Skeleton className="radius-sm block min-h-[48px] w-[48px]" />
+                  <div className="flex h-full flex-col justify-between">
+                    <div className="flex flex-col gap-4">
+                      <Skeleton className="h-6 w-28" />
+                      <ul className="flex flex-col gap-[12px]">
+                        {[0, 1, 2, 3].map((i) => (
+                          <Skeleton key={i} className="h-[20px] w-[60%]" />
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -188,7 +221,13 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
   );
 }
 
-function TopicCard({ group }: { group: Group }) {
+function TopicCard({
+  group,
+  isCardsLoading,
+}: {
+  group: Group;
+  isCardsLoading: boolean;
+}) {
   const { data: groupDetails, isLoading } = api.group.get.useQuery(
     { id: group.id },
     {
@@ -200,25 +239,27 @@ function TopicCard({ group }: { group: Group }) {
   }
   return (
     <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
-      {groupDetails && groupDetails.image_display_url && (
+      {!isLoading ? (
         <img
           src={groupDetails.image_display_url}
           width={48}
           height={48}
           alt={groupDetails.title}
         />
+      ) : (
+        <Skeleton className="radius-sm block min-h-[48px] w-[48px]" />
       )}
-      <div className="flex h-full flex-col justify-between">
+      <div className="flex h-full flex-col justify-between gap-3">
         <div className="flex flex-col gap-4">
-          {groupDetails ? (
+          {!isLoading ? (
             <span className="block text-lg font-semibold leading-tight text-gray-900">
               {groupDetails.title}
             </span>
           ) : (
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-6 w-28" />
           )}
           <ul className="flex flex-col gap-[12px]">
-            {groupDetails ? (
+            {!isLoading ? (
               <>
                 {groupDetails.packages?.slice(0, 5).map((item) => (
                   <Link
@@ -231,11 +272,13 @@ function TopicCard({ group }: { group: Group }) {
                 ))}
               </>
             ) : (
-              [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-4 w-12" />)
+              [0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-[20px] w-[60%]" />
+              ))
             )}
           </ul>
         </div>
-        {groupDetails ? (
+        {!isLoading && (
           <Link
             id={`show_all_${groupDetails.name}`}
             className="text-sm font-medium text-accent"
@@ -243,10 +286,12 @@ function TopicCard({ group }: { group: Group }) {
           >
             Show all
           </Link>
-        ) : (
-          <Skeleton className="h-4 w-12" />
         )}
       </div>
     </div>
   );
 }
+
+const CardSkeleton = () => {
+  return <></>;
+};
