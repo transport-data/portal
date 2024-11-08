@@ -211,3 +211,49 @@ export function useTableData({
     placeholderData: (previousData: any) => previousData,
   });
 }
+
+export function useNumberOfRows({
+  resourceId,
+  enabled = true,
+  filters,
+}: {
+  resourceId: string;
+  enabled?: boolean;
+  filters: FilterObjType;
+}) {
+  return useQuery({
+    queryKey: ["query", resourceId, filters],
+    queryFn: async () => {
+      let filtersSql = "";
+      if (filters.length > 0) {
+        filtersSql =
+          "AND " +
+          filters
+            .filter((f) => f.values.length > 0)
+            .map(
+              (filter) =>
+                `("${filter.column}" IN (${filter.values
+                  .map((v) => `${filter.type !== "text" ? `${v}` : `'${v}'`}`)
+                  .join(",")}))`
+            )
+            .join(" AND ");
+      }
+      const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT count(*) as count FROM "${resourceId}" WHERE 1=1 ${filtersSql}`;
+      const tableDataRes = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const tableData: DataResponse = await tableDataRes.json();
+      if (!tableData.success && tableData.error) {
+        if (tableData.error.message) {
+          throw Error(tableData.error.message);
+        }
+        throw Error(JSON.stringify(tableData.error));
+      }
+      const count: number = tableData.result.records[0]?.count;
+      return count;
+    },
+    enabled,
+  });
+}

@@ -2,9 +2,14 @@ import { flexRender, Table as TableType, Header } from "@tanstack/react-table";
 import { Pin, PinOff } from "lucide-react";
 import { useState } from "react";
 import { XCircleIcon } from "lucide-react";
-import { Tooltip } from "./Tooltip";
 import { DataExplorerColumnFilter } from "./DataExplorer";
 import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useFootnote } from "./queryHooks";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { QueryFormType } from "./search.schema";
@@ -13,7 +18,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@components/ui/popover";
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { DefaultTooltip } from "@components/ui/tooltip";
 
 type TableProps = {
   table: TableType<any>;
@@ -49,9 +55,6 @@ export function ToggleColumns({
               column.columnDef.header.toLowerCase().includes(q.toLowerCase()))
           );
         });
-  filteredItems = filteredItems.filter((column) => {
-    return column.id !== row && column.id !== "null";
-  });
   return (
     <ScrollArea className="h-64">
       <div className="overflow-hiddenoverflow-y-auto rounded-md bg-white py-4 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -63,11 +66,18 @@ export function ToggleColumns({
               value={q}
             />
             <div className="absolute inset-y-0 right-0 z-10 flex items-center pr-3">
-              <Tooltip content="Clear input" side="left">
-                <button onClick={() => setQ("")} className="h-4 w-4">
-                  <XCircleIcon className="h-4 w-4 text-gray-400" />
-                </button>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <button onClick={() => setQ("")} className="h-4 w-4">
+                      <XCircleIcon className="h-4 w-4 text-gray-400" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Clear input</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
@@ -156,10 +166,15 @@ function FootnotePopover({
   return <div>{metadata.Metadata}</div>;
 }
 
-export function Table({ table, isLoading, columns, resourceId, form }: TableProps) {
-  console.log('FORM', form)
-  const columnName = form && form.watch ? form.watch("column") : '';
-  const rowName = form && form.watch ? form.watch("row") : '';
+export function Table({
+  table,
+  isLoading,
+  columns,
+  resourceId,
+  form,
+}: TableProps) {
+  const columnName = form && form.watch ? form.watch("column") : "";
+  const rowName = form && form.watch ? form.watch("row") : "";
   const columnType = columns.find((c) => c.key === columnName)?.type ?? "text";
   const rowType = columns.find((c) => c.key === rowName)?.type ?? "text";
   return (
@@ -227,7 +242,11 @@ export function Table({ table, isLoading, columns, resourceId, form }: TableProp
                         </td>
                       );
                     }
-                    if (c.getValue() === "" || c.getValue() === " " || !c.getValue()) {
+                    if (
+                      c.getValue() === "" ||
+                      c.getValue() === " " ||
+                      !c.getValue()
+                    ) {
                       return (
                         <td key={c.id} className="py-2 pl-12">
                           <div className="flex min-h-[65px] items-center text-base">
@@ -238,24 +257,26 @@ export function Table({ table, isLoading, columns, resourceId, form }: TableProp
                     }
                     return (
                       <td key={c.id} className="py-2 pl-12">
-                        <div className="flex min-h-[65px] items-center text-base">
+                        <div className="flex min-h-[65px] items-center gap-1 text-base">
                           {flexRender(c.column.columnDef.cell, c.getContext())}
-                          <Popover>
-                            <PopoverTrigger>
-                              <InformationCircleIcon className="h-4 w-4 text-gray-400" />
-                            </PopoverTrigger>
-                            <PopoverContent>
-                              <FootnotePopover
-                                column={columnName}
-                                columnType={columnType}
-                                columnValue={columnValue}
-                                resourceId={resourceId}
-                                row={rowName}
-                                rowType={rowType}
-                                rowValue={rowValue}
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          {c.column.id !== rowName && (
+                            <Popover>
+                              <PopoverTrigger>
+                                <InformationCircleIcon className="h-4 w-4 text-gray-400" />
+                              </PopoverTrigger>
+                              <PopoverContent>
+                                <FootnotePopover
+                                  column={columnName}
+                                  columnType={columnType}
+                                  columnValue={columnValue}
+                                  resourceId={resourceId}
+                                  row={rowName}
+                                  rowType={rowType}
+                                  rowValue={rowValue}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          )}
                         </div>
                       </td>
                     );
@@ -278,25 +299,39 @@ function Column({ h }: { h: Header<any, unknown> }) {
       {!h.isPlaceholder && h.column.getCanPin() && (
         <div className="flex justify-center gap-1">
           {h.column.getIsPinned() !== "left" ? (
-            <Tooltip content="Pin to left">
-              <button
-                onClick={() => {
-                  h.column.pin("left");
-                }}
-              >
-                <Pin className="h-4 w-4" />
-              </button>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => {
+                      h.column.pin("left");
+                    }}
+                  >
+                    <Pin className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Pin to left</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ) : (
-            <Tooltip content="Unpin">
-              <button
-                onClick={() => {
-                  h.column.pin(false);
-                }}
-              >
-                <PinOff className="h-4 w-4" />
-              </button>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => {
+                      h.column.pin(false);
+                    }}
+                  >
+                    <PinOff className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Unpin</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       )}

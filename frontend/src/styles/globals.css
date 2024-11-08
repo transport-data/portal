@@ -428,3 +428,13 @@ div.w-fit[data-testid="flowbite-tooltip-target"] {
     transform: translateX(100%) scaleX(0.5);
   }
 }
+
+.hard-gradient-gray-to-white {
+  background: linear-gradient(
+    to right, 
+    rgb(249 250 251),
+    rgb(249 250 251)50%,
+    white 90%,
+    white
+  );
+}

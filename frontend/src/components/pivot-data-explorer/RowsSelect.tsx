@@ -7,7 +7,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { flexRender, Table as TableType, Header } from "@tanstack/react-table";
 import {
   Select,
   SelectContent,
@@ -24,46 +23,47 @@ import {
   useForm,
   useFormContext,
 } from "react-hook-form";
-import { QueryFormType } from "./search.schema";
-import { usePossibleValues } from "./queryHooks";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { usePossibleValues } from "./queryHooks";
+import { QueryFormType } from "./search.schema";
 import { match, P } from "ts-pattern";
 import { Skeleton } from "@components/ui/skeleton";
-import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ToggleColumns } from "./Table";
 
 interface ColumnSelectProps<T extends FieldValues, V extends Object> {
   options: string[];
   label: string;
-  table: TableType<any>;
 }
 
-export function ColumnSelect<T extends FieldValues, V extends Object>({
+export function RowsSelect<T extends FieldValues, V extends Object>({
   options,
   label,
-  table,
-}: ColumnSelectProps<T, V>) {
+}: ColumnSelectProps<QueryFormType, V>) {
   const form = useFormContext<QueryFormType>();
   const possibleRows = usePossibleValues({
     resourceId: form.watch("tableName"),
-    column: form.watch("column"),
-    enabled: !!form.watch("column"),
+    column: form.watch("row"),
+    enabled: !!form.watch("row"),
   });
   return (
     <FormField
       control={form.control}
-      name="column"
+      name="row"
       render={({ field }) => (
         <FormItem className="space-y-0">
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger className="rounded-b-none rounded-t-lg">
-                <SelectValue placeholder="Select a column to be pivoted" />
+                <SelectValue
+                  className="font-bold"
+                  placeholder="Select a row to be used"
+                />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
@@ -74,7 +74,6 @@ export function ColumnSelect<T extends FieldValues, V extends Object>({
               ))}
             </SelectContent>
           </Select>
-          <FormMessage />
           <Accordion
             type="single"
             collapsible
@@ -138,10 +137,15 @@ export function ColumnSelect<T extends FieldValues, V extends Object>({
                           data: P.select("rows"),
                         },
                         ({ rows }) => (
-                          <ToggleColumns
-                            table={table}
-                            row={form.watch("row")}
-                          />
+                          <div className="inline-flex items-center justify-start gap-2.5">
+                            <ul className="px-3 flex flex-col gap-y-1">
+                              {rows.map((r) => (
+                                <li key={r.key} className="text-sm font-normal leading-normal text-gray-500">
+                                  {r.name}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         )
                       )
                       .otherwise(() => (

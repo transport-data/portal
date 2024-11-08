@@ -12,10 +12,19 @@ import { Label } from "@components/ui/label";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export function DatasetPreview({ dataset }: { dataset: Dataset }) {
-  const resources = dataset.resources.filter(r => !!r.datastore_active)
+  const resources = dataset.resources.filter((r) => !!r.datastore_active);
   const [currentResource, setCurrentResource] = useState(
     resources[0]?.id ?? ""
   );
+  if (dataset.tdc_category === "tdc_harmonized") {
+    return (
+      <div className="min-h-[500px] hard-gradient-gray-to-white flex flex-col">
+        <div className="h-full grow flex flex-col">
+          {currentResource && <DataExplorer resourceId={currentResource} />}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-[500px] bg-gray-50">
       <div className="container py-8">
@@ -40,7 +49,7 @@ export function DatasetPreview({ dataset }: { dataset: Dataset }) {
           </div>
         </div>
         <div className="py-4">
-        {currentResource && <DataExplorer resourceId={currentResource} />}
+          {currentResource && <DataExplorer resourceId={currentResource} />}
         </div>
       </div>
     </div>
