@@ -95,26 +95,26 @@ In the second step, we have two ways to go:
 
 1. Request to participate in an existing organisation:
 
-- This section uses the custom [`request_organization_owner` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_organization_owner) created for this flow that receives a JSON in the body of the POST request:
+    - This section uses the custom [`request_organization_owner` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_organization_owner) created for this flow that receives a JSON in the body of the POST request:
 
-```json
-{
-  "id": "id of the organization that you want to participate",
-  "message": "message to the organization's admins"
-}
-```
+      ```json
+      {
+        "id": "id of the organization that you want to participate",
+        "message": "message to the organization's admins"
+      }
+      ```
 
 2. Request the creation of a new organization:
 
-- This section uses the custom [`request_new_organization` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_new_organization) created for this flow that receives a JSON in the body of the POST request:
+    - This section uses the custom [`request_new_organization` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/request_new_organization) created for this flow that receives a JSON in the body of the POST request:
 
-```json
-{
-  "org_name": "the org name",
-  "org_description": "description of the new org",
-  "dataset_description": "message to the sys admin approve your new organization"
-}
-```
+      ```json
+      {
+        "org_name": "the org name",
+        "org_description": "description of the new org",
+        "dataset_description": "message to the sys admin approve your new organization"
+      }
+      ```
 
 The third step uses the custom [`invite_user_to_tdc` endpoint](https://ckan.tdc.dev.datopian.com/api/3/action/invite_user_to_tdc) created for this flow that receives a JSON in the body of the POST request:
 
