@@ -213,9 +213,6 @@ export default function LoginPage({
     }
   }, [userFollowee, isLoading]);
 
-  console.log(isMessageEmpty);
-  console.log(inviteFriends);
-
   useEffect(() => {
     if (stepNumber === 0) {
       if (followedGroups) {
