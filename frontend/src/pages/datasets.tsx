@@ -23,7 +23,7 @@ export async function getStaticProps() {
     type: "topic",
     showCoordinates: false,
   });
-  await Promise.all([
+  /*await Promise.all([
     helpers.dataset.search.prefetch({
       limit: 10,
       tdc_category: "tdc_harmonized",
@@ -32,19 +32,19 @@ export async function getStaticProps() {
       topics.map((topic) => helpers.group.get.prefetch({ id: topic.id }))
     ),
     await helpers.ga.getVisitorStats.prefetch(),
-  ]);
+  ]);*/
   return {
     props: {
       topics,
-      trpcState: helpers.dehydrate(),
+      //trpcState: helpers.dehydrate(),
     },
   };
 }
 
 export default function DatasetsPage({
   topics,
-  trpcState,
-}: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
+}: //trpcState,
+InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
   const { data: listOfTopics } = api.group.list.useQuery(
     {
       type: "topic",
@@ -77,7 +77,7 @@ export default function DatasetsPage({
             <div className="mt-8 ">
               <SearchBar />
             </div>
-            <div className="flex items-center justify-center mt-5 text-sm text-[#6B7280]">
+            <div className="mt-5 flex items-center justify-center text-sm text-[#6B7280]">
               You can also browse the topics below to find what you are looking
               for.
             </div>
