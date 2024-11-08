@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ListOfFilters, Table, ToggleColumns, TopBar } from "./Table";
+import { Table, ToggleColumns } from "./Table";
 import {
   ColumnFiltersState,
   ColumnSort,
@@ -12,7 +12,6 @@ import {
 } from "@tanstack/react-table";
 import {
   useFields,
-  useNumberOfRows,
   usePossibleValues,
   useTableData,
 } from "./queryHooks";
@@ -23,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ColumnSelect } from "./ColumnSelect";
 import { Form } from "@components/ui/form";
+import Filters from "./Filters";
 
 export interface Filter {
   operation: "=" | "!=" | ">" | "<" | "contains";
@@ -72,24 +72,21 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
   >([]);
   const [columnPinning, setColumnPinning] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const filteredColumns = columnFilters
-    .map((filter) => ({
-      ...filter,
-      value: filter.value.filter((v) => v.value !== ""),
-    }))
-    .filter((filter) => filter.value.length > 0);
   const form = useForm<QueryFormType>({
     resolver: zodResolver(querySchema),
   });
-  const { data: possibleValuesColumns } = usePossibleValues(
+  const { data: possibleValuesColumns } = usePossibleValues({
     resourceId,
-    form.watch("column"),
-    !!form.watch("column") && !!form.watch("row")
-  );
+    column: form.watch("column"),
+    enabled: !!form.watch("column") && !!form.watch("row"),
+  });
   const { data: possibleValuesRows, isLoading: rowsLoading } =
-    usePossibleValues(resourceId, form.watch("row"), !!form.watch("row"));
+    usePossibleValues({
+      resourceId,
+      column: form.watch("row"),
+      enabled: !!form.watch("row"),
+    });
 
-  console.log('COLUMNS', columns)
   const dataEnabled =
     form.watch("row") &&
     form.watch("column") &&
@@ -108,9 +105,10 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
     row: form.watch("row"),
     value: form.watch("value"),
     pivotColumns: possibleValuesColumns?.map((v) => v.key) ?? [],
-    filters: filteredColumns,
+    filters: form.watch && form.watch('filters') ? form.watch('filters').filter((f) => f.values.length > 0) : [],
     enabled: dataEnabled,
-    columnsType: columns.find((c) => c.key === form.watch("column"))?.type ?? 'text',
+    columnsType:
+      columns.find((c) => c.key === form.watch("column"))?.type ?? "text",
   });
   const data = useMemo(() => {
     if (!tableData && possibleValuesRows) {
@@ -163,7 +161,6 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
     state: {
       columnPinning,
       columnVisibility,
-      columnFilters: filteredColumns,
     },
   });
   return (
@@ -171,14 +168,6 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
       <div
         className={`relative col-span-full flex w-full grow flex-col gap-y-2 lg:col-span-3`}
       >
-        <div className="flex flex-row justify-between gap-x-2">
-          <div className="flex grow flex-row justify-between">
-            <ListOfFilters
-              filters={filteredColumns}
-              setFilters={setColumnFilters}
-            />
-          </div>
-        </div>
         <div className="flex grow flex-col shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
           {isFetching && isPlaceholderData && (
             <span className="animate-pulse-fast h-1.5 w-full bg-accent/10" />
@@ -186,9 +175,10 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
           {data && data.length > 0 && (
             <Table
               table={table}
-              numOfRows={0}
               isLoading={rowsLoading || (dataLoading && dataEnabled)}
-              columnFilters={columnFilters}
+              columns={columns}
+              resourceId={resourceId}
+              form={form}
             />
           )}
         </div>
@@ -224,6 +214,7 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
                 (c) => c !== form.watch("row") && c !== form.watch("column")
               )}
           />
+          <Filters columns={columns} resourceId={resourceId} />
         </Form>
       </div>
     </div>

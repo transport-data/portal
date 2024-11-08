@@ -1,103 +1,32 @@
-import {
-  flexRender,
-  Table as TableType,
-  Column as ColumnType,
-  Header,
-} from "@tanstack/react-table";
-import {
-  ArrowUpDownIcon,
-  ChevronDown,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUp,
-  ChevronsUpDownIcon,
-  ListFilter,
-  MapPinIcon as MapPinIconSolid,
-  Pin,
-  PinOff,
-  TableIcon,
-} from "lucide-react";
-import { Fragment, Ref, useEffect, useState } from "react";
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  XCircleIcon,
-  MapPinIcon as MapPinIconOutline,
-  Filter,
-} from "lucide-react";
+import { flexRender, Table as TableType, Header } from "@tanstack/react-table";
+import { Pin, PinOff } from "lucide-react";
+import { useState } from "react";
+import { XCircleIcon } from "lucide-react";
 import { Tooltip } from "./Tooltip";
-import { match } from "ts-pattern";
-import { Popover, Transition } from "@headlessui/react";
-import { DebouncedInput } from "./DebouncedInput";
-import {
-  Controller,
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useFormContext,
-} from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FilterFormType, FilterObjType, filterSchema } from "./search.schema";
-import SimpleSelect from "./SimpleSelect";
 import { DataExplorerColumnFilter } from "./DataExplorer";
-import { DatePicker } from "./DatePicker";
-import { Button } from "@/components/ui/button";
-import { Reference, usePopper } from "react-popper";
 import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
+import { useFootnote } from "./queryHooks";
+import { useFormContext, UseFormReturn } from "react-hook-form";
+import { QueryFormType } from "./search.schema";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@components/ui/popover";
+import { InformationCircleIcon } from "@heroicons/react/20/solid";
 
 type TableProps = {
   table: TableType<any>;
-  numOfRows: number;
   isLoading: boolean;
-  columnFilters: DataExplorerColumnFilter[];
+  resourceId: string;
+  columns: {
+    key: string;
+    name: string;
+    type: string;
+    default?: string;
+  }[];
+  form: UseFormReturn<QueryFormType>;
 };
-
-export function TopBar({
-  table,
-  numOfRows,
-}: {
-  table: TableType<any>;
-  numOfRows: number;
-}) {
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
-  const numOfColumns = table.getAllColumns().length;
-  return (
-    <>
-      <span className="font-regular flex items-center text-base leading-5 text-[#3E3E3E]">
-        <TableIcon className="mr-2 h-5 w-5 text-accent" />
-        {numOfColumns} columns, {numOfRows} rows
-      </span>
-      <div>
-        <div className="flex items-center gap-x-3">
-          <ToggleColumns table={table} />
-          <span className="flex text-sm">
-            {pageIndex * pageSize + 1} - {(pageIndex + 1) * pageSize} of{" "}
-            {numOfRows}
-          </span>
-          <button
-            className={`h-4 w-4 ${
-              !table.getCanPreviousPage() ? "opacity-25" : "opacity-100"
-            }`}
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeftIcon />
-          </button>
-          <button
-            className={`h-4 w-4 ${
-              !table.getCanNextPage() ? "opacity-25" : "opacity-100"
-            }`}
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRightIcon />
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
 
 export function ToggleColumns({
   table,
@@ -192,8 +121,47 @@ export function ToggleColumns({
   );
 }
 
-export function Table({ table, isLoading }: TableProps) {
-  const numOfColumns = table.getAllColumns().length;
+function FootnotePopover({
+  rowType,
+  row,
+  rowValue,
+  columnType,
+  columnValue,
+  column,
+  resourceId,
+}: {
+  rowType: string;
+  row: string;
+  rowValue: string;
+  columnType: string;
+  columnValue: string;
+  column: string;
+  resourceId: string;
+}) {
+  const { data: metadata, isLoading } = useFootnote({
+    rowType,
+    row,
+    rowValue,
+    columnType,
+    column,
+    columnValue,
+    resourceId,
+  });
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (!metadata) {
+    return null;
+  }
+  return <div>{metadata.Metadata}</div>;
+}
+
+export function Table({ table, isLoading, columns, resourceId, form }: TableProps) {
+  console.log('FORM', form)
+  const columnName = form && form.watch ? form.watch("column") : '';
+  const rowName = form && form.watch ? form.watch("row") : '';
+  const columnType = columns.find((c) => c.key === columnName)?.type ?? "text";
+  const rowType = columns.find((c) => c.key === rowName)?.type ?? "text";
   return (
     <div className="flex max-w-full grow">
       <table className="block w-max shadow">
@@ -243,26 +211,23 @@ export function Table({ table, isLoading }: TableProps) {
                 </tr>
               ))}
             </thead>
-            {isLoading && (
-              <tbody>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((r) => (
-                  <tr key={r} className="border-b border-b-slate-200">
-                    {Array.from(Array(numOfColumns).keys()).map((c) => (
-                      <td key={c} className="py-2 pl-12">
-                        <div className="flex min-h-[65px] items-center text-base">
-                          <span className="h-4 w-24 animate-pulse rounded-md bg-accent/20" />
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            )}
             <tbody>
               {table.getRowModel().rows.map((r) => (
                 <tr key={r.id} className="border-b border-b-slate-200">
                   {r.getCenterVisibleCells().map((c) => {
-                    if (c.getValue() === "" || c.getValue() === " ") {
+                    const rowValue =
+                      (r.getAllCells()[0]?.getValue() as string) ?? "";
+                    const columnValue = c.column.id;
+                    if (!c.getValue() && isLoading) {
+                      return (
+                        <td key={c.id} className="py-2 pl-12">
+                          <div className="flex min-h-[65px] items-center text-base">
+                            <span className="h-4 w-24 animate-pulse rounded-md bg-accent/20" />
+                          </div>
+                        </td>
+                      );
+                    }
+                    if (c.getValue() === "" || c.getValue() === " " || !c.getValue()) {
                       return (
                         <td key={c.id} className="py-2 pl-12">
                           <div className="flex min-h-[65px] items-center text-base">
@@ -275,6 +240,22 @@ export function Table({ table, isLoading }: TableProps) {
                       <td key={c.id} className="py-2 pl-12">
                         <div className="flex min-h-[65px] items-center text-base">
                           {flexRender(c.column.columnDef.cell, c.getContext())}
+                          <Popover>
+                            <PopoverTrigger>
+                              <InformationCircleIcon className="h-4 w-4 text-gray-400" />
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <FootnotePopover
+                                column={columnName}
+                                columnType={columnType}
+                                columnValue={columnValue}
+                                resourceId={resourceId}
+                                row={rowName}
+                                rowType={rowType}
+                                rowValue={rowValue}
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
                       </td>
                     );
@@ -320,240 +301,5 @@ function Column({ h }: { h: Header<any, unknown> }) {
         </div>
       )}
     </div>
-  );
-}
-
-function FilterColumn({ column }: { column: ColumnType<any, unknown> }) {
-  return (
-    <Popover as={Fragment}>
-      {({ open }) => (
-        <>
-          <Popover.Button>
-            <Tooltip content="Filter">
-              <ListFilter className="h-4 w-4" />
-            </Tooltip>
-          </Popover.Button>
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-          >
-            <Popover.Panel className="absolute left-0 top-0 z-10 mt-6 w-56 origin-bottom rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <FilterForm column={column} />
-            </Popover.Panel>
-          </Transition>
-        </>
-      )}
-    </Popover>
-  );
-}
-
-function FilterForm({ column }: { column: ColumnType<any, unknown> }) {
-  const defaultValues = column.getFilterValue();
-  const formObj = useForm<FilterFormType>({
-    resolver: zodResolver(filterSchema),
-    defaultValues: {
-      filters: (defaultValues as FilterObjType[]) ?? [
-        {
-          operation:
-            column.columnDef.meta?.type === "timestamp"
-              ? { label: "Greater than", value: ">" }
-              : { label: "Equals", value: "=" },
-          value: "",
-          link: null,
-        },
-      ],
-    },
-  });
-  const { watch } = formObj;
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      column.setFilterValue(value.filters);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  return (
-    <FormProvider {...formObj}>
-      <div className="flex flex-col gap-y-2 px-4 py-4">
-        <div className="flex flex-col items-center justify-center gap-y-2">
-          <Filters datePicker={column.columnDef.meta?.type === "timestamp"} />
-        </div>
-      </div>
-    </FormProvider>
-  );
-}
-
-export default function Filters({
-  datePicker = false,
-}: {
-  datePicker?: boolean;
-}) {
-  const formObj = useFormContext<FilterFormType>();
-  const { register, control, setValue, watch, getValues } = formObj;
-  const { append, fields, remove } = useFieldArray({
-    control,
-    name: "filters",
-  });
-  const addFilter = (link: "and" | "or") => {
-    setValue(`filters.${lastItem}.link`, link);
-    append({
-      operation: { label: "Equals", value: "=" },
-      value: "",
-      link: null,
-    });
-  };
-  const removeFilter = (index: number) => {
-    remove(index);
-    const lastItem = watch(`filters`).length - 1;
-    if (lastItem >= 0) {
-      setValue(`filters.${lastItem}.link`, null);
-    }
-  };
-  const lastItem = fields.length - 1;
-
-  return (
-    <>
-      {fields.map((field, index) => (
-        <div
-          key={field.id}
-          className="flex w-full flex-col items-center gap-y-2"
-        >
-          <SimpleSelect
-            formObj={formObj}
-            name={`filters.${index}.operation`}
-            options={[
-              {
-                label: "Equals",
-                value: "=",
-              },
-              {
-                label: "Not equal",
-                value: "!=",
-              },
-              {
-                label: "Greater than",
-                value: ">",
-              },
-              {
-                label: "Greater or equal than",
-                value: ">=",
-              },
-              {
-                label: "Smaller than",
-                value: "<",
-              },
-              {
-                label: "Smaller or equal than",
-                value: "<=",
-              },
-            ].filter((o) => {
-              if (!datePicker) return true;
-              return datePicker && o.value !== "=" && o.value !== "!=";
-            })}
-            placeholder="Select a filter"
-          />
-          <Controller
-            control={control}
-            name={`filters.${index}.value`}
-            render={({ field: { onChange, onBlur, value, ref } }) =>
-              datePicker ? (
-                <DatePicker date={value} setDate={onChange} />
-              ) : (
-                <DebouncedInput
-                  onChange={onChange} // send value to hook form
-                  onBlur={onBlur} // notify when input is touched/blur
-                  value={value}
-                  //icon={
-                  //  fields.length > 1 && (
-                  //    <Tooltip content="Remove filter">
-                  //      <button
-                  //        onClick={() => removeFilter(index)}
-                  //        className="w-4 h-4"
-                  //      >
-                  //        <XCircleIcon className="text-red-600" />
-                  //      </button>
-                  //    </Tooltip>
-                  //  )
-                  //}
-                />
-              )
-            }
-          />
-          {field.link && (
-            <span className="text-xs uppercase text-gray-500">
-              {field.link}
-            </span>
-          )}
-        </div>
-      ))}
-      <div className="grid w-full grid-cols-2 gap-x-2">
-        <Button
-          type="button"
-          onClick={() => addFilter("and")}
-          className="flex h-8 w-full items-center justify-center rounded-md bg-accent text-xs text-accent-foreground hover:bg-accent/90 hover:text-white "
-        >
-          AND
-        </Button>
-        <Button
-          type="button"
-          onClick={() => addFilter("or")}
-          className="flex h-8 w-full items-center justify-center rounded-md bg-accent text-xs text-accent-foreground hover:bg-accent/90 hover:text-white "
-        >
-          OR
-        </Button>
-      </div>
-    </>
-  );
-}
-
-export function ListOfFilters({
-  filters,
-  setFilters,
-}: {
-  filters: DataExplorerColumnFilter[];
-  setFilters: (filters: DataExplorerColumnFilter[]) => void;
-}) {
-  function removeFilter(index: number) {
-    if (index >= 0 && index < filters.length) {
-      const newFilters = filters
-        .slice(0, index)
-        .concat(filters.slice(index + 1));
-      setFilters(newFilters);
-    }
-  }
-
-  return (
-    <>
-      <div className="flex flex-wrap gap-2">
-        {filters.map((f, i) => (
-          <div
-            key={f.id}
-            className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 px-3 py-1 shadow transition hover:bg-neutral-200"
-          >
-            <div className="font-['Acumin Pro SemiCondensed'] text-xs font-semibold leading-none text-black">
-              {f.id}
-            </div>
-            <Tooltip content="Remove filter">
-              <button onClick={() => removeFilter(i)}>
-                <XCircleIcon className="h-4 w-4 cursor-pointer text-red-600" />
-              </button>
-            </Tooltip>
-          </div>
-        ))}
-      </div>
-      {filters.length ? (
-        <button
-          onClick={() => setFilters([])}
-          className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-        >
-          Clear all filters
-        </button>
-      ) : null}
-    </>
   );
 }

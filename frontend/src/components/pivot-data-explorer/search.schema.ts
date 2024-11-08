@@ -1,26 +1,12 @@
 import z from "zod";
 
-export const filterObj = z.object({
-  operation: z.object({
-    value: z.enum([
-      "=",
-      "!=",
-      ">",
-      "<",
-      ">=",
-      "<=",
-      "in",
-      "not in",
-      "like",
-      "not like",
-      "is null",
-      "is not null",
-    ]),
-    label: z.string(),
-  }),
-  value: z.string(),
-  link: z.string().nullable(),
-});
+export const filterObj = z.array(
+z.object({
+    column: z.string(),
+    type: z.string(),
+    values: z.array(z.string()),
+  })
+);
 
 export const filterSchema = z.object({
   filters: z.array(filterObj),
@@ -37,7 +23,7 @@ const paginationSchema = z.object({
 });
 
 export const querySchema = z.object({
-  filters: filterSchema,
+  filters: filterObj,
   column: z.string(),
   row: z.string(),
   value: z.string(),
