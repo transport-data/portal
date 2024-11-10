@@ -41,7 +41,7 @@ export default ({
             onChange={(x) => {
               return form.setValue(
                 "newUsersEmailsToInvite",
-                x.map((a) => a.value)
+                Array.from(new Set(x.map((x) => x.value)))
               );
             }}
             inputProps={{
