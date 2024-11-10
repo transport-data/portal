@@ -1,4 +1,5 @@
-import { DataExplorer } from "@components/pivot-data-explorer/DataExplorer";
+import { DataExplorer as PivotTable } from "@components/pivot-data-explorer/DataExplorer";
+import { DataExplorer } from "@components/data-explorer/DataExplorer";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,7 @@ export function DatasetPreview({ dataset }: { dataset: Dataset }) {
     return (
       <div className="min-h-[500px] hard-gradient-gray-to-white flex flex-col">
         <div className="h-full grow flex flex-col">
-          {currentResource && <DataExplorer resourceId={currentResource} />}
+          {currentResource && <PivotTable resourceId={currentResource} />}
         </div>
       </div>
     );

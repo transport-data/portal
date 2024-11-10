@@ -25,7 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 require("@4tw/cypress-drag-drop");
-
+import '@testing-library/cypress/add-commands'
 import "cypress-axe";
 
 const cypressUpload = require("cypress-file-upload");

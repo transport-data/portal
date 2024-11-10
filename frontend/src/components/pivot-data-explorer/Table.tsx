@@ -262,7 +262,7 @@ export function Table({
                           {c.column.id !== rowName && (
                             <Popover>
                               <PopoverTrigger>
-                                <InformationCircleIcon className="h-4 w-4 text-gray-400" />
+                                <InformationCircleIcon id={`${rowValue}-${columnValue}-info`}  className="h-4 w-4 text-gray-400" />
                               </PopoverTrigger>
                               <PopoverContent>
                                 <FootnotePopover

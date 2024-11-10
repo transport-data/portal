@@ -427,7 +427,9 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
               </Popover>
             )}
             <DrawerTrigger asChild>
-              <Button className="gap-x-2 px-2 py-2 lg:hidden">
+              <Button className="gap-x-2 px-2 py-2 lg:hidden"
+                id="toggleSidebarMobile"
+              >
                 <FunnelIcon className="h-4 w-4" />
                 Structure & Filtering{" "}
               </Button>
@@ -436,6 +438,7 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
               <Button
                 className="hidden gap-x-2 px-2 py-2 lg:flex"
                 onClick={() => hideSidebar(false)}
+                id="toggleSidebarDesktop"
               >
                 <FunnelIcon className="h-4 w-4" />
                 Structure & Filtering{" "}
@@ -467,7 +470,7 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
         <div
           className={cn(
             "relative col-span-full hidden h-full w-full flex-col gap-y-4 border-l border-gray-200 bg-white p-4 lg:col-span-1 lg:flex",
-            sidebarHidden && "hidden"
+            sidebarHidden && "lg:hidden"
           )}
         >
           <Button

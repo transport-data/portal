@@ -170,7 +170,7 @@ describe("Create and edit datasets", () => {
     cy.get('input[name="sources.0.title"]').type("source title");
     cy.get('input[name="sources.0.url"]').type("https://google.com");
     cy.contains("Select TDC Category").click();
-    cy.get("select").eq(1).select("Public Data", { force: true });
+    cy.get("select").eq(1).select("TDC Harmonized", { force: true });
     cy.get("button[role='combobox']").eq(2).click();
     cy.get('input[role="combobox"').type("tonnes{enter}");
     cy.contains("From...").click();
@@ -186,9 +186,11 @@ describe("Create and edit datasets", () => {
     cy.get('input[name="dimensioning"]').type("dimensioning");
     cy.wait(1000);
     cy.contains("Next").click().click();
-    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/sample.csv", {
-      force: true,
-    });
+    cy.get("input[type=file]")
+      .eq(0)
+      .selectFile("cypress/fixtures/harmonized_dataset.csv", {
+        force: true,
+      });
     cy.get("input[type=file]")
       .eq(1)
       .selectFile("cypress/fixtures/sample-pdf-with-images.pdf", {
@@ -234,6 +236,37 @@ describe("Create and edit datasets", () => {
           cy.get("section").should("not.contain", dataset + " edited");
         });
       });
+    });
+    it("Should be able to pivot table", () => {
+      cy.viewport(1920, 1080);
+      cy.visit(`/@${ownerOrg}/${dataset}`);
+      cy.get("#dataset").click();
+      cy.contains(
+        "Please select a row a column and a value to display the data"
+      );
+      cy.get(".lucide-x").click();
+      cy.get("#toggleSidebarDesktop").click();
+      cy.contains("1118 Records");
+      cy.get('button[role="combobox"]').eq(0).click();
+      cy.findByRole("option", { name: /Geography/i }).click();
+      cy.get('button[role="combobox"]').eq(1).click();
+      cy.findByRole("option", { name: /Time/i }).click();
+      cy.get('button[role="combobox"]').eq(2).click();
+      cy.findByRole("option", { name: /Value/i }).click();
+      cy.contains("Add filter").click();
+      cy.contains("Fuel").click();
+      cy.contains("8 Possible values").click();
+      cy.get("#Fuel-Gasoline").click();
+      cy.get("#Fuel-Diesel").click();
+      cy.contains("133");
+      cy.contains("172");
+      cy.contains("214");
+      cy.contains("294");
+      cy.contains("106");
+      cy.get("#Armenia-1990-info").click();
+      cy.contains(
+        "Original ATO Code: TAS-VEP-015- We report cumulative number of vehicle registrations i.e. two wheelers on road. Two wheelers i.e. a two-wheeler motor vehicle not exceeding 400 kg of unladen weight, including vehicles with a cylinder capacity of 50 cc or above. It includes mopeds, motorcycles, scooters. We exclude electric two wheelers in this statistics"
+      );
     });
   });
 
