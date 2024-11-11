@@ -24,7 +24,6 @@ function getLastNameAndInitials(dataset: Dataset) {
     );
   const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin') ?? [];
   const contributorsCitations = contributors.map((contributor) => {
-    console.log("CONTRIBUTOR", contributor);
     if (contributor.fullname) {
       const splittedName = contributor?.fullname
         ?.split(" ")
