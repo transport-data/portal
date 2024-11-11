@@ -84,6 +84,7 @@ export function GeneralForm({
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Title
         </div>
+        <small className="text-xs text-muted-foreground">min. 2 characters*</small>
         <FormField
           control={control}
           name="title"
@@ -106,6 +107,7 @@ export function GeneralForm({
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Name
         </div>
+        <small className="text-xs text-muted-foreground">min. 2 characters*</small>
         <FormField
           control={control}
           name="name"
@@ -505,7 +507,7 @@ export function GeneralForm({
                                             })
                                           )
                                         );
-                                      setSearchedTag('')
+                                      setSearchedTag("");
                                     }}
                                   >
                                     <CheckIcon
@@ -559,7 +561,7 @@ export function GeneralForm({
                                         })
                                       )
                                     );
-                                    setSearchedTag('')
+                                  setSearchedTag("");
                                 }}
                               >
                                 Add {searchedTag}
