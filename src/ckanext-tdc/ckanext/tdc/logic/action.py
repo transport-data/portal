@@ -23,6 +23,7 @@ import ckan.lib.dictization.model_dictize as model_dictize
 import ckan.lib.helpers as h
 
 from ckanext.scheming import helpers as scheming_helpers
+from ckanext.datapusher.plugin import DatapusherPlugin
 from ckanext.tdc.conversions import converters
 from ckanext.tdc.schemas.schemas import dataset_approval_schema
 from ckanext.tdc.authz import is_org_admin_or_sysadmin
@@ -275,10 +276,21 @@ def _before_dataset_create_or_update(context, data_dict, is_update=False):
     _fix_approval_workflow(context, data_dict, is_update=is_update)
 
 
+def _submit_dataset_resources_to_datapusher(dataset):
+    resources = dataset.get("resources", [])
+    for resource in resources:
+        DatapusherPlugin()._submit_to_datapusher(resource)
+
+
+def _after_dataset_create_or_update(context, data_dict, is_update=False):
+    _submit_dataset_resources_to_datapusher(data_dict)
+
+
 @tk.chained_action
 def package_create(up_func, context, data_dict):
     _before_dataset_create_or_update(context, data_dict)
     result = up_func(context, data_dict)
+    _after_dataset_create_or_update(context, result)
     return result
 
 
@@ -299,15 +311,8 @@ def package_delete(up_func, context, data_dict):
 def package_update(up_func, context, data_dict):
     _before_dataset_create_or_update(context, data_dict, is_update=True)
     result = up_func(context, data_dict)
+    _after_dataset_create_or_update(context, result, is_update=True)
     return result
-
-
-# TODO: is overriding package_update enough?
-# @tk.chained_action
-# def package_patch(up_func, context, data_dict):
-#     _before_dataset_create_or_update(context, data_dict, is_update=True)
-#     result = up_func(context, data_dict)
-#     return result
 
 
 def _control_archived_datasets_visibility(data_dict):
