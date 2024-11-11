@@ -104,7 +104,7 @@ export function GeneralForm({
       </div>
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-          Slug
+          Name
         </div>
         <FormField
           control={control}
