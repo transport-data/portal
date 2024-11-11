@@ -5,6 +5,10 @@ import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { NextApiRequest, NextApiResponse } from "next";
+import {
+  ckanUserLoginWithGithub,
+  CkanUserLoginWithGitHubParams,
+} from "@utils/auth";
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
   return NextAuth(req, res, {
@@ -57,53 +61,33 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
     secret: env.NEXTAUTH_SECRET,
     // Optional callbacks for customization
     callbacks: {
-      async signIn({ user, account, profile, email, credentials }) {
+      async signIn({ user, account }) {
         const origin = req.cookies?.origin;
-        if (account?.provider === "github" && account.access_token) {
-          const access_token = account.access_token;
+        if (account?.provider === "github" && account?.access_token) {
+          const userLoginParams: CkanUserLoginWithGitHubParams = {
+            account,
+            user,
+          };
 
-          if (account && account.access_token) {
-            const body: any = {
-              from_github: true,
-              email: user?.email,
-              name: user?.name,
-              token: access_token,
-              client_secret: env.FRONTEND_AUTH_SECRET,
-            };
+          const inviteId = req?.cookies?.invite_id;
+          if (inviteId) {
+            userLoginParams["invite_id"] = req.cookies.invite_id;
+          }
+          const userLoginResult =
+            await ckanUserLoginWithGithub(userLoginParams);
 
-            if (req?.cookies?.invite_id) {
-              body["invite_id"] = req.cookies.invite_id;
+          if (userLoginResult.errors) {
+            let url = `/auth/${origin ?? "signin"}?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
+
+            if (origin == "signup" && inviteId) {
+              url += `&invite_id=${inviteId}`;
             }
 
-            const userLoginRes = await fetch(
-              `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_login`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-              },
-            );
-
-            const userLoginData: CkanResponse<
-              User & { frontend_token: string }
-            > = await userLoginRes.json();
-
-            let userLoginResult: any;
-            if (typeof userLoginData?.result == "string") {
-              userLoginResult = JSON.parse(userLoginData.result as any);
-            } else {
-              userLoginResult = userLoginData.result;
-            }
-
-            if (userLoginResult.errors) {
-              return `/auth/${origin ?? "signin"}?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
-            }
+            return url;
           }
         }
 
-        return true; // Allows the sign-in
+        return true;
       },
       session: ({ session, token }) => {
         return {
@@ -123,51 +107,24 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           token.sysadmin = user.sysadmin;
         }
         if (account?.provider === "github" && account.access_token) {
-          const access_token = account.access_token;
+          const userLoginParams: CkanUserLoginWithGitHubParams = {
+            account,
+            user,
+          };
 
-          if (account && account.access_token) {
-            const body: any = {
-              from_github: true,
-              email: user?.email,
-              name: user?.name,
-              token: access_token,
-              client_secret: env.FRONTEND_AUTH_SECRET,
-            };
+          const userLoginResult =
+            await ckanUserLoginWithGithub(userLoginParams);
 
-            const userLoginRes = await fetch(
-              `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_login`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-              },
-            );
+          user = {
+            ...user,
+            ...userLoginResult,
+            image: user?.image ?? userLoginResult?.image ?? "",
+            apikey: userLoginResult.frontend_token,
+            sysadmin: userLoginResult.sysadmin,
+          };
 
-            const userLoginData: CkanResponse<
-              User & { frontend_token: string }
-            > = await userLoginRes.json();
-
-            let userLoginResult: any;
-            if (typeof userLoginData?.result == "string") {
-              userLoginResult = JSON.parse(userLoginData.result as any);
-            } else {
-              userLoginResult = userLoginData.result;
-            }
-
-            user = {
-              ...user,
-              ...userLoginResult,
-              image: user?.image ?? userLoginResult?.image ?? "",
-              apikey: userLoginResult.frontend_token,
-              sysadmin: userLoginResult.sysadmin,
-            };
-
-            return { ...token, ...user, sub: userLoginResult.id };
-          }
+          return { ...token, ...user, sub: userLoginResult.id };
         }
-
         return token;
       },
     },
