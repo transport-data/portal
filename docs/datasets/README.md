@@ -77,3 +77,29 @@ And finally a place where you can download the resources and get an overview of 
 Obs: The number of downloads data comes from google analytics, and usually is about 24 hours behind the actual values
 
 ![Downloads](downloads.png)
+
+## TDC Harmonized Preview
+
+TDC Harmonized view will have a slightly different table preview, which will be more similar to a pivot table in Excel
+
+![Start pivot](pivot_start.png)
+
+For the data to appear you need to select the row, where we will use all possible values as the rows for the table
+
+![Row pivot](row_pivot.png)
+
+The column, where we will use all possible values as the columns for the table
+
+![Column pivot](column_pivot.png)
+
+The value, which will be aggregated at the intersection between the column and the row
+
+![Value pivot](value_pivot.png)
+
+Optionally you can filter the raw data to get different results, in the example below we are filtering out all rows which have `Diesel` as the value in the `Fuel` column
+
+![Filter pivot](filter_pivot.png)
+
+Finally assuming that the table contains the `Metadata` column, if you click on the information circle icon, you will get the value of that columns showing up
+
+![Tooltip pivot](tooltip_metadata.png)

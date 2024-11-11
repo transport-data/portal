@@ -78,8 +78,9 @@ export const api = createTRPCNext<AppRouter>({
 
 function verifyAuthorizationError(response: any) {
   if (
-      response?.data?.stack?.includes('Access denied') ||
-      response?.message?.includes('Access denied')
+      (response?.data?.stack?.includes('Access denied') ||
+      response?.message?.includes('Access denied')) && 
+      !response?.message?.includes('not authorized to create packages')
   ) {
       toast({
         description: 'Your session is no longer valid, please sign in again.'

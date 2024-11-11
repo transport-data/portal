@@ -12,6 +12,17 @@ export default ({
 }) => {
   const [emailValidationErrorMessage, setEmailValidationErrorMessage] =
     useState("");
+
+  const usersToInvite = form.watch("newUsersEmailsToInvite");
+
+  const messageVal = form.watch("messageToInviteNewUsers");
+
+  const isEmailRequired = messageVal
+    ? messageVal.length > 0 && messageVal !== "<p></p>"
+    : false;
+
+  const isUserEmpty = usersToInvite ? !(usersToInvite.length > 0) : true;
+
   return (
     <div>
       <div className="space-y-5">
@@ -20,17 +31,19 @@ export default ({
         </h2>
 
         <div className="space-y-4">
-          <TextDivisor text="Emails*" />
+          <TextDivisor
+            text={`E-mails ${isEmailRequired || !isUserEmpty ? "*" : ""}`}
+          />
           <MultipleSelector
             removeSuggestions
             hidePlaceholderWhenSelected
             transformInputValueInLowercase
-            onChange={(x) =>
-              form.setValue(
+            onChange={(x) => {
+              return form.setValue(
                 "newUsersEmailsToInvite",
                 Array.from(new Set(x.map((x) => x.value)))
-              )
-            }
+              );
+            }}
             inputProps={{
               className:
                 "border-0 text-[#111928] ring-0 border-[#00000000] lowercase",
@@ -39,7 +52,7 @@ export default ({
           inline-flex items-center border font-semibold
           "
             placeholder="name1@email.com; name2@email.com;"
-            creatable
+            creatable={true}
             validationOptions={{
               errorMessage: emailValidationErrorMessage,
               isDataValid: (v) => {
@@ -65,6 +78,10 @@ export default ({
             triggerSearchOnFocus={false}
             className="mail-icon-at-left pl-11 pr-4"
             hideClearAllButton
+            value={form.watch("newUsersEmailsToInvite")?.map((u) => ({
+              label: u,
+              value: u,
+            }))}
           />
         </div>
         <TextDivisor text="Attach a message" />

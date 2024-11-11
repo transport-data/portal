@@ -53,7 +53,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
     organizationsData.forEach((o) => {
       if (userOrganizationsIds.includes(o.id)) {
-          o.is_user_member = true
+        o.is_user_member = true;
       }
     });
   } catch (e) {
@@ -127,7 +127,7 @@ export default function LoginPage({
           name: loc.display_name,
           selected: false,
         }))
-      : [],
+      : []
   );
 
   const [organizations, setOrganizations] = useState(
@@ -137,7 +137,7 @@ export default function LoginPage({
           name: org.display_name,
           selected: false,
         }))
-      : [],
+      : []
   );
 
   const [topics, setTopics] = useState(
@@ -147,7 +147,7 @@ export default function LoginPage({
           name: topic.display_name,
           selected: false,
         }))
-      : [],
+      : []
   );
 
   const [stepNumber, setStep] = useState(0);
@@ -158,11 +158,20 @@ export default function LoginPage({
   ];
 
   const [paragraphText, setParagraphText] = useState<string | ReactNode>(
-    "The changes appear as a running list on your dashboard.",
+    "The changes appear as a running list on your dashboard."
   );
   const [subtitleText, setSubtitleText] = useState(
-    "Track the changes being made to the data you are interested in.",
+    "Track the changes being made to the data you are interested in."
   );
+
+  const inviteFriends = watch("newUsersEmailsToInvite");
+  const inviteMessage = watch("messageToInviteNewUsers");
+
+  const isMessageEmpty = inviteMessage
+    ? !(inviteMessage.length > 0 && inviteMessage.toString() !== "<p></p>")
+    : true;
+
+  const isUserEmpty = inviteFriends ? !(inviteFriends.length > 0) : true;
 
   useEffect(() => {
     if (userFollowee && !isLoading) {
@@ -174,7 +183,7 @@ export default function LoginPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "geography" &&
-                followee.dict.id === loc.id,
+                followee.dict.id === loc.id
             ),
           }))
         : [];
@@ -184,7 +193,7 @@ export default function LoginPage({
             name: org.display_name,
             selected: userFollowee.some(
               (followee: any) =>
-                followee.type === "organization" && followee.dict.id === org.id,
+                followee.type === "organization" && followee.dict.id === org.id
             ),
           }))
         : [];
@@ -196,7 +205,7 @@ export default function LoginPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "topic" &&
-                followee.dict.id === topic.id,
+                followee.dict.id === topic.id
             ),
           }))
         : [];
@@ -231,7 +240,7 @@ export default function LoginPage({
           >
             Reach out
           </Button>
-        </>,
+        </>
       );
       if (watch("isNewOrganizationSelected")) {
         setDisableButton(
@@ -239,7 +248,7 @@ export default function LoginPage({
             watch("newOrganizationName") &&
             watch("newOrganizationDescription") &&
             watch("confirmThatItParticipatesOfTheOrg")
-          ),
+          )
         );
       } else {
         setDisableButton(
@@ -247,17 +256,15 @@ export default function LoginPage({
             watch("orgInWhichItParticipates") &&
             watch("messageToParticipateOfTheOrg") &&
             watch("confirmThatItParticipatesOfTheOrg")
-          ),
+          )
         );
       }
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
-        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future.",
+        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
-      setDisableButton(
-        !(watch("newUsersEmailsToInvite") && watch("messageToInviteNewUsers")),
-      );
+      setDisableButton(isMessageEmpty || isUserEmpty);
     } else {
       setDisableButton(false);
     }
@@ -269,8 +276,10 @@ export default function LoginPage({
     watch("newOrganizationDescription"),
     watch("newOrganizationDataDescription"),
     watch("isNewOrganizationSelected"),
-    watch("newUsersEmailsToInvite"),
-    watch("messageToInviteNewUsers"),
+    inviteMessage,
+    inviteFriends,
+    //watch("newUsersEmailsToInvite"),
+    //watch("messageToInviteNewUsers"),
     stepNumber,
     followedGroups,
   ]);
@@ -318,7 +327,7 @@ export default function LoginPage({
                 <Fragment key={stepIdx}>
                   <div className="w-fit">
                     <div
-                      className="flex items-center gap-2"
+                      className="flex cursor-pointer items-center gap-2"
                       onClick={() => setStep(stepIdx)}
                     >
                       {stepNumber === stepIdx ? (
@@ -427,8 +436,8 @@ export default function LoginPage({
               {stepNumber === 0
                 ? "You can always do this later."
                 : stepNumber === 1
-                  ? "Don’t want to share data?"
-                  : "Don’t want to submit form?"}{" "}
+                ? "Don’t want to share data?"
+                : "Don’t want to submit form?"}{" "}
               <span
                 onClick={() => skipStep()}
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"

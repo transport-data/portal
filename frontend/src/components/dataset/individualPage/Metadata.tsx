@@ -17,6 +17,63 @@ import { getChoicesFromField } from "@utils/dataset";
 import { slugify } from "@lib/utils";
 import { ScrollArea } from "@components/ui/scroll-area";
 
+function getLastNameAndInitials(dataset: Dataset) {
+  if (!dataset.contributors_data || dataset.contributors_data.length === 0)
+    return (
+      dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+    );
+  const contributors = dataset.contributors_data;
+  const contributorsCitations = contributors.map((contributor) => {
+    console.log("CONTRIBUTOR", contributor);
+    if (contributor.fullname) {
+      const splittedName = contributor?.fullname
+        ?.split(" ")
+        .filter((n) => n !== "" && n !== " ");
+      const length = splittedName.length;
+      const lastName = splittedName[length - 1];
+      const initials = splittedName.map((n) => n[0]).join(".");
+      return `${lastName}, ${initials}`;
+    }
+    const splittedName = contributor?.name
+      ?.split(" ")
+      .filter((n) => n !== "" && n !== " ");
+    const length = splittedName.length;
+    const lastName = splittedName[length - 1];
+    const initials = splittedName.map((n) => n[0]).join(".");
+    return `${lastName}, ${initials}`;
+  });
+  return contributorsCitations.join(", ");
+}
+
+function getLastNameAndFirstName(dataset: Dataset) {
+  if (!dataset.contributors_data || dataset.contributors_data.length === 0)
+    return (
+      dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+    );
+  const contributors = dataset.contributors_data;
+  const contributorsCitations = contributors.map((contributor) => {
+    if (contributor.fullname) {
+      const splittedName = contributor?.fullname
+        ?.split(" ")
+        .filter((n) => n !== "" && n !== " ");
+      const length = splittedName.length;
+      const lastName = splittedName[length - 1];
+      const firstName = splittedName[0];
+      if (length === 1) return lastName;
+      return `${lastName}, ${firstName}`;
+    }
+    const splittedName = contributor?.name
+      ?.split(" ")
+      .filter((n) => n !== "" && n !== " ");
+    const length = splittedName.length;
+    const lastName = splittedName[length - 1];
+    const firstName = splittedName[0];
+    if (length === 1) return lastName;
+    return `${lastName}, ${firstName}`;
+  });
+  return contributorsCitations.join(", ");
+}
+
 export function Metadata({ dataset }: { dataset: Dataset }) {
   const { data: geographies } = api.group.tree.useQuery({
     type: "geography",
@@ -59,7 +116,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               Keywords
             </dt>
             {dataset.tags && dataset.tags.length > 0 ? (
-              <dd className="mt-1 flex flex-wrap text-sm leading-6 gap-2 text-gray-500 sm:mt-2">
+              <dd className="mt-1 flex flex-wrap gap-2 text-sm leading-6 text-gray-500 sm:mt-2">
                 {dataset.tags?.map((t) => (
                   <Badge variant="info">{t.display_name ?? t.name}</Badge>
                 )) ?? "-"}
@@ -130,7 +187,9 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
               {dataset.metadata_modified && (
                 <>
-                  {prettifyDateString(dataset.metadata_modified.split('T')[0] ?? '')}
+                  {prettifyDateString(
+                    dataset.metadata_modified.split("T")[0] ?? ""
+                  )}
                 </>
               )}
             </dd>
@@ -198,11 +257,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "APA",
-                content: `${
-                  dataset.creator_user?.fullname ??
-                  dataset.creator_user?.name ??
-                  "TDC"
-                }. (${
+                content: `${getLastNameAndInitials(dataset)}. (${
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
                     : "n.d"
@@ -215,11 +270,9 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "MLA",
-                content: `${
-                  dataset.creator_user?.fullname ??
-                  dataset.creator_user?.name ??
-                  "TDC"
-                }. <i>${dataset.title ?? dataset.name}</i>, ${
+                content: `${getLastNameAndFirstName(dataset)}. <i>${
+                  dataset.title ?? dataset.name
+                }</i>, ${
                   dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
@@ -232,11 +285,9 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "Chicago",
-                content: `${
-                  dataset.creator_user?.fullname ??
-                  dataset.creator_user?.name ??
-                  "TDC"
-                }. <i>${dataset.title ?? dataset.name}</i>. ${
+                content: `${getLastNameAndInitials(dataset)}. <i>${
+                  dataset.title ?? dataset.name
+                }</i>. ${
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
                     : "(n.d)"
@@ -249,11 +300,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "Harvard",
-                content: `${
-                  dataset.creator_user?.fullname ??
-                  dataset.creator_user?.name ??
-                  "TDC"
-                }. (${
+                content: `${getLastNameAndInitials(dataset)}. (${
                   dataset.metadata_created
                     ? new Date(dataset.metadata_created).getFullYear()
                     : "n.d"
@@ -278,9 +325,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                     )
                   ) + new Date(dataset.metadata_created as string).getFullYear()
                 },
-   author = {${
-     dataset.creator_user?.fullname ?? dataset.creator_user?.name ?? "TDC"
-   }},
+   author = {${dataset.contributors_data.map((c) => c.fullname).join(", ")}},
    year = ${new Date(dataset.metadata_created as string).getFullYear()},
    title = {${dataset.title ?? dataset.name}},
    institution = {${

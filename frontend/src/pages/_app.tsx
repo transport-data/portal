@@ -16,7 +16,7 @@ import { useEffect } from "react";
 import { pageview } from "@utils/ga";
 import PageLoading from "@components/_shared/PageLoading";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
