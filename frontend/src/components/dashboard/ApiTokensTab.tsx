@@ -165,7 +165,7 @@ export default ({
             >
               ✖️ {/* TODO REMOVE THIS CHARACTER FROM HERE AND USE A ICON COMPONENT */}
             </button>
-            <h3 className="mb-4">Are you sure you want to revoke the token</h3>
+            <h3 className="mb-4">Are you sure you want to revoke the token?</h3>
             <Button
               type="button"
               onClick={() => {
