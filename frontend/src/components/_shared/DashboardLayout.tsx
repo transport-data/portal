@@ -10,6 +10,7 @@ import Link from "next/link";
 import Heading from "./Heading";
 import Loading from "./Loading";
 import { api } from "@utils/api";
+import { DefaultTooltip } from "@components/ui/tooltip";
 
 interface DashboardLayotProps {
   children: React.ReactNode;
@@ -152,12 +153,22 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                   ))}
                 </div>
                 <div className="min-w-full md:min-w-fit">
-                  <Button asChild className="justify-between gap-2">
-                    <Link href="/dashboard/datasets/create">
-                      <DocumentPlusIcon className="h-4 w-4" />
-                      Add Data
-                    </Link>
-                  </Button>
+                  {(adminOrgs.length > 0 || editorOrgs.length > 0) && (
+                    <Button asChild className="justify-between gap-2">
+                      <Link href="/dashboard/datasets/create">
+                        <DocumentPlusIcon className="h-4 w-4" />
+                        Add Data
+                      </Link>
+                    </Button>
+                  )}
+                  {adminOrgs.length == 0 && editorOrgs.length == 0 && (
+                    <DefaultTooltip content="To add data you need to be at least an editor in at least one organization">
+                      <Button disabled className="justify-between gap-2">
+                        <DocumentPlusIcon className="h-4 w-4" />
+                        Add Data
+                      </Button>
+                    </DefaultTooltip>
+                  )}
                 </div>
               </div>
             </div>

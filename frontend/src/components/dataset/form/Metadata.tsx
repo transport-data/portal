@@ -51,6 +51,12 @@ import { SourcesForm } from "./SourcesForm";
 import { CommentsForm } from "./CommentsForm";
 import { RTEForm } from "@components/ui/formRte";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
 export function MetadataForm({ disabled }: any) {
   const formObj = useFormContext<DatasetFormType>();
@@ -198,8 +204,8 @@ export function MetadataForm({ disabled }: any) {
         name="language"
         render={({ field }) => (
           <FormItem className="flex flex-col py-4">
-            <Popover>
-              <PopoverTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <FormControl>
                   <Button
                     variant="outline"
@@ -219,8 +225,8 @@ export function MetadataForm({ disabled }: any) {
                       : "Select language"}
                   </Button>
                 </FormControl>
-              </PopoverTrigger>
-              <PopoverContent
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
                 className="p-0"
                 style={{ width: "var(--radix-popover-trigger-width)" }}
               >
@@ -233,31 +239,33 @@ export function MetadataForm({ disabled }: any) {
                     <CommandEmpty>No language found.</CommandEmpty>
                     <CommandGroup>
                       {languages.map((language) => (
-                        <CommandItem
-                          disabled={disabled}
-                          value={language.code}
-                          key={language.code}
-                          keywords={[language.name]}
-                          onSelect={() => {
-                            setValue("language", language.code);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              language.code === field.value
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                          {language.name}
-                        </CommandItem>
+                        <DropdownMenuItem>
+                          <CommandItem
+                            disabled={disabled}
+                            value={language.code}
+                            key={language.code}
+                            keywords={[language.name]}
+                            onSelect={() => {
+                              setValue("language", language.code);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                language.code === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {language.name}
+                          </CommandItem>
+                        </DropdownMenuItem>
                       ))}
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <FormMessage />
           </FormItem>
         )}
@@ -297,9 +305,9 @@ export function MetadataForm({ disabled }: any) {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) =>
-                      date < new Date("1900-01-01") || disabled
-                    }
+                    fromYear={1970}
+                    captionLayout="dropdown"
+                    toYear={2030}
                     className={cn(disabled && "cursor-not-allowed")}
                     initialFocus
                   />

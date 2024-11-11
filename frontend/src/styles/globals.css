@@ -446,3 +446,9 @@ div.w-fit[data-testid="flowbite-tooltip-target"] {
     white
   );
 }
+
+/* add this snippet in your globals.css file */
+
+.rdp-vhidden {
+  @apply hidden;
+}
