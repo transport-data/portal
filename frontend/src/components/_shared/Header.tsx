@@ -130,7 +130,7 @@ export default function Header({
               </div>
             ) : session?.user ? (
               <div className="relative flex items-center gap-[12px]">
-                <Link href="/dashboard/newsfeed">
+                <Link target="_blank" href="https://civicrm.changing-transport.org/form/tdci-newsletter">
                   <BellIcon width={22} className="text-gray-500" />
                 </Link>
 
