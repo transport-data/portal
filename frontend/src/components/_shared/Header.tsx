@@ -130,7 +130,10 @@ export default function Header({
               </div>
             ) : session?.user ? (
               <div className="relative flex items-center gap-[12px]">
-                <BellIcon width={22} className="text-gray-500" />
+                <Link href="/dashboard/newsfeed">
+                  <BellIcon width={22} className="text-gray-500" />
+                </Link>
+
                 <button onClick={handleToggleDropdown}>
                   <Avatar className="h-[32px] w-[32px]">
                     <AvatarImage
