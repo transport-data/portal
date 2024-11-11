@@ -1,4 +1,4 @@
-import Guidelines from "@components/_shared/Guidelines";
+import Guidelines from "@components/_shared/CommunityDiscussions";
 import NewsFeedSearchFilters from "@components/search/NewsfeedSearchFilters";
 import {
   Pagination,

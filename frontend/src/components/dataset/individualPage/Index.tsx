@@ -95,7 +95,7 @@ export default function IndexDatasetPage({
                           <Link
                             className="underline"
                             target="_blank"
-                            href={"https://google.com"}
+                            href={"/data-provider#how-tdc-datasets-work"}
                           >
                             click here
                           </Link>

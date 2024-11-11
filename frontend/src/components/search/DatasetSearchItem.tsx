@@ -61,14 +61,14 @@ export default function DatasetSearchItem({
                 <>
                   Data have been validated, and derived from multiple sources by
                   TDC. For more information,{" "}
-                  <Link className="underline" href={"https://google.com"}>
+                  <Link target="_blank" className="underline" href={"/data-provider#how-tdc-datasets-work"}>
                     click here
                   </Link>
                 </>
               ) : tdc_category === "tdc_formatted" ? (
                 <>
                   Data is SDMX-compliant. For more information,{" "}
-                  <Link className="underline" href={"https://google.com"}>
+                  <Link target="_blank" className="underline" href={"/data-provider#how-tdc-datasets-work"}>
                     click here
                   </Link>
                 </>
@@ -168,7 +168,7 @@ export default function DatasetSearchItem({
                     <Link
                       className="underline"
                       target="_blank"
-                      href={"https://google.com"}
+                      href={"/data-provider#how-tdc-datasets-work"}
                     >
                       click here
                     </Link>
@@ -179,7 +179,7 @@ export default function DatasetSearchItem({
                     <Link
                       className="underline"
                       target="_blank"
-                      href={"https://google.com"}
+                      href={"/data-provider#how-tdc-datasets-work"}
                     >
                       click here
                     </Link>
