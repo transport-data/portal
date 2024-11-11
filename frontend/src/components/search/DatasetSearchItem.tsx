@@ -57,7 +57,7 @@ export default function DatasetSearchItem({
                 : "Community Submitted"}
             </h4>
             <p className="text-xs text-[#9CA3AF]">
-              {tdc_category === "tdc_harmonised" ? (
+              {tdc_category === "tdc_harmonized" ? (
                 <>
                   Data have been validated, and derived from multiple sources by
                   TDC. For more information,{" "}
@@ -87,7 +87,7 @@ export default function DatasetSearchItem({
             variant="success"
             icon={<CheckCircleIcon width={20} />}
           />
-        ) : tdc_category === "tdc_harmonised" ? (
+        ) : tdc_category === "tdc_harmonized" ? (
           <Badge
             className="flex h-[32px] w-[32px] items-center justify-center p-0"
             variant="warning"
