@@ -39,8 +39,7 @@ export default function DatasetSearchItem({
       ?.display_name?.toLowerCase() || "";
 
   return (
-    <Link
-      href={`/${organization?.title}/${name}${isPrivate ? "/private" : ""}`}
+    <div
       id={`dataset-search-item-${title}`}
       className="flex w-fit cursor-pointer gap-5"
     >
@@ -61,14 +60,22 @@ export default function DatasetSearchItem({
                 <>
                   Data have been validated, and derived from multiple sources by
                   TDC. For more information,{" "}
-                  <Link target="_blank" className="underline" href={"/data-provider#how-tdc-datasets-work"}>
+                  <Link
+                    target="_blank"
+                    className="underline"
+                    href={"/data-provider#how-tdc-datasets-work"}
+                  >
                     click here
                   </Link>
                 </>
               ) : tdc_category === "tdc_formatted" ? (
                 <>
                   Data is SDMX-compliant. For more information,{" "}
-                  <Link target="_blank" className="underline" href={"/data-provider#how-tdc-datasets-work"}>
+                  <Link
+                    target="_blank"
+                    className="underline"
+                    href={"/data-provider#how-tdc-datasets-work"}
+                  >
                     click here
                   </Link>
                 </>
@@ -102,7 +109,10 @@ export default function DatasetSearchItem({
         )}
       </Tooltip>
 
-      <div className="flex w-full flex-col justify-start gap-2 lg:flex-row">
+      <Link
+        href={`/${organization?.title}/${name}${isPrivate ? "/private" : ""}`}
+        className="flex w-full flex-col justify-start gap-2 lg:flex-row"
+      >
         <div className="order-last flex flex-col gap-2 lg:order-first lg:mr-auto">
           <h4 className="text-lg font-bold leading-tight">{title}</h4>
           <div className="flex items-center gap-2">
@@ -148,64 +158,7 @@ export default function DatasetSearchItem({
             )}
           </div>
         </div>
-        <Tooltip
-          placement="bottom"
-          className="max-w-[192px] bg-[#1F2A37] "
-          content={
-            <div className="flex flex-col gap-1.5">
-              <h4 className="text-sm">
-                {tdc_category === "tdc_formatted"
-                  ? "TDC Formatted"
-                  : tdc_category === "tdc_harmonized"
-                  ? "TDC Harmonised"
-                  : "Community Submitted"}
-              </h4>
-              <p className="text-xs text-[#9CA3AF]">
-                {tdc_category === "tdc_harmonised" ? (
-                  <>
-                    Data have been validated, and derived from multiple sources
-                    by TDC. For more information,{" "}
-                    <Link
-                      className="underline"
-                      target="_blank"
-                      href={"/data-provider#how-tdc-datasets-work"}
-                    >
-                      click here
-                    </Link>
-                  </>
-                ) : tdc_category === "tdc_formatted" ? (
-                  <>
-                    Data is SDMX-compliant. For more information,{" "}
-                    <Link
-                      className="underline"
-                      target="_blank"
-                      href={"/data-provider#how-tdc-datasets-work"}
-                    >
-                      click here
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    Data sets submitted by individuals and organisation
-                    partners.
-                  </>
-                )}
-              </p>
-            </div>
-          }
-        >
-          {tdc_category === "tdc_formatted" && (
-            <Badge className="h-fit lg:ml-auto" variant="success">
-              TDC Formatted
-            </Badge>
-          )}
-          {tdc_category === "tdc_harmonised" && (
-            <Badge className="h-fit lg:ml-auto" variant="warning">
-              TDC Harmonised
-            </Badge>
-          )}
-        </Tooltip>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
