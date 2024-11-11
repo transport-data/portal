@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Settings](#settings)
+  - [API Keys](#api-keys)
+    - [Revoking API Key](#revoking-api-key)
+    - [Add New API Key](#add-new-api-key)
+  - [Sysadmins](#sysadmins)
+    - [Promote User To Sysadmin](#promote-user-to-sysadmin)
+    - [Demote Users](#demote-users)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Settings
 
 Once the user logs in, he can access the settings tab at `dashboard/settings` route.
