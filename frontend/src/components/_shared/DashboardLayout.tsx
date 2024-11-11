@@ -163,7 +163,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                   )}
                   {adminOrgs.length == 0 && editorOrgs.length == 0 && (
                     <DefaultTooltip content="To add data you need to be at least an editor in at least one organization">
-                      <Button disabled className="justify-between gap-2">
+                      <Button className="justify-between gap-2 opacity-50">
                         <DocumentPlusIcon className="h-4 w-4" />
                         Add Data
                       </Button>

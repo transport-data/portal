@@ -85,22 +85,7 @@ export function FileUploader({
 
   return (
     <>
-      <div
-        className="w-full"
-        onDragOver={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onDrop={(e) => {
-          console.log("TESTING", e.dataTransfer.files[0]);
-          e.preventDefault();
-          onInputChange({
-            target: {
-              files: e.dataTransfer.files,
-            },
-          } as any);
-        }}
-      >
+      <div className="w-full">
         {children}
         {!children && (
           <div
@@ -112,7 +97,22 @@ export function FileUploader({
               "flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
             )}
           >
-            <div className="flex flex-col items-center justify-center pb-6 pt-5">
+            <div
+              onDragOver={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onDrop={(e) => {
+                console.log("TESTING", e.dataTransfer.files[0]);
+                e.preventDefault();
+                onInputChange({
+                  target: {
+                    files: e.dataTransfer.files,
+                  },
+                } as any);
+              }}
+              className="flex flex-col items-center justify-center pb-6 pt-5 w-full"
+            >
               {uploading ? (
                 <div className="flex flex-col items-center">
                   <svg
