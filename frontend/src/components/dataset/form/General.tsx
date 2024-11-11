@@ -118,15 +118,15 @@ export function GeneralForm({
                     disabled ? "cursor-not-allowed" : "",
                     "disabled:bg-gray-200"
                   )}
-                  placeholder="Dataset slug"
+                  placeholder="Dataset name"
                   {...field}
                 />
               </FormControl>
               <FormMessage />
               <FormDescription>
                 {editing
-                  ? "Slug cannot be changed once dataset is created."
-                  : "Slug will be used in the URL of the dataset page. ex: datasets/{slug}"}
+                  ? "Name cannot be changed once dataset is created."
+                  : "Name will be used in the URL of the dataset page. ex: datasets/{name}"}
               </FormDescription>
             </FormItem>
           )}
@@ -505,6 +505,7 @@ export function GeneralForm({
                                             })
                                           )
                                         );
+                                      setSearchedTag('')
                                     }}
                                   >
                                     <CheckIcon
@@ -558,6 +559,7 @@ export function GeneralForm({
                                         })
                                       )
                                     );
+                                    setSearchedTag('')
                                 }}
                               >
                                 Add {searchedTag}

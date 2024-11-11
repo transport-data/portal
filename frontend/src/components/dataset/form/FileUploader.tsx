@@ -62,6 +62,7 @@ export function FileUploader({
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
+    console.log("FILES", files);
     if (!files || !files[0]) return;
     try {
       uppy.addFile({
@@ -84,7 +85,22 @@ export function FileUploader({
 
   return (
     <>
-      <div className="w-full">
+      <div
+        className="w-full"
+        onDragOver={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onDrop={(e) => {
+          console.log("TESTING", e.dataTransfer.files[0]);
+          e.preventDefault();
+          onInputChange({
+            target: {
+              files: e.dataTransfer.files,
+            },
+          } as any);
+        }}
+      >
         {children}
         {!children && (
           <div
@@ -137,9 +153,6 @@ export function FileUploader({
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                     <span className="font-semibold">Click to upload</span> or
                     drag and drop
-                  </p>
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                    Max. File Size: 30 MB
                   </p>
                   <div className="py-6">
                     <span

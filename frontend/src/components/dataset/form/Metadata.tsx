@@ -50,6 +50,7 @@ import { UnitsField } from "./UnitsField";
 import { SourcesForm } from "./SourcesForm";
 import { CommentsForm } from "./CommentsForm";
 import { RTEForm } from "@components/ui/formRte";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 export function MetadataForm({ disabled }: any) {
   const formObj = useFormContext<DatasetFormType>();
@@ -114,7 +115,10 @@ export function MetadataForm({ disabled }: any) {
         )}
       />
       <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-        TDC Category
+        TDC Category{" "}
+        <a target="_blank" href="/data-provider#how-tdc-datasets-work">
+          <InformationCircleIcon className="ml-2 h-4 w-4 text-gray-400" />
+        </a>
       </div>
       <FormField
         control={control}
@@ -424,7 +428,15 @@ export function MetadataForm({ disabled }: any) {
                               <CommandGroup
                                 key={r.name}
                                 heading={
-                                  <DefaultTooltip content={`${r.children.map(c => c.name).every(c => field.value.includes(c)) ? 'Remove' : 'Select'} all countries in this region`}>
+                                  <DefaultTooltip
+                                    content={`${
+                                      r.children
+                                        .map((c) => c.name)
+                                        .every((c) => field.value.includes(c))
+                                        ? "Remove"
+                                        : "Select"
+                                    } all countries in this region`}
+                                  >
                                     <span
                                       className="text-gray-600"
                                       onClick={() => {
@@ -583,40 +595,66 @@ export function MetadataForm({ disabled }: any) {
                           <CommandInput placeholder="Search sectors..." />
                           <CommandList>
                             <CommandEmpty>No sector found</CommandEmpty>
-                            {sectors.map((s) => (
-                              <CommandItem
-                                value={s.value}
-                                keywords={[s.label]}
-                                key={s.value}
-                                onSelect={() => {
-                                  match(field.value.includes(s.value))
-                                    .with(true, () =>
-                                      setValue(
-                                        "sectors",
-                                        getValues("sectors").filter(
-                                          (v) => v !== s.value
+                            <CommandItem
+                              value="all"
+                              keywords={["All"]}
+                              onSelect={() => {
+                                match(field.value.includes("all"))
+                                  .with(true, () => setValue("sectors", []))
+                                  .with(false, () =>
+                                    setValue(
+                                      "sectors",
+                                      sectors.map((s) => s.value)
+                                    )
+                                  );
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  field.value.includes("all")
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              All
+                            </CommandItem>
+                            {sectors
+                              .filter((s) => s.value !== "all")
+                              .map((s) => (
+                                <CommandItem
+                                  value={s.value}
+                                  keywords={[s.label]}
+                                  key={s.value}
+                                  onSelect={() => {
+                                    match(field.value.includes(s.value))
+                                      .with(true, () =>
+                                        setValue(
+                                          "sectors",
+                                          getValues("sectors").filter(
+                                            (v) => v !== s.value
+                                          )
                                         )
                                       )
-                                    )
-                                    .with(false, () =>
-                                      setValue(
-                                        "sectors",
-                                        getValues("sectors").concat(s.value)
-                                      )
-                                    );
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    field.value.includes(s.value)
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {s.label}
-                              </CommandItem>
-                            ))}
+                                      .with(false, () =>
+                                        setValue(
+                                          "sectors",
+                                          getValues("sectors").concat(s.value)
+                                        )
+                                      );
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value.includes(s.value)
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {s.label}
+                                </CommandItem>
+                              ))}
                           </CommandList>
                         </Command>
                       </PopoverContent>

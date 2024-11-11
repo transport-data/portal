@@ -6,7 +6,7 @@ export default () => {
   return (
     <div className="py-6 text-gray-500 lg:py-[96px]">
       <div>
-        <h1 className="text-4xl font-extrabold text-gray-900">
+        <h1 id="how-tdc-datasets-work" className="text-4xl font-extrabold text-gray-900">
           How TDC datasets work
         </h1>
         <p className="mt-4 text-xl font-normal text-gray-500">

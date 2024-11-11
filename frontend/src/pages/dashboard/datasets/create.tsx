@@ -26,24 +26,14 @@ import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 
 const docs = [
   {
-    title: "Data Submission Guidelines",
+    title: "SDMX Technical Specifications",
     format: "PDF",
-    url: "https://example.com",
+    url: "https://sdmx.org/?page_id=5008",
   },
   {
-    title: "Data Submission Guidelines",
+    title: "Help & FAQ Section of the platform",
     format: "PDF",
-    url: "https://example.com",
-  },
-  {
-    title: "Data Submission Guidelines",
-    format: "PDF",
-    url: "https://example.com",
-  },
-  {
-    title: "Step by Step Guide to Data Submission",
-    format: "MP4",
-    url: "https://example.com",
+    url: "/faq",
   },
 ];
 
@@ -89,6 +79,7 @@ const CreateDatasetDashboard: NextPage = () => {
       title: "",
       notes: "",
       state: "active",
+      tdc_category: 'public',
       geographies: [],
       topics: [],
       sectors: [],
@@ -211,6 +202,13 @@ const CreateDatasetDashboard: NextPage = () => {
                       className="w-full"
                       onClick={async () => {
                         await form.trigger();
+                        if (form.watch("name").length < 2) {
+                          form.setError("name", {
+                            type: "manual",
+                            message: "Name needs to be at least 2 characters long",
+                          });
+                          return;
+                        }
                         if (checkDisableNext()) {
                           return;
                         }
