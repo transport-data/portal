@@ -9,6 +9,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
   return NextAuth(req, res, {
     // Configure one or more authentication providers
+    pages: { signIn: "/auth/signin", error: "/auth/signin" },
     providers: [
       CredentialsProvider({
         // The name to display on the sign in form (e.g. "Sign in with...")
@@ -57,6 +58,51 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
     // Optional callbacks for customization
     callbacks: {
       async signIn({ user, account, profile, email, credentials }) {
+        const origin = req.cookies?.origin;
+        if (account?.provider === "github" && account.access_token) {
+          const access_token = account.access_token;
+
+          if (account && account.access_token) {
+            const body: any = {
+              from_github: true,
+              email: user?.email,
+              name: user?.name,
+              token: access_token,
+              client_secret: env.FRONTEND_AUTH_SECRET,
+            };
+
+            if (req?.cookies?.invite_id) {
+              body["invite_id"] = req.cookies.invite_id;
+            }
+
+            const userLoginRes = await fetch(
+              `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_login`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+              },
+            );
+
+            const userLoginData: CkanResponse<
+              User & { frontend_token: string }
+            > = await userLoginRes.json();
+
+            let userLoginResult: any;
+            if (typeof userLoginData?.result == "string") {
+              userLoginResult = JSON.parse(userLoginData.result as any);
+            } else {
+              userLoginResult = userLoginData.result;
+            }
+
+            if (userLoginResult.errors) {
+              return `/auth/${origin ?? "signin"}?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
+            }
+          }
+        }
+
         return true; // Allows the sign-in
       },
       session: ({ session, token }) => {
@@ -88,11 +134,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
               client_secret: env.FRONTEND_AUTH_SECRET,
             };
 
-            if (req?.cookies?.invite_id) {
-              body["invite_id"] = req.cookies.invite_id;
-            }
-
-            const userRes = await fetch(
+            const userLoginRes = await fetch(
               `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_login`,
               {
                 method: "POST",
@@ -103,20 +145,15 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
               },
             );
 
-            const userLoginResponse: CkanResponse<
+            const userLoginData: CkanResponse<
               User & { frontend_token: string }
-            > = await userRes.json();
+            > = await userLoginRes.json();
 
             let userLoginResult: any;
-            if (typeof userLoginResponse?.result == "string") {
-              userLoginResult = JSON.parse(userLoginResponse.result as any);
+            if (typeof userLoginData?.result == "string") {
+              userLoginResult = JSON.parse(userLoginData.result as any);
             } else {
-              userLoginResult = userLoginResponse.result;
-            }
-
-            if (userLoginResult.errors) {
-              // TODO: improve error handling
-              return { errors: userLoginResult.errors };
+              userLoginResult = userLoginData.result;
             }
 
             user = {

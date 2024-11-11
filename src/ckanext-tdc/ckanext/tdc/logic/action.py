@@ -510,17 +510,20 @@ def user_login(context, data_dict):
                 invited_ckan_user_q = session.query(model.User).filter(model.User.reset_key == invite_id)
                 invited_ckan_user = invited_ckan_user_q.first()
                 if not invited_ckan_user:
-                    # TODO: throw invalid invite error
-                    return generic_error_message
+                    error = {
+                        'errors': {'auth': [_('This invite is not valid. Please, try again or contact an administrator.')]},
+                    }
+                    return error
 
                 email_already_used = session.query(model.User).filter(
                         model.User.email == email,
                         model.User.state == 'active').all()
 
                 if len(email_already_used) > 0:
-                    # TODO: throw invalid invite due to GitHub account already used
-                    # in another CKAN account
-                    return generic_error_message
+                    error = {
+                        'errors': {'auth': [_('The email address of the GitHub account you signed in with is already assigned to another TDC account.')]},
+                    }
+                    return error
 
                 # Email adress is available and invite is valid
                 invited_ckan_user.email = email

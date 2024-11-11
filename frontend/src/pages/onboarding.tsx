@@ -67,7 +67,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-export default function LoginPage({
+export default function OnboardingPage({
   csrfToken,
   organizationsData,
   topicsData,
@@ -115,6 +115,7 @@ export default function LoginPage({
 
   useEffect(() => {
     deleteCookie("invite_id");
+    deleteCookie("origin");
     setIsSmallScreen(window.innerWidth < 1457);
   }, []);
 
