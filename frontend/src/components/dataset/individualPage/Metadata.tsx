@@ -22,9 +22,8 @@ function getLastNameAndInitials(dataset: Dataset) {
     return (
       dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
     );
-  const contributors = dataset.contributors_data;
+  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin') ?? [];
   const contributorsCitations = contributors.map((contributor) => {
-    console.log("CONTRIBUTOR", contributor);
     if (contributor.fullname) {
       const splittedName = contributor?.fullname
         ?.split(" ")
@@ -325,7 +324,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                     )
                   ) + new Date(dataset.metadata_created as string).getFullYear()
                 },
-   author = {${dataset.contributors_data.map((c) => c.fullname).join(", ")}},
+   author = {${dataset.contributors_data.filter(c => c.name !== 'ckan_admin').map((c) => c.fullname).join(", ")}},
    year = ${new Date(dataset.metadata_created as string).getFullYear()},
    title = {${dataset.title ?? dataset.name}},
    institution = {${
