@@ -44,6 +44,7 @@ import { DatePicker } from "./DatePicker";
 import { Button } from "@/components/ui/button";
 import { Reference, usePopper } from "react-popper";
 import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
+import { DefaultTooltip } from "@components/ui/tooltip";
 
 type TableProps = {
   table: TableType<any>;
@@ -374,9 +375,9 @@ function FilterColumn({ column }: { column: ColumnType<any, unknown> }) {
       {({ open }) => (
         <>
           <Popover.Button>
-            <Tooltip content="Filter">
+            <DefaultTooltip content="Filter">
               <ListFilter className="h-4 w-4" />
-            </Tooltip>
+            </DefaultTooltip>
           </Popover.Button>
           <Transition
             as={Fragment}

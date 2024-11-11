@@ -114,6 +114,7 @@ export function useTableData({
   sorting,
   enabled = true,
   filters,
+  columnsType,
 }: {
   resourceId: string;
   pagination: PaginationState;
@@ -121,6 +122,7 @@ export function useTableData({
   sorting: ColumnSort[];
   enabled?: boolean;
   filters: ColumnFilter[];
+  columnsType: string;
 }) {
   return useQuery({
     queryKey: ["query", resourceId, pagination, columns, sorting, filters],
