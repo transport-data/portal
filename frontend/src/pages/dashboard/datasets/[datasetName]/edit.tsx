@@ -282,16 +282,20 @@ const EditDatasetDashboard: NextPage<{
                           <div className="flex flex-col gap-2 sm:flex-row">
                             {isUserAdminOfTheDatasetOrg && (
                               <>
+                                {["pending", "rejected"].includes(
+                                  dataset.approval_status || ""
+                                ) && (
+                                  <ApproveDatasetButton
+                                    datasetId={dataset.id}
+                                    onSuccess={() =>
+                                      router.push(
+                                        "/dashboard/datasets-approvals"
+                                      )
+                                    }
+                                  />
+                                )}
                                 {"pending" === dataset.approval_status && (
                                   <>
-                                    <ApproveDatasetButton
-                                      datasetId={dataset.id}
-                                      onSuccess={() =>
-                                        router.push(
-                                          "/dashboard/datasets-approvals"
-                                        )
-                                      }
-                                    />
                                     <RejectDatasetButton
                                       dataset={dataset as any}
                                       onSuccess={() =>
