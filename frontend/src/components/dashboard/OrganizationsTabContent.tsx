@@ -37,16 +37,14 @@ export default () => {
   }, [organizations]);
 
   const searchResults = useMemo(() => {
-    const filtered_orgs = organizations
-      ? organizations.filter((org) => org.capacity == "admin")
-      : [];
+    const filtered_orgs = organizations || [];
     if (!searchText) {
       return filtered_orgs;
     }
     return miniSearch.search(searchText, { prefix: true }).map((result) => {
       const group = filtered_orgs?.find((g) => g.id === result.id);
       // Ensure all required fields are present
-      return group || ({} as DashboardOrganizationCardProps);
+      return group || ({} as any);
     });
   }, [searchText, organizations, miniSearch]);
 
@@ -87,7 +85,10 @@ export default () => {
             {paginatedData.length > 0 ? (
               paginatedData.map((org) => (
                 <div key={org?.id}>
-                  <DashboardOrganizationCard {...org} />
+                  <DashboardOrganizationCard
+                    {...org}
+                    isReadOnly={org.capacity !== "admin"}
+                  />
                 </div>
               ))
             ) : (

@@ -51,7 +51,8 @@ Note that if the user you want to invite doesn't have a portal account yet, you 
 ## List and Search Organizations
 To view the Organizations list, you can go to `/dashboard/organizations`.
 Sysadmin users can view all organizations.
-Other users can view organizations in which they are `admin' level role.
+
+Other users can view organizations that they belong to being able to click on the organization to edit it if they are 'admin' of the organization.
 
 ![List Organization](list.png)
 
