@@ -1,7 +1,7 @@
 import { env } from "@env.mjs";
 import { CkanResponse } from "@schema/ckan.schema";
 import { deleteCookie } from "cookies-next";
-import { NextApiRequest, NextApiResponse } from "next";
+import { OptionsType } from "cookies-next/lib/types";
 import { Account, User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 
@@ -11,10 +11,7 @@ export type CkanUserLoginWithGitHubParams = {
   invite_id?: string;
 };
 
-export const clearAllAuxAuthCookies = (context?: {
-  req: NextApiRequest;
-  res: NextApiResponse;
-}) => {
+export const clearAllAuxAuthCookies = (context?: OptionsType) => {
   const cookies = ["origin", "invite_id", "onboarding_completed"];
   cookies.forEach((c) => {
     if (context) {
