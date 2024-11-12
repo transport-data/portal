@@ -348,7 +348,10 @@ export function MetadataForm({ disabled }: any) {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) => date < new Date("1900-01-01")}
+                    fromYear={1970}
+                    captionLayout="dropdown"
+                    toYear={2030}
+                    className={cn(disabled && "cursor-not-allowed")}
                     initialFocus
                   />
                 </PopoverContent>

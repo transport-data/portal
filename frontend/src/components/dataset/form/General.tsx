@@ -75,6 +75,7 @@ export function GeneralForm({
     type: "topic",
   });
 
+  console.log('FORM OBJ', formObj.watch('private'))
   return (
     <div className="flex flex-col gap-y-4 py-4">
       <div className="text-xl font-bold leading-normal text-primary">
@@ -84,7 +85,9 @@ export function GeneralForm({
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Title
         </div>
-        <small className="text-xs text-muted-foreground">min. 2 characters*</small>
+        <small className="text-xs text-muted-foreground">
+          min. 2 characters*
+        </small>
         <FormField
           control={control}
           name="title"
@@ -107,7 +110,9 @@ export function GeneralForm({
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
           Name
         </div>
-        <small className="text-xs text-muted-foreground">min. 2 characters*</small>
+        <small className="text-xs text-muted-foreground">
+          min. 2 characters*
+        </small>
         <FormField
           control={control}
           name="name"
@@ -316,6 +321,7 @@ export function GeneralForm({
               .otherwise(() => (
                 <></>
               ))}
+            <FormDescription>Select the topic(s) of your data.</FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -373,22 +379,28 @@ export function GeneralForm({
               <Checkbox
                 className={cn(disabled ? "cursor-not-allowed" : "")}
                 disabled={disabled}
-                checked={field.value}
-                onCheckedChange={field.onChange}
+                checked={!field.value}
+                onCheckedChange={(e) => {
+                field.onChange(!(e.target as any).checked)
+                }}
               />
             </FormControl>
             <div className="space-y-1 leading-none">
               <FormLabel>
-                Is this dataset private?
-                {!isUserAdminOfTheDatasetOrg && !field.value ? (
-                  <span className=" text-gray-500">
-                    {" "}
-                    Before this dataset is published it'll be reviewed by an
-                    admin from the dataset's organization, and you won't be able
-                    to edit it before this review
-                  </span>
+                {!field.value ? (
+                  <>
+                    <span className="text-primary">Publish Data</span>
+                    {!isUserAdminOfTheDatasetOrg && (
+                      <span className=" text-gray-500">
+                        {" "}
+                        Note: Before this dataset is published it will be
+                        reviewed by an Admin from your organization. You won't
+                        be able to edit it during the review.
+                      </span>
+                    )}
+                  </>
                 ) : (
-                  <></>
+                  <>Private Data</>
                 )}
               </FormLabel>
             </div>
@@ -397,7 +409,7 @@ export function GeneralForm({
       />
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-          Keywords (max. 3)
+          Select or add keywords for your data to make it easier for the community to find. (max. 3)
         </div>
         <FormField
           control={control}
