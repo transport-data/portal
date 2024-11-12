@@ -7,32 +7,58 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from io import BytesIO
+import zipfile
 
-load_dotenv()              
+load_dotenv()
+
 # CKAN Configuration
 CKAN_URL = os.getenv('CKAN_URL')
 API_KEY = os.getenv('API_KEY')
 
-
-def resource_publish(indicator,sheet_name):
-    response = requests.get("https://zenodo.org/records/10148349/files/supplementary_information_GFEI2023_TDC.xlsx?download=1")
+def resource_publish(indicator, sheet_name):
+    """Fetches and converts an Excel sheet to CSV."""
+    response = requests.get("https://zenodo.org/records/14046031/files/supplementary_information_GFEI2023_TDC.xlsx?download=1")
     workbook = openpyxl.load_workbook(BytesIO(response.content), data_only=True)
     sheet = workbook[sheet_name]
     current_date = datetime.now().strftime('%Y-%m-%d')
     out_csv = f'{indicator}-fetch_on-{current_date}.csv'
-    with open(out_csv, mode='w', newline='', encoding='utf-8') as file:
-            csv_writer = csv.writer(file)
-            for row in sheet.iter_rows(values_only=True):
-                csv_writer.writerow(row)
-    file.close()
-    return out_csv
-def dataset_exists(dataset_name):
-    """
-    Check if a dataset already exists in CKAN.
     
-    :param dataset_name: Name or ID of the dataset to check.
-    :return: True if the dataset exists, False otherwise.
-    """
+    with open(out_csv, mode='w', newline='', encoding='utf-8') as file:
+        csv_writer = csv.writer(file)
+        for row in sheet.iter_rows(values_only=True):
+            csv_writer.writerow(row)
+    
+    return out_csv
+
+def resource_publish_sdmx(package_id):
+    """Downloads, extracts, and uploads SDMX XML files to CKAN."""
+    url = "https://zenodo.org/record/14046031/files/sdmx.zip"
+    response = requests.get(url)
+    with open("sdmx.zip", "wb") as file:
+        file.write(response.content)
+    
+    with zipfile.ZipFile("sdmx.zip", "r") as zip_ref:
+        zip_ref.extractall("extracted_files")
+    
+    for filename in os.listdir("extracted_files"):
+        if filename.endswith(".xml"):
+            file_path = os.path.join("extracted_files", filename)
+            current_date = datetime.now().strftime('%Y-%m-%d')
+            filename = f'{filename.split(".")[0]}-fetch_on-{current_date}'    
+            headers = {'Authorization': API_KEY}
+            data = {
+                'package_id': package_id,
+                'name': filename,
+                'format': 'xml',
+                'resource_type': 'data'
+            }
+            with open(file_path, "rb") as file:
+                files = {'upload': file}
+                resp = requests.post(f'{CKAN_URL}/api/3/action/resource_create', headers=headers, data=data, files=files)
+                print('Resource created successfully:', resp.json())
+
+def dataset_exists(dataset_name):
+    """Checks if a dataset exists in CKAN."""
     params = {"id": dataset_name}
     response = requests.get(
         urljoin(CKAN_URL, '/api/3/action/package_show'),
@@ -40,7 +66,6 @@ def dataset_exists(dataset_name):
         headers={'Authorization': API_KEY, 'Content-Type': 'application/json'}
     )
     
-    # If the dataset exists, we get a 200 status code, otherwise 404
     if response.status_code == 200:
         print(f"Dataset '{dataset_name}' already exists.")
         return True
@@ -48,9 +73,8 @@ def dataset_exists(dataset_name):
         print(f"Dataset '{dataset_name}' does not exist.")
         return False
     else:
-        response.raise_for_status()  # Raise an error for other HTTP statuses
+        response.raise_for_status()
 
-# WATER
 def dataset_publish_1(org_id, dataset_title):
     data = {
         'title': dataset_title,
@@ -80,6 +104,7 @@ def dataset_publish_1(org_id, dataset_title):
 
     if dataset_exists(dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','')):
         resource_name = resource_publish(data['indicators'],'data')
+        resource_publish_sdmx(data['name'])
         headers = {
             'Authorization': API_KEY,
         }
@@ -105,6 +130,7 @@ def dataset_publish_1(org_id, dataset_title):
             )
             print('Dataset created successfully:', response.json())
             resource_name = resource_publish(data['indicators'],'data')
+            resource_publish_sdmx(data['name'])
             headers = {
                 'Authorization': API_KEY,
             }
@@ -152,6 +178,7 @@ def dataset_publish_2(org_id, dataset_title):
 
     if dataset_exists(dataset_title.lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/','')):
         resource_name = resource_publish(data['indicators'],'data')
+        resource_publish_sdmx(data['name'])
         headers = {
             'Authorization': API_KEY,
         }
@@ -177,6 +204,7 @@ def dataset_publish_2(org_id, dataset_title):
             )
             print('Dataset created successfully:', response.json())
             resource_name = resource_publish(data['indicators'],'data')
+            resource_publish_sdmx(data['name'])
             headers = {
                 'Authorization': API_KEY,
             }

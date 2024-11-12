@@ -13,8 +13,6 @@ load_dotenv()
 CKAN_URL = os.getenv('CKAN_URL')
 API_KEY = os.getenv('API_KEY')
 
-
-
 def download_and_extract_zip(extract_to='JRC-IDEES-2021_EU27'):
     # Download the ZIP file
     response = requests.get("https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/JRC-IDEES/JRC-IDEES-2021_v1/JRC-IDEES-2021_EU27.zip")
