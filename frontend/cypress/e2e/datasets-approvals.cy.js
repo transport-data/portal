@@ -131,6 +131,19 @@ const editorUser = describe("Dataset Approval", () => {
     cy.visit("/dashboard/newsfeed");
     cy.get("p.text-base").contains(`You approved the dataset ${privateDatasetTitle2}`).should("exist");
   });
+  
+  it("Should open a rejected dataset and approve it", () => {
+    cy.visit("/dashboard/datasets-approvals");
+    cy.get("div").contains("h2", privateDatasetTitle2).should("exist");
+    cy.get(
+      `a[href="/dashboard/datasets/${privateDatasetName2}/edit?fromDatasetsRequests=true"]`
+    ).click();
+    cy.get("#approveDatasetButton").click();
+    cy.get("#confirmApproval").click();
+
+    cy.visit("/dashboard/newsfeed");
+    cy.get("p.text-base").contains(`You approved the dataset ${privateDatasetTitle2}`).should("exist");
+  });
 
   after(() => {
     cy.deleteDatasetAPI(privateDatasetName);

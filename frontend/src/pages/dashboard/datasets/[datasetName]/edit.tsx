@@ -32,6 +32,7 @@ import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { SaveDraftButton } from "../create";
 import { TRPCClientErrorLike } from "@trpc/client";
+import { DefaultTooltip } from "@components/ui/tooltip";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -55,13 +56,30 @@ export async function getServerSideProps(
   });
 
   const fromDatasetsRequests = !!context.query.fromDatasetsRequests;
-  const isUserAdminOfTheDatasetOrg = !!userOrgs.find(
-    (x) => x.id === dataset.organization?.id && x.capacity === "admin"
+  const userOrganization = userOrgs.find(
+    (x) => x.id === dataset.organization?.id
   );
+
+  if (
+    (!userOrganization || userOrganization.capacity === "member") &&
+    !session?.user.sysadmin
+  ) {
+    return {
+      redirect: {
+        destination: "/unauthorized",
+        permanent: false,
+      },
+    };
+  }
 
   if (!dataset.related_datasets || dataset.related_datasets.length === 0)
     return {
-      props: { isUserAdminOfTheDatasetOrg, dataset, fromDatasetsRequests },
+      props: {
+        isUserAdminOfTheDatasetOrg:
+          session?.user.sysadmin || userOrganization?.capacity === "admin",
+        dataset,
+        fromDatasetsRequests,
+      },
     };
   //we need to do this to have the title for the related_datasets in the combobox
   const relatedDatasets = await Promise.all(
@@ -75,7 +93,7 @@ export async function getServerSideProps(
 
   return {
     props: {
-      isUserAdminOfTheDatasetOrg,
+      isUserAdminOfTheDatasetOrg: userOrganization,
       fromDatasetsRequests,
       dataset: {
         ...dataset,
@@ -262,9 +280,11 @@ const EditDatasetDashboard: NextPage<{
                             Edit Dataset
                           </h2>
                           <div className="flex flex-col gap-2 sm:flex-row">
-                            {isUserAdminOfTheDatasetOrg &&
-                              "pending" === dataset.approval_status && (
-                                <>
+                            {isUserAdminOfTheDatasetOrg && (
+                              <>
+                                {["pending", "rejected"].includes(
+                                  dataset.approval_status || ""
+                                ) && (
                                   <ApproveDatasetButton
                                     datasetId={dataset.id}
                                     onSuccess={() =>
@@ -273,16 +293,21 @@ const EditDatasetDashboard: NextPage<{
                                       )
                                     }
                                   />
-                                  <RejectDatasetButton
-                                    dataset={dataset as any}
-                                    onSuccess={() =>
-                                      router.push(
-                                        "/dashboard/datasets-approvals"
-                                      )
-                                    }
-                                  />
-                                </>
-                              )}
+                                )}
+                                {"pending" === dataset.approval_status && (
+                                  <>
+                                    <RejectDatasetButton
+                                      dataset={dataset as any}
+                                      onSuccess={() =>
+                                        router.push(
+                                          "/dashboard/datasets-approvals"
+                                        )
+                                      }
+                                    />
+                                  </>
+                                )}
+                              </>
+                            )}
                             <DeleteDatasetButton
                               datasetId={dataset.id}
                               onSuccess={() =>
@@ -414,17 +439,32 @@ const EditDatasetDashboard: NextPage<{
                     >
                       Previous
                     </Button>
-                    <LoaderButton
-                      disabled={disabledForm}
-                      className={cn(
-                        disabledForm && "cursor-not-allowed",
-                        "w-full"
-                      )}
-                      loading={editDataset.isLoading}
-                      type="submit"
-                    >
-                      Submit
-                    </LoaderButton>
+                    {disabledForm ? (
+                      <DefaultTooltip content="The dataset is pending wait for an approval or refusal to make any changes">
+                        <LoaderButton
+                          disabled={disabledForm}
+                          className={cn(
+                            disabledForm && "cursor-not-allowed",
+                            "w-full"
+                          )}
+                          loading={editDataset.isLoading}
+                          type="submit"
+                        >
+                          Submit
+                        </LoaderButton>
+                      </DefaultTooltip>
+                    ) : (
+                      <LoaderButton
+                        className={cn(
+                          disabledForm && "cursor-not-allowed",
+                          "w-full"
+                        )}
+                        loading={editDataset.isLoading}
+                        type="submit"
+                      >
+                        Submit
+                      </LoaderButton>
+                    )}
                   </div>
                 </>
               )}
