@@ -216,6 +216,7 @@ def _fix_approval_workflow(context, data_dict, is_update):
     user_id = current_user.id
 
     is_resource_create = context.get("is_resource_create", False)
+    user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if is_update:
         dataset_id = data_dict.get("id")
@@ -229,7 +230,6 @@ def _fix_approval_workflow(context, data_dict, is_update):
         dataset = data_dict
 
     owner_org = dataset.get("owner_org")
-    user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if not user_is_admin:
         current_approval_contributors = dataset.get("current_approval_contributors", [])
@@ -262,6 +262,9 @@ def _fix_approval_workflow(context, data_dict, is_update):
         data_dict["previous_approval_contributors"] = data_dict.get("current_approval_contributors", [])
         data_dict["current_approval_contributors"] = []
 
+    if is_update and user_is_admin and old_dataset_is_private and not is_private and data_dict['approval_status'] != 'approved':
+        data_dict["approval_status"] = None
+        data_dict["approval_message"] = None
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
     is_approval_action = context.get("is_approval_action", False)
