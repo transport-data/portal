@@ -9,7 +9,7 @@ import { NextSeo } from "next-seo";
 import { formatIcon, slugify } from "@lib/utils";
 import { Steps } from "@components/dataset/form/Steps";
 import { MetadataForm } from "@components/dataset/form/Metadata";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn, UseFormWatch } from "react-hook-form";
 import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -23,6 +23,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import { ErrorAlert } from "@components/_shared/Alerts";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { TRPCClientErrorLike } from "@trpc/client";
 
 const docs = [
   {
@@ -79,7 +81,7 @@ const CreateDatasetDashboard: NextPage = () => {
       title: "",
       notes: "",
       state: "active",
-      tdc_category: 'public',
+      tdc_category: "public",
       geographies: [],
       topics: [],
       sectors: [],
@@ -123,7 +125,6 @@ const CreateDatasetDashboard: NextPage = () => {
       })
       .with("metadata", () => {
         const errorPaths = Object.keys(form.formState.errors);
-      console.log('FORM ERRORS', form.formState.errors)
         return [
           "sources",
           "language",
@@ -196,7 +197,15 @@ const CreateDatasetDashboard: NextPage = () => {
                 <>
                   <GeneralForm />
                   <div className="flex items-center gap-4">
-                    <SaveDraftButton callback={() => handleSaveDraft()} />
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <Button
                       type="button"
                       className="w-full"
@@ -205,7 +214,8 @@ const CreateDatasetDashboard: NextPage = () => {
                         if (form.watch("name").length < 2) {
                           form.setError("name", {
                             type: "manual",
-                            message: "Name needs to be at least 2 characters long",
+                            message:
+                              "Name needs to be at least 2 characters long",
                           });
                           return;
                         }
@@ -232,17 +242,29 @@ const CreateDatasetDashboard: NextPage = () => {
                     >
                       Previous
                     </Button>
-                    <SaveDraftButton callback={() => handleSaveDraft()} />
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <Button
                       type="button"
                       className="w-full"
                       onClick={async () => {
                         await form.trigger();
                         const next = await form.trigger();
-                        if (form.watch("temporal_coverage_start") > form.watch("temporal_coverage_end")) {
+                        if (
+                          form.watch("temporal_coverage_start") >
+                          form.watch("temporal_coverage_end")
+                        ) {
                           form.setError("temporal_coverage_end", {
                             type: "manual",
-                            message: "End date should be greater than start date",
+                            message:
+                              "End date should be greater than start date",
                           });
                           return;
                         }
@@ -269,7 +291,15 @@ const CreateDatasetDashboard: NextPage = () => {
                     >
                       Previous
                     </Button>
-                    <SaveDraftButton callback={() => handleSaveDraft()} />
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <LoaderButton
                       loading={createDataset.isLoading}
                       className="w-full"
@@ -342,13 +372,60 @@ const CreateDatasetDashboard: NextPage = () => {
 
 export default CreateDatasetDashboard;
 
-const SaveDraftButton = ({ callback }: { callback: Function }) => {
+export const SaveDraftButton = ({
+  form,
+  onSuccess,
+  onError,
+}: {
+  onSuccess: Function;
+  onError: Function;
+  form: UseFormReturn<DatasetFormType>;
+}) => {
+  const router = useRouter();
+  const createDraftDataset = api.dataset.draft.useMutation({
+    onSuccess: async (data) => {
+      onSuccess(data);
+      toast({
+        description: `Successfully created the ${
+          data?.title ?? data?.name
+        } dataset as Draft`,
+      });
+      await router.push("/dashboard/datasets");
+    },
+    onError: (error) => {
+      onError(error);
+    },
+  });
+
+  const validatePrimeRequiredFields = () => {
+    const primeRequiredFields = ["name", "notes", "owner_org"];
+    let hasPrimeError = false;
+    for (var name in form.formState.errors) {
+      if (primeRequiredFields.find((f) => f === name)) {
+        hasPrimeError = true;
+        break;
+      }
+    }
+    return !hasPrimeError;
+  };
+
+  const handleSaveDraft = async () => {
+    form.trigger().then(() => {
+      if (validatePrimeRequiredFields())
+        createDraftDataset.mutate({
+          ...form.getValues(),
+        });
+    });
+
+    return false;
+  };
+
   return (
     <Button
       variant="secondary"
       onClick={(e) => {
         e.preventDefault();
-        callback();
+        handleSaveDraft();
         return false;
       }}
     >

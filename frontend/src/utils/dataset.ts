@@ -362,23 +362,31 @@ export const draftDataset = async ({
   apiKey: string;
   input: DatasetDraftType;
 }) => {
-  const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
+
+  const datasetRequest = input.id ? await getDataset({
+    id : input.id,
+    apiKey,
+    include_extras:true
+  }) : await CkanRequest.post<CkanResponse<Dataset>>(
     `package_create`,
     {
       apiKey,
       json: {
         ...input,
-        state: "draft", //todo: state:"draft" is not working when creating datasets
+        state: "draft",
       },
     }
   );
-  if (dataset.result?.id && dataset.result?.state !== "draft") {
+
+  const dataset = datasetRequest.result;
+
+  if (dataset?.id) {
     const draft = await CkanRequest.post<CkanResponse<Dataset>>(
       "package_patch",
       {
         apiKey: apiKey,
         json: {
-          id: dataset.result.id,
+          id: dataset.id,
           state: "draft",
         },
       }

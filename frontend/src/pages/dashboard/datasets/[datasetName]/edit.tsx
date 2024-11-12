@@ -1,6 +1,5 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useSession } from "next-auth/react";
-
 import { Form } from "@/components/ui/form";
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Layout from "@components/_shared/Layout";
@@ -31,6 +30,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
+import { SaveDraftButton } from "../create";
+import { TRPCClientErrorLike } from "@trpc/client";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -317,25 +318,45 @@ const EditDatasetDashboard: NextPage<{
                     isUserAdminOfTheDatasetOrg={isUserAdminOfTheDatasetOrg}
                     disabled={disabledForm}
                   />
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={async () => {
-                      await form.trigger();
-                      if (checkDisableNext()) {
-                        return;
-                      }
-                      return send("next");
-                    }}
-                  >
-                    Next
-                  </Button>
+                  <div className="flex w-full flex-col gap-4 md:flex-row">
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={async () => {
+                        await form.trigger();
+                        if (checkDisableNext()) {
+                          return;
+                        }
+                        return send("next");
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </>
               )}
               {current.matches("metadata") && (
                 <>
                   <MetadataForm disabled={disabledForm} />
-                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                  <div className="flex w-full flex-col gap-4 md:flex-row">
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <Button
                       type="button"
                       variant="secondary"
@@ -349,10 +370,14 @@ const EditDatasetDashboard: NextPage<{
                       className="w-full"
                       onClick={async () => {
                         const next = await form.trigger();
-                        if (form.watch("temporal_coverage_start") > form.watch("temporal_coverage_end")) {
+                        if (
+                          form.watch("temporal_coverage_start") >
+                          form.watch("temporal_coverage_end")
+                        ) {
                           form.setError("temporal_coverage_end", {
                             type: "manual",
-                            message: "End date should be greater than start date",
+                            message:
+                              "End date should be greater than start date",
                           });
                           return;
                         }
@@ -371,7 +396,16 @@ const EditDatasetDashboard: NextPage<{
               {current.matches("uploads") && (
                 <>
                   <UploadsForm disabled={disabledForm} />
-                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                  <div className="flex w-full flex-col gap-4 md:flex-row">
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <Button
                       type="button"
                       variant="secondary"
