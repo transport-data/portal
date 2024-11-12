@@ -14,4 +14,5 @@ export interface User {
   apikey?: string;
   email?: string;
   image_display_url?: string;
+  plugin_extras?: any;
 }

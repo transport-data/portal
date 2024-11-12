@@ -8,7 +8,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import {
   ckanUserLoginWithGithub,
   CkanUserLoginWithGitHubParams,
+  clearAllAuxAuthCookies,
 } from "@utils/auth";
+import { setCookie } from "cookies-next";
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
   return NextAuth(req, res, {
@@ -76,15 +78,22 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           const userLoginResult =
             await ckanUserLoginWithGithub(userLoginParams);
 
-          if (userLoginResult.errors) {
+          if ("errors" in userLoginResult) {
             let url = `/auth/${origin ?? "signin"}?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
 
             if (origin == "signup" && inviteId) {
               url += `&invite_id=${inviteId}`;
             }
-
             return url;
           }
+
+          clearAllAuxAuthCookies({ req, res });
+
+          setCookie(
+            "onboarding_completed",
+            userLoginResult?.onboarding_completed,
+            { req, res },
+          );
         }
 
         return true;
@@ -103,7 +112,6 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       async jwt({ token, user, account }) {
         if (user) {
           token.apikey = user.apikey;
-          // token.teams = user.teams
           token.sysadmin = user.sysadmin;
         }
         if (account?.provider === "github" && account.access_token) {
@@ -114,6 +122,10 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 
           const userLoginResult =
             await ckanUserLoginWithGithub(userLoginParams);
+
+          if ("errors" in userLoginResult) {
+            throw new Error("Something went wrong");
+          }
 
           user = {
             ...user,

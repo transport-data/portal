@@ -1,6 +1,7 @@
 import { ErrorAlert } from "@components/_shared/Alerts";
 import { SingInLayout } from "@components/_shared/SignInLayout";
-import { deleteCookie, setCookie } from "cookies-next";
+import { clearAllAuxAuthCookies } from "@utils/auth";
+import { setCookie } from "cookies-next";
 import { signIn } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
@@ -11,8 +12,7 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
   const query = router.query;
 
   useEffect(() => {
-    deleteCookie("invite_id");
-    deleteCookie("origin");
+    clearAllAuxAuthCookies();
   }, []);
 
   const pageTitle = isSignUp ? "Register an account" : "Sign in";
@@ -23,9 +23,6 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
   const origin = isSignUp ? "signup" : "signin";
 
   let callbackUrl = (query?.callbackUrl as string) ?? "/dashboard";
-  if (isSignUp) {
-      callbackUrl = "/onboarding"
-  }
 
   return (
     <>

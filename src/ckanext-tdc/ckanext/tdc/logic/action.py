@@ -562,7 +562,13 @@ def user_login(context, data_dict):
             if config.get('ckanext.auth.include_frontend_login_token', False):
                 user = generate_token(context, user)
 
-            return json.dumps(user)
+            plugin_extras = user.get("plugin_extras")
+            onboarding_completed = False
+            if plugin_extras:
+                onboarding_completed = plugin_extras.get("onboarding_completed", False)
+            user["onboarding_completed"] = onboarding_completed
+
+            return json.loads(json.dumps(user))
         if not data_dict.get('id') or not data_dict.get('password'):
             return generic_error_message
 

@@ -1,5 +1,7 @@
 import { env } from "@env.mjs";
 import { CkanResponse } from "@schema/ckan.schema";
+import { deleteCookie } from "cookies-next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { Account, User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 
@@ -7,6 +9,20 @@ export type CkanUserLoginWithGitHubParams = {
   account: Account;
   user: User | AdapterUser;
   invite_id?: string;
+};
+
+export const clearAllAuxAuthCookies = (context?: {
+  req: NextApiRequest;
+  res: NextApiResponse;
+}) => {
+  const cookies = ["origin", "invite_id", "onboarding_completed"];
+  cookies.forEach((c) => {
+    if (context) {
+      deleteCookie(c, context);
+    } else {
+      deleteCookie(c);
+    }
+  });
 };
 
 export async function ckanUserLoginWithGithub({
@@ -39,15 +55,11 @@ export async function ckanUserLoginWithGithub({
     },
   );
 
-  const userLoginData: CkanResponse<User & { frontend_token: string }> =
-    await userLoginRes.json();
+  const userLoginData: CkanResponse<
+    (User & { frontend_token: string }) | { errors: { [k: string]: string[] } }
+  > = await userLoginRes.json();
 
-  let userLoginResult: any;
-  if (typeof userLoginData?.result == "string") {
-    userLoginResult = JSON.parse(userLoginData.result as any);
-  } else {
-    userLoginResult = userLoginData.result;
-  }
+  const userLoginResult = userLoginData.result;
 
   return userLoginResult;
 }
