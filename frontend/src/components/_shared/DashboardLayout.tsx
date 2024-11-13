@@ -53,7 +53,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       id: "my-datasets",
     },
     {
-      title: "My Organisation",
+      title: "My Organisation Datasets",
       href: "/dashboard/datasets/my-organization",
       id: "my-organization",
     },
