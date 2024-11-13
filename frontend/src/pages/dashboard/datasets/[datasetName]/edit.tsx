@@ -345,6 +345,7 @@ const EditDatasetDashboard: NextPage<{
                   />
                   <div className="flex w-full flex-col gap-4 md:flex-row">
                     <SaveDraftButton
+                      update={true}
                       form={form}
                       onError={(error: TRPCClientErrorLike<any>) => {
                         setErrorMessage(error.message);
@@ -374,6 +375,7 @@ const EditDatasetDashboard: NextPage<{
                   <MetadataForm disabled={disabledForm} />
                   <div className="flex w-full flex-col gap-4 md:flex-row">
                     <SaveDraftButton
+                      update={true}
                       form={form}
                       onError={(error: TRPCClientErrorLike<any>) => {
                         setErrorMessage(error.message);
@@ -423,6 +425,7 @@ const EditDatasetDashboard: NextPage<{
                   <UploadsForm disabled={disabledForm} />
                   <div className="flex w-full flex-col gap-4 md:flex-row">
                     <SaveDraftButton
+                      update={true}
                       form={form}
                       onError={(error: TRPCClientErrorLike<any>) => {
                         setErrorMessage(error.message);
