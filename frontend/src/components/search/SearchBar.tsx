@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { api } from "@utils/api";
 import Link from "next/link";
 import searchbarConfig from "@data/searchbar.config.json";
+import { Facet } from "@components/_shared/DatasetsFilter";
 
 interface FacetValueProps {
   display_name: string;
@@ -339,7 +340,6 @@ export default function SearchBar() {
             Browse all datasets
           </Link>
         </div>
-        {showCommandList ? "show command" : ""}
         <CommandList
           className={`absolute top-0 z-[15] mt-[70px] max-h-[500px] w-full bg-white shadow-[0px_4px_6px_0px_#0000000D] ${
             showCommandList ? "block" : "hidden"
@@ -355,14 +355,12 @@ export default function SearchBar() {
               >
                 {[
                   ...(inputValue.length
-                    ? facets[facetName]?.options?.filter(
-                        (i: { display_name: string }) => {
-                          console.log(i);
-                          return i.display_name
-                            ?.toLocaleLowerCase()
-                            .includes(inputValue);
-                        }
-                      )
+                    ? facets[facetName]?.options?.filter((i: Facet) => {
+                        return (i.display_name || i.name)
+                          ?.toString()
+                          ?.toLocaleLowerCase()
+                          .includes(inputValue.toLocaleLowerCase());
+                      })
                     : facets[facetName]?.options),
                 ]?.map((item: any, i: number) => (
                   <SearchFacetItem
