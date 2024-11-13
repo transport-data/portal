@@ -75,7 +75,7 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
             </div>
           </div>
 
-          <p className="mt-5 text-sm opacity-50">
+          {/*<p className="mt-5 text-sm opacity-50">
             *By {infinitiveAction} with GitHub you are agreeing with our{" "}
             <Link
               href="/terms-and-conditions"
@@ -83,7 +83,7 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
             >
               Terms and Conditions
             </Link>.
-          </p>
+          </p>*/}
           {query.error && (
             <div className="mt-5">
               <ErrorAlert text={query.error as string} />
