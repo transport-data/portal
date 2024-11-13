@@ -394,7 +394,7 @@ export function GeneralForm({
             </FormControl>
             <div className="space-y-1 leading-none">
               <FormLabel>
-                <span className="text-primary">Publish Data: </span>
+                <span className="text-primary">Publish Data</span>
                 {!field.value ? (
                   <>
                     {!isUserAdminOfTheDatasetOrg && (
