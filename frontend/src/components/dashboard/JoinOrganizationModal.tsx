@@ -26,8 +26,21 @@ import TextEditor from "@components/_shared/TextEditor";
 import { OnboardingFormType } from "@schema/onboarding.schema";
 import { toast } from "@components/ui/use-toast";
 
-export default function JoinOrganizationModalButton() {
-  const [isShow, setIsShow] = useState<boolean>(true);
+export default function JoinOrganizationModalButton({
+  render,
+}: {
+  render?: (setIsShow: Dispatch<SetStateAction<boolean>>) => React.ReactNode;
+}) {
+  const [isShow, setIsShow] = useState<boolean>(false);
+
+  if (render) {
+    return (
+      <>
+        {render(setIsShow)}
+        <JoinOrganizationModal isShow={isShow} setIsShow={setIsShow} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -88,7 +101,7 @@ function JoinOrganizationModal({
     onSuccess() {
       form.reset();
       toast({ description: "Request submitted" });
-      setErrorMessage("")
+      setErrorMessage("");
       setIsShow(false);
     },
     onError(e) {

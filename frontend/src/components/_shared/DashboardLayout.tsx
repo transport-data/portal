@@ -156,8 +156,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                 </div>
 
                 <div className="flex gap-2">
-                  {/* TODO: do not show for sysadmins */}
-                  <JoinOrganizationModalButton />
+                  {!isSysAdmin && <JoinOrganizationModalButton />}
                   <div className="min-w-full md:min-w-fit">
                     {(adminOrgs.length > 0 || editorOrgs.length > 0) && (
                       <Button asChild className="justify-between gap-2">
