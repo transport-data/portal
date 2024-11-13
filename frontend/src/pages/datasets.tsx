@@ -142,7 +142,7 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
               <div className="flex flex-col gap-[20px] rounded-[8px] bg-white p-5 shadow-[0px_1px_3px_0px_#0000001A]">
                 {tdcHarmonizedDatasets ? (
                   <img
-                    src="/images/icons/group-hamornised.png"
+                    src="/images/icons/group-harmonized.png"
                     width={48}
                     height={48}
                     alt="TDC Harmonized Logo"
