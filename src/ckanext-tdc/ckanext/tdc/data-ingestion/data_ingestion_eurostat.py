@@ -8,9 +8,7 @@ from tqdm import tqdm
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin
-from dotenv import load_dotenv
 
-load_dotenv()
 
 # CKAN Configuration
 CKAN_URL = os.getenv("CKAN_URL")
