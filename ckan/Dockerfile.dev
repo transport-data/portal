@@ -1,5 +1,7 @@
 FROM ckan/ckan-dev:2.11.0
 
+ENV CKANEXT_TDC_HASH c6be6d304be7f01fcda12639c898fa9d83fe4750
+
 USER root
 
 # Install any extensions needed by your CKAN instance
@@ -63,19 +65,3 @@ USER ckan
 
 COPY licenses.json /ext/licenses.json
 
-RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.anon_create_dataset = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.allow_dataset_collaborators = true"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.allow_admin_collaborators = true"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_dataset_if_not_in_organization = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.public_user_details = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.group_and_organization_list_all_fields_max = 350"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
-
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_create_groups = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_create_organizations = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_groups = false"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_organizations = false"
-
-RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
