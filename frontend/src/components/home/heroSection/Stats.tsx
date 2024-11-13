@@ -31,7 +31,7 @@ const Stats: React.FC<StatsProps> = ({
       stat: datasetCount,
     },
     {
-      name: "Organizations",
+      name: "Organisations",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -36,7 +36,7 @@ const DatasetsDashboard: NextPage<
 > = ({ adminOrEditorUserOrgs }) => {
   return (
     <>
-      <NextSeo title="My Organization" />
+      <NextSeo title="My Organisation" />
       <DashboardLayout active="datasets-approvals">
         <MyDatasetsRequestsTabContent
           adminOrEditorUserOrgs={adminOrEditorUserOrgs}

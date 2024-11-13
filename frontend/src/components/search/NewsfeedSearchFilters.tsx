@@ -34,7 +34,7 @@ export default function NewsFeedSearchFilters({
     <div className="grid grid-cols-12 gap-2 xl:max-h-[36px] ">
       <div className="col-span-12 xl:col-span-6">
         <SimpleSearchInput
-          placeholder="Search by dataset title, organization title or activity actor"
+          placeholder="Search by dataset title, organisation title or activity actor"
           onTextInput={(x) => setSearchTerm(x)}
         />
       </div>

@@ -15,14 +15,14 @@ export default function HeroSection() {
             href="/partners"
             className="flex items-center gap-1 text-lg font-medium leading-none text-accent"
           >
-            Full list of participating organizations{" "}
+            Full list of participating organisations{" "}
             <ChevronRightIcon width={16} />
           </Link>
         </div>
         <div className="flex w-full flex-col gap-4 lg:w-1/2">
           <p className="text-lg font-normal text-gray-500">
             Transport Data Commons is a initiative of individuals and
-            organizations who are passionate about sustainable transportation
+            organisations who are passionate about sustainable transportation
             and want to increase the use and impact of data in this sector. Our
             focus is on creating a common platform where transport-related data
             can be shared, analyzed, and utilized to help make informed

@@ -132,8 +132,8 @@ export const OrganizationForm: React.FC<{
                 ))}
             </FormControl>
             <FormDescription>
-              Use this if you want to say that this organization is a
-              sub-organization of another organization
+              Use this if you want to say that this organisation is a
+              sub-organisation of another organisation
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -145,7 +145,7 @@ export const OrganizationForm: React.FC<{
           name="image_url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Organization Image</FormLabel>
+              <FormLabel>Organisation Image</FormLabel>
               <FormControl>
                 <ImageUploader
                   clearImage={() => setValue("image_url", "")}

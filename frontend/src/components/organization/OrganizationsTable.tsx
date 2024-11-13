@@ -191,7 +191,7 @@ export const OrganizationsTable: React.FC<{ publicUrl: string }> = ({
         </div>
       </div>
       <Modal
-        title="Edit organization"
+        title="Edit organisation"
         show={!!editingOrganization}
         setShow={() => setEditingOrganization(null)}
       >

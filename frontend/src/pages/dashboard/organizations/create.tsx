@@ -16,7 +16,7 @@ const CreateOrganizationPage: NextPage = () => {
 
   return (
     <>
-      <NextSeo title="Create organization" />
+      <NextSeo title="Create organisation" />
       <Layout>
         <div className="container w-full">
           <div className="pt-8">
@@ -39,11 +39,11 @@ const CreateOrganizationPage: NextPage = () => {
                     { label: "Home", href: "/" },
                     { label: "Dashboard", href: "/dashboard" },
                     {
-                      label: "Organizations",
+                      label: "Organisations",
                       href: "/dashboard/organizations",
                     },
                     {
-                      label: "Create Organization",
+                      label: "Create Organisation",
                       href: "/dashboard/organization/create",
                     },
                   ]}

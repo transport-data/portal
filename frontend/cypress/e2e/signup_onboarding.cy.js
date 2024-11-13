@@ -64,14 +64,14 @@ describe("onboarding flow", () => {
 
     cy.get('button[type="button"]').click();
     // type organization name
-    cy.get('input[placeholder="Select an organization"]').type(
-      "Your Organization Name"
+    cy.get('input[placeholder="Select an organisation"]').type(
+      "Your Organisation Name"
     );
 
     // request new org
     cy.contains("Request a new organisation").click();
     cy.wait(2000);
-    cy.contains("Create a new organization");
+    cy.contains("Create a new organisation");
   });
 
   it("Should invite users", () => {

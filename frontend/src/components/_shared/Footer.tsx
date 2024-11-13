@@ -97,7 +97,7 @@ const Footer: React.FC = () => {
             </Link>
             <p className="mt-[20px] text-sm text-gray-500">
               Transport Data Commons is an initiative of individuals and
-              organizations who are passionate about sustainable transportation
+              organisations who are passionate about sustainable transportation
               and want to increase the use and impact of data in this sector.
             </p>
             <div className="mt-[20px] flex gap-[20px]">
