@@ -672,6 +672,7 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
         'site_url': site_url,
         'user_name': user_name,
         'user_email': from_user.email,
+        'to_email': to_email,
         **kwargs
     }
 
@@ -734,7 +735,7 @@ def request_organization_owner(context, data_dict):
     }
     org_dict = get_action('organization_show')({"ignore_auth": True}, data_dict)
     # find admin users of the org
-    to_emails = []
+    to_emails = [from_user.email]
     for user in org_dict.get("users"):
         if user.get("capacity") == "admin":
             user_show = model.User.get(user.get("id"))
@@ -767,7 +768,7 @@ def request_new_organization(context, data_dict):
 
     # get sysadmins emails
     sysadmins = session.query(model.User).filter(model.User.sysadmin==True).all()
-    to_emails = [user.email for user in sysadmins if user.email]
+    to_emails = [user.email for user in sysadmins if user.email] + [from_user.email]
 
     # send mails
     for email in to_emails:

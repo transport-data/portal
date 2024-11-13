@@ -88,6 +88,7 @@ function JoinOrganizationModal({
     onSuccess() {
       form.reset();
       toast({ description: "Request submitted" });
+      setErrorMessage("")
       setIsShow(false);
     },
     onError(e) {
