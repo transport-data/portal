@@ -11,6 +11,8 @@ import Heading from "./Heading";
 import Loading from "./Loading";
 import { api } from "@utils/api";
 import { DefaultTooltip } from "@components/ui/tooltip";
+import { BuildingIcon } from "lucide-react";
+import JoinOrganizationModalButton from "@components/dashboard/JoinOrganizationModal";
 
 interface DashboardLayotProps {
   children: React.ReactNode;
@@ -144,7 +146,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                         "inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-medium text-[#1f2a37] ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ",
                         active === tab.id
                           ? "bg-gray-200 text-foreground shadow-sm"
-                          : ""
+                          : "",
                       )}
                       href={tab.href}
                     >
@@ -152,23 +154,28 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                     </Link>
                   ))}
                 </div>
-                <div className="min-w-full md:min-w-fit">
-                  {(adminOrgs.length > 0 || editorOrgs.length > 0) && (
-                    <Button asChild className="justify-between gap-2">
-                      <Link href="/dashboard/datasets/create">
-                        <DocumentPlusIcon className="h-4 w-4" />
-                        Add Data
-                      </Link>
-                    </Button>
-                  )}
-                  {adminOrgs.length == 0 && editorOrgs.length == 0 && (
-                    <DefaultTooltip content="To add data you need to be at least an editor in at least one organization">
-                      <Button className="justify-between gap-2 opacity-50">
-                        <DocumentPlusIcon className="h-4 w-4" />
-                        Add Data
+
+                <div className="flex gap-2">
+                  {/* TODO: do not show for sysadmins */}
+                  <JoinOrganizationModalButton />
+                  <div className="min-w-full md:min-w-fit">
+                    {(adminOrgs.length > 0 || editorOrgs.length > 0) && (
+                      <Button asChild className="justify-between gap-2">
+                        <Link href="/dashboard/datasets/create">
+                          <DocumentPlusIcon className="h-4 w-4" />
+                          Add Data
+                        </Link>
                       </Button>
-                    </DefaultTooltip>
-                  )}
+                    )}
+                    {adminOrgs.length == 0 && editorOrgs.length == 0 && (
+                      <DefaultTooltip content="To add data you need to be at least an editor in at least one organization">
+                        <Button className="justify-between gap-2 opacity-50">
+                          <DocumentPlusIcon className="h-4 w-4" />
+                          Add Data
+                        </Button>
+                      </DefaultTooltip>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

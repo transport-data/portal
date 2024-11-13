@@ -20,7 +20,6 @@ import { listOrganizations, listUserOrganizations } from "@utils/organization";
 import { api } from "@utils/api";
 import { toast } from "@/components/ui/use-toast";
 import React from "react";
-import { deleteCookie } from "cookies-next";
 import { getServerAuthSession } from "@server/auth";
 import { clearAllAuxAuthCookies } from "@utils/auth";
 
