@@ -174,12 +174,10 @@ describe("Create and edit datasets", () => {
     cy.get("button[role='combobox']").eq(2).click();
     cy.get('input[role="combobox"').type("tonnes{enter}");
     cy.contains("From...").click();
-    cy.get(".lucide-chevron-left").click();
     cy.get('button[name="day"]').contains("10").click();
     cy.contains("Modes").click();
     cy.wait(1000);
     cy.contains("To...").click();
-    cy.get(".lucide-chevron-left").click();
     cy.get('button[name="day"]').contains("15").click();
     cy.contains("Modes").click();
     cy.wait(1000);
