@@ -23,7 +23,8 @@ import { Form, FormField } from "@components/ui/form";
 import { useForm, UseFormReturn } from "react-hook-form";
 import TextDivisor from "@components/_shared/TextDivisor";
 import TextEditor from "@components/_shared/TextEditor";
-import { ArrowLeft } from "lucide-react";
+import { OnboardingFormType } from "@schema/onboarding.schema";
+import { toast } from "@components/ui/use-toast";
 
 export default function JoinOrganizationModalButton() {
   const [isShow, setIsShow] = useState<boolean>(true);
@@ -49,7 +50,7 @@ const joinOrganizationSchema = z
   .object({
     isCreation: z.literal(false),
     org: OrganizationSchema,
-    message: z.string().min(20),
+    message: z.string().min(1),
     confirmMembership: z.literal(true),
   })
   .or(
@@ -71,16 +72,47 @@ function JoinOrganizationModal({
   isShow: boolean;
   setIsShow: Dispatch<SetStateAction<boolean>>;
 }) {
+  const [errorMessage, setErrorMessage] = useState("");
   const form = useForm<JoinOrganizationFormType>({
     mode: "onChange",
     resolver: zodResolver(joinOrganizationSchema),
     defaultValues: {
       isCreation: false,
+      message: "",
+    },
+  });
+
+  const onboardMutation = api.user.onboard.useMutation({
+    // TODO: reset is not working
+    // TODO: toast is hiding too fast
+    onSuccess() {
+      form.reset();
+      toast({ description: "Request submitted" });
+      setIsShow(false);
+    },
+    onError(e) {
+      setErrorMessage("Failed to submit request: " + e.message);
     },
   });
 
   const onSubmit = (data: JoinOrganizationFormType) => {
-    console.log(data);
+    let input: Partial<OnboardingFormType> = {
+      onBoardingStep: 1,
+      isNewOrganizationSelected: data.isCreation,
+    };
+
+    if (data.isCreation) {
+      input.confirmThatItParticipatesOfTheOrg = data.creationConfirmMembership;
+      input.newOrganizationName = data.name;
+      input.newOrganizationDescription = data.description;
+      input.newOrganizationDataDescription = data.whatDataMessage;
+    } else {
+      input.confirmThatItParticipatesOfTheOrg = data.confirmMembership;
+      input.orgInWhichItParticipates = data.org;
+      input.messageToParticipateOfTheOrg = data.message;
+    }
+
+    onboardMutation.mutate(input);
   };
 
   return (
@@ -101,6 +133,8 @@ function JoinOrganizationModal({
             <JoinOrganizationForm form={form} />
           )}
 
+          {errorMessage && <ErrorAlert text={errorMessage} />}
+
           <div className="flex justify-end gap-x-2">
             {form.watch("isCreation") && (
               <Button
@@ -116,10 +150,18 @@ function JoinOrganizationModal({
             )}
             <Button
               type="submit"
-              disabled={!form.formState.isValid || !form.formState.isDirty}
+              disabled={
+                !form.formState.isValid ||
+                !form.formState.isDirty ||
+                onboardMutation.isLoading
+              }
               className="mt-5"
             >
-              Submit
+              {!onboardMutation.isLoading ? (
+                "Submit"
+              ) : (
+                <Spinner className="text-slate-900" />
+              )}
             </Button>
           </div>
         </form>
