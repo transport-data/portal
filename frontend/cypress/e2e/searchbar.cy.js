@@ -11,7 +11,7 @@ const datasetTitle = `${uuid()}${datasetSuffix}`;
 const datasetName = `${uuid()}${datasetSuffix}`;
 const notes = `${uuid()}${datasetSuffix}`;
 const tags = ["tag1", "tag2", "tag3"];
-const geographies = ["afg"];
+const geographies = ["cpv"];
 const random = Math.random() * 100;
 const services = ["passenger"];
 const modes = ["heavy-rail"];
@@ -79,8 +79,34 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="in:${searchbarConfig.regions.description}"]`).click();
-		cy.get(`[data-value="in: Asia"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.name}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.description}: Cabo Verde"]`).click();
+
+		input.type( datasetTitle, { delay: 0 });
+
+		cy.wait(1500);
+
+		const titleElement = cy.get("div").contains("h5", datasetTitle);
+		const parent = titleElement.parents("a");
+		titleElement.should("exist");
+		
+		parent.click();
+		cy.get("div").should("contain", datasetTitle);
+
+  });
+
+  it("Should search the dataset filtered by country", () => {
+    
+		cy.visit(`/`);
+
+		const input = cy.get('input[placeholder="Find statistics, forecasts & studies"]');
+
+		input.focus().click();
+
+		cy.wait(500);
+
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.name}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.description}: Asia"]`).click();
 
 		input.type( datasetTitle, { delay: 0 });
 

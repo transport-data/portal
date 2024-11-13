@@ -1,7 +1,11 @@
 {
   "regions": {
-    "name": "in",
+    "name": "region",
     "description": "filter for regions"
+  },
+  "countries": {
+    "name": "country",
+    "description": "filter for countries"
   },
   "startYear": {
     "name": "after",
