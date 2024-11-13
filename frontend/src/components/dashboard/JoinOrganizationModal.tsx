@@ -59,20 +59,27 @@ export default function JoinOrganizationModalButton({
   );
 }
 
+const rte = z
+  .string()
+  .min(1 + "<p></p>".length, {
+    message: `Text must be at least 1 character long.`,
+  })
+  .refine((v) => v != "<p></p>");
+
 const joinOrganizationSchema = z
   .object({
     isCreation: z.literal(false),
     org: OrganizationSchema,
-    message: z.string().min(1),
-    confirmMembership: z.literal(true),
+    message: rte,
+    confirmMembership: z.boolean().refine((bool) => bool == true),
   })
   .or(
     z.object({
       isCreation: z.literal(true),
       name: z.string().min(1),
-      description: z.string().min(1),
-      whatDataMessage: z.string(),
-      creationConfirmMembership: z.literal(true),
+      description: rte,
+      whatDataMessage: rte,
+      creationConfirmMembership: z.boolean().refine((bool) => bool == true),
     }),
   );
 
@@ -92,6 +99,7 @@ function JoinOrganizationModal({
     defaultValues: {
       isCreation: false,
       message: "",
+      confirmMembership: false,
     },
   });
 
@@ -166,7 +174,6 @@ function JoinOrganizationModal({
               type="submit"
               disabled={
                 !form.formState.isValid ||
-                !form.formState.isDirty ||
                 onboardMutation.isLoading
               }
               className="mt-5"
@@ -325,17 +332,28 @@ function JoinOrganizationForm({
           }}
         />
         <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-            {...form.register("confirmMembership")}
-            id="confirmThatItParticipatesOfTheOrg"
+          <FormField
+            name="confirmMembership"
+            control={form.control}
+            render={({ field }) => {
+              return (
+                <>
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
+                    id="confirmThatItParticipatesOfTheOrg"
+                    checked={field.value}
+                    onChange={field.onChange}
+                  />
+                  <div className="pb-1 text-sm text-[#6B7280]">
+                    <label htmlFor="confirmationWorkingForTheOrg">
+                      I confirm that I work for this organisation
+                    </label>
+                  </div>
+                </>
+              );
+            }}
           />
-          <div className="pb-1 text-sm text-[#6B7280]">
-            <label htmlFor="confirmationWorkingForTheOrg">
-              I confirm that I work for this organisation
-            </label>
-          </div>
         </div>
       </>
     </div>
