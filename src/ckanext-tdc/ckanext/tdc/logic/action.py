@@ -216,7 +216,6 @@ def _fix_approval_workflow(context, data_dict, is_update):
     user_id = current_user.id
 
     is_resource_create = context.get("is_resource_create", False)
-    user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if is_update:
         dataset_id = data_dict.get("id")
@@ -230,6 +229,7 @@ def _fix_approval_workflow(context, data_dict, is_update):
         dataset = data_dict
 
     owner_org = dataset.get("owner_org")
+    user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if not user_is_admin:
         current_approval_contributors = dataset.get("current_approval_contributors", [])
