@@ -1,9 +1,5 @@
 FROM ckan/ckan-dev:2.11.0
 
-ENV CKANEXT_TDC_HASH c6be6d304be7f01fcda12639c898fa9d83fe4750
-
-USER root
-
 # Install any extensions needed by your CKAN instance
 # - Make sure to add the plugins to CKAN__PLUGINS in the .env file
 # - Also make sure all provide all extra configuration options, either by:
@@ -26,6 +22,7 @@ USER root
 # will also require gather_consumer and fetch_consumer processes running (please see https://github.com/ckan/ckanext-harvest)
 
 ### Scheming ###
+# Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4d5b3722c2bc64d39b6c2b1d76c9883636/test-requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/shubham-mahajan/ckanext-s3filestore/feature/r2support-ckan-2.11/requirements.txt' && \
@@ -42,16 +39,12 @@ RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=cka
 ## Hierarchy
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d3961a88c2622e4b4bdec1d711b677dc7c#egg=ckanext-hierarchy && \
     pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/abb4e2d3961a88c2622e4b4bdec1d711b677dc7c/requirements.txt
-    
-## Install the 'patch' command
-USER root
 
-RUN apk --no-cache add patch
-COPY setup/prerun.py ${APP_DIR}/prerun.py
-RUN chmod +x ${APP_DIR}/prerun.py
-    
-ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat envvars datatables_view image_view text_view s3filestore datastore datapusher activity 
+# Copy custom initialization scripts
+COPY docker-entrypoint.d/* /docker-entrypoint.d/
 
+# Apply any patches needed to CKAN core or any of the built extensions (not the
+# runtime mounted ones)
 COPY patches/ckan/* ${APP_DIR}/patches/ckan/
 
 RUN for d in $APP_DIR/patches/*; do \
@@ -59,9 +52,3 @@ RUN for d in $APP_DIR/patches/*; do \
 			cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; cd ${APP_DIR}/src && git apply --ignore-space-change --ignore-whitespace "$f" ; \
         done ; \
     done
-
-
-USER ckan
-
-COPY licenses.json /ext/licenses.json
-
