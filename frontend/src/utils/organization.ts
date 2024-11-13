@@ -103,6 +103,18 @@ export type UserOrganization = Organization & {
   capacity: "admin" | "editor" | "member";
 };
 
+export function isUserOrganization(obj: any): obj is UserOrganization {
+  return (
+    obj &&
+    typeof obj === "object" &&
+    typeof obj.capacity === "string" &&
+    ["admin", "editor", "member"].includes(obj.capacity) &&
+    typeof obj.id === "string" && // Assuming Organization has an id property
+    typeof obj.name === "string" // Assuming Organization has a name property
+    // Add other necessary checks for Organization properties here
+  );
+}
+
 export const listUserOrganizations = async ({
   id,
   apiKey,

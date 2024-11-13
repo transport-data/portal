@@ -875,7 +875,33 @@ export function MetadataForm({ disabled }: any) {
                           <CommandInput placeholder="Search modes..." />
                           <CommandList>
                             <CommandEmpty>No mode found</CommandEmpty>
-                            {modes.map((m) => (
+                            <CommandItem
+                              value="all"
+                              keywords={["All"]}
+                              onSelect={() => {
+                                match(field.value.includes("all"))
+                                  .with(true, () => setValue("modes", []))
+                                  .with(false, () =>
+                                    setValue(
+                                      "modes",
+                                      modes.map((s) => s.value)
+                                    )
+                                  );
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  field.value.includes("all")
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              All
+                            </CommandItem>
+                            {modes
+                              .filter((s) => s.value !== "all")
+                              .map((m) => (
                               <CommandItem
                                 value={m.value}
                                 keywords={[m.label]}

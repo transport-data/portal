@@ -36,6 +36,7 @@ import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { cn } from "@lib/utils";
 import { DatasetFormType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
+import { isUserOrganization } from "@utils/organization";
 import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -75,7 +76,7 @@ export function GeneralForm({
     type: "topic",
   });
 
-  console.log('FORM OBJ', formObj.watch('private'))
+  console.log("FORM OBJ", formObj.watch("private"));
   return (
     <div className="flex flex-col gap-y-4 py-4">
       <div className="text-xl font-bold leading-normal text-primary">
@@ -178,11 +179,17 @@ export function GeneralForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {data.map((group, index) => (
-                          <SelectItem key={index} value={group.id}>
-                            {group.title ?? group.display_name ?? group.name}
-                          </SelectItem>
-                        ))}
+                        {data
+                          .filter((x) => {
+                            if (!isUserOrganization(x)) return true
+                            return ["admin", "editor"].includes(x.capacity)
+                          }
+                          )
+                          .map((group, index) => (
+                            <SelectItem key={index} value={group.id}>
+                              {group.title ?? group.display_name ?? group.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   ))
@@ -381,15 +388,15 @@ export function GeneralForm({
                 disabled={disabled}
                 checked={!field.value}
                 onCheckedChange={(e) => {
-                field.onChange(!(e.target as any).checked)
+                  field.onChange(!(e.target as any).checked);
                 }}
               />
             </FormControl>
             <div className="space-y-1 leading-none">
               <FormLabel>
+                <span className="text-primary">Publish Data: </span>
                 {!field.value ? (
                   <>
-                    <span className="text-primary">Publish Data</span>
                     {!isUserAdminOfTheDatasetOrg && (
                       <span className=" text-gray-500">
                         {" "}
@@ -400,7 +407,7 @@ export function GeneralForm({
                     )}
                   </>
                 ) : (
-                  <>Private Data</>
+                  <></>
                 )}
               </FormLabel>
             </div>
@@ -409,7 +416,8 @@ export function GeneralForm({
       />
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center whitespace-nowrap text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-          Select or add keywords for your data to make it easier for the community to find. (max. 3)
+          Select or add keywords for your data to make it easier for the
+          community to find. (max. 3)
         </div>
         <FormField
           control={control}
