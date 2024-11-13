@@ -77,10 +77,9 @@ export default function SearchBar() {
     },
 
     countries: {
-      name: "country", //name of the facet, that is displayed on frontend
-      description: "filter for countries", //description of the facet
+      name: searchbarConfig.countries.name,
+      description: searchbarConfig.countries.description,
       options: data?.facets?.geographies?.items?.sort(
-        //sort facet items by name asc
         (a: { display_name: string }, b: { display_name: string }) =>
           a.display_name.localeCompare(b.display_name)
       ),
