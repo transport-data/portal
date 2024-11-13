@@ -169,7 +169,7 @@ describe("Create and edit datasets", () => {
     cy.contains("Add a source").click();
     cy.get('input[name="sources.0.title"]').type("source title");
     cy.get('input[name="sources.0.url"]').type("https://google.com");
-    cy.contains("Select TDC Category...").click();
+    cy.contains("Public Data").click();
     cy.get("select").eq(1).select("TDC Harmonized", { force: true });
     cy.get("button[role='combobox']").eq(2).click();
     cy.get('input[role="combobox"').type("tonnes{enter}");
