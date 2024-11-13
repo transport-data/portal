@@ -1,6 +1,5 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useSession } from "next-auth/react";
-
 import { Form } from "@/components/ui/form";
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Layout from "@components/_shared/Layout";
@@ -31,6 +30,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
+import { SaveDraftButton } from "../create";
+import { TRPCClientErrorLike } from "@trpc/client";
+import { DefaultTooltip } from "@components/ui/tooltip";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -54,13 +56,30 @@ export async function getServerSideProps(
   });
 
   const fromDatasetsRequests = !!context.query.fromDatasetsRequests;
-  const isUserAdminOfTheDatasetOrg = !!userOrgs.find(
-    (x) => x.id === dataset.organization?.id && x.capacity === "admin"
+  const userOrganization = userOrgs.find(
+    (x) => x.id === dataset.organization?.id
   );
+
+  if (
+    (!userOrganization || userOrganization.capacity === "member") &&
+    !session?.user.sysadmin
+  ) {
+    return {
+      redirect: {
+        destination: "/unauthorized",
+        permanent: false,
+      },
+    };
+  }
 
   if (!dataset.related_datasets || dataset.related_datasets.length === 0)
     return {
-      props: { isUserAdminOfTheDatasetOrg, dataset, fromDatasetsRequests },
+      props: {
+        isUserAdminOfTheDatasetOrg:
+          session?.user.sysadmin || userOrganization?.capacity === "admin",
+        dataset,
+        fromDatasetsRequests,
+      },
     };
   //we need to do this to have the title for the related_datasets in the combobox
   const relatedDatasets = await Promise.all(
@@ -74,7 +93,7 @@ export async function getServerSideProps(
 
   return {
     props: {
-      isUserAdminOfTheDatasetOrg,
+      isUserAdminOfTheDatasetOrg: userOrganization,
       fromDatasetsRequests,
       dataset: {
         ...dataset,
@@ -261,9 +280,11 @@ const EditDatasetDashboard: NextPage<{
                             Edit Dataset
                           </h2>
                           <div className="flex flex-col gap-2 sm:flex-row">
-                            {isUserAdminOfTheDatasetOrg &&
-                              "pending" === dataset.approval_status && (
-                                <>
+                            {isUserAdminOfTheDatasetOrg && (
+                              <>
+                                {["pending", "rejected"].includes(
+                                  dataset.approval_status || ""
+                                ) && (
                                   <ApproveDatasetButton
                                     datasetId={dataset.id}
                                     onSuccess={() =>
@@ -272,16 +293,21 @@ const EditDatasetDashboard: NextPage<{
                                       )
                                     }
                                   />
-                                  <RejectDatasetButton
-                                    dataset={dataset as any}
-                                    onSuccess={() =>
-                                      router.push(
-                                        "/dashboard/datasets-approvals"
-                                      )
-                                    }
-                                  />
-                                </>
-                              )}
+                                )}
+                                {"pending" === dataset.approval_status && (
+                                  <>
+                                    <RejectDatasetButton
+                                      dataset={dataset as any}
+                                      onSuccess={() =>
+                                        router.push(
+                                          "/dashboard/datasets-approvals"
+                                        )
+                                      }
+                                    />
+                                  </>
+                                )}
+                              </>
+                            )}
                             <DeleteDatasetButton
                               datasetId={dataset.id}
                               onSuccess={() =>
@@ -317,25 +343,45 @@ const EditDatasetDashboard: NextPage<{
                     isUserAdminOfTheDatasetOrg={isUserAdminOfTheDatasetOrg}
                     disabled={disabledForm}
                   />
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={async () => {
-                      await form.trigger();
-                      if (checkDisableNext()) {
-                        return;
-                      }
-                      return send("next");
-                    }}
-                  >
-                    Next
-                  </Button>
+                  <div className="flex w-full flex-col gap-4 md:flex-row">
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={async () => {
+                        await form.trigger();
+                        if (checkDisableNext()) {
+                          return;
+                        }
+                        return send("next");
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </>
               )}
               {current.matches("metadata") && (
                 <>
                   <MetadataForm disabled={disabledForm} />
-                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                  <div className="flex w-full flex-col gap-4 md:flex-row">
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <Button
                       type="button"
                       variant="secondary"
@@ -349,10 +395,14 @@ const EditDatasetDashboard: NextPage<{
                       className="w-full"
                       onClick={async () => {
                         const next = await form.trigger();
-                        if (form.watch("temporal_coverage_start") > form.watch("temporal_coverage_end")) {
+                        if (
+                          form.watch("temporal_coverage_start") >
+                          form.watch("temporal_coverage_end")
+                        ) {
                           form.setError("temporal_coverage_end", {
                             type: "manual",
-                            message: "End date should be greater than start date",
+                            message:
+                              "End date should be greater than start date",
                           });
                           return;
                         }
@@ -371,7 +421,16 @@ const EditDatasetDashboard: NextPage<{
               {current.matches("uploads") && (
                 <>
                   <UploadsForm disabled={disabledForm} />
-                  <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                  <div className="flex w-full flex-col gap-4 md:flex-row">
+                    <SaveDraftButton
+                      form={form}
+                      onError={(error: TRPCClientErrorLike<any>) => {
+                        setErrorMessage(error.message);
+                      }}
+                      onSuccess={async (data: Dataset) => {
+                        setErrorMessage(null);
+                      }}
+                    />
                     <Button
                       type="button"
                       variant="secondary"
@@ -380,17 +439,32 @@ const EditDatasetDashboard: NextPage<{
                     >
                       Previous
                     </Button>
-                    <LoaderButton
-                      disabled={disabledForm}
-                      className={cn(
-                        disabledForm && "cursor-not-allowed",
-                        "w-full"
-                      )}
-                      loading={editDataset.isLoading}
-                      type="submit"
-                    >
-                      Submit
-                    </LoaderButton>
+                    {disabledForm ? (
+                      <DefaultTooltip content="The dataset is pending wait for an approval or refusal to make any changes">
+                        <LoaderButton
+                          disabled={disabledForm}
+                          className={cn(
+                            disabledForm && "cursor-not-allowed",
+                            "w-full"
+                          )}
+                          loading={editDataset.isLoading}
+                          type="submit"
+                        >
+                          Submit
+                        </LoaderButton>
+                      </DefaultTooltip>
+                    ) : (
+                      <LoaderButton
+                        className={cn(
+                          disabledForm && "cursor-not-allowed",
+                          "w-full"
+                        )}
+                        loading={editDataset.isLoading}
+                        type="submit"
+                      >
+                        Submit
+                      </LoaderButton>
+                    )}
                   </div>
                 </>
               )}

@@ -263,6 +263,9 @@ def _fix_approval_workflow(context, data_dict, is_update):
         data_dict["previous_approval_contributors"] = data_dict.get("current_approval_contributors", [])
         data_dict["current_approval_contributors"] = []
 
+    if is_update and user_is_admin and old_dataset_is_private and not is_private and data_dict['approval_status'] != 'approved':
+        data_dict["approval_status"] = None
+        data_dict["approval_message"] = None
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
     is_approval_action = context.get("is_approval_action", False)

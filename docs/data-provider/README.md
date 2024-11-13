@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Data Provider Page](#data-provider-page)
+    - [Hero](#hero)
+    - [How TDC datasets work](#how-tdc-datasets-work)
+    - [Add Data Section](#add-data-section)
+    - [How To Add Data](#how-to-add-data)
+      - [Featured Asset](#featured-asset)
+    - [FAQ's](#faqs)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Data Provider Page
 
 This page consists of the following sections and features:

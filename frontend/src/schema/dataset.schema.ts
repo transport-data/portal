@@ -19,9 +19,9 @@ export const DatasetSchemaPartial = z.object({
     .min(2, { message: "Name is required to have at least 2 characters" })
     .regex(
       /^[^\(\) +]+$/,
-      "The name can't have spaces nor the dot(.) character, it needs to be URL Compatible"
+      "The chosen text must be URL-compatible. Please remove spaces and dots (.)"
     ),
-  title: z.string(),
+  title: z.string().min(2, { message: "Title is required to have at least 2 characters" }),
   notes: z.string().min(1, { message: "Description is required" }),
   overview_text: z.string().optional().nullable(),
   owner_org: z.string({ description: "Organization is required" }),

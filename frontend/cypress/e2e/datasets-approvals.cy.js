@@ -51,7 +51,7 @@ const editorUser = describe("Dataset Approval", () => {
       frequency: frequency,
       private: true,
     });
-    
+
     cy.createDatasetViaAPI({
       name: privateDatasetName2,
       title: privateDatasetTitle2,
@@ -103,8 +103,7 @@ const editorUser = describe("Dataset Approval", () => {
     cy.get("#rejectDatasetMessage").type(rejectMessage);
     cy.get("#confirmReject").click();
 
-
-    // TODO this doesn't work in the actions environment because the CKAN throws an error trying to send an email to the admin org, 
+    // TODO this doesn't work in the actions environment because the CKAN throws an error trying to send an email to the admin org,
     // breaking the reject flow
 
     // cy.get("div").contains("h2", privateDatasetTitle).should("exist");
@@ -129,7 +128,24 @@ const editorUser = describe("Dataset Approval", () => {
     cy.get("#confirmApproval").click();
 
     cy.visit("/dashboard/newsfeed");
-    cy.get("p.text-base").contains(`You approved the dataset ${privateDatasetTitle2}`).should("exist");
+    cy.get("p.text-base")
+      .contains(`You approved the dataset ${privateDatasetTitle2}`)
+      .should("exist");
+  });
+
+  it("Should open a rejected dataset and approve it", () => {
+    cy.visit("/dashboard/datasets-approvals");
+    cy.get("div").contains("h2", privateDatasetTitle).should("exist");
+    cy.get(
+      `a[href="/dashboard/datasets/${privateDatasetName}/edit?fromDatasetsRequests=true"]`
+    ).click();
+    cy.get("#approveDatasetButton").click();
+    cy.get("#confirmApproval").click();
+
+    cy.visit("/dashboard/newsfeed");
+    cy.get("p.text-base")
+      .contains(`You approved the dataset ${privateDatasetTitle2}`)
+      .should("exist");
   });
 
   after(() => {

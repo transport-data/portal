@@ -99,6 +99,22 @@ export const listOrganizations = async ({
   return organizations.result;
 };
 
+export type UserOrganization = Organization & {
+  capacity: "admin" | "editor" | "member";
+};
+
+export function isUserOrganization(obj: any): obj is UserOrganization {
+  return (
+    obj &&
+    typeof obj === "object" &&
+    typeof obj.capacity === "string" &&
+    ["admin", "editor", "member"].includes(obj.capacity) &&
+    typeof obj.id === "string" && // Assuming Organization has an id property
+    typeof obj.name === "string" // Assuming Organization has a name property
+    // Add other necessary checks for Organization properties here
+  );
+}
+
 export const listUserOrganizations = async ({
   id,
   apiKey,
@@ -107,7 +123,7 @@ export const listUserOrganizations = async ({
   apiKey: string;
 }) => {
   const organizationList = await CkanRequest.get<
-    CkanResponse<(Organization & { capacity: "admin" | "editor" | "member" })[]>
+    CkanResponse<UserOrganization[]>
   >(
     `organization_list_for_user?id=${id}&include_dataset_count=true&limit=1000`,
     {
@@ -292,20 +308,33 @@ export const requestNewOrganization = async ({
   return response;
 };
 
-
-export const followOrganization = async ({id,isFollowing,apiKey}:{id:string,isFollowing:boolean;apiKey:string})=>{
+export const followOrganization = async ({
+  id,
+  isFollowing,
+  apiKey,
+}: {
+  id: string;
+  isFollowing: boolean;
+  apiKey: string;
+}) => {
   const response = await CkanRequest.post<CkanResponse<any>>(
-    `${isFollowing ? 'unfollow' : 'follow'}_group`,
+    `${isFollowing ? "unfollow" : "follow"}_group`,
     {
       apiKey: apiKey,
       json: { id },
     }
   );
 
-  return response.result
-}
+  return response.result;
+};
 
-export const getOrgFollowersList = async ({ id,apiKey }:{ id:string, apiKey:string })=>{
+export const getOrgFollowersList = async ({
+  id,
+  apiKey,
+}: {
+  id: string;
+  apiKey: string;
+}) => {
   const response = await CkanRequest.post<CkanResponse<User[]>>(
     `organization_follower_list`,
     {
@@ -313,6 +342,5 @@ export const getOrgFollowersList = async ({ id,apiKey }:{ id:string, apiKey:stri
       json: { id },
     }
   );
-  return response.result
-}
-
+  return response.result;
+};
