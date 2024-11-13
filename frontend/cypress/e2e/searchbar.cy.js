@@ -79,8 +79,8 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.name}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.description}: Cabo Verde"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
 
 		input.type( datasetTitle, { delay: 0 });
 
@@ -105,8 +105,8 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.name}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.description}: Asia"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}: Cabo Verde"]`).click();
 
 		input.type( datasetTitle, { delay: 0 });
 
