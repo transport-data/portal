@@ -472,7 +472,7 @@ export default ({
                     }
                   />
                   <Checkboxes
-                    items={countries.filter((x) =>
+                    items={countries?.filter((x) =>
                       x.display_name
                         .toLowerCase()
                         .includes(searchedGeographyText.toLowerCase())
@@ -497,7 +497,7 @@ export default ({
                 />
               ) : (
                 <Checkboxes
-                  items={countries.filter((x) =>
+                  items={countries?.filter((x) =>
                     x.display_name
                       .toLowerCase()
                       .includes(searchedGeographyText.toLowerCase())
