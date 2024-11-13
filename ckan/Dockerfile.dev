@@ -1,5 +1,7 @@
 FROM ckan/ckan-dev:2.11.0
 
+ENV CKANEXT_TDC_HASH c6be6d304be7f01fcda12639c898fa9d83fe4750
+
 USER root
 
 # Install any extensions needed by your CKAN instance
