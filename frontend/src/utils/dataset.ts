@@ -387,6 +387,7 @@ export const draftDataset = async ({
         apiKey: apiKey,
         json: {
           id: dataset.id,
+          ...input,
           state: "draft",
         },
       }
