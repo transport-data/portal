@@ -387,9 +387,9 @@ export function GeneralForm({
             </FormControl>
             <div className="space-y-1 leading-none">
               <FormLabel>
+                <span className="text-primary">Publish Data: </span>
                 {!field.value ? (
                   <>
-                    <span className="text-primary">Publish Data</span>
                     {!isUserAdminOfTheDatasetOrg && (
                       <span className=" text-gray-500">
                         {" "}
@@ -400,7 +400,7 @@ export function GeneralForm({
                     )}
                   </>
                 ) : (
-                  <>Private Data</>
+                  <></>
                 )}
               </FormLabel>
             </div>

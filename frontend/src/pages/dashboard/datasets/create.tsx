@@ -343,11 +343,6 @@ const CreateDatasetDashboard: NextPage = () => {
                   className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
                 >
                   <div className="flex flex-1 items-center">
-                    <img
-                      src={formatIcon(d.format.toLowerCase() ?? "")}
-                      aria-hidden="true"
-                      className="h-8 w-8 flex-shrink-0 text-gray-400"
-                    />
                     <div className="ml-4 flex min-w-0 flex-1 gap-2">
                       <span className="truncate font-medium">{d.title}</span>
                     </div>
