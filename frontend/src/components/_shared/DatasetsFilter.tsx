@@ -50,10 +50,17 @@ export default ({
   onChange: SearchPageOnChange;
   defaultValue?: string;
 }) => {
+  const regionsActive =
+    searchFilter?.regions && searchFilter?.regions.length > 0;
+  const countriesActive =
+    searchFilter?.countries &&
+    searchFilter?.countries.length > 0 &&
+    !regionsActive;
+
   const [tabs, setTabs] = useState([
     { name: "All", current: false },
-    { name: "Regions", current: true },
-    { name: "Countries", current: false },
+    { name: "Regions", current: regionsActive },
+    { name: "Countries", current: countriesActive },
   ]);
 
   const [startYear, setStartYear] = useState<number | undefined>(
@@ -465,7 +472,7 @@ export default ({
                     }
                   />
                   <Checkboxes
-                    items={countries.filter((x) =>
+                    items={countries?.filter((x) =>
                       x.display_name
                         .toLowerCase()
                         .includes(searchedGeographyText.toLowerCase())
@@ -490,7 +497,7 @@ export default ({
                 />
               ) : (
                 <Checkboxes
-                  items={countries.filter((x) =>
+                  items={countries?.filter((x) =>
                     x.display_name
                       .toLowerCase()
                       .includes(searchedGeographyText.toLowerCase())

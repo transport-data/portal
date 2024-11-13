@@ -369,9 +369,11 @@ export default CreateDatasetDashboard;
 
 export const SaveDraftButton = ({
   form,
+  update = false,
   onSuccess,
   onError,
 }: {
+  update?: boolean;
   onSuccess: Function;
   onError: Function;
   form: UseFormReturn<DatasetFormType>;
@@ -406,10 +408,13 @@ export const SaveDraftButton = ({
 
   const handleSaveDraft = async () => {
     form.trigger().then(() => {
-      if (validatePrimeRequiredFields())
+      if (validatePrimeRequiredFields()) {
+        const { id, ...otherValues } = form.getValues();
         createDraftDataset.mutate({
-          ...form.getValues(),
+          ...(update ? { id } : {}),
+          ...otherValues,
         });
+      }
     });
 
     return false;

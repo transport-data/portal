@@ -61,7 +61,7 @@ function Main({
         >
           <TopBar />
           <SearchHero
-            title="Organizations"
+            title="Organisations"
             searchValue={searchString}
             onChange={setSearchString}
           />

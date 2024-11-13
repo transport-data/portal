@@ -996,7 +996,7 @@ export function MetadataForm({ disabled }: any) {
               </FormControl>
               <FormMessage />
               <FormDescription>
-                Organization or individual that provides the data and any
+                Organisation or individual that provides the data and any
                 related metadata
               </FormDescription>
             </FormItem>

@@ -51,11 +51,11 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
                     { label: "Home", href: "/" },
                     { label: "Dashboard", href: "/dashboard" },
                     {
-                      label: "Organizations",
+                      label: "Organisations",
                       href: "/dashboard/organizations",
                     },
                     {
-                      label: "Edit Organization",
+                      label: "Edit Organisation",
                       href: `/dashboard/organization/${organization.name}/edit`,
                     },
                   ]}
@@ -67,7 +67,7 @@ const EditOrganizationPage: NextPage<EditOrganizationPageProps> = ({
                     <div className="mt-6 md:flex md:items-center md:justify-between">
                       <div className="flex min-w-0 max-w-4xl flex-1 justify-between">
                         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
-                          Edit Organization
+                          Edit Organisation
                         </h2>
                         <DeleteOrganizationButton
                           groupId={organization.id}

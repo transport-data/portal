@@ -157,7 +157,7 @@ describe("Create and edit datasets", () => {
     cy.visit("/dashboard/datasets/create");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
-    cy.contains("Select organization for dataset").click();
+    cy.contains("Select organisation for dataset").click();
     cy.get("select").select(ownerOrg, { force: true });
     cy.get("button[role=combobox]").eq(1).click();
     cy.contains(topic1).click();
@@ -169,17 +169,15 @@ describe("Create and edit datasets", () => {
     cy.contains("Add a source").click();
     cy.get('input[name="sources.0.title"]').type("source title");
     cy.get('input[name="sources.0.url"]').type("https://google.com");
-    cy.contains("Select TDC Category...").click();
+    cy.contains("Public Data").click();
     cy.get("select").eq(1).select("TDC Harmonized", { force: true });
     cy.get("button[role='combobox']").eq(2).click();
     cy.get('input[role="combobox"').type("tonnes{enter}");
     cy.contains("From...").click();
-    cy.get(".lucide-chevron-left").click();
     cy.get('button[name="day"]').contains("10").click();
     cy.contains("Modes").click();
     cy.wait(1000);
     cy.contains("To...").click();
-    cy.get(".lucide-chevron-left").click();
     cy.get('button[name="day"]').contains("15").click();
     cy.contains("Modes").click();
     cy.wait(1000);

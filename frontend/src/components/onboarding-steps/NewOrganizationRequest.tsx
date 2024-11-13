@@ -21,16 +21,16 @@ export default ({
             />
           </div>
           <h2 className="text-sxl mb-2.5 ml-3 font-bold text-[#111928]">
-            Create a new organization
+            Create a new organisation
           </h2>
         </div>
         <p className="text-gray-500">
-          Please tell us more about your organization. We will review your
+          Please tell us more about your organisation. We will review your
           request and get back to you within 2 working days to discuss the data
           you would like to share.
         </p>
       </div>
-      <TextDivisor text="About your organization*" />
+      <TextDivisor text="About your organisation*" />
       <div className="space-y-1">
         <Combobox
           as="div"
@@ -41,7 +41,7 @@ export default ({
         >
           <div className="relative mt-2">
             <ComboboxInput
-              placeholder="Name of the organization..."
+              placeholder="Name of the organisation..."
               className="icon-at-left w-full rounded-md border-0 bg-white py-1.5 pl-11 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[#006064] sm:text-sm sm:leading-6"
               onChange={(event) => {
                 form.setValue("newOrganizationName", event.target.value);
@@ -52,7 +52,7 @@ export default ({
         </Combobox>
       </div>
       <TextEditor
-        placeholder="Write a short description of your organization..."
+        placeholder="Write a short description of your organisation..."
         setText={(text) => form.setValue("newOrganizationDescription", text)}
       />
       <TextDivisor text="What data would you like to share?" />

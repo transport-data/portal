@@ -142,7 +142,7 @@ export function GeneralForm({
       </div>
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center text-sm font-semibold leading-tight text-primary after:ml-2 after:h-1 after:w-full after:border-b after:border-gray-200 after:content-['']">
-          Organization
+          Organisation
         </div>
         <FormField
           control={control}
@@ -158,7 +158,7 @@ export function GeneralForm({
                   .with({ isLoading: true }, () => (
                     <span className="flex items-center gap-x-2 text-sm">
                       <Spinner />{" "}
-                      <span className="mt-1">Loading organizations...</span>
+                      <span className="mt-1">Loading organisations...</span>
                     </span>
                   ))
                   .with({ isError: true, errors: P.select() }, (errors) => (
@@ -175,7 +175,7 @@ export function GeneralForm({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select organization for dataset" />
+                          <SelectValue placeholder="Select organisation for dataset" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -195,7 +195,7 @@ export function GeneralForm({
                   ))
                   .otherwise(() => (
                     <span className="flex items-center text-sm text-red-600">
-                      Error loading organizations, please refresh the page
+                      Error loading organisations, please refresh the page
                     </span>
                   ))}
               </FormControl>
@@ -394,14 +394,14 @@ export function GeneralForm({
             </FormControl>
             <div className="space-y-1 leading-none">
               <FormLabel>
-                <span className="text-primary">Publish Data: </span>
+                <span className="text-primary">Publish Data</span>
                 {!field.value ? (
                   <>
                     {!isUserAdminOfTheDatasetOrg && (
                       <span className=" text-gray-500">
                         {" "}
                         Note: Before this dataset is published it will be
-                        reviewed by an Admin from your organization. You won't
+                        reviewed by an Admin from your organisation. You won't
                         be able to edit it during the review.
                       </span>
                     )}

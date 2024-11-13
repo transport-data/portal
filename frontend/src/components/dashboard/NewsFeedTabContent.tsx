@@ -125,7 +125,7 @@ export default ({
               {
                 icon: <Building size={14} />,
                 isSelected: false,
-                value: "Organizations",
+                value: "Organisations",
               },
               {
                 icon: <Database size={14} />,
@@ -147,7 +147,7 @@ export default ({
                       ? "approval"
                       : option === "Datasets"
                       ? "dataset"
-                      : option === "Organizations"
+                      : option === "Organisations"
                       ? "organization"
                       : "",
                 },
@@ -159,7 +159,7 @@ export default ({
                 : searchFilter.activityType === "dataset"
                 ? "Datasets"
                 : searchFilter.activityType === "organization"
-                ? "Organizations"
+                ? "Organisations"
                 : "All"
             }
             title="Categories"

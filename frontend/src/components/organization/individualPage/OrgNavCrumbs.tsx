@@ -28,7 +28,7 @@ export default function OrgNavCrumbs({
                 d="M8.25 4.5l7.5 7.5-7.5 7.5"
               />
             </svg>
-            Organizations
+            Organisations
           </Link>
           {org.name && org.title && (
             <Link href={`/@${org.name}`} className="font-semibold text-white">

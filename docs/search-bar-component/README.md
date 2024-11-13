@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Searchbar Component](#searchbar-component)
-    - [How it works](#how-it-works)
+  - [How it works](#how-it-works)
   - [Available Filters](#available-filters)
     - [How to edit filters description](#how-to-edit-filters-description)
   - [Example of search with applied filter](#example-of-search-with-applied-filter)
@@ -117,3 +117,57 @@ Whenever a user performs a search (by pressing `Enter` or clicking the **Search*
 ![Recent Searches](recent-searches.png)
 
 The component stores the last 5 searches.
+
+## Adding a New Filter Parameter to the `SearchBar` Component
+
+To add a new filter to the `SearchBar` component, you’ll update the `facets` variable in `/frontend/components/search/SearchBar.tsx`, which configures the filters displayed.
+
+For example, let's add a `countries` filter to the component.
+
+### Step 1: Update the Search Request
+
+In the search query, include the `geographies` facet in the `facetsFields` array:
+
+```typescript
+const { data, isLoading } = api.dataset.search.useQuery({
+  // keep other configurations as they are
+  facetsFields: [
+    "regions", //regions filter
+    "geographies", //countries filter
+    "sectors",
+    "modes",
+    "services",
+    "indicator",
+    "temporal_coverage_start",
+    "temporal_coverage_end",
+  ],
+});
+```
+
+### Step 2: Configure the New Facet in the `facets` Variable
+
+Add the `countries` filter to the `facets` variable, specifying its `name`, `description`, and options
+
+```typescript
+const facets: any = {
+  // Existing regions filter example
+  regions: {
+    name: "regions",
+    description: "Filter for regions",
+    options: data?.facets?.regions?.items?.sort((a, b) =>
+      a.display_name.localeCompare(b.display_name)
+    ),
+  },
+
+  // New countries filter
+  countries: {
+    name: "country",
+    description: "Filter for countries",
+    options: data?.facets?.geographies?.items?.sort((a, b) =>
+      a.display_name.localeCompare(b.display_name)
+    ),
+  },
+
+  // Additional facets...
+};
+```

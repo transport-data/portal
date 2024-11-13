@@ -35,7 +35,7 @@ export const CreateOrganizationForm: React.FC = () => {
   const createOrganization = api.organization.create.useMutation({
     onSuccess: async () => {
       toast({
-        description: `Successfully created the ${organizationCreated} organization`,
+        description: `Successfully created the ${organizationCreated} organisation`,
       });
       formObj.reset();
       setErrorMessage(null);
@@ -70,7 +70,7 @@ export const CreateOrganizationForm: React.FC = () => {
           {match(createOrganization.isLoading)
             .with(false, () => (
               <Button type="submit" color="stone" className="mt-8 w-full py-4">
-                Create organization
+                Create organisation
               </Button>
             ))
             .otherwise(() => (
@@ -81,7 +81,7 @@ export const CreateOrganizationForm: React.FC = () => {
                 className="mt-8 flex w-full py-4"
               >
                 <Spinner className="text-slate-900" />
-                Create organization
+                Create organisation
               </Button>
             ))}
         </div>

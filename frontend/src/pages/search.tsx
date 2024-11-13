@@ -64,6 +64,10 @@ export default function DatasetSearch({
   after,
   country,
 }: any) {
+  const showAdvancedFiltersOnLoad = region || country ? true : false;
+
+  const defaultLocationValue = region || country ? "location" : "";
+
   const [modes, setModes] = useState<Facet[]>([]);
   const [services, setServices] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
@@ -72,7 +76,9 @@ export default function DatasetSearch({
   const [orgs, setOrgs] = useState<Facet[]>([]);
   const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
-  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState<boolean>(
+    showAdvancedFiltersOnLoad
+  );
 
   const resetFilter = () => {
     setSearchFilter({
@@ -706,6 +712,7 @@ export default function DatasetSearch({
                     regions={regions}
                     countries={countries}
                     metadataCreatedDates={metadataCreatedDates}
+                    defaultValue={defaultLocationValue}
                   />
                 </div>
               </Transition>

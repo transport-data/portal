@@ -68,7 +68,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       : []),
 
     {
-      title: "Organizations",
+      title: "Organisations",
       id: "organizations",
       href: "/dashboard/organizations",
     },
@@ -151,7 +151,6 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                     </Link>
                   ))}
                 </div>
-
                 <div className="flex gap-2">
                   {!isSysAdmin && <JoinOrganizationModalButton />}
                   <div className="min-w-full md:min-w-fit">
@@ -164,7 +163,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                       </Button>
                     )}
                     {adminOrgs.length == 0 && editorOrgs.length == 0 && (
-                      <DefaultTooltip content="To add data you need to be at least an editor in at least one organization">
+                      <DefaultTooltip content="To add data you need to be at least an editor in at least one organisation">
                         <Button className="justify-between gap-2 opacity-50">
                           <DocumentPlusIcon className="h-4 w-4" />
                           Add Data

@@ -28,7 +28,7 @@ export function DeleteOrganizationButton({
   const deleteOrganizations = api.organization.delete.useMutation({
     onSuccess: async () => {
       toast({
-        description: "Succesfully deleted organization",
+        description: "Succesfully deleted organisation",
       })
       onSuccess();
       await utils.organization.list.invalidate();
@@ -37,7 +37,7 @@ export function DeleteOrganizationButton({
     onError: (e) => {
       setOpen(false)
       toast({
-        title: "Failed to delete organization",
+        title: "Failed to delete organisation",
         description: e.message,
         variant: "danger",
       })
@@ -52,7 +52,7 @@ export function DeleteOrganizationButton({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. It will permanently remove the organization.
+            This action cannot be undone. It will permanently remove the organisation.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -31,7 +31,7 @@ export default function SearchFacets({
       }
     >
       {entries
-        .slice(0, showAll ? entries.length : 4)
+        .slice(0, showAll ? entries.length : 5)
         .map(([facetName, facet]) => (
           <SearchNarrowItem
             key={facetName}

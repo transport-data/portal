@@ -146,7 +146,7 @@ export default function FollowDropdown({
               }}
             >
               <Tooltip>
-                <TooltipTrigger>This Organization</TooltipTrigger>
+                <TooltipTrigger>This Organisation</TooltipTrigger>
                 <TooltipContent className={``}>
                   {organization.title}
                 </TooltipContent>
