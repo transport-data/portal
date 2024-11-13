@@ -54,12 +54,14 @@ export default ({
   setText,
   placeholder,
   id,
-  initialValue = ""
+  initialValue = "",
+  editable = true,
 }: {
   setText: (text: string) => void;
   placeholder?: string;
   id?: string;
-  initialValue?: string
+  initialValue?: string;
+  editable?: boolean;
 }) => {
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -86,6 +88,7 @@ export default ({
         editorProps={{ attributes: { id: id || "" } }}
         onUpdate={({ editor }) => setText(editor.getHTML())}
         content={initialValue}
+        editable={editable}
       ></EditorProvider>
     </div>
   );

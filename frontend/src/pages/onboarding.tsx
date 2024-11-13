@@ -80,7 +80,13 @@ export default function OnboardingPage({
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
-  const form = useForm<OnboardingFormType>();
+  const userOrg = organizationsData?.find((o) => o?.is_user_member);
+
+  const form = useForm<OnboardingFormType>({
+    defaultValues: {
+      orgInWhichItParticipates: userOrg,
+    },
+  });
   const { handleSubmit, watch } = form;
   const [followedGroups, setFollowedGroups] = useState([]);
 
@@ -92,7 +98,7 @@ export default function OnboardingPage({
       if (stepNumber === 0) {
         setSuccessMessage("Successfully followed Groups");
       } else if (stepNumber === 1) {
-        setSuccessMessage("Request Submitted Successfully");
+        setSuccessMessage("Request submitted Successfully");
       } else {
         setSuccessMessage("Successfully sent Invites");
       }
@@ -249,13 +255,17 @@ export default function OnboardingPage({
           ),
         );
       } else {
-        setDisableButton(
-          !(
-            watch("orgInWhichItParticipates") &&
-            watch("messageToParticipateOfTheOrg") &&
-            watch("confirmThatItParticipatesOfTheOrg")
-          ),
-        );
+        if (!userOrg || watch("orgInWhichItParticipates.id") != userOrg?.id) {
+          setDisableButton(
+            !(
+              watch("orgInWhichItParticipates") &&
+              watch("messageToParticipateOfTheOrg") &&
+              watch("confirmThatItParticipatesOfTheOrg")
+            ),
+          );
+        } else {
+          setDisableButton(false);
+        }
       }
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
@@ -299,7 +309,18 @@ export default function OnboardingPage({
     form.setValue("onBoardingStep", stepNumber);
     setLoading(true);
     const data = form.getValues();
-    onBoardUser.mutate(data);
+
+    if (
+      stepNumber == 1 &&
+      !data.isNewOrganizationSelected &&
+      data.orgInWhichItParticipates?.id == userOrg?.id
+    ) {
+      skipStep();
+      setLoading(false);
+      setErrorMessage("");
+    } else {
+      onBoardUser.mutate(data);
+    }
   };
 
   const skipStep = async () => {
