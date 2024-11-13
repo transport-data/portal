@@ -60,7 +60,7 @@ export const SearchDatasetForm: React.FC<{
       </div>
       <div className="mt-1 w-full">
         <label htmlFor="orgs" className="block w-fit text-sm font-medium">
-          Organizations
+          Organisations
         </label>
         {organizations && (
           <Controller

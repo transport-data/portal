@@ -22,7 +22,7 @@ import { ContactForm } from "@components/_shared/ContactForm";
 
 const categories = {
   getting_started: { title: "Getting Started" },
-  organizations: { title: "Organizations" },
+  organizations: { title: "Organisations" },
   submitting_data: { title: "Submitting Data" },
   sharing_data: { title: "Sharing and Using Data" },
   geodata: { title: "Geodata" },

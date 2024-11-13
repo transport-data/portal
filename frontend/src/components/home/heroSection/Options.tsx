@@ -7,11 +7,11 @@ export function Organizations() {
         <img className="m-auto" src="/images/upload.svg" alt="Upload icon" />
         <h1 className="group-hover:text-white text-2xl uppercase font-black pt-4 font-inter text-center">
           {" "}
-          Organizations{" "}
+          Organisations{" "}
         </h1>
         <p className="group-hover:text-white text-center text-black font-sans pt-2">
           {" "}
-          See publisher organizations <br /> available on Portal.
+          See publisher organisations <br /> available on Portal.
         </p>
       </div>
     </Link>

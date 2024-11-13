@@ -56,8 +56,8 @@ describe("newsfeed tests", () => {
 
   it("should list orgs created by user", ()=>{
     cy.visit("/dashboard/newsfeed");
-    cy.get(".selectable-items-list").contains("Organizations").click();
-    cy.get('p.text-base').contains(`You created a new organization ${org}`);
+    cy.get(".selectable-items-list").contains("Organisations").click();
+    cy.get('p.text-base').contains(`You created a new organisation ${org}`);
   });
 
   it("should list dataset created by user", ()=>{
@@ -76,8 +76,8 @@ describe("newsfeed tests", () => {
   it("should list organization deleted by user", ()=>{
     cy.deleteOrganizationAPI(sample_org);
     cy.visit("/dashboard/newsfeed");
-    cy.get(".selectable-items-list").contains("Organizations").click();
-    cy.get('p.text-base').contains(`You deleted the organization ${org}`);
+    cy.get(".selectable-items-list").contains("Organisations").click();
+    cy.get('p.text-base').contains(`You deleted the organisation ${org}`);
   });
 
   

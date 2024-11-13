@@ -43,7 +43,7 @@ export const Dashboard: React.FC<{
     },
     {
       id: "organizations",
-      name: "Organizations",
+      name: "Organisations",
       href: "/dashboard/organizations",
       icon: BuildingLibraryIcon,
     },

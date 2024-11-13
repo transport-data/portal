@@ -60,7 +60,7 @@ export const EditOrganizationForm: React.FC<{
             variant="secondary"
             className="mt-8 w-full py-4"
           >
-            Edit Organization
+            Edit Organisation
           </LoaderButton>
         </div>
         {errorMessage && (

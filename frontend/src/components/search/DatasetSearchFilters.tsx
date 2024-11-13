@@ -79,7 +79,7 @@ export default function DatasetSearchFilters({
         {filterOptions.orgs.enabled && (
           <section className="bg-white rounded-lg xl:p-8 p-4 mb-4 max-h-[400px] overflow-y-auto">
             <h1 className="font-bold pb-4">
-              Refine by {`${filtersName?.org || 'Organization'}`}
+              Refine by {`${filtersName?.org || 'Organisation'}`}
             </h1>
             {orgs
               .filter((org) => org.title || org.id)

@@ -83,14 +83,14 @@ export default function DatasetSearchForm({
             <Field
               list="orgs"
               name="org"
-              placeholder="Organization"
+              placeholder="Organisation"
               className="lg:border-l p-4 mx-2 placeholder:text-neutral-400"
               autoComplete="off"
             ></Field>
           )}
 
           <datalist aria-label="Formats" id="orgs">
-            <option value="">Organization</option>
+            <option value="">Organisation</option>
             {orgs.map((org, index) => (
               <option key={index}>{org.title || org.display_name}</option>
             ))}

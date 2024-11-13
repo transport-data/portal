@@ -291,7 +291,7 @@ export const DatasetForm: React.FC<{
           htmlFor="owner_org"
           className="block w-fit text-sm font-medium opacity-75"
         >
-          Organization
+          Organisation
         </label>
         <select {...register("owner_org")} className={selectStyle}>
           {organizationOptions.map((o) => (

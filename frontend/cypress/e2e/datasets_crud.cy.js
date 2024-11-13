@@ -157,7 +157,7 @@ describe("Create and edit datasets", () => {
     cy.visit("/dashboard/datasets/create");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
-    cy.contains("Select organization for dataset").click();
+    cy.contains("Select organisation for dataset").click();
     cy.get("select").select(ownerOrg, { force: true });
     cy.get("button[role=combobox]").eq(1).click();
     cy.contains(topic1).click();

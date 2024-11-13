@@ -45,7 +45,7 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
                     aria-hidden="true"
                     className="-ml-1 mr-1 h-3.5 w-3.5 flex-shrink-0 text-gray-400"
                   />
-                  Organizations
+                  Organisations
                 </Link>
               </nav>
               <nav aria-label="Breadcrumb" className="hidden sm:flex">
@@ -54,15 +54,15 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
                     { label: "Home", href: "/" },
                     { label: "Dashboard", href: "/dashboard" },
                     {
-                      label: "Organizations",
+                      label: "Organisations",
                       href: "/dashboard/organizations",
                     },
                     {
-                      label: "Edit Organization",
+                      label: "Edit Organisation",
                       href: `/dashboard/organizations/${organization.name}/edit`,
                     },
                     {
-                      label: "Edit Organization Members",
+                      label: "Edit Organisation Members",
                       href: `/dashboard/organizations/${organization.name}/members`,
                     },
                   ]}
@@ -74,7 +74,7 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
                     <div className="mt-6 md:flex md:items-center md:justify-between">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-5xl sm:tracking-tight">
-                          Edit Organization Members
+                          Edit Organisation Members
                         </h2>
                       </div>
                     </div>

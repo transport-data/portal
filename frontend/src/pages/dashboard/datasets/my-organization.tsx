@@ -11,7 +11,7 @@ const DatasetsDashboard: NextPage = () => {
 
   return (
     <>
-      <NextSeo title="My Organization" />
+      <NextSeo title="My Organisation" />
       <DashboardLayout active="my-organization">
         <MyOrganizationTabContent />
       </DashboardLayout>
