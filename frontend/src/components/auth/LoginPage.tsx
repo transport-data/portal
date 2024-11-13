@@ -4,6 +4,7 @@ import { clearAllAuxAuthCookies } from "@utils/auth";
 import { setCookie } from "cookies-next";
 import { signIn } from "next-auth/react";
 import { NextSeo } from "next-seo";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -21,6 +22,7 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
     : "Welcome back";
   const action = isSignUp ? "Sign up" : "Sign in";
   const origin = isSignUp ? "signup" : "signin";
+  const infinitiveAction = isSignUp ? "signing up" : "signing in";
 
   let callbackUrl = (query?.callbackUrl as string) ?? "/dashboard";
 
@@ -72,6 +74,16 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
               </a>
             </div>
           </div>
+
+          <p className="mt-5 text-sm opacity-50">
+            *By {infinitiveAction} with GitHub you are agreeing with our{" "}
+            <Link
+              href="/terms-and-conditions"
+              className="text-accent underline"
+            >
+              Terms and Conditions
+            </Link>.
+          </p>
           {query.error && (
             <div className="mt-5">
               <ErrorAlert text={query.error as string} />
