@@ -1,12 +1,35 @@
-import type { NextPage } from "next";
+import type {
+  InferGetServerSidePropsType,
+  NextPage
+} from "next";
 import { useSession } from "next-auth/react";
 
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import Loading from "@components/_shared/Loading";
 import OrganizationsTabContent from "@components/dashboard/OrganizationsTabContent";
+import { getServerAuthSession } from "@server/auth";
+import { listUserOrganizations } from "@utils/organization";
 import { NextSeo } from "next-seo";
 
-const OrgsDashboard: NextPage = () => {
+export async function getServerSideProps(context: any) {
+  const session = await getServerAuthSession(context);
+  const apiKey = (context as any).session?.apiKey || "";
+
+  const userOrganizations = await listUserOrganizations({
+    apiKey,
+    id: session?.user?.id || "",
+  });
+
+  return {
+    props: {
+      userOrganizations,
+    },
+  };
+}
+
+const OrgsDashboard: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ userOrganizations }) => {
   const { data: sessionData } = useSession();
   if (!sessionData) return <Loading />;
 
@@ -14,7 +37,7 @@ const OrgsDashboard: NextPage = () => {
     <>
       <NextSeo title="Newsfeed" />
       <DashboardLayout active="organizations">
-        <OrganizationsTabContent />
+        <OrganizationsTabContent userOrganizations={userOrganizations} />
       </DashboardLayout>
     </>
   );

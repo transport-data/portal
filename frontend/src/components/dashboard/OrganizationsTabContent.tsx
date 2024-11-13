@@ -1,14 +1,3 @@
-import { useState, useMemo } from "react";
-import DashboardOrganizationCard, {
-  DashboardOrganizationCardProps,
-} from "@components/_shared/DashboardOrganizationCard";
-import { api } from "@utils/api";
-import SimpleSearchInput from "@components/ui/simple-search-input";
-import { Button } from "@components/ui/button";
-import MiniSearch from "minisearch";
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import { useSession } from "next-auth/react";
 import {
   Pagination,
   PaginationContent,
@@ -17,38 +6,48 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import DashboardOrganizationCard from "@components/_shared/DashboardOrganizationCard";
+import { Button } from "@components/ui/button";
+import SimpleSearchInput from "@components/ui/simple-search-input";
+import { UserOrganization } from "@utils/organization";
+import { Plus } from "lucide-react";
+import MiniSearch from "minisearch";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
-export default () => {
+export default ({
+  userOrganizations,
+}: {
+  userOrganizations: UserOrganization[];
+}) => {
   const { data: sessionData } = useSession();
   const isSysAdmin = sessionData?.user?.sysadmin == true;
 
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const { data: organizations } = api.organization.listForUser.useQuery();
 
   const miniSearch = useMemo(() => {
     const search = new MiniSearch({
       fields: ["description", "display_name", "name"], // fields to index for full-text search
       storeFields: ["id", "name"],
     });
-    search.addAll(organizations || []);
+    search.addAll(userOrganizations || []);
     return search;
-  }, [organizations]);
+  }, [userOrganizations]);
 
   const searchResults = useMemo(() => {
-    const filtered_orgs = organizations
-      ? organizations.filter((org) => org.capacity == "admin")
-      : [];
+    const filtered_orgs = userOrganizations || [];
     if (!searchText) {
       return filtered_orgs;
     }
     return miniSearch.search(searchText, { prefix: true }).map((result) => {
       const group = filtered_orgs?.find((g) => g.id === result.id);
       // Ensure all required fields are present
-      return group || ({} as DashboardOrganizationCardProps);
+      return group || ({} as any);
     });
-  }, [searchText, organizations, miniSearch]);
+  }, [searchText, userOrganizations, miniSearch]);
 
   const paginatedData = useMemo(() => {
     if (searchText) {
@@ -87,7 +86,10 @@ export default () => {
             {paginatedData.length > 0 ? (
               paginatedData.map((org) => (
                 <div key={org?.id}>
-                  <DashboardOrganizationCard {...org} />
+                  <DashboardOrganizationCard
+                    {...org}
+                    isReadOnly={org.capacity !== "admin"}
+                  />
                 </div>
               ))
             ) : (
