@@ -27,8 +27,8 @@ import { listUserOrganizations } from "@utils/organization";
 import { useMachine } from "@xstate/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Dispatch, SetStateAction, useState } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { match } from "ts-pattern";
 import { SaveDraftButton } from "../create";
 import { TRPCClientErrorLike } from "@trpc/client";
@@ -233,6 +233,21 @@ const EditDatasetDashboard: NextPage<{
     ? false
     : dataset.approval_status === "pending";
 
+  const SaveAsDraft = () => {
+    return dataset.approval_status !== "pending" ? (
+      <SaveDraftButton
+        update={true}
+        form={form}
+        onError={(error: TRPCClientErrorLike<any>) => {
+          setErrorMessage(error.message);
+        }}
+        onSuccess={async (data: Dataset) => {
+          setErrorMessage(null);
+        }}
+      />
+    ) : null;
+  };
+
   return (
     <>
       <NextSeo title="Edit dataset" />
@@ -344,16 +359,7 @@ const EditDatasetDashboard: NextPage<{
                     disabled={disabledForm}
                   />
                   <div className="flex w-full flex-col gap-4 md:flex-row">
-                    <SaveDraftButton
-                      update={true}
-                      form={form}
-                      onError={(error: TRPCClientErrorLike<any>) => {
-                        setErrorMessage(error.message);
-                      }}
-                      onSuccess={async (data: Dataset) => {
-                        setErrorMessage(null);
-                      }}
-                    />
+                    <SaveAsDraft />
                     <Button
                       type="button"
                       className="w-full"
@@ -374,16 +380,7 @@ const EditDatasetDashboard: NextPage<{
                 <>
                   <MetadataForm disabled={disabledForm} />
                   <div className="flex w-full flex-col gap-4 md:flex-row">
-                    <SaveDraftButton
-                      update={true}
-                      form={form}
-                      onError={(error: TRPCClientErrorLike<any>) => {
-                        setErrorMessage(error.message);
-                      }}
-                      onSuccess={async (data: Dataset) => {
-                        setErrorMessage(null);
-                      }}
-                    />
+                    <SaveAsDraft />
                     <Button
                       type="button"
                       variant="secondary"
@@ -424,16 +421,7 @@ const EditDatasetDashboard: NextPage<{
                 <>
                   <UploadsForm disabled={disabledForm} />
                   <div className="flex w-full flex-col gap-4 md:flex-row">
-                    <SaveDraftButton
-                      update={true}
-                      form={form}
-                      onError={(error: TRPCClientErrorLike<any>) => {
-                        setErrorMessage(error.message);
-                      }}
-                      onSuccess={async (data: Dataset) => {
-                        setErrorMessage(null);
-                      }}
-                    />
+                    <SaveAsDraft />
                     <Button
                       type="button"
                       variant="secondary"

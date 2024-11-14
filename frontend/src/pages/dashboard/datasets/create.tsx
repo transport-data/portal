@@ -57,20 +57,7 @@ const CreateDatasetDashboard: NextPage = () => {
       setErrorMessage(error.message);
     },
   });
-  const createDraftDataset = api.dataset.draft.useMutation({
-    onSuccess: async (data) => {
-      setErrorMessage(null);
-      toast({
-        description: `Successfully created the ${
-          data?.title ?? data?.name
-        } dataset as Draft`,
-      });
-      await router.push("/dashboard/datasets");
-    },
-    onError: (error) => {
-      setErrorMessage(error.message);
-    },
-  });
+
   const [current, send] = useMachine(datasetOnboardingMachine);
   const form = useForm<DatasetFormType>({
     resolver: zodResolver(DatasetSchema),
@@ -147,29 +134,6 @@ const CreateDatasetDashboard: NextPage = () => {
         return ["resources", "license"].some((e) => errorPaths.includes(e));
       })
       .otherwise(() => false);
-
-  const validatePrimeRequiredFields = () => {
-    const primeRequiredFields = ["name", "notes", "owner_org"];
-    let hasPrimeError = false;
-    for (var name in form.formState.errors) {
-      if (primeRequiredFields.find((f) => f === name)) {
-        hasPrimeError = true;
-        break;
-      }
-    }
-    return !hasPrimeError;
-  };
-
-  const handleSaveDraft = async () => {
-    form.trigger().then(() => {
-      if (validatePrimeRequiredFields())
-        createDraftDataset.mutate({
-          ...form.getValues(),
-        });
-    });
-
-    return false;
-  };
 
   return (
     <>
@@ -413,6 +377,7 @@ export const SaveDraftButton = ({
         createDraftDataset.mutate({
           ...(update ? { id } : {}),
           ...otherValues,
+          private: true,
         });
       }
     });
