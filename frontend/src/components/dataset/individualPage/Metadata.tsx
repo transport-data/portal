@@ -284,7 +284,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "Chicago",
-                content: `${getLastNameAndInitials(dataset)}. <i>${
+                content: `${getLastNameAndFirstName(dataset)}. <i>${
                   dataset.title ?? dataset.name
                 }</i>. ${
                   dataset.metadata_created
