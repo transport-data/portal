@@ -114,5 +114,22 @@ Note: in order to create resource, we need to pass package_id(dataset_name), for
 
 ## Script
 
-In order to run `process_tdc.py`, you need to pass 2 variables in requirements. 
-This script consists functions for each dataset which differs only metadata or resource type. In order to run, remove comments in the main section.
+The `process_tdc.py` script consists of a set of functions for the ingestion of each dataset, which differs only in metadata or resource type. To control which datasets are going to be ingested, look for the `__main__` section of the script, and uncomment the desired datasets' function.
+
+Also make sure to set the two required environment variables: `CKAN_URL` and `API_KEY`. This controls which CKAN instance the script will be targeting, or, in other words, in which CKAN instance the datasets will be created.
+
+**Example: setting env vars in a Unix environment**
+
+```bash
+export CKAN_URL=http://ckan.com
+export API_KEY=my-api-key 
+```
+
+>[!tip]
+> Note that these two environment variables are gotten with the following code snippet on `proccess_tdc.py`:
+> ```
+> CKAN_URL = os.getenv('CKAN_URL')
+> API_KEY = os.getenv('API_KEY')
+> ```
+
+
