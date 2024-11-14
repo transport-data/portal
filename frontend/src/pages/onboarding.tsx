@@ -20,8 +20,8 @@ import { listOrganizations, listUserOrganizations } from "@utils/organization";
 import { api } from "@utils/api";
 import { toast } from "@/components/ui/use-toast";
 import React from "react";
-import { deleteCookie } from "cookies-next";
 import { getServerAuthSession } from "@server/auth";
+import { clearAllAuxAuthCookies } from "@utils/auth";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const csrfToken = await getCsrfToken(context);
@@ -69,7 +69,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-export default function LoginPage({
+export default function OnboardingPage({
   csrfToken,
   organizationsData,
   topicsData,
@@ -82,7 +82,13 @@ export default function LoginPage({
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
-  const form = useForm<OnboardingFormType>();
+  const userOrg = organizationsData?.find((o) => o?.is_user_member);
+
+  const form = useForm<OnboardingFormType>({
+    defaultValues: {
+      orgInWhichItParticipates: userOrg,
+    },
+  });
   const { handleSubmit, watch } = form;
   const [followedGroups, setFollowedGroups] = useState([]);
 
@@ -94,7 +100,7 @@ export default function LoginPage({
       if (stepNumber === 0) {
         setSuccessMessage("Successfully followed Groups");
       } else if (stepNumber === 1) {
-        setSuccessMessage("Request Submitted Successfully");
+        setSuccessMessage("Request submitted Successfully");
       } else {
         setSuccessMessage("Successfully sent Invites");
       }
@@ -105,7 +111,7 @@ export default function LoginPage({
       form.reset();
       setErrorMessage(null);
       if (stepNumber === 2) {
-        await router.push("/dashboard/newsfeed");
+        finishOnboarding();
       }
       setStep(stepNumber + 1);
     },
@@ -116,7 +122,7 @@ export default function LoginPage({
   });
 
   useEffect(() => {
-    deleteCookie("invite_id");
+    clearAllAuxAuthCookies();
     setIsSmallScreen(window.innerWidth < 1457);
   }, []);
 
@@ -127,7 +133,7 @@ export default function LoginPage({
           name: loc.display_name,
           selected: false,
         }))
-      : []
+      : [],
   );
 
   const [organizations, setOrganizations] = useState(
@@ -137,7 +143,7 @@ export default function LoginPage({
           name: org.display_name,
           selected: false,
         }))
-      : []
+      : [],
   );
 
   const [topics, setTopics] = useState(
@@ -147,7 +153,7 @@ export default function LoginPage({
           name: topic.display_name,
           selected: false,
         }))
-      : []
+      : [],
   );
 
   const [stepNumber, setStep] = useState(0);
@@ -158,10 +164,10 @@ export default function LoginPage({
   ];
 
   const [paragraphText, setParagraphText] = useState<string | ReactNode>(
-    "The changes appear as a running list on your dashboard."
+    "The changes appear as a running list on your dashboard.",
   );
   const [subtitleText, setSubtitleText] = useState(
-    "Track the changes being made to the data you are interested in."
+    "Track the changes being made to the data you are interested in.",
   );
 
   const inviteFriends = watch("newUsersEmailsToInvite");
@@ -183,7 +189,7 @@ export default function LoginPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "geography" &&
-                followee.dict.id === loc.id
+                followee.dict.id === loc.id,
             ),
           }))
         : [];
@@ -193,7 +199,7 @@ export default function LoginPage({
             name: org.display_name,
             selected: userFollowee.some(
               (followee: any) =>
-                followee.type === "organization" && followee.dict.id === org.id
+                followee.type === "organization" && followee.dict.id === org.id,
             ),
           }))
         : [];
@@ -205,7 +211,7 @@ export default function LoginPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "topic" &&
-                followee.dict.id === topic.id
+                followee.dict.id === topic.id,
             ),
           }))
         : [];
@@ -240,7 +246,7 @@ export default function LoginPage({
           >
             Reach out
           </Button>
-        </>
+        </>,
       );
       if (watch("isNewOrganizationSelected")) {
         setDisableButton(
@@ -248,21 +254,25 @@ export default function LoginPage({
             watch("newOrganizationName") &&
             watch("newOrganizationDescription") &&
             watch("confirmThatItParticipatesOfTheOrg")
-          )
+          ),
         );
       } else {
-        setDisableButton(
-          !(
-            watch("orgInWhichItParticipates") &&
-            watch("messageToParticipateOfTheOrg") &&
-            watch("confirmThatItParticipatesOfTheOrg")
-          )
-        );
+        if (!userOrg || watch("orgInWhichItParticipates.id") != userOrg?.id) {
+          setDisableButton(
+            !(
+              watch("orgInWhichItParticipates") &&
+              watch("messageToParticipateOfTheOrg") &&
+              watch("confirmThatItParticipatesOfTheOrg")
+            ),
+          );
+        } else {
+          setDisableButton(false);
+        }
       }
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
-        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
+        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future.",
       );
       setDisableButton(isMessageEmpty || isUserEmpty);
     } else {
@@ -284,6 +294,16 @@ export default function LoginPage({
     followedGroups,
   ]);
 
+  const setOnboardingCompleted = api.user.setOnboardingCompleted.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard/newsfeed");
+    },
+  });
+
+  const finishOnboarding = () => {
+    setOnboardingCompleted.mutate();
+  };
+
   const nextStep = async () => {
     if (stepNumber === 0) {
       form.setValue("followingGroups", followedGroups);
@@ -291,13 +311,24 @@ export default function LoginPage({
     form.setValue("onBoardingStep", stepNumber);
     setLoading(true);
     const data = form.getValues();
-    onBoardUser.mutate(data);
+
+    if (
+      stepNumber == 1 &&
+      !data.isNewOrganizationSelected &&
+      data.orgInWhichItParticipates?.id == userOrg?.id
+    ) {
+      skipStep();
+      setLoading(false);
+      setErrorMessage("");
+    } else {
+      onBoardUser.mutate(data);
+    }
   };
 
   const skipStep = async () => {
     if (stepNumber === 2) {
       setLoading(true);
-      router.push("/dashboard/newsfeed");
+      finishOnboarding();
     }
     setStep(stepNumber + 1);
   };
@@ -436,8 +467,8 @@ export default function LoginPage({
               {stepNumber === 0
                 ? "You can always do this later."
                 : stepNumber === 1
-                ? "Don’t want to share data?"
-                : "Don’t want to submit form?"}{" "}
+                  ? "Don’t want to share data?"
+                  : "Don’t want to submit form?"}{" "}
               <span
                 onClick={() => skipStep()}
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"

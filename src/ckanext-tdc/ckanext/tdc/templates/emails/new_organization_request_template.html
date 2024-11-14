@@ -50,17 +50,23 @@
         }
     </style>
 </head>
+
+{% set is_sent_to_requester = to_email == user_email %}
+{% set _user_name = "You" if is_sent_to_requester else user_name %}
+{% set _verb = "have" if is_sent_to_requester else "has" %}
+{% set _action_text = "Request" if is_set_to_requester else "Please review the request." %}
+
 <body>
     <h2 class="background" style="text-align: center; color: #FFFFFF; padding: 10px 0px;">New Organization Request</h2>
     <p style="margin-top: 15px;">
         <span class="highlight color" title="{{ user_email }}">
-            {{ user_name }}
+            {{ _user_name }}
         </span> 
-        has requested to create a new organization on {{ site_title }}.
+        {{ _verb }} requested to create a new organization on {{ site_title }}.
     </p>
 
     <div class="request-box">
-        <h3 class="background request-heading">Please review the request.</h3>
+        <h3 class="background request-heading">{{ _action_text }}</h3>
         <div style="padding: 0px 15px 15px 15px;">
             <h4 class="highlight color heading">Name</h4>
             <div class="details">
@@ -76,8 +82,10 @@
             </div>
         </div>
     </div>
-    <p>To create the organization, please visit {{ site_title }}.</p>
-    <a href="{{ site_url }}" class="background visit_btn">VISIT {{ site_title }}</a>
+    {% if not is_sent_to_requester %}
+        <p>To create the organization, please visit {{ site_title }}.</p>
+        <a href="{{ site_url }}" class="background visit_btn">VISIT {{ site_title }}</a>
+    {% endif %}
     <p>Have a nice day.</p>
 </body>
 </html>

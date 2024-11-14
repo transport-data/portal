@@ -35,6 +35,7 @@ declare module "next-auth" {
     apikey: string;
     frontend_token: string;
     sysadmin: boolean;
+    onboarding_completed?: boolean;
   }
 }
 

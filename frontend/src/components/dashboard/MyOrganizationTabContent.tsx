@@ -23,8 +23,8 @@ import { cn } from "@lib/utils";
 import { SearchPageOnChange } from "@pages/search";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
-import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import JoinOrganizationModalButton from "./JoinOrganizationModal";
 
 export default () => {
   const [contributors, setContributors] = useState<Facet[]>([]);
@@ -70,7 +70,7 @@ export default () => {
   const datasetCount = hasOrganizations ? count : 0;
 
   const pages = new Array(
-    Math.ceil((datasetCount || 0) / datasetsPerPage)
+    Math.ceil((datasetCount || 0) / datasetsPerPage),
   ).fill(0);
 
   const resetFilter = () => {
@@ -116,8 +116,8 @@ export default () => {
           if (!orgs.length)
             setOrgs(
               facets[key].items?.filter((item: any) =>
-                orgsForUser?.map((org) => org.name)?.includes(item?.name)
-              )
+                orgsForUser?.map((org) => org.name)?.includes(item?.name),
+              ),
             );
           break;
         }
@@ -155,13 +155,13 @@ export default () => {
             });
             const [lastMonthFacet] = data.splice(
               data.findIndex((x) =>
-                x.display_name.toLowerCase().includes("last")
+                x.display_name.toLowerCase().includes("last"),
               ),
-              1
+              1,
             );
 
             data.sort(
-              (a, b) => Number(a.display_name) - Number(b.display_name)
+              (a, b) => Number(a.display_name) - Number(b.display_name),
             );
             data.splice(1, 0, lastMonthFacet!);
             setMetadataCreatedDates(data);
@@ -196,7 +196,7 @@ export default () => {
           countByYear.set(
             new Date().getFullYear().toString(),
             (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
-              (countByYear.get(LAST_MONTH_KEY) ?? 0)
+              (countByYear.get(LAST_MONTH_KEY) ?? 0),
           );
 
           if (!countByYear.get(LAST_MONTH_KEY)) {
@@ -256,45 +256,45 @@ export default () => {
                     advancedQueries: [
                       //preserve other advancedQueries and remove "state" and "private"
                       ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
+                        (aq) => aq.key !== "state" && aq.key !== "private",
                       ),
                       ...[{ key: "private", values: ["(false)"] }],
                     ],
                   }
                 : selected === "private"
-                ? {
-                    includePrivate: true,
-                    includeDrafts: false,
-                    advancedQueries: [
-                      //preserve other advancedQueries and remove "state" and "private"
-                      ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
-                      ),
-                      ...[{ key: "private", values: ["(true)"] }],
-                    ],
-                  }
-                : selected === "draft"
-                ? {
-                    includeDrafts: true,
-                    includePrivate: true,
-                    advancedQueries: [
-                      //preserve other advancedQueries and remove "state"
-                      ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state"
-                      ),
-                      ...[{ key: "state", values: ["draft"] }],
-                    ],
-                  }
-                : {
-                    includeDrafts: true,
-                    includePrivate: true,
-                    advancedQueries: [
-                      //preserve other advancedQueries and remove "state" and "private"
-                      ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
-                      ),
-                    ],
-                  }),
+                  ? {
+                      includePrivate: true,
+                      includeDrafts: false,
+                      advancedQueries: [
+                        //preserve other advancedQueries and remove "state" and "private"
+                        ...(_value.advancedQueries ?? []).filter(
+                          (aq) => aq.key !== "state" && aq.key !== "private",
+                        ),
+                        ...[{ key: "private", values: ["(true)"] }],
+                      ],
+                    }
+                  : selected === "draft"
+                    ? {
+                        includeDrafts: true,
+                        includePrivate: true,
+                        advancedQueries: [
+                          //preserve other advancedQueries and remove "state"
+                          ...(_value.advancedQueries ?? []).filter(
+                            (aq) => aq.key !== "state",
+                          ),
+                          ...[{ key: "state", values: ["draft"] }],
+                        ],
+                      }
+                    : {
+                        includeDrafts: true,
+                        includePrivate: true,
+                        advancedQueries: [
+                          //preserve other advancedQueries and remove "state" and "private"
+                          ...(_value.advancedQueries ?? []).filter(
+                            (aq) => aq.key !== "state" && aq.key !== "private",
+                          ),
+                        ],
+                      }),
               offset: 0,
             }));
             setCurrentPage(0);
@@ -330,7 +330,7 @@ export default () => {
               ...{
                 advancedQueries: [
                   ...(_value.advancedQueries ?? []).filter(
-                    (aq) => aq.key !== "contributors"
+                    (aq) => aq.key !== "contributors",
                   ),
                   ...(v === "*" ? [] : [{ key: "contributors", values: [v] }]),
                 ],
@@ -367,10 +367,29 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {datasets?.length > 0 ? (
+              {!hasOrganizations && (
+                <JoinOrganizationModalButton
+                  render={(setIsShow) => {
+                    return (
+                      <p className="text-[14px]">
+                        You are not a member of an organisation yet.{" "}
+                        <button
+                          onClick={() => setIsShow(true)}
+                          className="font-semibold text-accent underline"
+                        >
+                          Click here
+                        </button>{" "}
+                        to request to join an organisation or request the
+                        creation of a new one.
+                      </p>
+                    );
+                  }}
+                />
+              )}
+              {!!(hasOrganizations && datasets?.length > 0) &&
                 datasets?.map((x) => {
                   const org = orgsForUser?.find(
-                    (org) => org.name === x.organization?.name
+                    (org) => org.name === x.organization?.name,
                   );
                   const role = org?.capacity;
                   const canEdit = role === "admin" || role === "editor";
@@ -381,8 +400,9 @@ export default () => {
                       canEdit={canEdit}
                     />
                   );
-                })
-              ) : (
+                })}
+
+              {!!(hasOrganizations && datasets?.length == 0) && (
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
@@ -396,7 +416,7 @@ export default () => {
                         className={cn(
                           "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
                           "rounded-s-lg px-2",
-                          currentPage === 0 ? "cursor-not-allowed" : ""
+                          currentPage === 0 ? "cursor-not-allowed" : "",
                         )}
                         onClick={() => {
                           setSearchFilter((oldV) => ({
@@ -423,13 +443,15 @@ export default () => {
                             }}
                             className={cn(
                               `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
-                              currentPage === i ? "cursor-auto bg-gray-100" : ""
+                              currentPage === i
+                                ? "cursor-auto bg-gray-100"
+                                : "",
                             )}
                           >
                             {i + 1}
                           </button>
                         </PaginationItem>
-                      )
+                      ),
                     )}
                     <PaginationItem>
                       <button
@@ -447,7 +469,7 @@ export default () => {
                           "rounded-e-lg px-2",
                           currentPage === pages.length - 1
                             ? "cursor-not-allowed"
-                            : ""
+                            : "",
                         )}
                       >
                         <ChevronRightIcon className="h-4 w-4" />

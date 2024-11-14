@@ -5,10 +5,17 @@ import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import CkanRequest from "@datopian/ckan-api-client-js";
 import { NextApiRequest, NextApiResponse } from "next";
+import {
+  ckanUserLoginWithGithub,
+  CkanUserLoginWithGitHubParams,
+  clearAllAuxAuthCookies,
+} from "@utils/auth";
+import { setCookie } from "cookies-next";
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
   return NextAuth(req, res, {
     // Configure one or more authentication providers
+    pages: { signIn: "/auth/signin", error: "/auth/signin" },
     providers: [
       CredentialsProvider({
         // The name to display on the sign in form (e.g. "Sign in with...")
@@ -56,8 +63,40 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
     secret: env.NEXTAUTH_SECRET,
     // Optional callbacks for customization
     callbacks: {
-      async signIn({ user, account, profile, email, credentials }) {
-        return true; // Allows the sign-in
+      async signIn({ user, account }) {
+        const origin = req.cookies?.origin;
+        if (account?.provider === "github" && account?.access_token) {
+          const userLoginParams: CkanUserLoginWithGitHubParams = {
+            account,
+            user,
+          };
+
+          const inviteId = req?.cookies?.invite_id;
+          if (inviteId) {
+            userLoginParams["invite_id"] = req.cookies.invite_id;
+          }
+          const userLoginResult =
+            await ckanUserLoginWithGithub(userLoginParams);
+
+          if ("errors" in userLoginResult) {
+            let url = `/auth/${origin ?? "signin"}?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
+
+            if (origin == "signup" && inviteId) {
+              url += `&invite_id=${inviteId}`;
+            }
+            return url;
+          }
+
+          clearAllAuxAuthCookies({ req, res });
+
+          setCookie(
+            "onboarding_completed",
+            userLoginResult?.onboarding_completed,
+            { req, res },
+          );
+        }
+
+        return true;
       },
       session: ({ session, token }) => {
         return {
@@ -73,64 +112,31 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       async jwt({ token, user, account }) {
         if (user) {
           token.apikey = user.apikey;
-          // token.teams = user.teams
           token.sysadmin = user.sysadmin;
         }
         if (account?.provider === "github" && account.access_token) {
-          const access_token = account.access_token;
+          const userLoginParams: CkanUserLoginWithGitHubParams = {
+            account,
+            user,
+          };
 
-          if (account && account.access_token) {
-            const body: any = {
-              from_github: true,
-              email: user?.email,
-              name: user?.name,
-              token: access_token,
-              client_secret: env.FRONTEND_AUTH_SECRET,
-            };
+          const userLoginResult =
+            await ckanUserLoginWithGithub(userLoginParams);
 
-            if (req?.cookies?.invite_id) {
-              body["invite_id"] = req.cookies.invite_id;
-            }
-
-            const userRes = await fetch(
-              `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_login`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-              },
-            );
-
-            const userLoginResponse: CkanResponse<
-              User & { frontend_token: string }
-            > = await userRes.json();
-
-            let userLoginResult: any;
-            if (typeof userLoginResponse?.result == "string") {
-              userLoginResult = JSON.parse(userLoginResponse.result as any);
-            } else {
-              userLoginResult = userLoginResponse.result;
-            }
-
-            if (userLoginResult.errors) {
-              // TODO: improve error handling
-              return { errors: userLoginResult.errors };
-            }
-
-            user = {
-              ...user,
-              ...userLoginResult,
-              image: user?.image ?? userLoginResult?.image ?? "",
-              apikey: userLoginResult.frontend_token,
-              sysadmin: userLoginResult.sysadmin,
-            };
-
-            return { ...token, ...user, sub: userLoginResult.id };
+          if ("errors" in userLoginResult) {
+            throw new Error("Something went wrong");
           }
-        }
 
+          user = {
+            ...user,
+            ...userLoginResult,
+            image: user?.image ?? userLoginResult?.image ?? "",
+            apikey: userLoginResult.frontend_token,
+            sysadmin: userLoginResult.sysadmin,
+          };
+
+          return { ...token, ...user, sub: userLoginResult.id };
+        }
         return token;
       },
     },

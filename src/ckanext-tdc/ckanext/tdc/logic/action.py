@@ -23,6 +23,7 @@ import ckan.lib.dictization.model_dictize as model_dictize
 import ckan.lib.helpers as h
 
 from ckanext.scheming import helpers as scheming_helpers
+from ckanext.datapusher.plugin import DatapusherPlugin
 from ckanext.tdc.conversions import converters
 from ckanext.tdc.schemas.schemas import dataset_approval_schema
 from ckanext.tdc.authz import is_org_admin_or_sysadmin
@@ -278,10 +279,21 @@ def _before_dataset_create_or_update(context, data_dict, is_update=False):
     _fix_approval_workflow(context, data_dict, is_update=is_update)
 
 
+def _submit_dataset_resources_to_datapusher(dataset):
+    resources = dataset.get("resources", [])
+    for resource in resources:
+        DatapusherPlugin()._submit_to_datapusher(resource)
+
+
+def _after_dataset_create_or_update(context, data_dict, is_update=False):
+    _submit_dataset_resources_to_datapusher(data_dict)
+
+
 @tk.chained_action
 def package_create(up_func, context, data_dict):
     _before_dataset_create_or_update(context, data_dict)
     result = up_func(context, data_dict)
+    _after_dataset_create_or_update(context, result)
     return result
 
 
@@ -302,15 +314,8 @@ def package_delete(up_func, context, data_dict):
 def package_update(up_func, context, data_dict):
     _before_dataset_create_or_update(context, data_dict, is_update=True)
     result = up_func(context, data_dict)
+    _after_dataset_create_or_update(context, result, is_update=True)
     return result
-
-
-# TODO: is overriding package_update enough?
-# @tk.chained_action
-# def package_patch(up_func, context, data_dict):
-#     _before_dataset_create_or_update(context, data_dict, is_update=True)
-#     result = up_func(context, data_dict)
-#     return result
 
 
 def _control_archived_datasets_visibility(data_dict):
@@ -508,17 +513,20 @@ def user_login(context, data_dict):
                 invited_ckan_user_q = session.query(model.User).filter(model.User.reset_key == invite_id)
                 invited_ckan_user = invited_ckan_user_q.first()
                 if not invited_ckan_user:
-                    # TODO: throw invalid invite error
-                    return generic_error_message
+                    error = {
+                        'errors': {'auth': [_('This invite is not valid. Please, try again or contact an administrator.')]},
+                    }
+                    return error
 
                 email_already_used = session.query(model.User).filter(
                         model.User.email == email,
                         model.User.state == 'active').all()
 
                 if len(email_already_used) > 0:
-                    # TODO: throw invalid invite due to GitHub account already used
-                    # in another CKAN account
-                    return generic_error_message
+                    error = {
+                        'errors': {'auth': [_('The email address of the GitHub account you signed in with is already assigned to another TDC account.')]},
+                    }
+                    return error
 
                 # Email adress is available and invite is valid
                 invited_ckan_user.email = email
@@ -557,7 +565,13 @@ def user_login(context, data_dict):
             if config.get('ckanext.auth.include_frontend_login_token', False):
                 user = generate_token(context, user)
 
-            return json.dumps(user)
+            plugin_extras = user.get("plugin_extras")
+            onboarding_completed = False
+            if plugin_extras:
+                onboarding_completed = plugin_extras.get("onboarding_completed", False)
+            user["onboarding_completed"] = onboarding_completed
+
+            return json.loads(json.dumps(user))
         if not data_dict.get('id') or not data_dict.get('password'):
             return generic_error_message
 
@@ -661,6 +675,7 @@ def send_email(email_type, to_email, from_user, site_title=None, site_url=None, 
         'site_url': site_url,
         'user_name': user_name,
         'user_email': from_user.email,
+        'to_email': to_email,
         **kwargs
     }
 
@@ -723,7 +738,7 @@ def request_organization_owner(context, data_dict):
     }
     org_dict = get_action('organization_show')({"ignore_auth": True}, data_dict)
     # find admin users of the org
-    to_emails = []
+    to_emails = [from_user.email]
     for user in org_dict.get("users"):
         if user.get("capacity") == "admin":
             user_show = model.User.get(user.get("id"))
@@ -756,7 +771,7 @@ def request_new_organization(context, data_dict):
 
     # get sysadmins emails
     sysadmins = session.query(model.User).filter(model.User.sysadmin==True).all()
-    to_emails = [user.email for user in sysadmins if user.email]
+    to_emails = [user.email for user in sysadmins if user.email] + [from_user.email]
 
     # send mails
     for email in to_emails:

@@ -3,7 +3,6 @@ import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Dispatch, SetStateAction } from "react";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   Paperclip,
@@ -55,10 +54,14 @@ export default ({
   setText,
   placeholder,
   id,
+  initialValue = "",
+  editable = true,
 }: {
   setText: (text: string) => void;
   placeholder?: string;
   id?: string;
+  initialValue?: string;
+  editable?: boolean;
 }) => {
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -84,6 +87,8 @@ export default ({
         extensions={extensions}
         editorProps={{ attributes: { id: id || "" } }}
         onUpdate={({ editor }) => setText(editor.getHTML())}
+        content={initialValue}
+        editable={editable}
       ></EditorProvider>
     </div>
   );

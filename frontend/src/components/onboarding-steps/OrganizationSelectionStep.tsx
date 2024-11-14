@@ -23,6 +23,9 @@ export default ({
   orgs: any[];
 }) => {
   const [query, setQuery] = useState("");
+  const userOrg = orgs.find((o) => o?.is_user_member);
+  const isUserOrgSelected =
+    userOrg && userOrg?.id == form.watch("orgInWhichItParticipates.id");
   const filteredOrgs =
     query === ""
       ? orgs
@@ -37,14 +40,28 @@ export default ({
         <>
           <div>
             <h2 className="mb-2.5 text-xl font-bold text-[#111928]">
-              Find your organisation
+              {!userOrg
+                ? "Find your organisation"
+                : "Request to join another organisation"}
             </h2>
             <p className="text-gray-500">
-              Please note that that your account must be associated with an
-              organisation to submit data.
+              {!userOrg ? (
+                "Please note that that your account must be associated with an organisation to submit data."
+              ) : (
+                <>
+                  Please note that you are already a member of the{" "}
+                  <span className="font-semibold text-accent">
+                    {userOrg.display_name}
+                  </span>{" "}
+                  organisation, but you can optionally request to be a member of
+                  another organisation.
+                </>
+              )}
             </p>
           </div>
-          <TextDivisor text="Select organisation*" />
+          <TextDivisor
+            text={`Select organisation${!isUserOrgSelected ? "*" : ""}`}
+          />
           <div className="space-y-1">
             <Combobox
               as="div"
@@ -64,7 +81,15 @@ export default ({
                   onBlur={() => {
                     setQuery("");
                   }}
-                  displayValue={(org: any) => org?.display_name}
+                  displayValue={(org: any) => {
+                    let displayName = org?.display_name;
+
+                    if (org?.is_user_member) {
+                      displayName += " (Already a member)";
+                    }
+
+                    return displayName;
+                  }}
                 />
                 <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none data-[open]:rotate-180">
                   <ChevronDown size={14} />
@@ -74,7 +99,6 @@ export default ({
                   <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {filteredOrgs.map((org: any) => (
                       <ComboboxOption
-                        disabled={org?.is_user_member}
                         key={org.id}
                         value={org}
                         className="group relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-500 hover:bg-[#E5E7EB]"
@@ -107,26 +131,36 @@ export default ({
               </Link>
             </p>
           </div>
-          <TextDivisor text="Message for organisation owner*" />
-          <TextEditor
-            placeholder="Message for organisation admin..."
-            setText={(text) =>
-              form.setValue("messageToParticipateOfTheOrg", text)
-            }
-          />
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
-              {...form.register("confirmThatItParticipatesOfTheOrg")}
-              id="confirmThatItParticipatesOfTheOrg"
-            />
-            <div className="pb-1 text-sm text-[#6B7280]">
-              <label htmlFor="confirmationWorkingForTheOrg">
-                I confirm that I work for this organisation
-              </label>
+
+          {!isUserOrgSelected && (
+            <>
+              <TextDivisor
+                text={`Message for organisation owner${!isUserOrgSelected ? "*" : ""}`}
+              />
+              <TextEditor
+                editable={!isUserOrgSelected}
+                placeholder="Message for organisation admin..."
+                setText={(text) =>
+                  form.setValue("messageToParticipateOfTheOrg", text)
+                }
+              />
+            </>
+          )}
+          {!isUserOrgSelected && (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="rounded border-gray-300 text-[#006064] focus:ring-[#006064]"
+                {...form.register("confirmThatItParticipatesOfTheOrg")}
+                id="confirmThatItParticipatesOfTheOrg"
+              />
+              <div className="pb-1 text-sm text-[#6B7280]">
+                <label htmlFor="confirmationWorkingForTheOrg">
+                  I confirm that I work for this organisation
+                </label>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>

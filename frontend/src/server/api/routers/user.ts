@@ -61,13 +61,13 @@ export const userRouter = createTRPCRouter({
             email: input.email,
             state: "active",
           },
-        }
+        },
       );
       return userUpdateState;
     } catch (e) {
       console.log(e);
       throw new Error(
-        "Could not reset user, please contact the system administrator"
+        "Could not reset user, please contact the system administrator",
       );
     }
   }),
@@ -87,7 +87,7 @@ export const userRouter = createTRPCRouter({
               role: input.role,
               email: input.user,
             },
-          }
+          },
         );
         if (!newUser.success && newUser.error) {
           if (newUser.error.message) throw Error(newUser.error.message);
@@ -96,7 +96,7 @@ export const userRouter = createTRPCRouter({
             Object.entries(newUser.error)
               .filter(([k, v]) => k !== "__type")
               .map(([k, v]) => `${k}: ${v}`)
-              .join(", ")
+              .join(", "),
           );
         }
 
@@ -148,7 +148,7 @@ export const userRouter = createTRPCRouter({
         throw error;
       }
       throw new Error(
-        "Could not create user, please contact the system administrator"
+        "Could not create user, please contact the system administrator",
       );
     }
   }),
@@ -174,10 +174,10 @@ export const userRouter = createTRPCRouter({
           action === "updated"
             ? "changed"
             : action === "created"
-            ? "new"
-            : action === "requested"
-            ? "pending"
-            : action;
+              ? "new"
+              : action === "requested"
+                ? "pending"
+                : action;
         activityType = activityType ?? "";
         query = query ?? "";
         limit = limit ?? 10;
@@ -206,10 +206,10 @@ export const userRouter = createTRPCRouter({
             }`,
             {
               apiKey: ctx.session.user.apikey,
-            }
+            },
           )
         ).result;
-      }
+      },
     ),
   list: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
@@ -311,7 +311,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
@@ -327,7 +327,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       const apiKey = ctx.session.user.apikey;
@@ -370,8 +370,21 @@ export const userRouter = createTRPCRouter({
             user_id: user.id,
             group_list: input,
           },
-        }
+        },
       );
       return data.result;
     }),
+  setOnboardingCompleted: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const id = user.id;
+    return patchUser({
+      apiKey: env.SYS_ADMIN_API_KEY,
+      user: {
+        id,
+        plugin_extras: {
+          onboarding_completed: true,
+        },
+      },
+    });
+  }),
 });
