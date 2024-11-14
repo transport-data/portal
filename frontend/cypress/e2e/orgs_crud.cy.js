@@ -29,7 +29,7 @@ describe("Create and edit orgs", () => {
       cy.get("button[type=submit]").click();
       cy.visit(`/dashboard/organizations/${org}/edit`).then(() => {
         cy.get("input[name=title]").should("have.value", org + " edited");
-        cy.contains('Delete Organisation').click()
+        cy.contains('Delete Organization').click()
         cy.wait(2000)
         cy.get('#confirmDelete').click()
         //check if value is no longer preset
@@ -65,7 +65,7 @@ describe("List and Search Organizations", () => {
 
     cy.visit(`/dashboard/organizations/${sample_org}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", sample_org);
-      cy.contains('Delete Organisation').click()
+      cy.contains('Delete Organization').click()
       cy.wait(2000)
       cy.get('#confirmDelete').click()
     });
