@@ -1,4 +1,4 @@
-FROM ckan/ckan-dev:2.11.0
+FROM ckan/ckan-dev:2.11.0@sha256:92be932b2144f0f342728abe08f44a5a8a98a86b120dff3221c6dfb9e512dc9e
 
 ENV CKANEXT_TDC_HASH c6be6d304be7f01fcda12639c898fa9d83fe4750
 
