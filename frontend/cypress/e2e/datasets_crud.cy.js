@@ -82,15 +82,17 @@ describe("List and Search Datasets", () => {
   });
 
   it("Should filter the dataset using the advanced filter and the quick filters", () => {
+    cy.viewport('macbook-11')
     cy.visit(`/search`);
-    cy.get("#show-advanced-filter").then((x) => {
-      if (x.length) {
-        return cy.wrap(x).scrollIntoView().click({ force: true });
-      } else
-        return cy
-          .get("#show-advanced-filter-large-w")
-          .scrollIntoView()
-          .click({ force: true });
+
+    cy.wait(4000);
+
+    cy.get("#show-advanced-filter-large-w").its('length').then((length) => {
+      if (length) {
+          cy.get("#show-advanced-filter-large-w").parent().scrollIntoView().click({ force: true });
+      } else {
+          cy.get("#show-advanced-filter").parent().scrollIntoView().click({ force: true });
+      }
     });
 
     cy.get("button").contains("Keyword").scrollIntoView().click();
