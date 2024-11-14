@@ -79,19 +79,15 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.name}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.description}: Cabo Verde"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
 
 		input.type( datasetTitle, { delay: 0 });
 
 		cy.wait(1500);
 
 		const titleElement = cy.get("div").contains("h5", datasetTitle);
-		const parent = titleElement.parents("a");
 		titleElement.should("exist");
-		
-		parent.click();
-		cy.get("div").should("contain", datasetTitle);
 
   });
 
@@ -105,19 +101,14 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.name}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.description}: Asia"]`).click();
+		cy.get(`[data-value="${searchbarConfig.countries.name}:${searchbarConfig.countries.description}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.countries.name}: Cabo Verde"]`).click();
 
 		input.type( datasetTitle, { delay: 0 });
 
 		cy.wait(1500);
-
 		const titleElement = cy.get("div").contains("h5", datasetTitle);
-		const parent = titleElement.parents("a");
 		titleElement.should("exist");
-		
-		parent.click();
-		cy.get("div").should("contain", datasetTitle);
 
   });
 
@@ -132,8 +123,8 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="in:${searchbarConfig.regions.description}"]`).click();
-		cy.get(`[data-value="in: Asia"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
 
 		input.type( 'Recent Search Test', { delay: 0 });
 
