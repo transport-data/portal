@@ -79,6 +79,18 @@ function getLastNameAndFirstName(dataset: Dataset) {
   return contributorsCitations.join(", ");
 }
 
+function bibtexAuthor(dataset: Dataset) {
+  if (!dataset.contributors_data || dataset.contributors_data.length === 0)
+    return (
+      dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+    );
+  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin').filter(c => c.fullname && c.fullname.split(' ').length > 1) ?? [];
+  if (contributors.length === 0) return {
+    name: dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+  }
+  return contributors.map((c) => c.fullname).join(', ').trim()
+}
+
 export function Metadata({ dataset }: { dataset: Dataset }) {
   const { data: geographies } = api.group.tree.useQuery({
     type: "geography",
@@ -330,7 +342,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                     )
                   ) + new Date(dataset.metadata_created as string).getFullYear()
                 },
-   author = {${dataset.contributors_data.filter(c => c.name !== 'ckan_admin').map((c) => c.fullname).join(", ")}},
+   author = {${bibtexAuthor(dataset)}},
    year = ${new Date(dataset.metadata_created as string).getFullYear()},
    title = {${dataset.title ?? dataset.name}},
    institution = {${
