@@ -22,7 +22,10 @@ function getLastNameAndInitials(dataset: Dataset) {
     return (
       dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
     );
-  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin') ?? [];
+  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin').filter(c => c.fullname && c.fullname.split(' ').length > 1) ?? [];
+  if (contributors.length === 0) return {
+    name: dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+  }
   const contributorsCitations = contributors.map((contributor) => {
     if (contributor.fullname) {
       const splittedName = contributor?.fullname
@@ -49,7 +52,10 @@ function getLastNameAndFirstName(dataset: Dataset) {
     return (
       dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
     );
-  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin') ?? [];
+  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin').filter(c => c.fullname && c.fullname.split(' ').length > 1) ?? [];
+  if (contributors.length === 0) return {
+    name: dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+  }
   const contributorsCitations = contributors.map((contributor) => {
     if (contributor.fullname) {
       const splittedName = contributor?.fullname
