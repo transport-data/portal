@@ -4,16 +4,12 @@ import requests
 import json
 from urllib.parse import urljoin
 import os
-from dotenv import load_dotenv
 import zipfile
 from datetime import datetime
-
-load_dotenv()              
+            
 # CKAN Configuration
 CKAN_URL = os.getenv('CKAN_URL')
 API_KEY = os.getenv('API_KEY')
-
-
 
 def download_and_extract_zip(extract_to='JRC-IDEES-2021_EU27'):
     # Download the ZIP file
