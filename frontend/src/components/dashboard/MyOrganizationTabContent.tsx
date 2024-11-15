@@ -6,9 +6,6 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@components/ui/pagination";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
@@ -25,6 +22,10 @@ import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
 import { useEffect, useState } from "react";
 import JoinOrganizationModalButton from "./JoinOrganizationModal";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
+
+const DATASETS_PER_PAGE = 9;
+const FACET_FIELDS = `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`;
 
 export default () => {
   const [contributors, setContributors] = useState<Facet[]>([]);
@@ -38,19 +39,16 @@ export default () => {
   const [visibility, setVisibility] = useState("*");
   const [contributor, setContributor] = useState("*");
   const [currentPage, setCurrentPage] = useState(0);
-  const { data: orgsForUser } = api.organization.listForUser.useQuery();
 
-  const datasetsPerPage = 9;
-
-  const hasOrganizations = orgsForUser?.length;
+  const { isMemberInAnyRole, userOrgs } = useUserGlobalOrganizationRoles();
 
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
-    limit: hasOrganizations ? datasetsPerPage : 0,
+    limit: isMemberInAnyRole ? DATASETS_PER_PAGE : 0,
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
-    facetsFields: `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`,
+    facetsFields: FACET_FIELDS,
   });
 
   const {
@@ -67,16 +65,16 @@ export default () => {
         : searchFilter.orgs,
   });
 
-  const datasetCount = hasOrganizations ? count : 0;
+  const datasetCount = isMemberInAnyRole ? count : 0;
 
   const pages = new Array(
-    Math.ceil((datasetCount || 0) / datasetsPerPage),
+    Math.ceil((datasetCount || 0) / DATASETS_PER_PAGE),
   ).fill(0);
 
   const resetFilter = () => {
     setSearchFilter({
       offset: 0,
-      limit: hasOrganizations ? datasetsPerPage : 0,
+      limit: isMemberInAnyRole ? DATASETS_PER_PAGE : 0,
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
@@ -100,7 +98,7 @@ export default () => {
     if (orgs.length)
       setSearchFilter((_value) => ({
         ..._value,
-        limit: datasetsPerPage,
+        limit: DATASETS_PER_PAGE,
         orgs: [],
       }));
   }, [orgs]);
@@ -116,7 +114,7 @@ export default () => {
           if (!orgs.length)
             setOrgs(
               facets[key].items?.filter((item: any) =>
-                orgsForUser?.map((org) => org.name)?.includes(item?.name),
+                userOrgs?.map((org) => org.name)?.includes(item?.name),
               ),
             );
           break;
@@ -211,10 +209,7 @@ export default () => {
         }
       }
     }
-  }, [facets, orgsForUser]);
-
-  const totalDatasets = datasetCount ?? 0;
-  const totalPages = Math.ceil(totalDatasets / datasetsPerPage);
+  }, [facets, userOrgs]);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
@@ -367,7 +362,7 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {!hasOrganizations && (
+              {!isMemberInAnyRole && (
                 <JoinOrganizationModalButton
                   render={(setIsShow) => {
                     return (
@@ -386,9 +381,9 @@ export default () => {
                   }}
                 />
               )}
-              {!!(hasOrganizations && datasets?.length > 0) &&
+              {!!(isMemberInAnyRole && datasets?.length > 0) &&
                 datasets?.map((x) => {
-                  const org = orgsForUser?.find(
+                  const org = userOrgs?.find(
                     (org) => org.name === x.organization?.name,
                   );
                   const role = org?.capacity;
@@ -402,7 +397,7 @@ export default () => {
                   );
                 })}
 
-              {!!(hasOrganizations && datasets?.length == 0) && (
+              {!!(isMemberInAnyRole && datasets?.length == 0) && (
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
@@ -421,7 +416,7 @@ export default () => {
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
-                            offset: (currentPage - 1) * datasetsPerPage,
+                            offset: (currentPage - 1) * DATASETS_PER_PAGE,
                           }));
                           setCurrentPage((oldV) => oldV - 1);
                         }}
@@ -437,7 +432,7 @@ export default () => {
                             onClick={() => {
                               setSearchFilter((oldV) => ({
                                 ...oldV,
-                                offset: i * datasetsPerPage,
+                                offset: i * DATASETS_PER_PAGE,
                               }));
                               setCurrentPage(i);
                             }}
@@ -460,7 +455,7 @@ export default () => {
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
-                            offset: (currentPage + 1) * datasetsPerPage,
+                            offset: (currentPage + 1) * DATASETS_PER_PAGE,
                           }));
                           setCurrentPage((oldV) => oldV + 1);
                         }}
