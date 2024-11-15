@@ -1,15 +1,7 @@
-import {
-  ColumnSort,
-  PaginationState,
-  ColumnFilter,
-  Updater,
-} from "@tanstack/react-table";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { DataExplorerColumnFilter } from "./DataExplorer";
+import { useMutation } from "@tanstack/react-query";
 import { CkanResponse } from "./ckan.interface";
-import getConfig from "next/config";
 import { env } from "@env.mjs";
-import { FilterFormType, FilterObjType } from "./search.schema";
+import { FilterObjType } from "./search.schema";
 
 export interface FieldsResponse {
   tableName: string;
