@@ -38,6 +38,6 @@ export function useUserGlobalOrganizationRoles() {
     adminOrgs,
     canCreateDatasets:
       !!editorOrgs?.length || !!adminOrgs?.length || isSysadmin,
-    isMemberInAnyRole: !!userOrgs.length,
+    belongsToAnyOrg: !!userOrgs.length,
   };
 }

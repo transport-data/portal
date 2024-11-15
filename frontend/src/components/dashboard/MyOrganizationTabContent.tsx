@@ -40,11 +40,11 @@ export default () => {
   const [contributor, setContributor] = useState("*");
   const [currentPage, setCurrentPage] = useState(0);
 
-  const { isMemberInAnyRole, userOrgs } = useUserGlobalOrganizationRoles();
+  const { belongsToAnyOrg, userOrgs } = useUserGlobalOrganizationRoles();
 
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
-    limit: isMemberInAnyRole ? DATASETS_PER_PAGE : 0,
+    limit: belongsToAnyOrg ? DATASETS_PER_PAGE : 0,
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
@@ -65,7 +65,7 @@ export default () => {
         : searchFilter.orgs,
   });
 
-  const datasetCount = isMemberInAnyRole ? count : 0;
+  const datasetCount = belongsToAnyOrg ? count : 0;
 
   const pages = new Array(
     Math.ceil((datasetCount || 0) / DATASETS_PER_PAGE),
@@ -74,7 +74,7 @@ export default () => {
   const resetFilter = () => {
     setSearchFilter({
       offset: 0,
-      limit: isMemberInAnyRole ? DATASETS_PER_PAGE : 0,
+      limit: belongsToAnyOrg ? DATASETS_PER_PAGE : 0,
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
@@ -362,7 +362,7 @@ export default () => {
             <DatasetsCardsLoading />
           ) : (
             <>
-              {!isMemberInAnyRole && (
+              {!belongsToAnyOrg && (
                 <JoinOrganizationModalButton
                   render={(setIsShow) => {
                     return (
@@ -381,7 +381,7 @@ export default () => {
                   }}
                 />
               )}
-              {!!(isMemberInAnyRole && datasets?.length > 0) &&
+              {!!(belongsToAnyOrg && datasets?.length > 0) &&
                 datasets?.map((x) => {
                   const org = userOrgs?.find(
                     (org) => org.name === x.organization?.name,
@@ -397,7 +397,7 @@ export default () => {
                   );
                 })}
 
-              {!!(isMemberInAnyRole && datasets?.length == 0) && (
+              {!!(belongsToAnyOrg && datasets?.length == 0) && (
                 <div className="text-[14px]">No datasets found...</div>
               )}
 
