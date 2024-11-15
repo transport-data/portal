@@ -384,6 +384,8 @@ Example of a POST request to the `package_create` endpoint:
 - The validation is written in a declarative way by using [zod](https://zod.dev/) for datasets for example, the frontend validation is written in `src/schema/dataset.schema.ts`
 - The components themselves(comboboxes/inputs/selects etc) have documentation [here](https://ui.shadcn.com/docs/components/form)
 
+The code itself for the form can be found on `src/components/dataset/form`, the same form is used both for adding and editing, the only difference is that the edit version has a different layout and makes use of the `defaultValues` feature of react-hook-form to have all fields pre-filled with data coming from the backend
+
 #### Edit Dataset page
 
 This page is restricted just for signed-in users that have the editor or admin role.
