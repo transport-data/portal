@@ -30,15 +30,20 @@ const OrgsDashboard: NextPage<
 > = ({ userOrganizations }) => {
   const { data: sessionData } = useSession();
   if (!sessionData) return <Loading />;
+  const isSysadmin = sessionData?.user.sysadmin;
+
+  const hasOrganizations = !!userOrganizations.length;
+  const showOrgsSection = hasOrganizations || isSysadmin;
+  const showJoinOrgButton = !hasOrganizations && !isSysadmin;
 
   return (
     <>
       <NextSeo title="Newsfeed" />
       <DashboardLayout active="organizations">
-        {!!userOrganizations.length && (
+        {showOrgsSection && (
           <OrganizationsTabContent userOrganizations={userOrganizations} />
         )}
-        {!userOrganizations.length && (
+        {showJoinOrgButton && (
           <JoinOrganizationModalButton
             render={(setIsShow) => {
               return (
