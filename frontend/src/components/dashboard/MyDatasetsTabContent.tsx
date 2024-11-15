@@ -3,12 +3,10 @@ import DashboardDatasetCard, {
 } from "@components/_shared/DashboardDatasetCard";
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
-import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { useEffect, useState } from "react";
 import { SearchDatasetType } from "@schema/dataset.schema";
-import { searchDatasets } from "@utils/dataset";
 import {
   DocumentReportIcon,
   DocumentSearchIcon,
@@ -20,14 +18,15 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@components/ui/pagination";
 import React from "react";
 import { SearchPageOnChange } from "@pages/search";
 import { cn } from "@lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
+import JoinOrganizationModalButton from "./JoinOrganizationModal";
+
+const DATASETS_PER_PAGE = 9;
 
 export default function MyDatasetsTabContent() {
   const { data: session } = useSession();
@@ -41,12 +40,11 @@ export default function MyDatasetsTabContent() {
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
   const [visibility, setVisibility] = useState("*");
   const [currentPage, setCurrentPage] = useState(0);
-  const { data: orgsForUser } = api.organization.listForUser.useQuery();
-  const datasetsPerPage = 9;
+  const { userOrgs, canCreateDatasets } = useUserGlobalOrganizationRoles();
 
   const [searchFilter, setSearchFilter] = useState<SearchDatasetType>({
     offset: 0,
-    limit: datasetsPerPage,
+    limit: DATASETS_PER_PAGE,
     sort: "score desc, metadata_modified desc",
     includePrivate: true,
     includeDrafts: true,
@@ -66,13 +64,13 @@ export default function MyDatasetsTabContent() {
   } = api.dataset.search.useQuery(searchFilter);
 
   const pages = new Array(
-    Math.ceil((datasetCount || 0) / datasetsPerPage)
+    Math.ceil((datasetCount || 0) / DATASETS_PER_PAGE),
   ).fill(0);
 
   const resetFilter = () => {
     setSearchFilter({
       offset: 0,
-      limit: datasetsPerPage,
+      limit: DATASETS_PER_PAGE,
       sort: "score desc, metadata_modified desc",
       includePrivate: true,
       includeDrafts: true,
@@ -104,8 +102,8 @@ export default function MyDatasetsTabContent() {
           if (!orgs.length)
             setOrgs(
               facets[key].items?.filter((item: any) =>
-                orgsForUser?.map((org) => org.name)?.includes(item?.name)
-              )
+                userOrgs?.map((org) => org.name)?.includes(item?.name),
+              ),
             );
           break;
         }
@@ -144,13 +142,13 @@ export default function MyDatasetsTabContent() {
             });
             const [lastMonthFacet] = data.splice(
               data.findIndex((x) =>
-                x.display_name.toLowerCase().includes("last")
+                x.display_name.toLowerCase().includes("last"),
               ),
-              1
+              1,
             );
 
             data.sort(
-              (a, b) => Number(a.display_name) - Number(b.display_name)
+              (a, b) => Number(a.display_name) - Number(b.display_name),
             );
             data.splice(1, 0, lastMonthFacet!);
             setMetadataCreatedDates(data);
@@ -185,7 +183,7 @@ export default function MyDatasetsTabContent() {
           countByYear.set(
             new Date().getFullYear().toString(),
             (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
-              (countByYear.get(LAST_MONTH_KEY) ?? 0)
+              (countByYear.get(LAST_MONTH_KEY) ?? 0),
           );
 
           if (!countByYear.get(LAST_MONTH_KEY)) {
@@ -200,7 +198,7 @@ export default function MyDatasetsTabContent() {
         }
       }
     }
-  }, [facets, orgsForUser]);
+  }, [facets, userOrgs]);
 
   return (
     <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
@@ -242,45 +240,45 @@ export default function MyDatasetsTabContent() {
                     advancedQueries: [
                       //preserve other advancedQueries and remove "state" and "private"
                       ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
+                        (aq) => aq.key !== "state" && aq.key !== "private",
                       ),
                       ...[{ key: "private", values: ["(false)"] }],
                     ],
                   }
                 : selected === "private"
-                ? {
-                    includePrivate: true,
-                    includeDrafts: false,
-                    advancedQueries: [
-                      //preserve other advancedQueries and remove "state" and "private"
-                      ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
-                      ),
-                      ...[{ key: "private", values: ["(true)"] }],
-                    ],
-                  }
-                : selected === "draft"
-                ? {
-                    includeDrafts: true,
-                    includePrivate: true,
-                    advancedQueries: [
-                      //preserve other advancedQueries and remove "state"
-                      ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state"
-                      ),
-                      ...[{ key: "state", values: ["draft"] }],
-                    ],
-                  }
-                : {
-                    includeDrafts: true,
-                    includePrivate: true,
-                    advancedQueries: [
-                      //preserve other advancedQueries and remove "state" and "private"
-                      ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private"
-                      ),
-                    ],
-                  }),
+                  ? {
+                      includePrivate: true,
+                      includeDrafts: false,
+                      advancedQueries: [
+                        //preserve other advancedQueries and remove "state" and "private"
+                        ...(_value.advancedQueries ?? []).filter(
+                          (aq) => aq.key !== "state" && aq.key !== "private",
+                        ),
+                        ...[{ key: "private", values: ["(true)"] }],
+                      ],
+                    }
+                  : selected === "draft"
+                    ? {
+                        includeDrafts: true,
+                        includePrivate: true,
+                        advancedQueries: [
+                          //preserve other advancedQueries and remove "state"
+                          ...(_value.advancedQueries ?? []).filter(
+                            (aq) => aq.key !== "state",
+                          ),
+                          ...[{ key: "state", values: ["draft"] }],
+                        ],
+                      }
+                    : {
+                        includeDrafts: true,
+                        includePrivate: true,
+                        advancedQueries: [
+                          //preserve other advancedQueries and remove "state" and "private"
+                          ...(_value.advancedQueries ?? []).filter(
+                            (aq) => aq.key !== "state" && aq.key !== "private",
+                          ),
+                        ],
+                      }),
               offset: 0,
             }));
             setCurrentPage(0);
@@ -322,7 +320,31 @@ export default function MyDatasetsTabContent() {
                   />
                 ))
               ) : (
-                <div className="text-[14px]">No datasets found...</div>
+                <>
+                  {canCreateDatasets && (
+                    <div className="text-[14px]">No datasets found...</div>
+                  )}
+                  {!canCreateDatasets && (
+                    <JoinOrganizationModalButton
+                      render={(setIsShow) => {
+                        return (
+                          <p className="text-[14px]">
+                            To add data you need to be at least an editor in at
+                            least one organisation.{" "}
+                            <button
+                              onClick={() => setIsShow(true)}
+                              className="font-semibold text-accent underline"
+                            >
+                              Click here
+                            </button>{" "}
+                            to request to join an organisation or request the
+                            creation of a new one.
+                          </p>
+                        );
+                      }}
+                    />
+                  )}
+                </>
               )}
 
               {pages.length ? (
@@ -335,12 +357,12 @@ export default function MyDatasetsTabContent() {
                         className={cn(
                           "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
                           "rounded-s-lg px-2",
-                          currentPage === 0 ? "cursor-not-allowed" : ""
+                          currentPage === 0 ? "cursor-not-allowed" : "",
                         )}
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
-                            offset: (currentPage - 1) * datasetsPerPage,
+                            offset: (currentPage - 1) * DATASETS_PER_PAGE,
                           }));
                           setCurrentPage((oldV) => oldV - 1);
                         }}
@@ -356,19 +378,21 @@ export default function MyDatasetsTabContent() {
                             onClick={() => {
                               setSearchFilter((oldV) => ({
                                 ...oldV,
-                                offset: i * datasetsPerPage,
+                                offset: i * DATASETS_PER_PAGE,
                               }));
                               setCurrentPage(i);
                             }}
                             className={cn(
                               `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
-                              currentPage === i ? "cursor-auto bg-gray-100" : ""
+                              currentPage === i
+                                ? "cursor-auto bg-gray-100"
+                                : "",
                             )}
                           >
                             {i + 1}
                           </button>
                         </PaginationItem>
-                      )
+                      ),
                     )}
                     <PaginationItem>
                       <button
@@ -377,7 +401,7 @@ export default function MyDatasetsTabContent() {
                         onClick={() => {
                           setSearchFilter((oldV) => ({
                             ...oldV,
-                            offset: (currentPage + 1) * datasetsPerPage,
+                            offset: (currentPage + 1) * DATASETS_PER_PAGE,
                           }));
                           setCurrentPage((oldV) => oldV + 1);
                         }}
@@ -386,7 +410,7 @@ export default function MyDatasetsTabContent() {
                           "rounded-e-lg px-2",
                           currentPage === pages.length - 1
                             ? "cursor-not-allowed"
-                            : ""
+                            : "",
                         )}
                       >
                         <ChevronRightIcon className="h-4 w-4" />

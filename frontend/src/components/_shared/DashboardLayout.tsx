@@ -9,10 +9,9 @@ import { NextSeo } from "next-seo";
 import Link from "next/link";
 import Heading from "./Heading";
 import Loading from "./Loading";
-import { api } from "@utils/api";
 import { DefaultTooltip } from "@components/ui/tooltip";
-import { BuildingIcon } from "lucide-react";
 import JoinOrganizationModalButton from "@components/dashboard/JoinOrganizationModal";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
 
 interface DashboardLayotProps {
   children: React.ReactNode;
@@ -23,22 +22,11 @@ interface DashboardLayotProps {
 const DashboardLayout: React.FC<DashboardLayotProps> = ({
   children,
   active,
-  cta,
 }) => {
   const { data: sessionData } = useSession();
   const isSysAdmin = sessionData?.user?.sysadmin == true;
-  const { data: userOrgs = [] } = api.organization.listForUser.useQuery();
 
-  const adminOrgs: typeof userOrgs = [];
-  const editorOrgs: typeof userOrgs = [];
-
-  userOrgs.forEach((x) => {
-    if (x.capacity === "admin") {
-      adminOrgs.push(x);
-    } else if (x.capacity === "editor") {
-      editorOrgs.push(x);
-    }
-  });
+  const { canCreateDatasets } = useUserGlobalOrganizationRoles();
 
   if (!sessionData) return <Loading />;
   const tabs = [
@@ -72,7 +60,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
       id: "organizations",
       href: "/dashboard/organizations",
     },
-    ...(isSysAdmin || adminOrgs.length || editorOrgs.length
+    ...(canCreateDatasets
       ? [
           {
             title: "Datasets Approvals",
@@ -154,7 +142,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                 <div className="flex gap-2">
                   {!isSysAdmin && <JoinOrganizationModalButton />}
                   <div className="min-w-full md:min-w-fit">
-                    {(adminOrgs.length > 0 || editorOrgs.length > 0) && (
+                    {canCreateDatasets && (
                       <Button asChild className="justify-between gap-2">
                         <Link href="/dashboard/datasets/create">
                           <DocumentPlusIcon className="h-4 w-4" />
@@ -162,7 +150,7 @@ const DashboardLayout: React.FC<DashboardLayotProps> = ({
                         </Link>
                       </Button>
                     )}
-                    {adminOrgs.length == 0 && editorOrgs.length == 0 && (
+                    {!canCreateDatasets && (
                       <DefaultTooltip content="To add data you need to be at least an editor in at least one organisation">
                         <Button className="justify-between gap-2 opacity-50">
                           <DocumentPlusIcon className="h-4 w-4" />
