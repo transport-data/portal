@@ -1,13 +1,10 @@
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { flexRender, Table as TableType, Header } from "@tanstack/react-table";
+import { Table as TableType } from "@tanstack/react-table";
 import {
   Select,
   SelectContent,
@@ -16,12 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Controller,
   FieldValues,
-  Path,
-  PathValue,
-  UseFormReturn,
-  useForm,
   useFormContext,
 } from "react-hook-form";
 import { QueryFormType } from "./search.schema";
@@ -30,7 +22,6 @@ import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger,
 } from "@/components/ui/accordion";
 import { match, P } from "ts-pattern";
 import { Skeleton } from "@components/ui/skeleton";

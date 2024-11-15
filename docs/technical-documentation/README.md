@@ -26,6 +26,7 @@
   - [Add Dataset page](#add-dataset-page)
   - [Edit Dataset page](#edit-dataset-page)
   - [Dataset Details page](#dataset-details-page)
+  - [Data Explorer ](#data-explorer)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -338,6 +339,8 @@ Request used to get the all the user [organizations](https://github.com/transpor
 
 Request used to get the [geographies](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/geography.yaml): [https://ckan.tdc.dev.datopian.com/api/3/action/group_list?&all_fields=True&include_extras=True&type=geography&limit=350]()
 
+We also fetch the backend [schema](https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml): [https://ckan.tdc.dev.datopian.com/api/action/scheming_dataset_schema_show?type=dataset](), this is useful because for example, if we want to add a new Category for datasets, all we need to do is update the backend schema and the frontend grabs that automatically
+
 Example of a POST request to the `package_create` endpoint:
 
 ```json
@@ -376,6 +379,10 @@ Example of a POST request to the `package_create` endpoint:
   "resources": ["any resources that you want to add"]
 }
 ```
+
+- Just like all the forms in the application, we use [react-hook-form](https://react-hook-form.com/) for managing the state of all the checkboxes/dropdowns/input fields etc
+- The validation is written in a declarative way by using [zod](https://zod.dev/) for datasets for example, the frontend validation is written in `src/schema/dataset.schema.ts`
+- The components themselves(comboboxes/inputs/selects etc) have documentation [here](https://ui.shadcn.com/docs/components/form)
 
 #### Edit Dataset page
 
@@ -469,3 +476,143 @@ To present the data on the table with sorting, filtering, and all the features a
 Example of a request to the datastore_search endpoint: [https://ckan.tdc.dev.datopian.com//api/3/action/datastore_search?resource_id=\<id of a resource uploaded to datastore\>]()
 
 Example of a request to the datastore_search_sql endpoint: [https://ckan.tdc.dev.datopian.com//api/action/datastore_search_sql?sql=SELECT count(\*) FROM "<id of the resource>" WHERE ("field of the resource" != 'a' )]()
+
+#### Data Explorer
+
+##### Current code
+
+The data-explorer uses essentially 3 main libraries
+
+- [@tanstack/react-query](https://tanstack.com/query/latest/docs/framework/react/overview) for fetching, caching, synchronizing, and essentially managing async state coming from the server
+- [react-hook-form](https://react-hook-form.com/) for managing the state of all the checkboxes/dropdowns/input fields etc in the data-explorer, essentially making them all one big <form> obj, whose result is then the input for react-query to make the calls
+- [@tanstack/react-table](https://tanstack.com/table/latest/docs/introduction) essentially allows us to manage the table state (What columns are currently pinned for example, or if we wanted to add some sort of client sorting etc)
+
+We have two data explorers currently in the project
+
+- `/components/data-explorer`
+- `/components/pivot-data-explorer`
+
+Im going to focus on the pivot since thats the most likely to be updated by the TDC Team, pretty much all necessary is in these files
+
+```
+❯ tree .
+.
+├── ckan.interface.ts
+├── ColumnSelect.tsx
+├── DataExplorer.tsx
+├── exportMutation.ts
+├── Filters.tsx
+├── queryHooks.ts
+├── RowsSelect.tsx
+├── search.schema.ts
+├── Spinner.tsx
+└── Table.tsx
+
+1 directory, 10 files
+```
+
+Currently all calls to the backend are done in the `queryHooks` file, which is where we are going to start
+
+He we will find 5 hooks
+
+- useFields, this one is called at the start of the loading of the component to get the list of available columns from CKAN, returning them in the following shape
+```
+tableName: resourceId //This is the name of the SQL Table,
+columns: 
+  key: //Name of the column,
+  name: //Can be a label for the column,
+  type: //Type of the column, usually something between text/date or numeric,
+  default: //If the value is empty you could set the default value here, to show on the table
+})),
+```
+- usePossibleValues, this one is particular for the pivot version, and its used to get the possible values from a column like in the example below
+![usePossibleValues example](./usePossibleValues.png)
+In this case as soon as the user selects a column, we start fetching the possible values to fill out the list of checkboxes
+
+- useFootnote, used to fetch the footnote for a particular combination of row and column, for example, in the image below, we will provide it with 
+  - rowValue = Austria
+  - row = Geography
+  - rowType = text
+  - column = Time
+  - columnType = numeric
+  - columnValue = 1990
+  - resourceId
+
+![useFootnotes](./useFootnotes.png)
+And we will try to fetch the first available metadata field for a row where the Geography = Austria and the Time = 1990
+
+- useTableData, this one is where we actually fetch the data from database, and its pretty simple, it receives the following props
+```
+  resourceId: string;
+  pivotColumns: string[];
+  column: string;
+  row: string;
+  value: string;
+  enabled?: boolean;
+  columnsType: string;
+  filters: FilterObjType;
+```
+
+- ResourceId = id of the resource and name of table in db
+- pivotColumns = All the possible column values that we have, in the example use beforehand, a list with [1990, 1991, 1992...]
+- column = The name of the column in the example `Time`
+- row = The name of the row, which in this case would be `Geography`
+- value = The name of the value column, which in this case would be `Value`
+- enabled = By default react-query hooks are fetches as soon as the component mounts, in our scenario obviously we can only fetch something when the user selects everything
+- filters = An array of filter objs, to filter the raw data before pivoting
+
+- useNumberOfRows, used to get the number of rows in the raw data that correspond to the filters, it ends up creating just a simple count(*) statement with all the filters, receives the following props
+```
+  resourceId: string;
+  enabled?: boolean;
+  filters: FilterObjType;
+```
+
+Besides those hooks another piece of code worth mentioning is the schema, in `search.schema.ts` which just describes the schema for the form, it uses `zod`, which is a library that allows us to enforce a schema and have it infered by typescript
+ 
+```
+import z from "zod";
+
+export const filterObj = z.array(
+z.object({
+    column: z.string(),
+    type: z.string(),
+    values: z.array(z.string()),
+  })
+);
+
+export const querySchema = z.object({
+  filters: filterObj,
+  column: z.string(),
+  row: z.string(),
+  value: z.string(),
+  tableName: z.string(),
+});
+
+export type QueryFormType = z.infer<typeof querySchema>;
+export type FilterObjType = z.infer<typeof filterObj>;
+```
+
+##### Moving to `structure.xml`
+
+So lets imagine that we want to use a `structure.xml` file as our source of truth about the DB Table, on a general basis we would do the following
+
+Rewrite the initial hook which is `useFields` to parse that structure.xml file and return something like an array of columns, where each column would have a shape similar to this
+
+```
+{
+name: a human readable nice name for the column
+key: the actual name of the column in the DB, of course needing to be unique for that table 
+type: the type of the column, this is needed so that in the SQL we can for example use X = Y for numbers and X = "Y" for strings
+default: a default value if nothing is provided in the column, can leave as "" if you guys dont want to provide anything
+possibleValues: a list of all the posssible values that particular column can have, if this is a column that talks about fuel, it could something like ['Eletric', 'Diesel', 'Gasoline', ...]
+}
+```
+
+After that all the calls to `usePossibleValues` could use that object and then instead of having to call the following SQL 
+
+- `SELECT \"${column}\" as columnname, count(distinct \"${column}\") as count FROM \"${resourceId}\" GROUP BY \"${column}\"` to get the available values, those could just be retrieved from the possibleValues array, eliminating that call to the server
+
+`useTableData` and `useNumberOfRows` would probably stay the same
+
+and `useFootenote` could be changed depending on your needs, if more data needs to be retrieved from the `structure.xml` file that could be done in the `useFields` hook and `useFootnote` could use those values there

@@ -8,20 +8,6 @@ z.object({
   })
 );
 
-export const filterSchema = z.object({
-  filters: z.array(filterObj),
-});
-
-const sortSchema = z.object({
-  column: z.string(),
-  direction: z.enum(["asc", "desc"]),
-});
-
-const paginationSchema = z.object({
-  limit: z.number(),
-  offset: z.number(),
-});
-
 export const querySchema = z.object({
   filters: filterObj,
   column: z.string(),
@@ -31,6 +17,4 @@ export const querySchema = z.object({
 });
 
 export type QueryFormType = z.infer<typeof querySchema>;
-export type PaginationType = z.infer<typeof paginationSchema>;
-export type FilterFormType = z.infer<typeof filterSchema>;
 export type FilterObjType = z.infer<typeof filterObj>;
