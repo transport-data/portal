@@ -42,6 +42,8 @@ export default (activity: DashboardNewsfeedCardProps) => {
   const activityTarget = activitySegments
     ? activitySegments[1] === "package"
       ? "dataset"
+      : activitySegments[1] === "user"
+      ? "profile"
       : activitySegments[1]
     : "entity";
 
@@ -53,7 +55,7 @@ export default (activity: DashboardNewsfeedCardProps) => {
       color = "green";
       break;
     case "changed":
-      actionText = "updated the ";
+      actionText = `updated  ${activityTarget === "profile" ? "your" : "the "}`;
       color = "purple";
       break;
     case "deleted":
