@@ -155,8 +155,14 @@ const EditDatasetDashboard: NextPage<{
       indicators: dataset.indicators ?? [],
       tags: dataset.tags ?? [],
       resources: dataset.resources.map(r => ({
-        ...r,
-        datastore_active: undefined
+        id: r.id,
+        name: r.name,
+        package_id: r.package_id,
+        url_type: r.url_type,
+        format: r.format,
+        size: r.size,
+        resource_type: r.resource_type,
+        url: r.url,
       })),
       comments: dataset.comments
         ? dataset.comments.map((c) => ({
