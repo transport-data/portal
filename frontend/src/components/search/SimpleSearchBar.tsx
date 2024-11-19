@@ -70,7 +70,7 @@ export default function SearchBar({
   query?: string;
   hideDatasetSuggestion?: boolean;
   facetValue?: string;
-  facetDisplayName?: string,
+  facetDisplayName?: string;
   facetName?: keyof SearchDatasetType;
   facetDisplayValue?: string;
 }) {
@@ -164,7 +164,7 @@ export default function SearchBar({
           />
           {(isTyping || facetName || facetValue) && (
             <span
-              className="absolute right-[120px] z-[20] cursor-pointer p-2 text-gray-500"
+              className="absolute right-[120px] z-[1] cursor-pointer p-2 text-gray-500"
               role="button"
               onClick={() => handleCancelSearch()}
             >
@@ -243,7 +243,7 @@ export default function SearchBar({
                     heading={<CommandListHeader title="Datasets" />}
                   >
                     {datasets.slice(0, 2).map((dataset, index) => (
-                      <SearchDatasetItem {...dataset as any} key={index} />
+                      <SearchDatasetItem {...(dataset as any)} key={index} />
                     ))}
                   </CommandGroup>
 
