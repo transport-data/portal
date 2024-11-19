@@ -340,24 +340,6 @@ export default function DatasetSearch({
     }
   }, [searchFilter]);
 
-  const totalPages = Math.ceil(datasetCount || 0 / 9);
-
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const halfRange = Math.floor(5 / 2);
-    let start = Math.max(currentPage - halfRange, 1);
-    let end = Math.min(start + 4, totalPages);
-
-    if (end - start < 4) {
-      start = Math.max(end - 4, 1);
-    }
-
-    for (let i = start; i <= end; i++) {
-      pageNumbers.push(i);
-    }
-    return pageNumbers;
-  };
-
   return (
     <>
       <Head>
@@ -380,7 +362,7 @@ export default function DatasetSearch({
           </div>
           <div className="mt-8">
             <div className="flex flex-col gap-4 lg:flex-row lg:gap-[64px]">
-              <div className="mb-8 flex w-full flex-col justify-between">
+              <div className="mb-8 flex w-full flex-col">
                 <div>
                   <div className="flex flex-col flex-wrap items-center justify-between gap-2 md:flex-row">
                     <div className="flex flex-col items-center gap-4 md:flex-row">
