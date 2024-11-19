@@ -154,6 +154,10 @@ const EditDatasetDashboard: NextPage<{
       services: dataset.services ?? [],
       indicators: dataset.indicators ?? [],
       tags: dataset.tags ?? [],
+      resources: dataset.resources.map(r => ({
+        ...r,
+        datastore_active: undefined
+      })),
       comments: dataset.comments
         ? dataset.comments.map((c) => ({
             ...c,
