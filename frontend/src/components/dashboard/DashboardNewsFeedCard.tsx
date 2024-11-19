@@ -42,6 +42,8 @@ export default (activity: DashboardNewsfeedCardProps) => {
   const activityTarget = activitySegments
     ? activitySegments[1] === "package"
       ? "dataset"
+      : activitySegments[1] === "user"
+      ? "profile"
       : activitySegments[1]
     : "entity";
 
@@ -53,7 +55,7 @@ export default (activity: DashboardNewsfeedCardProps) => {
       color = "green";
       break;
     case "changed":
-      actionText = "updated the ";
+      actionText = `updated the `;
       color = "purple";
       break;
     case "deleted":
@@ -88,6 +90,8 @@ export default (activity: DashboardNewsfeedCardProps) => {
   } else if (typeof activity?.user_data === "string") {
     actor = activity?.user_data;
   }
+  if (activityTarget === "profile" && activityType === "changed")
+    actor = "Your";
   let linkHref = "";
   let linkTitle: string | undefined = "";
   switch (activityTarget) {
@@ -127,7 +131,10 @@ export default (activity: DashboardNewsfeedCardProps) => {
       }
       break;
   }
-  const fullText = `${actionText} ${activityTarget}`;
+  const fullText =
+    activityTarget === "profile" && activityType === "changed"
+      ? "profile was updated"
+      : `${actionText} ${activityTarget}`;
 
   if (activityType == "deleted") {
     //  Unset href if entity was deleted

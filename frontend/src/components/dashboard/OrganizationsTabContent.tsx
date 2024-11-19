@@ -94,7 +94,7 @@ export default ({
               ))
             ) : (
               <div className="flex h-[80px] items-center justify-center">
-                <p className="text-center">No Organizations found</p>
+                <p className="text-center">No Organisations found</p>
               </div>
             )}
           </section>

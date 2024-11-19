@@ -25,7 +25,7 @@ jobs:
 
       - name: Run GFEI ingestion
         env:
-          ENV_VAR_1: ${{ secrets.API_KEY }}
-          ENV_VAR_2: ${{ secrets.CKAN_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
+          CKAN_URL: ${{ secrets.CKAN_URL }}
         run: |
           python src/ckanext-tdc/ckanext/tdc/data-ingestion/data_ingestion_gfei.py

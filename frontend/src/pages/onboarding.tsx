@@ -133,7 +133,7 @@ export default function OnboardingPage({
           name: loc.display_name,
           selected: false,
         }))
-      : [],
+      : []
   );
 
   const [organizations, setOrganizations] = useState(
@@ -143,7 +143,7 @@ export default function OnboardingPage({
           name: org.display_name,
           selected: false,
         }))
-      : [],
+      : []
   );
 
   const [topics, setTopics] = useState(
@@ -153,7 +153,7 @@ export default function OnboardingPage({
           name: topic.display_name,
           selected: false,
         }))
-      : [],
+      : []
   );
 
   const [stepNumber, setStep] = useState(0);
@@ -164,10 +164,10 @@ export default function OnboardingPage({
   ];
 
   const [paragraphText, setParagraphText] = useState<string | ReactNode>(
-    "The changes appear as a running list on your dashboard.",
+    "The changes appear as a running list on your dashboard."
   );
   const [subtitleText, setSubtitleText] = useState(
-    "Track the changes being made to the data you are interested in.",
+    "Track the changes being made to the data you are interested in."
   );
 
   const inviteFriends = watch("newUsersEmailsToInvite");
@@ -189,7 +189,7 @@ export default function OnboardingPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "geography" &&
-                followee.dict.id === loc.id,
+                followee.dict.id === loc.id
             ),
           }))
         : [];
@@ -199,7 +199,7 @@ export default function OnboardingPage({
             name: org.display_name,
             selected: userFollowee.some(
               (followee: any) =>
-                followee.type === "organization" && followee.dict.id === org.id,
+                followee.type === "organization" && followee.dict.id === org.id
             ),
           }))
         : [];
@@ -211,7 +211,7 @@ export default function OnboardingPage({
               (followee: any) =>
                 followee.type === "group" &&
                 followee.dict.type === "topic" &&
-                followee.dict.id === topic.id,
+                followee.dict.id === topic.id
             ),
           }))
         : [];
@@ -246,7 +246,7 @@ export default function OnboardingPage({
           >
             Reach out
           </Button>
-        </>,
+        </>
       );
       if (watch("isNewOrganizationSelected")) {
         setDisableButton(
@@ -254,7 +254,7 @@ export default function OnboardingPage({
             watch("newOrganizationName") &&
             watch("newOrganizationDescription") &&
             watch("confirmThatItParticipatesOfTheOrg")
-          ),
+          )
         );
       } else {
         if (!userOrg || watch("orgInWhichItParticipates.id") != userOrg?.id) {
@@ -263,7 +263,7 @@ export default function OnboardingPage({
               watch("orgInWhichItParticipates") &&
               watch("messageToParticipateOfTheOrg") &&
               watch("confirmThatItParticipatesOfTheOrg")
-            ),
+            )
           );
         } else {
           setDisableButton(false);
@@ -272,9 +272,9 @@ export default function OnboardingPage({
     } else if (stepNumber === 2) {
       setSubtitleText("Invite your friends and colleagues");
       setParagraphText(
-        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future.",
+        "Invite your colleagues to collaborate on sustainable transportation solutions. Together, you can share and analyse transport-related data, identify trends, and develop evidence-based policies that promote a more sustainable future."
       );
-      setDisableButton(isMessageEmpty || isUserEmpty);
+      setDisableButton(isUserEmpty);
     } else {
       setDisableButton(false);
     }
@@ -467,8 +467,8 @@ export default function OnboardingPage({
               {stepNumber === 0
                 ? "You can always do this later."
                 : stepNumber === 1
-                  ? "Don’t want to share data?"
-                  : "Don’t want to submit form?"}{" "}
+                ? "Don’t want to share data?"
+                : "Don’t want to submit form?"}{" "}
               <span
                 onClick={() => skipStep()}
                 className="cursor-pointer text-[#00ACC1] hover:text-[#008E9D]"

@@ -21,8 +21,6 @@ export default ({
     ? messageVal.length > 0 && messageVal !== "<p></p>"
     : false;
 
-  const isMessageRequired = usersToInvite ? usersToInvite.length > 0 : false;
-
   const isUserEmpty = usersToInvite ? !(usersToInvite.length > 0) : true;
 
   return (
@@ -86,9 +84,7 @@ export default ({
             }))}
           />
         </div>
-        <TextDivisor
-          text={`Attach a message ${isMessageRequired ? "*" : ""}`}
-        />
+        <TextDivisor text={`Attach a message`} />
         <TextEditor
           placeholder="Message for friends and colleagues..."
           setText={(text) => form.setValue("messageToInviteNewUsers", text)}
