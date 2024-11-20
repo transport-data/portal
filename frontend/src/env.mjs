@@ -41,7 +41,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP: z.boolean().default(false),
+    NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP: z.coerce.boolean(),
     NEXT_PUBLIC_R2_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_CKAN_URL: z.string().url(),
     NEXT_PUBLIC_PUBLIC_PORTAL_URL: z.string().url().optional(),
