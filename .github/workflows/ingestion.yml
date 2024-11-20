@@ -2,7 +2,7 @@ name: Daily Scraping Job
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # This cron expression runs the workflow at midnight UTC every day
+    - cron: '0 0 1 1 0'  # This cron expression runs the workflow at midnight UTC every year 1st January
   workflow_dispatch:  # This allows manual trigger
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'  # Change to your preferred Python version
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
@@ -29,3 +29,17 @@ jobs:
           CKAN_URL: ${{ secrets.CKAN_URL }}
         run: |
           python src/ckanext-tdc/ckanext/tdc/data-ingestion/data_ingestion_gfei.py
+
+      - name: Run EUROSTAT ingestion
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          CKAN_URL: ${{ secrets.CKAN_URL }}
+        run: |
+          python src/ckanext-tdc/ckanext/tdc/data-ingestion/data_ingestion_eurostat.py
+
+      - name: Run JRC ingestion
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          CKAN_URL: ${{ secrets.CKAN_URL }}
+        run: |
+          python src/ckanext-tdc/ckanext/tdc/data-ingestion/data_ingestion_jrc.py

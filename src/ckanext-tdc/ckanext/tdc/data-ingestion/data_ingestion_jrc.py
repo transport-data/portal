@@ -4,10 +4,10 @@ import requests
 import json
 from urllib.parse import urljoin
 import os
+from dotenv import load_dotenv
 import zipfile
 from datetime import datetime
-            
-# CKAN Configuration
+
 CKAN_URL = os.getenv('CKAN_URL')
 API_KEY = os.getenv('API_KEY')
 

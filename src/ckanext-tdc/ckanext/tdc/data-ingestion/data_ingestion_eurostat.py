@@ -6,79 +6,132 @@ import requests
 import zipfile
 from tqdm import tqdm
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 from urllib.parse import urljoin
-
-
+           
 # CKAN Configuration
-CKAN_URL = os.getenv("CKAN_URL")
-API_KEY = os.getenv("API_KEY")
+CKAN_URL = os.getenv('CKAN_URL')
+API_KEY = os.getenv('API_KEY')
 
 def convert_tsv_to_csv(input_file):
-    """Converts a TSV file to CSV."""
-    with open(input_file, "r") as infile, open(input_file.replace(".tsv", ".csv"), "w") as outfile:
-        outfile.write(infile.read().replace("\t", ","))
-    return input_file.replace(".tsv", ".csv")
+# Read the content of the input file
+    with open(input_file, 'r') as infile:
+        content = infile.read()
+
+# Replace tabs with commas
+    content = content.replace('\t', ',')
+    output_file = input_file.replace('.tsv', '.csv')
+    with open(output_file, 'w') as outfile:
+        outfile.write(content)
+    return output_file
 
 def get_all_datasets():
-    """Loads datasets from a JSON file."""
-    with open("metadata_eurostat.json") as f:
-        return json.load(f)
+    # get json from datasets.json
+    with open('src/ckanext-tdc/ckanext/tdc/data-ingestion/metadata_eurostat.json') as f:
+        datasets = json.load(f)
+        return datasets
 
 def dataset_exists(id):
-    """Checks if a dataset exists on CKAN."""
-    url = f"{CKAN_URL}/api/3/action/package_show?id={id}"
-    return requests.get(url).json()["success"]
+    url = f'{CKAN_URL}/api/3/action/package_show?id={id}'
+    response = requests.get(url)
+    return response.json()['success']
 
 def create_dataset_copy(dataset):
-    """Creates a copy of a dataset on CKAN if it doesn't exist."""
-    if dataset_exists(dataset["name"]):
+    if dataset_exists(dataset['name']):
         print(f"Dataset already exists: {dataset['name']}")
-        return dataset["name"]
-    dataset["name"] = re.sub(r"[^a-zA-Z0-9-]", "", dataset["title"].lower().replace(" ", "-"))
-    response = requests.post(
-        f"{CKAN_URL}/api/3/action/package_create",
-        headers={"Authorization": API_KEY},
-        json=dataset
-    )
-    return response.json()["result"]["id"]
+        return dataset['name']
+    else: 
+        dataset_metadata = {
+            'title': dataset['title'],
+            'name': dataset['title'].lower().replace(' - ', '-').replace(' ', '-').replace(',','').replace('(','').replace(')','').replace('/',''),
+            'notes': " ",
+            'license_id': dataset['license_id'],
+            'owner_org': 'eurostat',
+            'temporal_coverage_start': dataset['temporal_coverage_start'],
+            'temporal_coverage_end': dataset['temporal_coverage_end'],
+            'geographies': ['eur'],
+            'tdc_category': dataset['tdc_category'],
+            'sources': dataset['sources'],
+            'language': dataset['language'],
+            'sectors': dataset['sectors'],
+            'modes': dataset['modes'],
+            'services': dataset['services'],
+            'frequency': dataset['frequency'],
+            'indicators':dataset['indicators'],
+            'data_provider': dataset['data_provider'],
+            'url': dataset['url'],
+            'data_access': dataset['data_access'],
+            'units': dataset['units'],
+            'dimensioning': dataset['dimensioning'],
+        }
+        dataset = requests.post(f'{CKAN_URL}/api/3/action/package_create', headers={'Authorization': API_KEY}, json=dataset_metadata)
+        __import__('pprint').pprint(dataset)
+        return dataset.json()['result']['id']
 
 def download_resource(resource, dataset_id):
-    """Downloads a resource file with progress bar and saves it."""
-    response = requests.get(resource["url"], stream=True)
-    file_extension = os.path.splitext(re.findall(r'filename="(.+)"', response.headers.get("Content-Disposition", ""))[0] or "")[1]
-    full_path = f"{resource['name']}{file_extension}"
+    download_url = resource['url']
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_str = today_str.replace('-', '_')
+    resource_data = {
+        'name': resource['name'] + ' ' + today_str,
+        'description': resource['description'],
+        'format': resource['format'],
+        'package_id': dataset_id,
+        'resource_type': 'data'
+    }
+    print(f"Downloading from {download_url}")
+    response = requests.get(download_url, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
+    content_disposition = response.headers.get('Content-Disposition')
+    if content_disposition:
+        filename = re.findall('filename="(.+)"', content_disposition)
+        if filename:
+            file_extension = os.path.splitext(filename[0])[1]
+        else:
+            file_extension = ''
+    else:
+        file_extension = ''
+    
+    # Save the file with the correct extension
+    full_path = resource['name'] + file_extension
+    full_path = resource['name'] + file_extension
+    if os.path.exists(full_path):
+        print(f"File already exists: {full_path}")
+        return resource_data, full_path
+    with open(full_path, 'wb') as f, tqdm(
+        desc=full_path,
+        total=total_size,
+        unit='B',
+        unit_scale=True,
+        unit_divisor=1024,
+    ) as bar:
+        for data in response.iter_content(chunk_size=1024):
+            f.write(data)
+            bar.update(len(data))
+    return resource_data, full_path
+    
 
-    if not os.path.exists(full_path):
-        with open(full_path, "wb") as f, tqdm(total=int(response.headers.get("content-length", 0)), unit="B", unit_scale=True) as bar:
-            for chunk in response.iter_content(chunk_size=1024):
-                f.write(chunk)
-                bar.update(len(chunk))
-    return {"name": resource["name"], "package_id": dataset_id, "format": resource["format"]}, full_path
-
-def upload_resource(resource, resource_path):
-    """Uploads a file to CKAN."""
-    with open(resource_path, "rb") as file:
-        response = requests.post(
-            f"{CKAN_URL}/api/3/action/resource_create",
-            headers={"Authorization": API_KEY},
-            data=resource,
-            files={"upload": file}
-        )
-        print("Resource created:", response.json())
-
-def datasets_publish():
-    """Processes all datasets concurrently for download and upload to CKAN."""
+def dataset_publish():
     datasets = get_all_datasets()
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        futures = [
-            executor.submit(download_resource, resource, create_dataset_copy(dataset))
-            for dataset in datasets for resource in dataset["resources"]
-        ]
-        for future in futures:
-            resource, path = future.result()
-            csv_path = convert_tsv_to_csv(path)
-            upload_resource(resource, csv_path)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        futures = []
+        for pk in datasets:
+            dataset = create_dataset_copy(pk)
+            for resource in pk['resources']:
+                futures.append(executor.submit(download_resource, resource, dataset)) 
+        for future in concurrent.futures.as_completed(futures):
+            resource, resource_path = future.result()
+            print('Creating resource:', resource['name'])
+            resource_path = convert_tsv_to_csv(resource_path)
+            with open(resource_path, 'rb') as file:
+                files = {
+                    'upload': file,
+                }
+                headers = {
+                    'Authorization': API_KEY,
+                }
+                resp = requests.post(f'{CKAN_URL}/api/3/action/resource_create', headers=headers, data=resource, files=files)
+                print('Resource created successfully:', resp.json())
 
 if __name__ == '__main__':
-    datasets_publish()
+    dataset_publish()
