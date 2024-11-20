@@ -10,6 +10,8 @@ import { useEffect } from "react";
 import { Group } from "@schema/group.schema";
 import Link from "next/link";
 import Layout from "../components/_shared/Layout";
+import { env } from "@env.mjs";
+import { cn } from "@lib/utils";
 
 export async function getStaticProps() {
   const countriesByLetterObj: any = {};
@@ -17,7 +19,7 @@ export async function getStaticProps() {
   const groups = (
     await listGroups({
       type: "geography",
-      showCoordinates: true,
+      showCoordinates: env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP,
       limit: 350,
     })
   ).filter((country) => {
@@ -50,190 +52,191 @@ export default function DatasetsPage({
   groups,
   countriesByLetterObj,
 }: InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
-  const countriesFlagsByName = new Map<string, string>();
   const router = useRouter();
 
   useEffect(() => {
-    const getCountryFlag = (country: (typeof groups)[0]) => {
-      const cachedImage = flagsCache.get(country.iso2);
+    if (env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP) {
+      const getCountryFlag = (country: (typeof groups)[0]) => {
+        const cachedImage = flagsCache.get(country.iso2);
 
-      if (cachedImage && !cachedImage.isLoading) {
-        return cachedImage;
-      }
-
-      flagsCache.set(country.iso2, {
-        isLoading: true,
-        url: "",
-      });
-
-      fetch(
-        // Using the flagscdn because it responds faster than S3
-        `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
-        // country.image_display_url,
-      ).then(async (r) => {
-        const blob = await r.blob();
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          flagsCache.set(country.iso2, {
-            isLoading: false,
-            url: reader.result as string,
-          });
-          const imgEl: any = document.getElementById(
-            `country-popup-flag-${country.iso2}`
-          );
-          if (imgEl) {
-            imgEl.src = reader.result;
-          }
-        };
-        reader.readAsDataURL(blob);
-      });
-    };
-
-    const map = new maplibregl.Map({
-      style: style,
-      container: "map",
-      attributionControl: false,
-      interactive: window.innerWidth < 787,
-      renderWorldCopies: false,
-      scrollZoom: false,
-      maxZoom: window.innerWidth < 787 ? 0.6 : null,
-    });
-
-    map.on("load", () => {
-      const popup = new maplibregl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        className: "customized-tooltip",
-      });
-
-      let maxOfDatasets = 0;
-
-      groups.forEach((x) => {
-        if (maxOfDatasets < x.package_count) maxOfDatasets = x.package_count;
-      });
-
-      const getFillColor = (packageCount: number) => {
-        if (packageCount === 0) return "#D1D5DB";
-
-        const colors = interpolateColors(
-          hexToRgb("#B2EBF2"),
-          hexToRgb("#006064"),
-          10
-        );
-
-        let index = 0;
-        const percentage = `${(packageCount / maxOfDatasets) * 100}`;
-
-        if (/\d/g.test(percentage[1]!)) {
-          index = Number(percentage[0]!);
+        if (cachedImage && !cachedImage.isLoading) {
+          return cachedImage;
         }
 
-        if (/\d\d\d/g.test(percentage.slice(0, 3)!)) {
-          index = colors.length - 1;
-        }
+        flagsCache.set(country.iso2, {
+          isLoading: true,
+          url: "",
+        });
 
-        return colors[index];
+        fetch(
+          // Using the flagscdn because it responds faster than S3
+          `https://flagcdn.com/h60/${country.iso2.toLowerCase()}.png`
+          // country.image_display_url,
+        ).then(async (r) => {
+          const blob = await r.blob();
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            flagsCache.set(country.iso2, {
+              isLoading: false,
+              url: reader.result as string,
+            });
+            const imgEl: any = document.getElementById(
+              `country-popup-flag-${country.iso2}`
+            );
+            if (imgEl) {
+              imgEl.src = reader.result;
+            }
+          };
+          reader.readAsDataURL(blob);
+        });
       };
 
-      map.addSource("countriesWithDashedLines", {
-        type: "geojson",
-        data: countriesWithDashedLines as any,
+      const map = new maplibregl.Map({
+        style: style,
+        container: "map",
+        attributionControl: false,
+        interactive: window.innerWidth < 787,
+        renderWorldCopies: false,
+        scrollZoom: false,
+        maxZoom: window.innerWidth < 787 ? 0.6 : null,
       });
 
-      groups.forEach((x, index) => {
-        if (x.geography_shape) {
-          const lineLayerId = x.id + `--${index}`;
-          const fillColor = getFillColor(x.package_count);
-          map.addSource(x.id, {
-            type: "geojson",
-            data: x.geography_shape,
-          });
+      map.on("load", () => {
+        const popup = new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          className: "customized-tooltip",
+        });
 
-          map.addLayer({
-            id: x.id,
-            type: "fill",
-            source: x.id,
-            paint: {
-              "fill-color": fillColor,
-              "fill-outline-color": "white",
-            },
-          });
+        let maxOfDatasets = 0;
 
-          map.addLayer({
-            id: lineLayerId,
-            type: "line",
-            source: x.id,
-            paint: {
-              "line-width": 2,
-              "line-color": "white",
-            },
-          });
+        groups.forEach((x) => {
+          if (maxOfDatasets < x.package_count) maxOfDatasets = x.package_count;
+        });
 
-          map.on("click", x.id, () => {
-            router.push(`/search?country=${x.name.toLowerCase()}`);
-          });
+        const getFillColor = (packageCount: number) => {
+          if (packageCount === 0) return "#D1D5DB";
 
-          map.on("mouseenter", x.id, () => {
-            map.getCanvas().style.cursor = "pointer";
-          });
+          const colors = interpolateColors(
+            hexToRgb("#B2EBF2"),
+            hexToRgb("#006064"),
+            10
+          );
 
-          map.on("mousemove", x.id, (e) => {
-            if (popup._container) {
-              popup._container.style.minWidth = "194px";
-              popup._container.style.cursor = "pointer";
-              popup._container.style.width = "194px";
-              popup._container.style.height = "171px";
-              popup._container.style.minHeight = "171px";
-            }
+          let index = 0;
+          const percentage = `${(packageCount / maxOfDatasets) * 100}`;
 
-            popup
-              .setLngLat(e.lngLat)
-              .setHTML(
-                `
-              <div>
-              <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" id="country-popup-flag-${
-                x.iso2
-              }" src="${
-                  getCountryFlag(x)?.url ?? "/assets/loading.webp"
-                }"></img>
+          if (/\d/g.test(percentage[1]!)) {
+            index = Number(percentage[0]!);
+          }
 
-              <div class="country-title" style="color: white'; font-size: 14px">${
-                x.title
+          if (/\d\d\d/g.test(percentage.slice(0, 3)!)) {
+            index = colors.length - 1;
+          }
+
+          return colors[index];
+        };
+
+        map.addSource("countriesWithDashedLines", {
+          type: "geojson",
+          data: countriesWithDashedLines as any,
+        });
+
+        groups.forEach((x, index) => {
+          if (x.geography_shape) {
+            const lineLayerId = x.id + `--${index}`;
+            const fillColor = getFillColor(x.package_count);
+            map.addSource(x.id, {
+              type: "geojson",
+              data: x.geography_shape,
+            });
+
+            map.addLayer({
+              id: x.id,
+              type: "fill",
+              source: x.id,
+              paint: {
+                "fill-color": fillColor,
+                "fill-outline-color": "white",
+              },
+            });
+
+            map.addLayer({
+              id: lineLayerId,
+              type: "line",
+              source: x.id,
+              paint: {
+                "line-width": 2,
+                "line-color": "white",
+              },
+            });
+
+            map.on("click", x.id, () => {
+              router.push(`/search?country=${x.name.toLowerCase()}`);
+            });
+
+            map.on("mouseenter", x.id, () => {
+              map.getCanvas().style.cursor = "pointer";
+            });
+
+            map.on("mousemove", x.id, (e) => {
+              if (popup._container) {
+                popup._container.style.minWidth = "194px";
+                popup._container.style.cursor = "pointer";
+                popup._container.style.width = "194px";
+                popup._container.style.height = "171px";
+                popup._container.style.minHeight = "171px";
               }
-              </div>
-              <div style="color: #9CA3AF">${x.iso2.toUpperCase()}</div>
 
+              popup
+                .setLngLat(e.lngLat)
+                .setHTML(
+                  `
+                <div>
+                <img style="object-fit: cover; width: 40px; height: 40px; border-radius: 9999px;" id="country-popup-flag-${
+                  x.iso2
+                }" src="${
+                    getCountryFlag(x)?.url ?? "/assets/loading.webp"
+                  }"></img>
+  
+                <div class="country-title" style="color: white'; font-size: 14px">${
+                  x.title
+                }
                 </div>
+                <div style="color: #9CA3AF">${x.iso2.toUpperCase()}</div>
+  
+                  </div>
+  
+                  <div style="color: white; font-size: 30px">${formatNumber(
+                    x.package_count
+                  )}</div>
+                  <div style="color: #9CA3AF; font-size: 16px">${
+                    x.package_count > 1 ? "Datasets" : "Dataset"
+                  }</div>
+                `
+                )
+                .addTo(map);
+            });
 
-                <div style="color: white; font-size: 30px">${formatNumber(
-                  x.package_count
-                )}</div>
-                <div style="color: #9CA3AF; font-size: 16px">${
-                  x.package_count > 1 ? "Datasets" : "Dataset"
-                }</div>
-              `
-              )
-              .addTo(map);
-          });
+            map.on("mouseleave", x.id, () => {
+              map.getCanvas().style.cursor = "";
+              popup.remove();
+            });
+          }
+        });
 
-          map.on("mouseleave", x.id, () => {
-            map.getCanvas().style.cursor = "";
-            popup.remove();
-          });
-        }
+        map.addLayer({
+          id: "countriesWithDashedLines",
+          source: "countriesWithDashedLines",
+          type: "line",
+          paint: {
+            "line-width": 1.8,
+            "line-color": "#dedede",
+            "line-dasharray": [0.7, 0.5], // [dash length, gap length]
+          },
+        });
       });
-
-      map.addLayer({
-        id: "countriesWithDashedLines",
-        source: "countriesWithDashedLines",
-        type: "line",
-        paint: {
-          "line-width": 1.8,
-          "line-color": "#dedede",
-          "line-dasharray": [0.7, 0.5], // [dash length, gap length]
-        },
-      });
-    });
+    }
   }, []);
 
   return (
@@ -254,51 +257,58 @@ export default function DatasetsPage({
                 Datasets by country & geography
               </h5>
             </div>
-            <div
-              className="flex max-h-[523px] min-h-[523px] sm:max-h-[823px] sm:min-h-[823px]"
-              id="map"
-            >
-              <div className="customized-scroll absolute top-[650px] z-10 max-h-[157px] max-w-60 overflow-y-scroll rounded border-black bg-transparent p-2">
-                <p>
-                  <span className="font-bold">Terms of use</span>
+            {env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP && (
+              <div
+                className="flex max-h-[523px] min-h-[523px] sm:max-h-[823px] sm:min-h-[823px]"
+                id="map"
+              >
+                <div className="customized-scroll absolute top-[650px] z-10 max-h-[157px] max-w-60 overflow-y-scroll rounded border-black bg-transparent p-2">
+                  <p>
+                    <span className="font-bold">Terms of use</span>
+                    <br />
+                    <br />
+                    The designations employed and the presentation of material
+                    on this map do not imply the expression of any opinion
+                    whatsoever on the part of the Secretariat of the United
+                    Nations concerning the legal status of any country,
+                    territory, city or area or of its authorities, or concerning
+                    the delimitation of its frontiers or boundaries. (long form)
+                    <br />
+                    <br />
+                    Final boundary between the Republic of Sudan and the
+                    Republic of South Sudan has not yet been determined.
+                    <br />
+                    <br />
+                    Dotted line represents approximately the Line of Control in
+                    Jammu and Kashmir agreed upon by India and Pakistan. The
+                    final status of Jammu and Kashmir has not yet been agreed
+                    upon by the parties.
+                    <br />
+                    <br />A dispute exists between the Governments of Argentina
+                    and the United Kingdom of Great Britain and Northern Ireland
+                    concerning sovereignty over the Falkland Islands (Malvinas).
+                  </p>
+                  <br />
+                  <ul style={{ listStyleType: "disc" }} className="pl-7">
+                    <li>Non-Self-Governing-Territories</li>
+                  </ul>
                   <br />
                   <br />
-                  The designations employed and the presentation of material on
-                  this map do not imply the expression of any opinion whatsoever
-                  on the part of the Secretariat of the United Nations
-                  concerning the legal status of any country, territory, city or
-                  area or of its authorities, or concerning the delimitation of
-                  its frontiers or boundaries. (long form)
+                  <span className="font-bold">Credits</span>
                   <br />
                   <br />
-                  Final boundary between the Republic of Sudan and the Republic
-                  of South Sudan has not yet been determined.
-                  <br />
-                  <br />
-                  Dotted line represents approximately the Line of Control in
-                  Jammu and Kashmir agreed upon by India and Pakistan. The final
-                  status of Jammu and Kashmir has not yet been agreed upon by
-                  the parties.
-                  <br />
-                  <br />A dispute exists between the Governments of Argentina
-                  and the United Kingdom of Great Britain and Northern Ireland
-                  concerning sovereignty over the Falkland Islands (Malvinas).
-                </p>
-                <br />
-                <ul style={{ listStyleType: "disc" }} className="pl-7">
-                  <li>Non-Self-Governing-Territories</li>
-                </ul>
-                <br />
-                <br />
-                <span className="font-bold">Credits</span>
-                <br />
-                <br />
-                United Nations Geospatial
+                  United Nations Geospatial
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="flex flex-wrap items-center justify-center">
-            <div className="mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 pt-20 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2873px]">
+            <div
+              className={cn(
+                "mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2873px]",
+                env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP ? "pt-20" : "pt-4"
+              )}
+            >
               {Object.keys(countriesByLetterObj).map((letter) => (
                 <LetterCard
                   letter={letter}

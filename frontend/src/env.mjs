@@ -41,6 +41,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP: z.boolean().default(false),
     NEXT_PUBLIC_R2_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_CKAN_URL: z.string().url(),
     NEXT_PUBLIC_PUBLIC_PORTAL_URL: z.string().url().optional(),
@@ -60,6 +61,7 @@ export const env = createEnv({
     R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
     R2_SECRET_KEY_ID: process.env.R2_SECRET_KEY_ID,
     SYS_ADMIN_API_KEY: process.env.SYS_ADMIN_API_KEY,
+    NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP: process.env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP,
     NEXT_PUBLIC_R2_PUBLIC_URL: process.env.NEXT_PUBLIC_R2_PUBLIC_URL,
     NEXT_PUBLIC_CKAN_URL: process.env.NEXT_PUBLIC_CKAN_URL,
     NEXT_PUBLIC_PUBLIC_PORTAL_URL: process.env.NEXT_PUBLIC_PUBLIC_PORTAL_URL,
