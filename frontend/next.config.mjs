@@ -8,6 +8,8 @@ await import("./src/env.mjs");
 const config = {
   images: {
     unoptimized: true,
+    loader: 'custom',
+    loaderFile: './image-loader.js',
     domains: ["portal.transport-data.org", "ckan.tdc.dev.datopian.com", "ckan.tdc.prod.datopian.com"],
   },
   reactStrictMode: true,
