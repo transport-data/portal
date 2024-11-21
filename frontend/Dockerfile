@@ -5,6 +5,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 RUN npm ci -f
+RUN npm i sharp
 
 FROM --platform=linux/amd64 node:16-alpine3.17 AS builder
 
