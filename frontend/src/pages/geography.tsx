@@ -19,7 +19,7 @@ export async function getStaticProps() {
   const groups = (
     await listGroups({
       type: "geography",
-      showCoordinates: env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP,
+      showCoordinates: !!env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP,
       limit: 350,
     })
   ).filter((country) => {
@@ -55,7 +55,7 @@ export default function DatasetsPage({
   const router = useRouter();
 
   useEffect(() => {
-    if (env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP) {
+    if (!!env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP) {
       const getCountryFlag = (country: (typeof groups)[0]) => {
         const cachedImage = flagsCache.get(country.iso2);
 
@@ -257,7 +257,7 @@ export default function DatasetsPage({
                 Datasets by country & geography
               </h5>
             </div>
-            {env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP && (
+            {!!env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP && (
               <div
                 className="flex max-h-[523px] min-h-[523px] sm:max-h-[823px] sm:min-h-[823px]"
                 id="map"
@@ -306,7 +306,7 @@ export default function DatasetsPage({
             <div
               className={cn(
                 "mb-24 flex max-w-[1280px] flex-col flex-wrap gap-4 sm:max-h-[6273px] md:max-h-[4573px] lg:max-h-[3473px] xl:max-h-[2873px]",
-                env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP ? "pt-20" : "pt-4"
+                !!env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP ? "pt-20" : "pt-4"
               )}
             >
               {Object.keys(countriesByLetterObj).map((letter) => (
