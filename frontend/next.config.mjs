@@ -7,7 +7,7 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   images: {
-    domains: ["ckan.tdc.dev.datopian.com"],
+    domains: ["ckan.tdc.dev.datopian.com", "ckan.tdc.prod.datopian.com"],
   },
   reactStrictMode: true,
   output: "standalone",
