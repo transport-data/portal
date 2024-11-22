@@ -1007,3 +1007,25 @@ def github_user_invite(context, data_dict):
         raise ValidationError(message)
 
     return model_dictize.user_dictize(user, context)
+
+def resource_upsert_many(context, data_dict):
+    """
+    Patches multiple resources at once, also deletes any resources which are not in the list
+    """
+    _resources = data_dict.get("resources")
+    dataset_id = data_dict.get("dataset_id")
+    dataset_resources = get_action("package_show")(context, {"id": dataset_id}).get('resources', [])
+    def _exists(resource, resource_list):
+        for item in resource_list:
+            if resource.get('id', None) == item['id']:
+                return True
+        return False
+    def upsert(resource):
+        exists = _exists(resource, dataset_resources)
+        if exists:
+            return get_action("resource_patch")(context, resource)
+        else:
+            return get_action("resource_create")(context, {**resource, **{"package_id": dataset_id}})
+    resources_to_update_or_create = [upsert(resource) for resource in _resources]
+    [get_action("resource_delete")(context, {"id": resource['id']}) for resource in dataset_resources if not _exists(resource, _resources)]
+    return resources_to_update_or_create
