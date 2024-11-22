@@ -37,7 +37,7 @@ COPY . .
 
 RUN SKIP_ENV_VALIDATION=1 npm run build
 
-FROM --platform=linux/amd64 node:20-alpine AS builder
+FROM --platform=linux/amd64 node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
