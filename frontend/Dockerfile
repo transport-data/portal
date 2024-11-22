@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:16-alpine3.17 AS deps
+FROM --platform=linux/amd64 node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl1.1-compat
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci -f
 RUN npm i sharp
 
-FROM --platform=linux/amd64 node:16-alpine3.17 AS builder
+FROM --platform=linux/amd64 node:20-alpine AS builder
 
 ARG R2_ACCESS_KEY_ID
 ARG R2_ACCOUNT_ID
@@ -36,7 +36,7 @@ COPY . .
 
 RUN SKIP_ENV_VALIDATION=1 npm run build
 
-FROM --platform=linux/amd64 node:16-alpine3.17 AS runner
+FROM --platform=linux/amd64 node:20-alpine AS builder
 WORKDIR /app
 
 ENV NODE_ENV production
