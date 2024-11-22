@@ -410,19 +410,17 @@ export const patchDataset = async ({
       json: datasetBody,
     }
   );
-  if (dataset.result) {
-    const _resources = await CkanRequest.post<CkanResponse<Resource[]>>(
-      "resource_upsert_many",
-      {
-        apiKey: apiKey,
-        json: {
-          resources,
-          dataset_id: dataset.result.id,
-        },
-      }
-    );
-    return { ...dataset.result, resources: _resources.result };
-  }
+  const _resources = await CkanRequest.post<CkanResponse<Resource[]>>(
+    "resource_upsert_many",
+    {
+      apiKey: apiKey,
+      json: {
+        resources,
+        dataset_id: dataset.result.id,
+      },
+    }
+  );
+  return { ...dataset.result, resources: _resources.result };
 };
 
 export const deleteDatasets = async ({
