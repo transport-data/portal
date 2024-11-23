@@ -8,19 +8,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { FormLabel } from "@components/ui/form";
 import { Label } from "@components/ui/label";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 
 export function DatasetPreview({ dataset }: { dataset: Dataset }) {
-  const resources = dataset.resources.filter((r) => !!r.datastore_active);
+  const resources = dataset.resources.filter(
+    (r) => !!r.datastore_active && !r.hide_preview,
+  );
   const [currentResource, setCurrentResource] = useState(
-    resources[0]?.id ?? ""
+    resources[0]?.id ?? "",
   );
   if (dataset.tdc_category === "tdc_harmonized") {
     return (
-      <div className="min-h-[500px] hard-gradient-gray-to-white flex flex-col">
-        <div className="h-full grow flex flex-col">
+      <div className="hard-gradient-gray-to-white flex min-h-[500px] flex-col">
+        <div className="flex h-full grow flex-col">
           {currentResource && <PivotTable resourceId={currentResource} />}
         </div>
       </div>

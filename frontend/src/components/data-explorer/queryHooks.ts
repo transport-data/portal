@@ -2,13 +2,12 @@ import {
   ColumnSort,
   PaginationState,
   ColumnFilter,
-  Updater,
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { DataExplorerColumnFilter } from "./DataExplorer";
 import { CkanResponse } from "./ckan.interface";
-import getConfig from "next/config";
 import { env } from "@env.mjs";
+import { useSession } from "next-auth/react";
 
 export interface FieldsResponse {
   tableName: string;
@@ -21,17 +20,23 @@ export type DataResponse = CkanResponse<{
   fields: Array<Record<string, any>>;
 }>;
 
-const ckanUrl = env.NEXT_PUBLIC_CKAN_URL
+const ckanUrl = env.NEXT_PUBLIC_CKAN_URL;
 
 export function useFields(resourceId: string) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["fields", resourceId],
     queryFn: async () => {
-      const fieldsRes = await fetch(`${ckanUrl}/api/3/action/datastore_search?resource_id=${resourceId}`, {
-        headers: {
-          "Content-Type": "application/json",
+      const fieldsRes = await fetch(
+        `${ckanUrl}/api/3/action/datastore_search?resource_id=${resourceId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: apiKey,
+          },
         },
-      });
+      );
       const fields: CkanResponse<{
         fields: Array<{
           id: string;
@@ -61,6 +66,8 @@ export function useNumberOfRows({
   resourceId: string;
   filters: DataExplorerColumnFilter[];
 }) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["query", resourceId, filters],
     queryFn: async () => {
@@ -76,9 +83,9 @@ export function useNumberOfRows({
                       (v) =>
                         `"${filter.id}" ${v.operation} '${v.value}' ${
                           v.link ?? ""
-                        }`
+                        }`,
                     )
-                    .join("")})`
+                    .join("")})`,
               )
               .join(" AND ")
           : "";
@@ -86,6 +93,7 @@ export function useNumberOfRows({
       const numRowsRes = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: apiKey,
         },
       });
       const numRows: DataResponse = await numRowsRes.json();
@@ -124,10 +132,12 @@ export function useTableData({
   filters: ColumnFilter[];
   columnsType: string;
 }) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["query", resourceId, pagination, columns, sorting, filters],
     queryFn: async () => {
-      console.log('FILTERS', filters)
+      console.log("FILTERS", filters);
       const paginationSql = `LIMIT ${
         pagination.pageSize
       } OFFSET ${pagination.pageIndex * pagination.pageSize}`;
@@ -150,20 +160,21 @@ export function useTableData({
                       (v) =>
                         `"${filter.id}" ${v.operation} '${v.value}' ${
                           v.link ?? ""
-                        }`
+                        }`,
                     )
-                    .join("")})`
+                    .join("")})`,
               )
               .join(" AND ")
           : "";
-      console.log('FILTERS SQL', filtersSql)
+      console.log("FILTERS SQL", filtersSql);
       const parsedColumns = columns.map((column) => `"${column}"`);
       const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
-        " , "
+        " , ",
       )} FROM "${resourceId}" ${filtersSql} ${sortSql} ${paginationSql}`;
       const tableDataRes = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: apiKey,
         },
       });
       const tableData: DataResponse = await tableDataRes.json();

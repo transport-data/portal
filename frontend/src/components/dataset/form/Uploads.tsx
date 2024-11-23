@@ -21,6 +21,10 @@ import { api } from "@utils/api";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { P, match } from "ts-pattern";
 import { FileUploader } from "./FileUploader";
+import { EyeOffIcon } from "lucide-react";
+import { EyeIcon } from "@heroicons/react/24/outline";
+import { DefaultTooltip } from "@components/ui/tooltip";
+import { useState } from "react";
 
 function findIndex<T>(arr: T[], predicate: (item: T) => boolean): number {
   for (let i = 0; i < arr.length; i++) {
@@ -34,12 +38,10 @@ function findIndex<T>(arr: T[], predicate: (item: T) => boolean): number {
 export function UploadsForm({ disabled }: any) {
   const form = useFormContext<DatasetFormType>();
   const licenses = api.dataset.listLicenses.useQuery();
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
-      name: "resources", // unique name for your Field Array
-    }
-  );
+  const { fields, append, remove } = useFieldArray({
+    control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
+    name: "resources", // unique name for your Field Array
+  });
   const docs = fields.filter((f) => f.resource_type === "documentation");
   const files = fields.filter((f) => f.resource_type === "data");
   return (
@@ -64,7 +66,7 @@ export function UploadsForm({ disabled }: any) {
                 const resourceId = urlParts[urlParts.length - 2];
                 const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
-                  "id"
+                  "id",
                 )}/resource/${resourceId}/${fileName ?? ""}`;
                 append({
                   id: resourceId,
@@ -74,6 +76,8 @@ export function UploadsForm({ disabled }: any) {
                   resource_type: "data",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
+                  hide_preview: false,
+                  is_new: true,
                 });
               }}
             >
@@ -82,47 +86,98 @@ export function UploadsForm({ disabled }: any) {
                   role="list"
                   className="divide-y divide-gray-100 rounded-md border border-gray-200"
                 >
-                  {files.map((r, index) => (
-                    <li
-                      key={r.id}
-                      className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
-                    >
-                      <div className="flex w-0 flex-1 items-center">
-                        <img
-                          src={formatIcon(r.format?.toLowerCase() ?? "")}
-                          aria-hidden="true"
-                          className="h-8 w-8 flex-shrink-0 text-gray-400"
-                        />
-                        <div className="ml-4 flex min-w-0 flex-1 flex-col">
-                          <span className="truncate font-medium">
-                            {r.name ?? getFileName(r.url ?? "")}
-                          </span>
-                          {r.size && (
-                            <span className="flex-shrink-0 text-gray-400">
-                              {formatBytes(r.size)}
+                  {files.map((r) => {
+                    const _index = findIndex(fields, (f) => f.id === r.id);
+                    const datapusherAcceptedFormats = [
+                      "csv",
+                      "xls",
+                      "xlsx",
+                      "xlsm",
+                      "xlsb",
+                      "tsv",
+                      "tab",
+                    ];
+                    const fileFormat = (r.format ?? "").toLowerCase();
+                    const isTabular =
+                      datapusherAcceptedFormats.includes(fileFormat);
+
+                    const isNewTabular = r.is_new && isTabular;
+                    const notNewTabular = !r.is_new && !!r._datastore_active;
+                    const displayHidePreview = isNewTabular || notNewTabular;
+
+                    return (
+                      <li
+                        key={r.id}
+                        className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
+                      >
+                        <div className="flex w-0 flex-1 items-center">
+                          <img
+                            src={formatIcon(r.format?.toLowerCase() ?? "")}
+                            aria-hidden="true"
+                            className="h-8 w-8 flex-shrink-0 text-gray-400"
+                          />
+                          <div className="ml-4 flex min-w-0 flex-1 flex-col">
+                            <span className="truncate font-medium">
+                              {r.name ?? getFileName(r.url ?? "")}
                             </span>
-                          )}
+                            {r.size && (
+                              <span className="flex-shrink-0 text-gray-400">
+                                {formatBytes(r.size)}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="ml-4 flex-shrink-0">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const _index = findIndex(
-                              fields,
-                              (f) => f.id === r.id
-                            );
-                            console.log("INDEX", _index);
-                            remove(_index);
-                          }}
-                          type="button"
-                          className="font-medium text-gray-500 hover:text-accent"
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </li>
-                  ))}
+                        <div className="ml-4 flex flex-shrink-0 flex-row gap-x-5">
+                          <FormField
+                            control={form.control}
+                            name={`resources.${_index}.hide_preview`}
+                            render={({ field }) => {
+                              const tooltip = !field.value
+                                ? "Click to disable the preview of this data file on the dataset page"
+                                : "Click to enable the preview of this data file on the dataset page";
+
+                              if (!displayHidePreview) {
+                                return <></>;
+                              }
+
+                              return (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    field.onChange(!field.value);
+                                  }}
+                                  type="button"
+                                  className="font-medium text-gray-500 hover:text-accent"
+                                >
+                                  <DefaultTooltip content={tooltip}>
+                                    <div>
+                                      {!field.value && (
+                                        <EyeIcon className="h-5 w-5" />
+                                      )}
+                                      {!!field.value && (
+                                        <EyeOffIcon className="h-5 w-5" />
+                                      )}
+                                    </div>
+                                  </DefaultTooltip>
+                                </button>
+                              );
+                            }}
+                          />
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              remove(_index);
+                            }}
+                            type="button"
+                            className="font-medium text-gray-500 hover:text-accent"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </FileUploader>
@@ -143,7 +198,7 @@ export function UploadsForm({ disabled }: any) {
                 const resourceId = urlParts[urlParts.length - 2];
                 const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
-                  "id"
+                  "id",
                 )}/resource/${resourceId}/${fileName ?? ""}`;
                 append({
                   id: resourceId,
@@ -153,6 +208,7 @@ export function UploadsForm({ disabled }: any) {
                   resource_type: "documentation",
                   size: response.successful[0]?.size ?? 0,
                   format: response.successful[0]?.extension ?? "",
+                  hide_preview: false,
                 });
               }}
             >
@@ -161,7 +217,7 @@ export function UploadsForm({ disabled }: any) {
                   role="list"
                   className="divide-y divide-gray-100 rounded-md border border-gray-200"
                 >
-                  {docs.map((r, index) => (
+                  {docs.map((r) => (
                     <li
                       key={r.id}
                       className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6 transition hover:bg-gray-100"
@@ -189,13 +245,13 @@ export function UploadsForm({ disabled }: any) {
                           disabled={disabled}
                           className={cn(
                             disabled && "cursor-not-allowed",
-                            "font-medium text-gray-500 hover:text-accent"
+                            "font-medium text-gray-500 hover:text-accent",
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
                             const _index = findIndex(
                               fields,
-                              (f) => f.id === r.id
+                              (f) => f.id === r.id,
                             );
                             remove(_index);
                           }}
