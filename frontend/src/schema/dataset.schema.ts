@@ -10,6 +10,9 @@ export const ResourceSchema = z.object({
   size: z.number().optional().nullable(),
   resource_type: z.enum(["data", "documentation"]),
   url: z.string().url(),
+  hide_preview: z.boolean().default(false),
+  is_new: z.boolean().optional(), // Not stored on DB
+  _datastore_active: z.boolean().optional(), // Not stored on DB
 });
 
 export const DatasetSchemaPartial = z.object({
@@ -19,9 +22,11 @@ export const DatasetSchemaPartial = z.object({
     .min(2, { message: "Name is required to have at least 2 characters" })
     .regex(
       /^[^\(\) +]+$/,
-      "The chosen text must be URL-compatible. Please remove spaces and dots (.)"
+      "The chosen text must be URL-compatible. Please remove spaces and dots (.)",
     ),
-  title: z.string().min(2, { message: "Title is required to have at least 2 characters" }),
+  title: z
+    .string()
+    .min(2, { message: "Title is required to have at least 2 characters" }),
   notes: z.string().min(1, { message: "Description is required" }),
   overview_text: z.string().optional().nullable(),
   owner_org: z.string({ description: "Organization is required" }),
@@ -30,21 +35,21 @@ export const DatasetSchemaPartial = z.object({
   tags: z.array(
     z.object({
       name: z.string(),
-    })
+    }),
   ),
   userRepresents: z.boolean().default(false),
   sources: z.array(
     z.object({
       title: z.string(),
       url: z.string().url().optional().or(emptyStringToUndefined),
-    })
+    }),
   ),
   comments: z.array(
     z.object({
       initials: z.string(),
       comment: z.string(),
       date: z.date().default(() => new Date()),
-    })
+    }),
   ),
   language: z.string().optional(),
   frequency: z.string().optional(),
@@ -69,14 +74,14 @@ export const DatasetSchemaPartial = z.object({
     z.object({
       name: z.string(),
       title: z.string(),
-    })
+    }),
   ),
   resources: z.array(ResourceSchema),
 });
 
 export const DatasetSchema = DatasetSchemaPartial.refine(
   (data) => {
-    console.log(data.temporal_coverage_start, data.temporal_coverage_end)
+    console.log(data.temporal_coverage_start, data.temporal_coverage_end);
     if (data.temporal_coverage_start > data.temporal_coverage_end) {
       return false;
     }
@@ -85,7 +90,7 @@ export const DatasetSchema = DatasetSchemaPartial.refine(
   {
     message: "Temporal coverage start date must be before end date",
     path: ["temporal_coverage_start"],
-  }
+  },
 );
 
 export const DraftDatasetSchema = DatasetSchemaPartial.partial().extend({
@@ -101,7 +106,7 @@ export const SearchDatasetSchema = z.object({
       z.object({
         values: z.array(z.string()),
         key: z.string(),
-      })
+      }),
     )
     .optional(),
   query: z.string().nullable().optional(),

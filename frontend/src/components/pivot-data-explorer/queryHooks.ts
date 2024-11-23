@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CkanResponse } from "./ckan.interface";
 import { env } from "@env.mjs";
 import { FilterObjType } from "./search.schema";
+import { useSession } from "next-auth/react";
 
 export interface FieldsResponse {
   tableName: string;
@@ -17,6 +18,8 @@ export type DataResponse = CkanResponse<{
 const ckanUrl = env.NEXT_PUBLIC_CKAN_URL;
 
 export function useFields(resourceId: string) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["fields", resourceId],
     queryFn: async () => {
@@ -25,8 +28,9 @@ export function useFields(resourceId: string) {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: apiKey,
           },
-        }
+        },
       );
       const fields: CkanResponse<{
         fields: Array<{
@@ -66,9 +70,11 @@ export function usePossibleValues({
       type: string;
       default: string;
       count: number;
-    }[]
+    }[],
   ) => void;
 }) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["possibleValues", resourceId, column],
     onSuccess: onSuccess,
@@ -78,8 +84,9 @@ export function usePossibleValues({
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: apiKey,
           },
-        }
+        },
       );
       const fields: DataResponse = await possibleValuesRes.json();
 
@@ -114,6 +121,8 @@ export function useFootnote({
   columnType: string;
   resourceId: string;
 }) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["query", resourceId, column, row],
     queryFn: async () => {
@@ -125,6 +134,7 @@ export function useFootnote({
       const tableDataRes = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: apiKey,
         },
       });
       const tableData: DataResponse = await tableDataRes.json();
@@ -159,6 +169,8 @@ export function useTableData({
   columnsType: string;
   filters: FilterObjType;
 }) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["query", resourceId, pivotColumns, row, value, filters],
     queryFn: async () => {
@@ -172,7 +184,7 @@ export function useTableData({
               (filter) =>
                 `("${filter.column}" IN (${filter.values
                   .map((v) => `${filter.type !== "text" ? `${v}` : `'${v}'`}`)
-                  .join(",")}))`
+                  .join(",")}))`,
             )
             .join(" AND ");
       }
@@ -180,13 +192,14 @@ export function useTableData({
         .map((c) =>
           columnsType === "text"
             ? `SUM(CASE WHEN \"${column}\"  = '${c}' THEN \"${value}\" ELSE 0 END) as "${c}" `
-            : `SUM(CASE WHEN \"${column}\"  = ${c} THEN \"${value}\" ELSE 0 END) as "${c}" `
+            : `SUM(CASE WHEN \"${column}\"  = ${c} THEN \"${value}\" ELSE 0 END) as "${c}" `,
         )
         .join(", ");
       const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT \"${row}\", ${cases} FROM "${resourceId}" WHERE 1=1 ${filtersSql}  GROUP BY \"${row}\"`;
       const tableDataRes = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: apiKey,
         },
       });
       const tableData: DataResponse = await tableDataRes.json();
@@ -213,6 +226,8 @@ export function useNumberOfRows({
   enabled?: boolean;
   filters: FilterObjType;
 }) {
+  const session = useSession();
+  const apiKey = session?.data?.user?.apikey ?? "";
   return useQuery({
     queryKey: ["query", resourceId, filters],
     queryFn: async () => {
@@ -226,7 +241,7 @@ export function useNumberOfRows({
               (filter) =>
                 `("${filter.column}" IN (${filter.values
                   .map((v) => `${filter.type !== "text" ? `${v}` : `'${v}'`}`)
-                  .join(",")}))`
+                  .join(",")}))`,
             )
             .join(" AND ");
       }
@@ -234,6 +249,7 @@ export function useNumberOfRows({
       const tableDataRes = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: apiKey,
         },
       });
       const tableData: DataResponse = await tableDataRes.json();

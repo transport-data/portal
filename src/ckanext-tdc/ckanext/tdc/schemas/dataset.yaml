@@ -320,3 +320,7 @@ resource_fields:
       label: Data
     - value: documentation
       label: Documentation
+
+- field_name: hide_preview
+  label: Hide preview
+  output_validators: scheming_load_json

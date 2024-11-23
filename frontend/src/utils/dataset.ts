@@ -2,6 +2,7 @@ import CkanRequest from "@datopian/ckan-api-client-js";
 import { env } from "@env.mjs";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { User } from "@interfaces/ckan/user.interface";
+import { Resource } from "@interfaces/datapackage.interface";
 import { Activity } from "@portaljs/ckan";
 import { CkanResponse } from "@schema/ckan.schema";
 import {
@@ -193,7 +194,7 @@ export async function searchDatasets<T = Dataset>({
   }
 
   if (options.query) {
-    queryParams.push(`q=/.*${options.query}.*/`)
+    queryParams.push(`q=/.*${options.query}.*/`);
   }
 
   if (options.limit != undefined) {
@@ -208,11 +209,11 @@ export async function searchDatasets<T = Dataset>({
     queryParams.push(`include_private=${true}`);
   }
 
-  if(options.showArchived) {
+  if (options.showArchived) {
     queryParams.push(`include_archived=${true}`);
   }
-  
-  if(options.includeDrafts) {
+
+  if (options.includeDrafts) {
     queryParams.push(`include_drafts=${true}`);
   }
 
@@ -362,21 +363,19 @@ export const draftDataset = async ({
   apiKey: string;
   input: DatasetDraftType;
 }) => {
-
-  const datasetRequest = input.id ? await getDataset({
-    id : input.id,
-    apiKey,
-    include_extras:true
-  }) : await CkanRequest.post<CkanResponse<Dataset>>(
-    `package_create`,
-    {
-      apiKey,
-      json: {
-        ...input,
-        state: "draft",
-      },
-    }
-  );
+  const datasetRequest = input.id
+    ? await getDataset({
+        id: input.id,
+        apiKey,
+        include_extras: true,
+      })
+    : await CkanRequest.post<CkanResponse<Dataset>>(`package_create`, {
+        apiKey,
+        json: {
+          ...input,
+          state: "draft",
+        },
+      });
 
   const dataset = datasetRequest.result;
 
@@ -403,14 +402,25 @@ export const patchDataset = async ({
   apiKey: string;
   input: DatasetCreateEditType;
 }) => {
+  const { resources, ...datasetBody } = input;
   const dataset = await CkanRequest.post<CkanResponse<Dataset>>(
     "package_patch",
     {
       apiKey: apiKey,
-      json: input,
+      json: datasetBody,
     }
   );
-  return dataset.result;
+  const _resources = await CkanRequest.post<CkanResponse<Resource[]>>(
+    "resource_upsert_many",
+    {
+      apiKey: apiKey,
+      json: {
+        resources,
+        dataset_id: dataset.result.id,
+      },
+    }
+  );
+  return { ...dataset.result, resources: _resources.result };
 };
 
 export const deleteDatasets = async ({
@@ -464,20 +474,33 @@ export const listDatasetActivities = async ({
   return activities.flat();
 };
 
-
-export const followDataset = async ({id,isFollowing,apiKey}:{id:string,isFollowing:boolean;apiKey:string})=>{
+export const followDataset = async ({
+  id,
+  isFollowing,
+  apiKey,
+}: {
+  id: string;
+  isFollowing: boolean;
+  apiKey: string;
+}) => {
   const response = await CkanRequest.post<CkanResponse<any>>(
-    `${isFollowing ? 'unfollow' : 'follow'}_dataset`,
+    `${isFollowing ? "unfollow" : "follow"}_dataset`,
     {
       apiKey: apiKey,
       json: { id },
     }
   );
 
-  return response.result
-}
+  return response.result;
+};
 
-export const getDatasetFollowersList = async ({id,apiKey}:{id:string,apiKey:string})=>{
+export const getDatasetFollowersList = async ({
+  id,
+  apiKey,
+}: {
+  id: string;
+  apiKey: string;
+}) => {
   const response = await CkanRequest.post<CkanResponse<User[]>>(
     `dataset_follower_list`,
     {
@@ -485,5 +508,5 @@ export const getDatasetFollowersList = async ({id,apiKey}:{id:string,apiKey:stri
       json: { id },
     }
   );
-  return response.result
-}
+  return response.result;
+};

@@ -61,7 +61,8 @@ class TdcPlugin(plugins.SingletonPlugin):
             "tdc_dashboard_activity_list": activity.dashboard_activity_list_action,
             "dataset_approval_update": action.dataset_approval_update,
             "user_following_groups": action.user_following_groups,
-            "github_user_invite": action.github_user_invite
+            "github_user_invite": action.github_user_invite,
+            "resource_upsert_many": action.resource_upsert_many
         }
 
     # IPackageController
