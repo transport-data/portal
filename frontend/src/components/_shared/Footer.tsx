@@ -86,7 +86,7 @@ const Footer: React.FC = () => {
     <footer className="border-t border-gray-100 bg-gray-50 py-[64px]">
       <div className="container flex flex-col gap-[48px]">
         <div className="flex flex-col gap-x-16 lg:flex-row">
-          <div className="lg:w-[384px]">
+          <div className="lg:w-[525px]">
             <Link href="/" className="flex flex-shrink-0 items-center">
               <Image
                 alt="Transport Data Commons"
@@ -95,10 +95,18 @@ const Footer: React.FC = () => {
                 height={32}
               />
             </Link>
-            <p className="mt-[20px] text-sm text-gray-500">
+            <p className="mt-[15px] text-sm text-gray-500">
               Transport Data Commons is an initiative of individuals and
               organisations who are passionate about sustainable transportation
               and want to increase the use and impact of data in this sector.
+            </p>
+            <p className="font-weight-[500] mt-2 text-sm text-gray-500">
+              The development of this portal was funded by UKAID through the UK
+              Foreign, Commonwealth & Development Office under the{" "}
+              <a href="https://transport-links.com/" className="font-medium">
+                High Volume Transport Applied Research Programme
+              </a>
+              , managed by DT Global
             </p>
             <div className="mt-[20px] flex gap-[20px]">
               {navigation.social.map((social, i) => (
