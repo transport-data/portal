@@ -103,7 +103,7 @@ const Footer: React.FC = () => {
             <p className="font-weight-[500] mt-2 text-sm text-gray-500">
               The development of this portal was funded by UKAID through the UK
               Foreign, Commonwealth & Development Office under the{" "}
-              <a href="https://transport-links.com/" className="font-medium">
+              <a target="_blank" href="https://transport-links.com/" className="font-medium underline">
                 High Volume Transport Applied Research Programme
               </a>
               , managed by DT Global
