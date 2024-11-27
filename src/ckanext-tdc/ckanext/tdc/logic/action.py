@@ -282,7 +282,8 @@ def _before_dataset_create_or_update(context, data_dict, is_update=False):
 def _submit_dataset_resources_to_datapusher(dataset):
     resources = dataset.get("resources", [])
     for resource in resources:
-        DatapusherPlugin()._submit_to_datapusher(resource)
+        if resource.get("resource_type") == "data":
+            DatapusherPlugin()._submit_to_datapusher(resource)
 
 
 def _after_dataset_create_or_update(context, data_dict, is_update=False):
