@@ -426,11 +426,47 @@ def _add_display_name_to_multi_select_facets(search_response):
                             item["display_name"] = value_label
 
 
+def _fix_facet_items_per_field_type(result):
+    dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
+    search_facets = result.get("search_facets", [])
+
+    if len(search_facets) > 0:
+        dataset_fields = dataset_schema["dataset_fields"]
+
+        for facet_name in search_facets:
+            facet_field = list(filter(lambda x: x.get(
+                "field_name") == facet_name, dataset_fields))
+            if len(facet_field) > 0:
+                facet_field = facet_field[0]
+                preset = facet_field.get("preset")
+                if preset in ["multiple_select", "select"]:
+                    choices = facet_field.get("choices")
+                    search_facet = search_facets[facet_name]
+                    search_facet_items = search_facet["items"]
+                    search_facet["items"] = []
+                    for choice in choices:
+                        name = choice.get("value")
+                        display_name = choice.get("label")
+                        count = 0
+
+                        search_facet_item = list(
+                            filter(lambda x: x.get("name") == name, search_facet_items))
+                        if len(search_facet_item):
+                            count = search_facet_item[0].get('count')
+
+                        search_facet["items"].append({
+                            "name": name,
+                            "display_name": display_name,
+                            "count": count
+                        })
+
+
 @tk.chained_action
 @tk.side_effect_free
 def package_search(up_func, context, data_dict):
     _control_archived_datasets_visibility(data_dict)
     result = up_func(context, data_dict)
+    _fix_facet_items_per_field_type(result)
     _add_display_name_to_custom_group_facets(result)
     _add_display_name_to_multi_select_facets(result)
     _add_display_name_to_contributors_facets(result)

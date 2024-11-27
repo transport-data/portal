@@ -32,7 +32,6 @@ export async function searchDatasets<T = Dataset>({
 }): Promise<{
   datasets: Array<T>;
   count: number;
-  facets: Record<string, any>;
 }> {
   let endpoint = "package_search";
   let fqAr = [];
@@ -222,7 +221,7 @@ export async function searchDatasets<T = Dataset>({
   }
 
   if (options.facetsFields) {
-    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000&facet.mincount=0`;
+    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000`;
   }
 
   const headers: any = {};
