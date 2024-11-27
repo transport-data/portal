@@ -32,6 +32,7 @@ export async function searchDatasets<T = Dataset>({
 }): Promise<{
   datasets: Array<T>;
   count: number;
+  facets: Record<string, any>;
 }> {
   let endpoint = "package_search";
   let fqAr = [];
