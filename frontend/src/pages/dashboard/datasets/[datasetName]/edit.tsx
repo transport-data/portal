@@ -27,8 +27,8 @@ import { listUserOrganizations } from "@utils/organization";
 import { useMachine } from "@xstate/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { SaveDraftButton } from "../create";
 import { TRPCClientErrorLike } from "@trpc/client";
@@ -163,6 +163,9 @@ const EditDatasetDashboard: NextPage<{
         size: r.size,
         resource_type: r.resource_type,
         url: r.url,
+        _datastore_active: r.datastore_active,
+        hide_preview: r.hide_preview,
+        is_new: false
       })),
       comments: dataset.comments
         ? dataset.comments.map((c) => ({

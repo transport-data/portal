@@ -82,6 +82,7 @@ export interface Resource {
     cache_url?: string;
     created?: string;
     datastore_active?: boolean;
+    hide_preview?: boolean;
     description?: string;
     format?: string;
     hash?: string;

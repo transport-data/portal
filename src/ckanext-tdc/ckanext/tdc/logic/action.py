@@ -263,7 +263,7 @@ def _fix_approval_workflow(context, data_dict, is_update):
         data_dict["previous_approval_contributors"] = data_dict.get("current_approval_contributors", [])
         data_dict["current_approval_contributors"] = []
 
-    if is_update and user_is_admin and old_dataset_is_private and not is_private and data_dict['approval_status'] != 'approved':
+    if is_update and user_is_admin and old_dataset_is_private and not is_private and data_dict.get('approval_status', False) != 'approved':
         data_dict["approval_status"] = None
         data_dict["approval_message"] = None
 
@@ -282,7 +282,8 @@ def _before_dataset_create_or_update(context, data_dict, is_update=False):
 def _submit_dataset_resources_to_datapusher(dataset):
     resources = dataset.get("resources", [])
     for resource in resources:
-        DatapusherPlugin()._submit_to_datapusher(resource)
+        if resource.get("resource_type") == "data":
+            DatapusherPlugin()._submit_to_datapusher(resource)
 
 
 def _after_dataset_create_or_update(context, data_dict, is_update=False):
@@ -1007,3 +1008,28 @@ def github_user_invite(context, data_dict):
         raise ValidationError(message)
 
     return model_dictize.user_dictize(user, context)
+
+
+def resource_upsert_many(context, data_dict):
+    """
+    Patches multiple resources at once, also deletes any resources which are not in the list
+    """
+    _resources = data_dict.get("resources")
+    dataset_id = data_dict.get("dataset_id")
+    dataset_resources = get_action("package_show")(context, {"id": dataset_id}).get('resources', [])
+    context["ignore_approval_status"] = True
+    context["is_resource_create"] = True
+    def _exists(resource, resource_list):
+        for item in resource_list:
+            if resource.get('id', None) == item['id']:
+                return True
+        return False
+    def upsert(resource):
+        exists = _exists(resource, dataset_resources)
+        if exists:
+            return get_action("resource_patch")(context, resource)
+        else:
+            return get_action("resource_create")(context, {**resource, **{"package_id": dataset_id}})
+    resources_to_update_or_create = [upsert(resource) for resource in _resources]
+    [get_action("resource_delete")(context, {"id": resource['id']}) for resource in dataset_resources if not _exists(resource, _resources)]
+    return resources_to_update_or_create
