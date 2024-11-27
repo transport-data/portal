@@ -43,7 +43,8 @@ export function useFields(resourceId: string) {
 
       return {
         tableName: resourceId,
-        columns: fields.result.fields.map((field) => ({
+        //Nicolas requested us to hide the _id column
+        columns: fields.result.fields.filter((field) => field.id !== '_id').map((field) => ({
           key: field.id,
           name: field.id,
           type: field.type,
@@ -127,7 +128,6 @@ export function useTableData({
   return useQuery({
     queryKey: ["query", resourceId, pagination, columns, sorting, filters],
     queryFn: async () => {
-      console.log('FILTERS', filters)
       const paginationSql = `LIMIT ${
         pagination.pageSize
       } OFFSET ${pagination.pageIndex * pagination.pageSize}`;
@@ -156,7 +156,6 @@ export function useTableData({
               )
               .join(" AND ")
           : "";
-      console.log('FILTERS SQL', filtersSql)
       const parsedColumns = columns.map((column) => `"${column}"`);
       const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
         " , "

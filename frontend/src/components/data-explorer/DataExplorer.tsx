@@ -31,8 +31,8 @@ export function DataExplorer({ resourceId }: { resourceId: string }) {
   const { data: tableData } = useFields(resourceId);
   if (!tableData)
     return (
-      <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
-        <Spinner className="text-accent w-12 h-12" />
+      <div className="bg-lima-700 my-auto flex h-full w-full flex-col items-center justify-center overflow-hidden opacity-75">
+        <Spinner className="h-12 w-12 text-accent" />
         <h2 className="text-center text-xl font-semibold text-accent">
           Loading...
         </h2>
@@ -101,7 +101,19 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
     sorting,
     columns: columns.map((c) => c.key),
     filters: filteredColumns,
-    columnsType: columns[0]?.type ?? 'string',
+    columnsType: columns[0]?.type ?? "string",
+  });
+  const _prefetchData = useTableData({
+    resourceId,
+    pagination: {
+      pageIndex: pagination.pageIndex + 1,
+      pageSize: pagination.pageSize,
+    },
+    sorting,
+    filters: filteredColumns,
+    columns: columns.map((c) => c.key),
+    enabled: !isLoading,
+    columnsType: columns[0]?.type ?? "string",
   });
 
   const data = useMemo(() => tableData ?? [], [tableData]);
@@ -145,21 +157,21 @@ function DataExplorerInner({ resourceId, columns }: DataExplorerInnerProps) {
   });
   if (pageCount < pagination.pageIndex) resetPagination();
   return (
-    <div className={`w-full relative grow flex flex-col gap-y-2`}>
-      <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center">
+    <div className={`relative flex w-full grow flex-col gap-y-2`}>
+      <div className="flex flex-col items-end justify-between gap-y-4 sm:flex-row sm:items-center">
         <TopBar table={table} numOfRows={numOfRows ?? 0} />
       </div>
       <div className="flex flex-row justify-between gap-x-2">
-        <div className="flex flex-row justify-between grow">
+        <div className="flex grow flex-row justify-between">
           <ListOfFilters
             filters={filteredColumns}
             setFilters={setColumnFilters}
           />
         </div>
       </div>
-      <div className="flex flex-col grow shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+      <div className="flex grow flex-col shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
         {isFetching && isPlaceholderData && (
-          <span className="w-full h-1.5 animate-pulse-fast bg-accent/10" />
+          <span className="animate-pulse-fast h-1.5 w-full bg-accent/10" />
         )}
         <Table
           table={table}
