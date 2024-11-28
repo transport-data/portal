@@ -43,7 +43,8 @@ export function useFields(resourceId: string) {
 
       return {
         tableName: resourceId,
-        columns: fields.result.fields.map((field) => ({
+        //Nicolas requested us to hide the _id column
+        columns: fields.result.fields.filter((field) => field.id !== '_id').map((field) => ({
           key: field.id,
           name: field.id,
           type: field.type,
