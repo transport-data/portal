@@ -53,3 +53,13 @@ Clicking on a Topics will redirect you to Edit Topic Page.
 If you go to the `/datasets` page you will see a grid with all the topics and 5 sample datasets, besides that you will also have a list of datasets which are TDC Harmonized and the most popular datasets with data retrieved from Google Analytics
 
 ![List topics public](list_public.png)
+
+## Seed default topics
+
+When a new CKAN instance is created, the instance database can be seeded with the default topics by running the following command:
+
+```bash
+ckan -c CKAN_INI seed-default-topics
+```
+
+In order to update the list of default topics, edit the `ckanext-tdc/ckanext/tdc/assets/topics/topics.json` file.
