@@ -401,64 +401,39 @@ def _add_display_name_to_contributors_facets(search_response):
                 contributor["display_image"] = image_display_url
 
 
-def _add_display_name_to_multi_select_facets(search_response):
-    dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
-    search_facets = search_response.get("search_facets", [])
-
-    if len(search_facets) > 0:
-        dataset_fields = dataset_schema["dataset_fields"]
-
-        for facet_name in search_facets:
-            facet_field = list(filter(lambda x: x.get("field_name") == facet_name, dataset_fields))
-            if len(facet_field) > 0:
-                facet_field = facet_field[0]
-                preset = facet_field.get("preset")
-                if preset in ["multiple_select", "select"]:
-                    choices = facet_field.get("choices")
-                    search_facet = search_facets[facet_name]
-                    items = search_facet["items"]
-                    for item in items:
-                        value = item["name"]
-                        value_choice = list(filter(lambda x: x.get("value") == value, choices))
-                        if len(value_choice) > 0:
-                            value_choice = value_choice[0]
-                            value_label = value_choice["label"]
-                            item["display_name"] = value_label
-
-
 def _fix_facet_items_per_field_type(result):
     dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
     search_facets = result.get("search_facets", [])
 
     if len(search_facets) > 0:
-        dataset_fields = dataset_schema["dataset_fields"]
+        dataset_select_fields = {
+                df.get("field_name"): df
+                for df in dataset_schema["dataset_fields"]
+                if (
+                    df.get("preset") in ['multiple_select', 'select']
+                    and df.get("field_name") in search_facets
+                )
+        }
 
-        for facet_name in search_facets:
-            facet_field = list(filter(lambda x: x.get(
-                "field_name") == facet_name, dataset_fields))
-            if len(facet_field) > 0:
-                facet_field = facet_field[0]
-                preset = facet_field.get("preset")
-                if preset in ["multiple_select", "select"]:
-                    choices = facet_field.get("choices")
-                    search_facet = search_facets[facet_name]
-                    search_facet_items = search_facet["items"]
-                    search_facet["items"] = []
-                    for choice in choices:
-                        name = choice.get("value")
-                        display_name = choice.get("label")
-                        count = 0
+        for facet_name in dataset_select_fields:
+            dataset_field = dataset_select_fields[facet_name]
+            search_facet = search_facets[facet_name]
+            choices = dataset_field.get("choices")
+            search_facet_items = {
+                    i.get("name"): i
+                    for i in search_facet["items"]
+            }
+            search_facet["items"] = []
+            for choice in choices:
+                name = choice.get("value")
+                display_name = choice.get("label")
+                search_facet_item = search_facet_items.get(name)
 
-                        search_facet_item = list(
-                            filter(lambda x: x.get("name") == name, search_facet_items))
-                        if len(search_facet_item):
-                            count = search_facet_item[0].get('count')
-
-                        search_facet["items"].append({
-                            "name": name,
-                            "display_name": display_name,
-                            "count": count
-                        })
+                search_facet["items"].append({
+                    "name": name,
+                    "display_name": display_name,
+                    "count": search_facet_item.get("count") if search_facet_item else 0
+                })
 
 
 @tk.chained_action
@@ -468,7 +443,6 @@ def package_search(up_func, context, data_dict):
     result = up_func(context, data_dict)
     _fix_facet_items_per_field_type(result)
     _add_display_name_to_custom_group_facets(result)
-    _add_display_name_to_multi_select_facets(result)
     _add_display_name_to_contributors_facets(result)
     return result
 
