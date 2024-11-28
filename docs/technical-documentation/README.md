@@ -515,7 +515,7 @@ Im going to focus on the pivot since thats the most likely to be updated by the 
 
 Currently all calls to the backend are done in the `queryHooks` file, which is where we are going to start
 
-He we will find 5 hooks
+Here we will find 5 hooks
 
 - useFields, this one is called at the start of the loading of the component to get the list of available columns from CKAN, returning them in the following shape
 ```
@@ -528,7 +528,9 @@ columns:
 })),
 ```
 - usePossibleValues, this one is particular for the pivot version, and its used to get the possible values from a column like in the example below
+
 ![usePossibleValues example](./usePossibleValues.png)
+
 In this case as soon as the user selects a column, we start fetching the possible values to fill out the list of checkboxes
 
 - useFootnote, used to fetch the footnote for a particular combination of row and column, for example, in the image below, we will provide it with 
@@ -555,12 +557,12 @@ And we will try to fetch the first available metadata field for a row where the 
   filters: FilterObjType;
 ```
 
-- ResourceId = id of the resource and name of table in db
-- pivotColumns = All the possible column values that we have, in the example use beforehand, a list with [1990, 1991, 1992...]
+- ResourceId = id of the resource/name of the table in db
+- pivotColumns = All the possible column values that we have, in the example used beforehand, a list with [1990, 1991, 1992...]
 - column = The name of the column in the example `Time`
 - row = The name of the row, which in this case would be `Geography`
 - value = The name of the value column, which in this case would be `Value`
-- enabled = By default react-query hooks are fetches as soon as the component mounts, in our scenario obviously we can only fetch something when the user selects everything
+- enabled = By default react-query hooks start fetching data as soon as the component mounts, in our scenario obviously we can only fetch something when the user selects everything, which is why its only enabled once everything is present
 - filters = An array of filter objs, to filter the raw data before pivoting
 
 - useNumberOfRows, used to get the number of rows in the raw data that correspond to the filters, it ends up creating just a simple count(*) statement with all the filters, receives the following props
@@ -607,7 +609,7 @@ name: a human readable nice name for the column
 key: the actual name of the column in the DB, of course needing to be unique for that table 
 type: the type of the column, this is needed so that in the SQL we can for example use X = Y for numbers and X = "Y" for strings
 default: a default value if nothing is provided in the column, can leave as "" if you guys dont want to provide anything
-possibleValues: a list of all the posssible values that particular column can have, if this is a column that talks about fuel, it could something like ['Eletric', 'Diesel', 'Gasoline', ...]
+possibleValues: a list of all the posssible values that particular column can have, if this is a column that talks about fuel, it could be something like ['Eletric', 'Diesel', 'Gasoline', ...]
 }
 ```
 
