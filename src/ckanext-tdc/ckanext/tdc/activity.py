@@ -127,14 +127,6 @@ def _activities_from_dataset_approval_workflow(user_id, limit, approval_status=N
 
     return core_model_activity._activities_limit(q, limit)
 
-
-def _dashboard_approval_activity_query(user_id: str, limit: int = 0, approval_status=None):
-    q1 = _activities_from_dataset_approval_workflow(
-        user_id, limit, approval_status=approval_status)
-
-    return core_model_activity._activities_union_all(q1)
-
-
 def _dashboard_activity_query(user_id: str, limit: int = 0):
     q1 = core_model_activity._user_activity_query(user_id, limit)
     q2 = _activities_from_everything_followed_by_user_query(user_id, limit)
