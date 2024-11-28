@@ -222,7 +222,7 @@ export async function searchDatasets<T = Dataset>({
   }
 
   if (options.facetsFields) {
-    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000&facet.mincount=0`;
+    endpoint += `&facet.field=${options.facetsFields}&facet.limit=1000000000`;
   }
 
   const headers: any = {};
