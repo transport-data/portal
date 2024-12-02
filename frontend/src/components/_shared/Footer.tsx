@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="border-t border-gray-100 bg-gray-50 py-[64px]">
-      <div className="container flex flex-col gap-[48px]">
+      <div className="container flex flex-col">
         <div className="flex flex-col gap-x-16 lg:flex-row">
           <div className="lg:w-[525px]">
             <Link href="/" className="flex flex-shrink-0 items-center">
@@ -103,23 +103,15 @@ const Footer: React.FC = () => {
             <p className="font-weight-[500] mt-2 text-sm text-gray-500">
               The development of this portal was funded by UKAID through the UK
               Foreign, Commonwealth & Development Office under the{" "}
-              <a target="_blank" href="https://transport-links.com/" className="font-medium underline">
+              <a
+                target="_blank"
+                href="https://transport-links.com/"
+                className="font-medium underline"
+              >
                 High Volume Transport Applied Research Programme
               </a>
               , managed by DT Global
             </p>
-            <div className="mt-[20px] flex gap-[20px]">
-              {navigation.social.map((social, i) => (
-                <Link
-                  key={`footer-social-${i}`}
-                  href={social.href}
-                  target="_blank"
-                  className="block"
-                >
-                  <social.icon className="w-[18px] text-gray-400" aria-hidden />
-                </Link>
-              ))}
-            </div>
           </div>
           <div className="mt-5 flex flex-col gap-8 sm:flex-row lg:ml-auto lg:mt-0">
             <div className="w-full lg:w-[176px]">
@@ -164,6 +156,44 @@ const Footer: React.FC = () => {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+        <div className="mb-[48px] mt-5 flex w-full flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <div className="flex gap-[20px]">
+            {navigation.social.map((social, i) => (
+              <Link
+                key={`footer-social-${i}`}
+                href={social.href}
+                target="_blank"
+                className="block"
+              >
+                <social.icon className="w-[18px] text-gray-400" aria-hidden />
+              </Link>
+            ))}
+          </div>
+          <div className="flex w-fit items-center gap-1">
+            Powered by{" "}
+            <Link
+              className="text-red underline"
+              href="https://portaljs.org"
+              target="_blank"
+            >
+              PortalJS
+            </Link>{" "}
+            from
+            <Link
+              // className="w-full"
+              href="https://www.datopian.com"
+              target="_blank"
+            >
+              <img
+                src="/images/logos/logo_datopian.png"
+                width={92}
+                height={27}
+                alt="Datopian Logo"
+                className="h-fit"
+              />
+            </Link>
           </div>
         </div>
         <div className="w-full text-center">
