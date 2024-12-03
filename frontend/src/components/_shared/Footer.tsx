@@ -112,6 +112,11 @@ const Footer: React.FC = () => {
               </a>
               , managed by DT Global
             </p>
+
+            <div className="flex items-center gap-6 mt-6 ">
+              <img src="/images/sponsors/hvt.png" alt="High Volume Transport Applied Research" className="h-[35px] sm:h-[45px] md:h-[55px]"/>
+              <img src="/images/sponsors/uk-international-development.png" alt="UK International Development" className="h-[35px] sm:h-[45px] md:h-[55px]"/>
+            </div>
           </div>
           <div className="mt-5 flex flex-col gap-8 sm:flex-row lg:ml-auto lg:mt-0">
             <div className="w-full lg:w-[176px]">
