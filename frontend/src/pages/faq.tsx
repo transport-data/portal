@@ -100,7 +100,7 @@ export default function Faq({
                 </a>
               ))}
             </div>
-            <Button>Got a question? Contact us</Button>
+            <Button asChild><a href="https://github.com/orgs/transport-data/discussions/categories/user-feedback" target="_blank">Got a question? Contact us</a></Button>
           </div>
         </div>
         <div className="lg:col-span-5">
@@ -146,87 +146,6 @@ export default function Faq({
               </div>
             );
           })}
-        </div>
-      </div>
-      <div className="container grid grid-cols-1 py-6 lg:grid-cols-7 xl:gap-x-12">
-        <div className="lg:col-span-2"></div>
-          <div className="flex lg:col-span-5 pb-12">
-            <h2 className="text-4xl font-extrabold leading-10 text-primary">
-              Still need help?
-            </h2>
-          </div>
-        <div className="flex flex-col gap-y-4 py-4 lg:col-span-2">
-          <div className="text-lg font-semibold leading-relaxed text-primary">
-            Points of contact
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              U.S. Flowbite
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              11350 McCormick Rd, EP III, Suite 200, Hunt Valley, MD 21031
-            </dd>
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              Information and Sales
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              <a className="text-accent " href="#">
-                sales@company.com
-              </a>
-            </dd>
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              Support
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              <a className="text-accent " href="#">
-                support@company.com
-              </a>
-            </dd>
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              Verification of Employment
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              <a className="text-accent " href="#">
-                voe@company.com
-              </a>
-            </dd>
-          </div>
-          <div className="text-lg font-semibold leading-relaxed text-primary">
-            Our offices around the world
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              Canada
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              11350 McCormick Rd, EP III, Suite 200, Hunt Valley, MD 21031
-            </dd>
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              Germany
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              11350 McCormick Rd, EP III, Suite 200, Hunt Valley, MD 21031
-            </dd>
-          </div>
-          <div className="px-4 sm:col-span-1 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-primary">
-              France
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
-              11350 McCormick Rd, EP III, Suite 200, Hunt Valley, MD 21031
-            </dd>
-          </div>
-        </div>
-        <div className="flex w-full max-w-3xl flex-col gap-y-4 py-4 lg:col-span-5 xl:pb-16">
-          <ContactForm />
         </div>
       </div>
       <NewsLetterSection />
