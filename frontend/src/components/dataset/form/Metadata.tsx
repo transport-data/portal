@@ -411,7 +411,7 @@ export function MetadataForm({ disabled }: any) {
                             disabled={disabled}
                             className={cn(
                               disabled && "cursor-not-allowed",
-                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
+                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary overflow-hidden",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
                             )}
@@ -422,7 +422,6 @@ export function MetadataForm({ disabled }: any) {
                                   .filter((c) => field.value.includes(c.name))
                                   ?.map((v) => v.title ?? v.name)
                                   .join(", ")
-                                  .slice(0, 50)
                               : "Select country"}
                           </Button>
                         </FormControl>
@@ -583,7 +582,7 @@ export function MetadataForm({ disabled }: any) {
                             role="combobox"
                             className={cn(
                               disabled && "cursor-not-allowed",
-                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
+                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary overflow-hidden",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
                             )}
@@ -852,7 +851,7 @@ export function MetadataForm({ disabled }: any) {
                             disabled={disabled}
                             className={cn(
                               disabled && "cursor-not-allowed",
-                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
+                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary overflow-hidden",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
                             )}
