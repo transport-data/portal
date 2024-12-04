@@ -427,7 +427,7 @@ function FilterForm({ column }: { column: ColumnType<any, unknown> }) {
     <FormProvider {...formObj}>
       <div className="flex flex-col gap-y-2 px-4 py-4">
         <div className="flex flex-col items-center justify-center gap-y-2">
-          <Filters datePicker={column.columnDef.meta?.type === "timestamp"} />
+          <Filters datePicker={column.columnDef.meta?.type === "timestamp"} text={column.columnDef.meta?.type === 'text'} />
         </div>
       </div>
     </FormProvider>
@@ -436,8 +436,10 @@ function FilterForm({ column }: { column: ColumnType<any, unknown> }) {
 
 export default function Filters({
   datePicker = false,
+  text = false,
 }: {
   datePicker?: boolean;
+  text?: boolean;
 }) {
   const formObj = useFormContext<FilterFormType>();
   const { register, control, setValue, watch, getValues } = formObj;
@@ -482,6 +484,10 @@ export default function Filters({
                 value: "!=",
               },
               {
+                label: "Contains",
+                value: "ilike",
+              },
+              {
                 label: "Greater than",
                 value: ">",
               },
@@ -498,7 +504,12 @@ export default function Filters({
                 value: "<=",
               },
             ].filter((o) => {
-              if (!datePicker) return true;
+              if (!datePicker) {
+                  if (!text) {
+                    return o.value !== "ilike"
+                  }
+                  return true
+                };
               return datePicker && o.value !== "=" && o.value !== "!=";
             })}
             placeholder="Select a filter"

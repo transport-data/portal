@@ -12,7 +12,7 @@ export const filterObj = z
                 '<=',
                 'in',
                 'not in',
-                'like',
+                'ilike',
                 'not like',
                 'is null',
                 'is not null',

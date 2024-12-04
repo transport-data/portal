@@ -35,7 +35,7 @@ export function useFields(resourceId: string) {
             "Content-Type": "application/json",
             Authorization: apiKey,
           },
-        },
+        }
       );
       const fields: CkanResponse<{
         fields: Array<{
@@ -49,12 +49,14 @@ export function useFields(resourceId: string) {
       return {
         tableName: resourceId,
         //Nicolas requested us to hide the _id column
-        columns: fields.result.fields.filter((field) => field.id !== '_id').map((field) => ({
-          key: field.id,
-          name: field.id,
-          type: field.type,
-          default: "",
-        })),
+        columns: fields.result.fields
+          .filter((field) => field.id !== "_id")
+          .map((field) => ({
+            key: field.id,
+            name: field.id,
+            type: field.type,
+            default: "",
+          })),
       };
     },
   });
@@ -80,13 +82,17 @@ export function useNumberOfRows({
                 (filter) =>
                   `(${filter.value
                     .filter((v) => v.value !== "")
-                    .map(
-                      (v) =>
-                        `"${filter.id}" ${v.operation} '${v.value}' ${
+                    .map((v) => {
+                      if ((v.operation as any) === "ilike") {
+                        return `"${filter.id}" ILIKE '%${v.value}%' ${
                           v.link ?? ""
-                        }`,
-                    )
-                    .join("")})`,
+                        }`;
+                      }
+                      return `"${filter.id}" ${v.operation} '${
+                        v.value
+                      }' ${v.link ?? ""}`;
+                    })
+                    .join("")})`
               )
               .join(" AND ")
           : "";
@@ -130,7 +136,7 @@ export function useTableData({
   columns: string[];
   sorting: ColumnSort[];
   enabled?: boolean;
-  filters: ColumnFilter[];
+  filters: DataExplorerColumnFilter[];
   columnsType: string;
 }) {
   const session = useSession();
@@ -138,9 +144,9 @@ export function useTableData({
   return useQuery({
     queryKey: ["query", resourceId, pagination, columns, sorting, filters],
     queryFn: async () => {
-      const paginationSql = `LIMIT ${
-        pagination.pageSize
-      } OFFSET ${pagination.pageIndex * pagination.pageSize}`;
+      const paginationSql = `LIMIT ${pagination.pageSize} OFFSET ${
+        pagination.pageIndex * pagination.pageSize
+      }`;
       const sortSql =
         sorting.length > 0
           ? "ORDER BY " +
@@ -154,21 +160,25 @@ export function useTableData({
             filters
               .map(
                 (filter) =>
-                  `(${(filter.value as any[])
-                    .filter((v: any) => v.value !== "")
-                    .map(
-                      (v) =>
-                        `"${filter.id}" ${v.operation} '${v.value}' ${
+                  `(${filter.value
+                    .filter((v) => v.value !== "")
+                    .map((v) => {
+                      if ((v.operation as any) === "ilike") {
+                        return `"${filter.id}" ILIKE '%${v.value}%' ${
                           v.link ?? ""
-                        }`,
-                    )
-                    .join("")})`,
+                        }`;
+                      }
+                      return `"${filter.id}" ${v.operation} '${
+                        v.value
+                      }' ${v.link ?? ""}`;
+                    })
+                    .join("")})`
               )
               .join(" AND ")
           : "";
       const parsedColumns = columns.map((column) => `"${column}"`);
       const url = `${ckanUrl}/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
-        " , ",
+        " , "
       )} FROM "${resourceId}" ${filtersSql} ${sortSql} ${paginationSql}`;
       const tableDataRes = await fetch(url, {
         headers: {
