@@ -22,8 +22,17 @@ function getLastNameAndInitials(dataset: Dataset) {
     return (
       dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
     );
-  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin').filter(c => c.fullname && c.fullname !== '' && c.fullname.split(' ').length > 1) ?? [];
-  if (contributors.length === 0) return dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+  const contributors =
+    dataset.contributors_data
+      .filter((c) => c.name !== "ckan_admin")
+      .filter(
+        (c) =>
+          c.fullname && c.fullname !== "" && c.fullname.split(" ").length > 1
+      ) ?? [];
+  if (contributors.length === 0)
+    return (
+      dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+    );
   const contributorsCitations = contributors.map((contributor) => {
     if (contributor.fullname) {
       const splittedName = contributor?.fullname
@@ -31,7 +40,7 @@ function getLastNameAndInitials(dataset: Dataset) {
         .filter((n) => n !== "" && n !== " ");
       const length = splittedName.length;
       const lastName = splittedName[length - 1];
-      const initials = splittedName.map((n) => n[0])[0]
+      const initials = splittedName.map((n) => n[0])[0];
       return `${lastName}, ${initials}`;
     }
     const splittedName = contributor?.name
@@ -50,8 +59,17 @@ function getLastNameAndFirstName(dataset: Dataset) {
     return (
       dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
     );
-  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin').filter(c => c.fullname && c.fullname !== '' && c.fullname.split(' ').length > 1) ?? [];
-  if (contributors.length === 0) return dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+  const contributors =
+    dataset.contributors_data
+      .filter((c) => c.name !== "ckan_admin")
+      .filter(
+        (c) =>
+          c.fullname && c.fullname !== "" && c.fullname.split(" ").length > 1
+      ) ?? [];
+  if (contributors.length === 0)
+    return (
+      dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+    );
   const contributorsCitations = contributors.map((contributor) => {
     if (contributor.fullname) {
       const splittedName = contributor?.fullname
@@ -76,14 +94,26 @@ function getLastNameAndFirstName(dataset: Dataset) {
 }
 
 function bibtexAuthor(dataset: Dataset) {
-  console.log(dataset.contributors_data)
+  console.log(dataset.contributors_data);
   if (!dataset.contributors_data || dataset.contributors_data.length === 0)
     return (
       dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
     );
-  const contributors = dataset.contributors_data.filter(c => c.name !== 'ckan_admin').filter(c => c.fullname && c.fullname !== '' && c.fullname.split(' ').length > 1) ?? [];
-  if (contributors.length === 0) return dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
-  return contributors.map((c) => c.fullname).join(', ').trim()
+  const contributors =
+    dataset.contributors_data
+      .filter((c) => c.name !== "ckan_admin")
+      .filter(
+        (c) =>
+          c.fullname && c.fullname !== "" && c.fullname.split(" ").length > 1
+      ) ?? [];
+  if (contributors.length === 0)
+    return (
+      dataset.organization?.display_name ?? dataset.organization?.name ?? "TDC"
+    );
+  return contributors
+    .map((c) => c.fullname)
+    .join(", ")
+    .trim();
 }
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
@@ -132,6 +162,20 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 {dataset.tags?.map((t) => (
                   <Badge variant="info">{t.display_name ?? t.name}</Badge>
                 )) ?? "-"}
+              </dd>
+            ) : (
+              <dd className="mt-1 flex flex-wrap text-sm leading-6 text-gray-500 sm:mt-2">
+                -
+              </dd>
+            )}
+          </div>
+          <div className="border-t border-gray-100 px-4 sm:col-span-1 sm:px-0">
+            <dt className="text-sm font-medium leading-6 text-primary">URL</dt>
+            {dataset.url ? (
+              <dd className="mt-1 flex flex-wrap gap-2 text-sm leading-6 text-gray-500 sm:mt-2">
+                <a className="text-accent underline" href={dataset.url}>
+                  {dataset.url}
+                </a>
               </dd>
             ) : (
               <dd className="mt-1 flex flex-wrap text-sm leading-6 text-gray-500 sm:mt-2">
