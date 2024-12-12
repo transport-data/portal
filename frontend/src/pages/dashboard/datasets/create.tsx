@@ -25,6 +25,8 @@ import { ErrorAlert } from "@components/_shared/Alerts";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { TRPCClientErrorLike } from "@trpc/client";
+import UntrackedContributorCheckbox from "@components/dataset/form/UntrackedContributorCheckbox";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
 
 const docs = [
   {
@@ -42,6 +44,7 @@ const docs = [
 const CreateDatasetDashboard: NextPage = () => {
   const { data: sessionData } = useSession();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { canReviewDatasets } = useUserGlobalOrganizationRoles()
   const router = useRouter();
   const createDataset = api.dataset.create.useMutation({
     onSuccess: async (data) => {
@@ -247,6 +250,7 @@ const CreateDatasetDashboard: NextPage = () => {
               {current.matches("uploads") && (
                 <>
                   <UploadsForm />
+                  {canReviewDatasets && <UntrackedContributorCheckbox form={form} />}
                   <div className="flex items-center gap-4">
                     <Button
                       type="button"

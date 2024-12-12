@@ -33,6 +33,8 @@ import { match } from "ts-pattern";
 import { SaveDraftButton } from "../create";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { DefaultTooltip } from "@components/ui/tooltip";
+import UntrackedContributorCheckbox from "@components/dataset/form/UntrackedContributorCheckbox";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -122,6 +124,7 @@ const EditDatasetDashboard: NextPage<{
   fromDatasetsRequests: boolean;
 }> = ({ dataset, isUserAdminOfTheDatasetOrg, fromDatasetsRequests }) => {
   const { data: sessionData } = useSession();
+  const { canReviewDatasets } = useUserGlobalOrganizationRoles()
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const editDataset = api.dataset.patch.useMutation({
@@ -433,6 +436,7 @@ const EditDatasetDashboard: NextPage<{
               {current.matches("uploads") && (
                 <>
                   <UploadsForm disabled={disabledForm} />
+                  {canReviewDatasets && <UntrackedContributorCheckbox form={form} />}
                   <div className="flex w-full flex-col gap-4 md:flex-row">
                     <SaveAsDraft />
                     <Button

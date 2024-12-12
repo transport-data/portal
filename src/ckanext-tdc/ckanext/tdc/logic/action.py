@@ -144,6 +144,10 @@ def _update_contributors(context, data_dict, is_update=False):
     Whenever an update happens, contributors list
     is updated based on which user did the update
     """
+    prevent_contributors_update = context.get("prevent_contributors_update", False)
+
+    if prevent_contributors_update:
+        return
 
     current_user = tk.current_user
     if not hasattr(current_user, "id"):
@@ -151,6 +155,12 @@ def _update_contributors(context, data_dict, is_update=False):
     current_user_id = current_user.id
     user_show_action = tk.get_action("user_show")
     excluded_ids = []
+
+    untracked_contributors_ids = data_dict.get(
+        "untracked_contributors_ids", [])
+    if len(untracked_contributors_ids) > 0:
+        excluded_ids.extend(untracked_contributors_ids)
+
     try:
         site_user = logic.get_action(u"get_site_user")(privileged_context, {})
         excluded_ids.append(site_user.get("id"))
@@ -266,6 +276,7 @@ def _fix_approval_workflow(context, data_dict, is_update):
     if is_update and user_is_admin and old_dataset_is_private and not is_private and data_dict.get('approval_status', False) != 'approved':
         data_dict["approval_status"] = None
         data_dict["approval_message"] = None
+
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
     is_approval_action = context.get("is_approval_action", False)
@@ -1029,17 +1040,21 @@ def resource_upsert_many(context, data_dict):
     dataset_resources = get_action("package_show")(context, {"id": dataset_id}).get('resources', [])
     context["ignore_approval_status"] = True
     context["is_resource_create"] = True
+    context["prevent_contributors_update"] = True
+
     def _exists(resource, resource_list):
         for item in resource_list:
             if resource.get('id', None) == item['id']:
                 return True
         return False
+
     def upsert(resource):
         exists = _exists(resource, dataset_resources)
         if exists:
             return get_action("resource_patch")(context, resource)
         else:
             return get_action("resource_create")(context, {**resource, **{"package_id": dataset_id}})
+
     resources_to_update_or_create = [upsert(resource) for resource in _resources]
     [get_action("resource_delete")(context, {"id": resource['id']}) for resource in dataset_resources if not _exists(resource, _resources)]
     return resources_to_update_or_create

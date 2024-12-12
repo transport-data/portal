@@ -38,6 +38,7 @@ export function useUserGlobalOrganizationRoles() {
     adminOrgs,
     canCreateDatasets:
       !!editorOrgs?.length || !!adminOrgs?.length || isSysadmin,
+    canReviewDatasets: !!adminOrgs?.length || isSysadmin,
     belongsToAnyOrg: !!userOrgs.length,
   };
 }

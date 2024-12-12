@@ -77,6 +77,7 @@ export const DatasetSchemaPartial = z.object({
     }),
   ),
   resources: z.array(ResourceSchema),
+  untracked_contributors_ids: z.array(z.string()).default([])
 });
 
 export const DatasetSchema = DatasetSchemaPartial.refine(
