@@ -35,9 +35,14 @@ https://ckan.tdc.dev.datopian.com/
 
 Check the documentation here https://docs.ckan.org/en/2.10/api/#ckan.logic.action.create.package_create
 
-To publish a dataset, the owner_org parameter (organization ID) must be provided. This ID can be retrieved using the organization_list method. Please refer to the [API documentation](https://docs.ckan.org/en/2.10/api/#ckan.logic.action.get.organization_list) for details on extracting the owner_org.
+To publish a dataset, the owner_org parameter (organization ID) must be provided. This ID can be retrieved using the `organization_list` API endpoint. Please refer to the [API documentation](https://docs.ckan.org/en/2.10/api/#ckan.logic.action.get.organization_list) for more details.
 
-Please, check dataset schema for each property https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml
+Example: https://ckan.transport-data.org/api/3/action/organization_list?all_fields=True
+
+> [!tip]
+> Whenever a CKAN API endpoint supports an `id` parameter, its value can be either the `name` or `id` of the entity.
+
+Please, check the dataset schema for each property https://github.com/transport-data/tdc-data-portal/blob/main/src/ckanext-tdc/ckanext/tdc/schemas/dataset.yaml
 Sample:
 
 ```python
