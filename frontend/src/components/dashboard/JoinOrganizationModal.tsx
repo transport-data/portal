@@ -347,7 +347,7 @@ function JoinOrganizationForm({
                   />
                   <div className="pb-1 text-sm text-[#6B7280]">
                     <label htmlFor="confirmationWorkingForTheOrg">
-                      I confirm that I work for this organisation
+                      I confirm that I am a member of this organisation.
                     </label>
                   </div>
                 </>
@@ -428,7 +428,7 @@ function RequestOrganizationForm({
         />
         <div className="pb-1 text-sm text-[#6B7280]">
           <label htmlFor="confirmationWorkingForTheOrg">
-            I confirm that I work for this organisation
+            I confirm that I am a member of this organisation.
           </label>
         </div>
       </div>
