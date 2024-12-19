@@ -6,7 +6,7 @@ const R2 = new S3Client({
   endpoint:
     env.R2_ACCESS_KEY_ID === "minioadmin"
       ? "http://minio:9000"
-      : `https://83025b28472d6aa2bf5ae59f3724aa78.eu.r2.cloudflarestorage.com`,
+      : `https://${env.R2_ACCOUNT_ID}.eu.r2.cloudflarestorage.com`,
   credentials: {
     accessKeyId: env.R2_ACCESS_KEY_ID,
     secretAccessKey: env.R2_SECRET_KEY_ID,

@@ -762,7 +762,7 @@ def request_organization_owner(context, data_dict):
     # find admin users of the org
     to_emails = [from_user.email]
     for user in org_dict.get("users"):
-        if user.get("capacity") == "admin":
+        if user.get("capacity") == "admin" or user.get("sysadmin"):
             user_show = model.User.get(user.get("id"))
             to_emails.append(user_show.email)
 
