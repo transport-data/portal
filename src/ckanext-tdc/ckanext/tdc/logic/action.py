@@ -761,14 +761,14 @@ def request_organization_owner(context, data_dict):
     org_dict = get_action('organization_show')({"ignore_auth": True}, data_dict)
     to_emails = [from_user.email]
     users = tk.get_action('user_list')({"ignore_auth": True})
-    sysadmins_emails = [user.get('email') for user in users if user.get('sysadmin')]
+    sysadmins_users = [user for user in users if user.get('sysadmin')]
     # find admin users of the org
-    for user in org_dict.get("users"):
+    for user in org_dict.get("users") + sysadmins_users:
         if user.get("capacity") == "admin" or user.get("sysadmin"):
             user_show = model.User.get(user.get("id"))
             to_emails.append(user_show.email)
 
-    for email in set(to_emails + sysadmins_emails):
+    for email in set(to_emails):
         send_email("organization_participation", email, from_user, message=message, organization=org_dict.get("name"))
 
     return "Request Sent Successfully"
