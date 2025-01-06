@@ -4,7 +4,6 @@ import requests
 import json
 from urllib.parse import urljoin
 import os
-from dotenv import load_dotenv
 import zipfile
 from datetime import datetime
 
