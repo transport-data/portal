@@ -21,7 +21,10 @@ RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=cka
 ## Hierarchy
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d3961a88c2622e4b4bdec1d711b677dc7c#egg=ckanext-hierarchy && \
     pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/abb4e2d3961a88c2622e4b4bdec1d711b677dc7c/requirements.txt
-    
+
+# Fixes an error related to s3filestore plugin in the r2support-ckan-2.11 branch 
+RUN pip install boto3==1.35.77
+
 ## Install the 'patch' command
 USER root
 
