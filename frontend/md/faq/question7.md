@@ -1,5 +1,5 @@
 ---
-title: Who can submit data?
+title: Who can submit data??
 category: submitting_data
 ---
 
