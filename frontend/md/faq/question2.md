@@ -1,11 +1,8 @@
 ---
-title: What is Open Data
+title: 2) How to create an account on the platform?
 category: getting_started
 ---
 
-TESTING 2
 
-With that being said, feel free to use this design kit for your open-source projects.
-Find out more information by reading the license.
-With that being said, feel free to use this design kit for your open-source projects.
-Find out more information by reading the license.
+https://github.com/user-attachments/assets/d282d580-3ab9-47f4-a85e-d945e0793f01
+
