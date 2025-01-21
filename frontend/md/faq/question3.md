@@ -1,10 +1,9 @@
 ---
-title: Is TDC Open Source
+title: 3) How to create an Organisation
 category: getting_started
 ---
 
-TESTING 3
 
-Generally, it is accepted to use FlowBite in open-source projects, as long as it is not a UI library, a theme, a template, a page-builder that would be considered as an alternative to FlowBite itself.
-With that being said, feel free to use this design kit for your open-source projects.
-Find out more information by reading the license.
+https://github.com/user-attachments/assets/1dc27b34-6539-427d-9e77-cd13e357a121
+
+
