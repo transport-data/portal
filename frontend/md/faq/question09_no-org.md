@@ -1,5 +1,5 @@
 ---
-title: I don't see my organization. What should I do?
+title: I don't see my organisation. What should I do?
 category: organizations
 ---
 
