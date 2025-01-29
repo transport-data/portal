@@ -1,9 +1,9 @@
 ---
-title: What is an organization?
+title: What is an organisation?
 category: organizations
 ---
 
-An organization is an entity that publishes data on the TDC Portal. Organizations are a central concept for the management of datasets on a CKAN platform, as they define which users are allowed to see, publish and edit individual datasets. 
+An organisation is an entity that publishes data on the TDC Portal. Organisations are a central concept for the management of datasets on a CKAN platform, as they define which users are allowed to see, publish and edit individual datasets. 
 
 ## User Roles
 The authorizations granted to users in different roles are adapted from the official [CKAN documentation](https://docs.ckan.org/en/2.11/user-guide.html#managing-an-organization).
