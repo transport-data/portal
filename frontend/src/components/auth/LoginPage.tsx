@@ -22,7 +22,6 @@ export default function LoginPage({ isSignUp = false }: { isSignUp: boolean }) {
     : "Welcome back";
   const action = isSignUp ? "Sign up" : "Sign in";
   const origin = isSignUp ? "signup" : "signin";
-  const infinitiveAction = isSignUp ? "signing up" : "signing in";
 
   let callbackUrl = (query?.callbackUrl as string) ?? "/dashboard";
 

@@ -44,7 +44,6 @@ class TdcPlugin(plugins.SingletonPlugin):
         }
 
     # IActions
-
     def get_actions(self):
         return {
             "package_create": action.package_create,

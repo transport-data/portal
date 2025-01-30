@@ -12,7 +12,12 @@ import {
 } from "@utils/auth";
 import { setCookie } from "cookies-next";
 
+const inviteIdsByIps = new Map();
+
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
+  if (req.cookies.invite_id) {
+    inviteIdsByIps.set(req.socket.remoteAddress, req.cookies.invite_id);
+  }
   return NextAuth(req, res, {
     // Configure one or more authentication providers
     pages: { signIn: "/auth/signin", error: "/auth/signin" },
@@ -38,7 +43,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
                 password: credentials.password,
                 client_secret: env.FRONTEND_AUTH_SECRET,
               },
-            },
+            }
           );
 
           if (user.result.id) {
@@ -50,7 +55,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
             };
           } else {
             return Promise.reject(
-              "/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username",
+              "/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username"
             );
           }
         },
@@ -71,18 +76,32 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
             user,
           };
 
-          const inviteId = req?.cookies?.invite_id;
-          if (inviteId) {
-            userLoginParams["invite_id"] = req.cookies.invite_id;
+          const invite_id = inviteIdsByIps.get(req.socket.remoteAddress)
+
+          if (invite_id) {
+            userLoginParams["invite_id"] = invite_id;
+            inviteIdsByIps.delete(req.socket.remoteAddress)
           }
-          const userLoginResult =
-            await ckanUserLoginWithGithub(userLoginParams);
+
+          let userLoginResult = await ckanUserLoginWithGithub(userLoginParams);
+
+          if (
+            "errors" in userLoginResult &&
+            userLoginResult.errors["auth"]![0]!.includes(
+              "The email address of the GitHub account you signed in with is already assigned"
+            )
+          ) {
+            delete userLoginParams["invite_id"];
+            userLoginResult = await ckanUserLoginWithGithub(userLoginParams);
+          }
 
           if ("errors" in userLoginResult) {
-            let url = `/auth/${origin ?? "signin"}?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
+            let url = `/auth/${
+              origin ?? "signin"
+            }?error=${userLoginResult?.errors?.auth?.join(" | ")}`;
 
-            if (origin == "signup" && inviteId) {
-              url += `&invite_id=${inviteId}`;
+            if (origin == "signup" && invite_id) {
+              url += `&invite_id=${invite_id}`;
             }
             return url;
           }
@@ -92,7 +111,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           setCookie(
             "onboarding_completed",
             userLoginResult?.onboarding_completed,
-            { req, res },
+            { req, res }
           );
         }
 
@@ -120,8 +139,9 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
             user,
           };
 
-          const userLoginResult =
-            await ckanUserLoginWithGithub(userLoginParams);
+          const userLoginResult = await ckanUserLoginWithGithub(
+            userLoginParams
+          );
 
           if ("errors" in userLoginResult) {
             throw new Error("Something went wrong");
