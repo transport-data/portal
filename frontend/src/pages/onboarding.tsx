@@ -173,10 +173,6 @@ export default function OnboardingPage({
   const inviteFriends = watch("newUsersEmailsToInvite");
   const inviteMessage = watch("messageToInviteNewUsers");
 
-  const isMessageEmpty = inviteMessage
-    ? !(inviteMessage.length > 0 && inviteMessage.toString() !== "<p></p>")
-    : true;
-
   const isUserEmpty = inviteFriends ? !(inviteFriends.length > 0) : true;
 
   useEffect(() => {
