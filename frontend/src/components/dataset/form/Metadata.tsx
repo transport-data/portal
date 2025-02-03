@@ -305,9 +305,9 @@ export function MetadataForm({ disabled }: any) {
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    fromYear={1970}
+                    fromYear={1000}
                     captionLayout="dropdown"
-                    toYear={2030}
+                    toYear={4000}
                     className={cn(disabled && "cursor-not-allowed")}
                     initialFocus
                   />
