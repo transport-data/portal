@@ -3,7 +3,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
+  CommandList,
 } from "@/components/ui/command";
 import {
   FormControl,
@@ -91,37 +91,38 @@ export function UnitsField({ disabled }: any) {
                       {f}
                     </CommandItem>
                   ))}
-                  {typedUnit.length > 2 && !field.value.includes(typedUnit) && (
-                    <CommandGroup>
-                      <CommandItem
-                        value={typedUnit}
-                        className={cn(
-                          field.value.includes(typedUnit)
-                            ? "bg-accent text-accent-foreground"
-                            : ""
-                        )}
-                        onSelect={() => {
-                          match(field.value.includes(typedUnit))
-                            .with(true, () =>
-                              setValue(
-                                "units",
-                                getValues("units").filter(
-                                  (v) => v !== typedUnit
+                  {typedUnit?.trim()?.length > 0 &&
+                    !field.value.includes(typedUnit) && (
+                      <CommandGroup>
+                        <CommandItem
+                          value={typedUnit}
+                          className={cn(
+                            field.value.includes(typedUnit)
+                              ? "bg-accent text-accent-foreground"
+                              : ""
+                          )}
+                          onSelect={() => {
+                            match(field.value.includes(typedUnit))
+                              .with(true, () =>
+                                setValue(
+                                  "units",
+                                  getValues("units").filter(
+                                    (v) => v !== typedUnit
+                                  )
                                 )
                               )
-                            )
-                            .with(false, () =>
-                              setValue(
-                                "units",
-                                getValues("units").concat(typedUnit)
-                              )
-                            );
-                        }}
-                      >
-                        Add {typedUnit}
-                      </CommandItem>
-                    </CommandGroup>
-                  )}
+                              .with(false, () =>
+                                setValue(
+                                  "units",
+                                  getValues("units").concat(typedUnit)
+                                )
+                              );
+                          }}
+                        >
+                          Add {typedUnit}
+                        </CommandItem>
+                      </CommandGroup>
+                    )}
                 </CommandList>
               </Command>
             </PopoverContent>
