@@ -1,8 +1,8 @@
 ---
 title: International Symposium on Transportation Data & Modelling - ISTDM 2023
 image: /images/events/istdm-2023.png
-from: 2024-11-02
-to: 2024-11-04
+from: 2023-06-19
+to: 2023-06-2
 organization: JRC European Commission
 location: JRC ISPRA, Italy
 link: https://joint-research-centre.ec.europa.eu/events/istdm2023-2023-06-19_en
