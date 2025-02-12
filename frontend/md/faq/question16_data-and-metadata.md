@@ -1,6 +1,6 @@
 ---
 title: How does the platform promote metadata exchange and data quality?
-category: metadata_and_data_quality
+category: metadata
 ---
 
 The TDC Portal supports the well established [__Statistical Data and Metadata Exchange (SDMX)__](sdmx.org) format to ensure compatibility of data sources and data quality ensurance. 
