@@ -1,5 +1,5 @@
 ---
-title: How do I access the TDC Portal via API?
+title: How does the TDC define sensitive data?
 category: sensitive_data
 ---
 
