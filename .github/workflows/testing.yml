@@ -86,7 +86,7 @@ jobs:
       - name: Print Error Logs
         if: failure()
         run: docker compose -f docker-compose.dev.yml --env-file .env.example logs
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: Frontend screenshots
