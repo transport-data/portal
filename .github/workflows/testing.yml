@@ -77,7 +77,7 @@ jobs:
           wait-on-timeout: 600
           command: npm run test
           working-directory: ./frontend
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
