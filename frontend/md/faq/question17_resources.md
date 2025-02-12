@@ -1,6 +1,6 @@
 ---
 title: How do I access the TDC Portal via API?
-category: resources_for_developers
+category: devs
 ---
 
 The TDC Portal provides a web interface for updating and managing data and metadata in the Transport Data Commons. However, the Portal does also allow programmatic access of data and metadata via API.
