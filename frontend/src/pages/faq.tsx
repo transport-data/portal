@@ -84,7 +84,7 @@ export default function Faq({
       <div className="container grid pb-8 lg:grid-cols-7 xl:gap-x-12">
         <div className="lg:col-span-2">
           <div className="inline-flex w-full flex-col items-start justify-start gap-6 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:max-w-fit lg:p-6 xl:p-8">
-            <div className="text-base font-bold uppercase leading-normal text-primary">
+            <div className="text-base font-bold leading-normal text-primary">
               Help & FAQs
             </div>
             <div className="flex flex-col items-start justify-start gap-4">
@@ -100,7 +100,7 @@ export default function Faq({
                 </a>
               ))}
             </div>
-            <Button asChild><a href="https://github.com/orgs/transport-data/discussions/categories/user-feedback" target="_blank">Got a question? Contact us</a></Button>
+            <Button asChild><a href="https://github.com/orgs/transport-data/discussions/categories/user-feedback" target="_blank">Further questions? Contact us!</a></Button>
           </div>
         </div>
         <div className="lg:col-span-5">
