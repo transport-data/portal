@@ -11,4 +11,6 @@ TDC uniquely convenes groups which approach transport and energy from broadly di
 - Energy firms, and
 - Consultancies.
 
-TDC welcomes broader participation from the global transport-energy modelling community. Interested teams should contact the [TDC organizing group](https://google.com).
+TDC welcomes broader participation from the global transport-energy modelling community. Interested teams should [contact the TDC organizing group](https://portal.transport-data.org/contact).
+
+For futher information about the TDC initiative, [visit our website](https://tdc.unece.org/).
