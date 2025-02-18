@@ -100,7 +100,7 @@ export default function Faq({
                 </a>
               ))}
             </div>
-            <Button asChild><a href="https://github.com/orgs/transport-data/discussions/categories/user-feedback" target="_blank">Further questions? Contact us!</a></Button>
+            <Button asChild><a href="https://portal.transport-data.org/contact" target="_blank">Further questions? Contact us!</a></Button>
           </div>
         </div>
         <div className="lg:col-span-5">
