@@ -4,7 +4,7 @@ category: getting_started
 ---
 
 For general inquiries, to join the initiative, or any other questions,
-please feel free to reach out to us via 📧 Email: contact@transport-data.org
+please feel free to reach out to us via 📧 Email: [contact@transport-data.org](mailto:contact@transport-data.org)
 
 If you have questions, suggestions, or encounter issues related to our data,
 we encourage you to use our GitHub Discussions Page.
