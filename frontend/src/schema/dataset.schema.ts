@@ -5,7 +5,7 @@ export const ResourceSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
   package_id: z.string().optional(),
-  url_type: z.string(),
+  url_type: z.string().nullable(),
   format: z.string().optional(),
   size: z.number().optional().nullable(),
   resource_type: z.enum(["data", "documentation"]),
