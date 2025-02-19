@@ -8,7 +8,8 @@ When you encounter an issue using the TDC Portal or have feedback for us, you ca
 ### If you have a __Github account__:
 
 1. Go to our 🔗 [__GitHub Discussions page__](https://github.com/orgs/transport-data/discussions/categories/user-feedback)
-<img width="635" alt="image" src="https://github.com/user-attachments/assets/8c1abd1a-e4b6-41c6-96a7-ee07f7f2d4c4" />
+
+![image](https://github.com/user-attachments/assets/5f9893e1-bba9-4893-9f91-92559710da6c)
 
 2. Open a __New discussion__ and describe your issue or feedback. If possible, add details such as a screenshot, context information (e.g., browser, or system environment), or the steps to reproduce the issue.
 
