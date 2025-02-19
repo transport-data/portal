@@ -7,7 +7,7 @@ When you encounter an issue using the TDC Portal or have feedback for us, you ca
 
 ### If you have a __Github account__:
 
-1. Go to our [__GitHub Discussions page__](https://github.com/orgs/transport-data/discussions/categories/user-feedback)
+1. Go to our 🔗 [__GitHub Discussions page__](https://github.com/orgs/transport-data/discussions/categories/user-feedback)
 <img width="635" alt="image" src="https://github.com/user-attachments/assets/8c1abd1a-e4b6-41c6-96a7-ee07f7f2d4c4" />
 
 2. Open a __New discussion__ and describe your issue or feedback. If possible, add details such as a screenshot, context information (e.g., browser, or system environment), or the steps to reproduce the issue.
@@ -21,7 +21,7 @@ We will react to your ticket. If you have reported an issue, we will investigate
 
 ### If you don't have a __Github account__:
 
-Contact us via [__contact@transport-data.org__](mailto:contact@transport-data.org), describing your issue or feedback. If possible, add details such as a screenshot, context information (e.g., browser, or system environment), or the steps to reproduce the issue.
+Contact us via 📧 [__contact@transport-data.org__](mailto:contact@transport-data.org), describing your issue or feedback. If possible, add details such as a screenshot, context information (e.g., browser, or system environment), or the steps to reproduce the issue.
 
 __→ What happens next?__
 
