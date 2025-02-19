@@ -66,3 +66,21 @@ So with the following information we can see that the example gave above is goin
 In the 'Getting started' section
 
 One final thing to none is that the questions are arranged in alphabetical order of the filename, so inside the category `question1.md` is going to come before `question2.md` etc
+
+## Editing FAQ sections
+
+To change the sections present in the FAQ page you have to change it directly in the page code here: https://github.com/transport-data/portal/blob/main/frontend/src/pages/faq.tsx#L33
+
+If you change only this text it'll apply to the frontend without any problems.
+
+if you want to add a new category you have to add it to the same object by adding a new key with a new title:
+
+![image](https://github.com/user-attachments/assets/bd49ea4d-ca7d-4d72-9261-d0065be4bd6d)
+
+
+Then you have to create a new question .md file to be presented on the category accordion it must have the same key created for the object above, like this:
+
+![image](https://github.com/user-attachments/assets/b8a157c1-1578-4e3b-8a43-637ec484d11f)
+
+ 
+
