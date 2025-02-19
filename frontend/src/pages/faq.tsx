@@ -31,6 +31,7 @@ const categories = {
   devs: { title: "Resources for Developers" },
   sensitive_data: { title: "Sensitive Data" },
   licenses: { title: "Data Licenses" },
+  issues: { title: "Issues and Feedback" },
 };
 
 const breadcrumbs = [
