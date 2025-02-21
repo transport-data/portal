@@ -5,7 +5,7 @@ import random
 import string
 import json
 import os.path as path
-
+from ckan.lib.search import rebuild
 from sqlalchemy import func
 from jinja2 import Environment, FileSystemLoader
 from socket import error as socket_error
@@ -319,6 +319,14 @@ def package_delete(up_func, context, data_dict):
         related_datasets.remove(package['name'])
         tk.get_action('package_patch')({ "ignore_auth": True }, {'id': item['id'], 'related_datasets': related_datasets})
     result = up_func(context, data_dict)
+    return result
+
+@tk.chained_action
+def organization_update(up_func, context, data_dict):
+    before_update_org = tk.get_action('organization_show')(context, {'id': data_dict['id'], 'all_fields': True})
+    result = up_func(context, data_dict)
+    if(result.get('name') != before_update_org.get('name')):
+        rebuild(defer_commit=True)
     return result
 
 

@@ -48,6 +48,7 @@ class TdcPlugin(plugins.SingletonPlugin):
         return {
             "package_create": action.package_create,
             "package_delete": action.package_delete,
+            "organization_update": action.organization_update,
             "package_update": action.package_update,
             # "package_patch": action.package_patch,
             "package_search": action.package_search,
