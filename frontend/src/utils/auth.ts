@@ -33,6 +33,7 @@ export async function ckanUserLoginWithGithub({
     from_github: true,
     email: user?.email,
     name: user?.name,
+    fullname: user.name,
     token: access_token,
     client_secret: env.FRONTEND_AUTH_SECRET,
   };
@@ -49,7 +50,7 @@ export async function ckanUserLoginWithGithub({
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-    },
+    }
   );
 
   const userLoginData: CkanResponse<

@@ -528,6 +528,7 @@ def user_login(context, data_dict):
         if from_github:
             token = data_dict['token']
             email = data_dict['email']
+            fullname = data_dict['fullname'] or data_dict['name']
             model = context['model']
             context['ignore_auth'] = True
             invite_id = data_dict.get("invite_id", None)
@@ -560,6 +561,7 @@ def user_login(context, data_dict):
 
                 # Email adress is available and invite is valid
                 invited_ckan_user.email = email
+                invited_ckan_user.fullname = fullname
                 invited_ckan_user.reset_key = mailer.make_key()
                 invited_ckan_user.state = 'active'
                 model.repo.commit_and_remove()
@@ -582,14 +584,17 @@ def user_login(context, data_dict):
                     context,
                     {
                         'name': user_name,
-                        'display_name': data_dict['name'],
-                        'fullname': data_dict['name'],
+                        'display_name': fullname,
+                        'fullname': fullname,
                         'email': email,
                         'password': password,
                         'state': 'active',
                     },
                 )
             else:
+                if fullname != user.fullname:
+                    user.fullname = fullname
+                    model.repo.commit()
                 user = user.as_dict()
 
             if config.get('ckanext.auth.include_frontend_login_token', False):
