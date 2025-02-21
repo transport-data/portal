@@ -265,7 +265,7 @@ def dashboard_activity_list_action(
         }
 
         cached_users_data[user_id] = user_data
-        return name
+        return user_data
 
     if dashboard:
         last_viewed = dashboard.activity_stream_last_viewed
