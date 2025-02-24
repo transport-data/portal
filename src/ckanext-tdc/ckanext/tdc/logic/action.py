@@ -325,8 +325,8 @@ def package_delete(up_func, context, data_dict):
 def organization_update(up_func, context, data_dict):
     before_update_org = tk.get_action('organization_show')(context, {'id': data_dict['id'], 'all_fields': True})
     result = up_func(context, data_dict)
-    if(result.get('name') != before_update_org.get('name')):
-        rebuild(defer_commit=True)
+    if(result.get('name') != before_update_org.get('name')) or result.get('title') != before_update_org.get('title'):
+        rebuild()
     return result
 
 
@@ -421,6 +421,7 @@ def _add_display_name_to_contributors_facets(search_response):
 
 
 def _fix_facet_items_per_field_type(result):
+    return
     dataset_schema = scheming_helpers.scheming_get_dataset_schema("dataset")
     search_facets = result.get("search_facets", [])
 
