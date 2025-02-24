@@ -27,6 +27,7 @@ from ckanext.datapusher.plugin import DatapusherPlugin
 from ckanext.tdc.conversions import converters
 from ckanext.tdc.schemas.schemas import dataset_approval_schema
 from ckanext.tdc.authz import is_org_admin_or_sysadmin
+import subprocess
 
 log = logging.getLogger(__name__)
 
@@ -325,10 +326,13 @@ def package_delete(up_func, context, data_dict):
 def organization_update(up_func, context, data_dict):
     before_update_org = tk.get_action('organization_show')(context, {'id': data_dict['id'], 'all_fields': True})
     result = up_func(context, data_dict)
-    if(result.get('name') != before_update_org.get('name')) or result.get('title') != before_update_org.get('title'):
-        rebuild()
-    return result
+    try:
+        if(result.get('name') != before_update_org.get('name')) or result.get('title') != before_update_org.get('title'):
+            subprocess.Popen(["ckan", "search-index", "rebuild"])
+    except Exception:
+        return result
 
+    return result
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
