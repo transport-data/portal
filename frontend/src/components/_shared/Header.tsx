@@ -130,7 +130,10 @@ export default function Header({
               </div>
             ) : session?.user ? (
               <div className="relative flex items-center gap-[12px]">
-                <Link target="_blank" href="https://civicrm.changing-transport.org/form/tdci-newsletter">
+                <Link
+                  target="_blank"
+                  href="https://civicrm.changing-transport.org/form/tdci-newsletter"
+                >
                   <BellIcon width={22} className="text-gray-500" />
                 </Link>
 
@@ -158,6 +161,7 @@ export default function Header({
                     userEmail={session.user.email}
                     isSysAdmin={isSysAdmin}
                     handleSignOut={handleSignOut}
+                    fullName={(session?.user as any)?.fullName}
                     setShowDropdown={setShowDropdown}
                   />
                 )}

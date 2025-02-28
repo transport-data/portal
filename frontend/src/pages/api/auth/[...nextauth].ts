@@ -117,17 +117,6 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 
         return true;
       },
-      session: ({ session, token }) => {
-        return {
-          ...session,
-          user: {
-            ...session.user,
-            apikey: token.apikey ? token.apikey : "",
-            id: token.sub,
-            sysadmin: token.sysadmin,
-          },
-        };
-      },
       async jwt({ token, user, account }) {
         if (user) {
           token.apikey = user.apikey;
@@ -158,6 +147,18 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           return { ...token, ...user, sub: userLoginResult.id };
         }
         return token;
+      },
+      session: ({ session, token }) => {
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            apikey: token.apikey ? token.apikey : "",
+            fullName: token.fullname,
+            id: token.sub,
+            sysadmin: token.sysadmin,
+          },
+        };
       },
     },
   });

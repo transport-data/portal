@@ -4,6 +4,7 @@ import Link from "next/link";
 interface UserMenuDropdownProps {
   userName?: string;
   userEmail?: string;
+  fullName?: string;
   isSysAdmin: boolean;
   handleSignOut: () => void;
   setShowDropdown: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,6 +12,7 @@ interface UserMenuDropdownProps {
 
 export default function UserMenuDropdown({
   userName,
+  fullName,
   userEmail,
   isSysAdmin,
   handleSignOut,
@@ -46,6 +48,9 @@ export default function UserMenuDropdown({
         aria-labelledby="options-menu"
       >
         <div className="px-4 py-2 text-sm font-bold text-gray-900">
+          {fullName}
+        </div>
+        <div className="px-4 py-2 text-sm text-gray-500">
           {userName}
         </div>
         <div className="px-4 py-2 text-sm text-gray-500">{userEmail}</div>

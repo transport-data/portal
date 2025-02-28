@@ -65,7 +65,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
       ?.filter((x) => !orgUsers?.some((a) => a.id === x.id))
       .map((user) => ({
         value: user.id,
-        label: `${user.display_name} - ${user.email}`,
+        label: `${user.display_name} ${user.name === user.display_name ?'' : `- ${user.name}`}`,
       })) || [];
 
   const roleOptions = [
