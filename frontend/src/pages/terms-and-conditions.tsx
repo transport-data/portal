@@ -75,14 +75,11 @@ export default function Faq({
 
       <div className="mb-12 flex w-full flex-col items-center justify-center">
         <div className="shrink grow basis-0 pb-4 text-2xl font-bold leading-9 text-primary">
-          {termsAndConditions?.other[0]?.title}
+          {termsAndConditions?.other?.at(0)?.title}
         </div>
         <div className="prose prose-p:mt-2 prose-p:text-base prose-p:text-gray-500 prose-a:text-accent prose-a:no-underline prose-ul:mt-2 prose-li:m-0 prose-li:text-base prose-li:text-gray-500">
           <Markdown remarkPlugins={[remarkFrontmatter]}>
-            {
-              // @ts-ignore
-              termsAndConditions["other"][0]["source"]
-            }
+            {termsAndConditions?.other?.at(0)?.source}
           </Markdown>
         </div>
       </div>
