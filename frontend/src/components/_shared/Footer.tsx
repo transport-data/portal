@@ -29,9 +29,8 @@ const Footer: React.FC = () => {
       { name: "Contact", href: "/contact" },
     ],
     legal: [
-      { name: "Privacy and Policy", href: "#" },
-      { name: "Terms and Conditions", href: "#" },
-      { name: "EULA", href: "#" },
+      { name: "Privacy and Policy", href: "/privacy-and-policy" },
+      { name: "Terms and Conditions", href: "/terms-and-conditions" },
     ],
     social: [
       {
