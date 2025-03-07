@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
       { name: "Contact", href: "/contact" },
     ],
     legal: [
-      { name: "Privacy and Policy", href: "/privacy-and-policy" },
+      { name: "Privacy Policy", href: "/privacy-policy" },
       { name: "Terms and Conditions", href: "/terms-and-conditions" },
     ],
     social: [

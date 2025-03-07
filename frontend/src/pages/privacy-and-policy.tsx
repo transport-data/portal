@@ -14,8 +14,8 @@ const breadcrumbs = [
     label: "Home",
   },
   {
-    href: `/privacy-and-policy`,
-    label: `Privacy and Policy`,
+    href: `/privacy-policy`,
+    label: `Privacy Policy`,
   },
 ];
 
@@ -23,7 +23,7 @@ export const getStaticProps = async () => {
   const mddb = await clientPromise;
   // get all files that are not marked as draft in the frontmatter
   const privacyAndPolicyFiles = await mddb.getFiles({
-    folder: "privacy-and-policy",
+    folder: "privacy-policy",
   });
   const privacyAndPolicy = R.groupBy(
     privacyAndPolicyFiles.map((file) => {
