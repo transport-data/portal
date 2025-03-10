@@ -93,5 +93,12 @@
     "image": "/images/logos/partners/climate-trace-colored.png",
     "name": "Climate TRACE",
     "url": "https://climatetrace.org"
+  },
+  {
+    "image": "/images/sponsors/hvt.png",
+    "name": "High Volume Transport Applied Research Programme (HVT)",
+    "url": "https://transport-links.com/"
   }
+  
+
 ]
