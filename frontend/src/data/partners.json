@@ -78,5 +78,15 @@
     "image": "/images/logos/partners/unece-colored.svg",
     "name": "UNECE",
     "url": "https://unece.org"
+  },
+  {
+    "image": "/images/logos/partners/the-world-bank-colored.svg",
+    "name": "World Bank",
+    "url": "https://www.worldbank.org"
+  },
+  {
+    "image": "/images/logos/partners/chalmers-colored.svg",
+    "name": "University of Chalmers Göteborg",
+    "url": "https://www.chalmers.se"
   }
 ]
