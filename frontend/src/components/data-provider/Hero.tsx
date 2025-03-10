@@ -62,14 +62,6 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/gfei-colored.jpg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/oica-colored.jpg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/tumi-colored.svg"}
           />
         </div>
