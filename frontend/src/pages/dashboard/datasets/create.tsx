@@ -39,6 +39,11 @@ const docs = [
     format: "PDF",
     url: "/faq",
   },
+  {
+    title: "HOWTO Create records using the TDC Portal",
+    format: "PDF",
+    url: "https://transport-data--45.org.readthedocs.build/en/45/howto/portal.html",
+  },
 ];
 
 const CreateDatasetDashboard: NextPage = () => {
