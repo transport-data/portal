@@ -167,5 +167,8 @@
   },
   "ct3aMetadata": {
     "initVersion": "7.18.0"
+  },
+  "resolutions": {
+    "axios": "^1.8.2"
   }
 }
