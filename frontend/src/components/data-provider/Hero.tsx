@@ -30,22 +30,6 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/ifeu-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/oxford-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/ricardo-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/kfw-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/unece-colored.svg"}
           />
           <img
@@ -58,15 +42,7 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/ebrd-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/solcat-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/fia-colored.svg"}
           />
           <img
             className="object-contain"
@@ -74,19 +50,7 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/chalmers-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/fdm-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/iiasa-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/sei-colored.svg"}
           />
           <img
             className="object-contain"
@@ -94,55 +58,19 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/uc-davis-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/wri-colored.svg"}
-          />
-          <img
-            className="object-contain md:pl-12"
-            src={"/images/logos/partners/itdp-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/mobilise-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/ccg-colored.svg"}
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/sumc-colored.svg"}
+            src={"/images/logos/partners/gfei-colored.jpg"}
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/gnpt-colored.svg"}
+            src={"/images/logos/partners/oica-colored.jpg"}
           />
           <img
-            className="object-contain md:pl-6"
+            className="object-contain"
             src={"/images/logos/partners/tumi-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/loughbrough-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/itf-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/icct-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/the-world-bank-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/cgep-colored.svg"}
           />
         </div>
       </div>
