@@ -12,14 +12,15 @@ export default function Hero() {
             </h2>
             <p className="mb-8 text-center text-xl leading-[30px] text-gray-500">
               Help us build a more comprehensive and diverse transportation data
-              repository by contributing your own transportation-related
+              repository 
+              by contributing your own transportation-related
               datasets.
             </p>
             <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
-              <Link href="/dashboard/datasets/create">Add data to TDC</Link>
+              <Link href="/dashboard/datasets/create">Add Data to TDC</Link>
             </Button>
             <p className="font-semibold text-gray-500">
-              Join organisation which already provide data to TDC
+              Join the organisations which already provide data to TDC.
             </p>
           </div>
         </div>
@@ -63,6 +64,18 @@ export default function Hero() {
           <img
             className="object-contain"
             src={"/images/logos/partners/tumi-colored.svg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/gfei-colored.jpg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/oica-colored.jpg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/climate-trace-colored.jpg"}
           />
         </div>
       </div>
