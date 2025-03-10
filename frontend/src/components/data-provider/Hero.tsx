@@ -12,14 +12,15 @@ export default function Hero() {
             </h2>
             <p className="mb-8 text-center text-xl leading-[30px] text-gray-500">
               Help us build a more comprehensive and diverse transportation data
-              repository by contributing your own transportation-related
+              repository 
+              by contributing your own transportation-related
               datasets.
             </p>
             <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
-              <Link href="/dashboard/datasets/create">Add data to TDC</Link>
+              <Link href="/dashboard/datasets/create">Add Data to TDC</Link>
             </Button>
             <p className="font-semibold text-gray-500">
-              Join organisation which already provide data to TDC
+              Join the organisations which already provide data to TDC.
             </p>
           </div>
         </div>
@@ -27,22 +28,6 @@ export default function Hero() {
           <img
             className="object-contain md:pl-12"
             src={"/images/logos/partners/giz-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/ifeu-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/oxford-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/ricardo-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/kfw-colored.svg"}
           />
           <img
             className="object-contain"
@@ -58,15 +43,7 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/ebrd-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/solcat-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/fia-colored.svg"}
           />
           <img
             className="object-contain"
@@ -74,19 +51,7 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/chalmers-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/fdm-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/iiasa-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/sei-colored.svg"}
           />
           <img
             className="object-contain"
@@ -94,55 +59,23 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/uc-davis-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/wri-colored.svg"}
-          />
-          <img
-            className="object-contain md:pl-12"
-            src={"/images/logos/partners/itdp-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/mobilise-colored.svg"}
-          />
-          <img
-            className="object-contain"
             src={"/images/logos/partners/ccg-colored.svg"}
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/sumc-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/gnpt-colored.svg"}
-          />
-          <img
-            className="object-contain md:pl-6"
             src={"/images/logos/partners/tumi-colored.svg"}
           />
           <img
-            className="object-contain"
-            src={"/images/logos/partners/loughbrough-colored.svg"}
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/gfei-colored.jpg"}
           />
           <img
-            className="object-contain"
-            src={"/images/logos/partners/itf-colored.svg"}
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/oica-colored.jpg"}
           />
           <img
-            className="object-contain"
-            src={"/images/logos/partners/icct-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/the-world-bank-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/cgep-colored.svg"}
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/climate-trace-colored.png"}
           />
         </div>
       </div>

@@ -30,12 +30,17 @@ import { useUserGlobalOrganizationRoles } from "@hooks/user";
 
 const docs = [
   {
+    title: "HOWTO Create records using the TDC Portal",
+    format: "PDF",
+    url: "https://transport-data--45.org.readthedocs.build/en/45/howto/portal.html",
+  },
+  {
     title: "SDMX Technical Specifications",
     format: "PDF",
     url: "https://sdmx.org/?page_id=5008",
   },
   {
-    title: "Help & FAQ Section of the platform",
+    title: "Help & FAQ Section",
     format: "PDF",
     url: "/faq",
   },
