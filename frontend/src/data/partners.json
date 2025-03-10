@@ -88,5 +88,10 @@
     "image": "/images/logos/partners/chalmers-colored.svg",
     "name": "University of Chalmers Göteborg",
     "url": "https://www.chalmers.se"
+  },
+  {
+    "image": "/images/logos/partners/climate-trace-colored.svg",
+    "name": "Climate TRACE",
+    "url": "https://climatetrace.org"
   }
 ]
