@@ -74,8 +74,8 @@ export default function Hero() {
             src={"/images/logos/partners/oica-colored.jpg"}
           />
           <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/climate-trace-colored.jpg"}
+            className="object-contain"
+            src={"/images/logos/partners/climate-trace-colored.png"}
           />
         </div>
       </div>
