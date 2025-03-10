@@ -99,8 +99,6 @@
     "embla-carousel-react": "^8.2.0",
     "flowbite-react": "^0.10.1",
     "formik": "^2.2.9",
-    "frictionless-js-browser": "^1.0.8",
-    "frictionless.js": "^0.13.4",
     "ky": "^0.33.3",
     "libsodium-wrappers": "^0.7.11",
     "lucide-react": "^0.436.0",
@@ -167,8 +165,5 @@
   },
   "ct3aMetadata": {
     "initVersion": "7.18.0"
-  },
-  "resolutions": {
-    "axios": "^1.8.2"
   }
 }
