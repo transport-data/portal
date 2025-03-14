@@ -340,16 +340,20 @@ def _filter_by_action_activity_type_status_and_query(q, activity_type=None, stat
                 )
             )
     if query:
+        from ckan.model import User
+        from ckan.model.meta import Session
+        usernames = Session.query(User.name) \
+            .filter(or_(User.name.ilike(f"%{query}%"), User.fullname.ilike(f"%{query}%"))).all()
         q = q.filter(
             or_(
                 (
                     core_model_activity.Activity.data.cast(JSON).op(
                         '->')('package').op('->>')('title').ilike(f'%{query}%')
                 ),
-                (
+                *[(
                     core_model_activity.Activity.data.cast(JSON).op(
-                        '->')('actor').op('->>')('name').ilike(f'%{query}%')
-                ),
+                        '->>')('actor') == name
+                ) for name in [user[0] for user in usernames]],
                 (
                     core_model_activity.Activity.data.cast(JSON).op(
                         '->')('group').op('->>')('title').ilike(f'%{query}%')
