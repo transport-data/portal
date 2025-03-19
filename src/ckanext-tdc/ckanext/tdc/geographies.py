@@ -73,6 +73,11 @@ def create_geography(data_dict):
     show_group_action = tk.get_action("group_show")
     data_dict["type"] = "geography"
 
+    # The shared geojson set Cyprus as an Asia country 
+    # but it's global consensus that it's part of Europe
+    if data_dict['name'] == 'cyp':
+        data_dict['groups'] = [{"name": TDC_REGIONS[150]["name"]}]
+
     group_exists = True
     try:
         show_group_action(priviliged_context, {"id": data_dict["name"]})
