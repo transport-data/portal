@@ -79,20 +79,25 @@ def _fix_geographies_field(data_dict):
     to geographies and regions groups
     """
     geography_names = data_dict.get("geographies", [])
+    region_names = data_dict.get("regions", [])
 
     if isinstance(geography_names, str):
         geography_names = [geography_names]
 
+    if isinstance(region_names, str):
+        region_names = [region_names]
+
     has_geographies = isinstance(
         geography_names, list) and len(geography_names) > 0
+    has_regions = isinstance(region_names, list) and len(region_names) > 0
+
+    priviliged_context = {"ignore_auth": True}
+    group_list_action = tk.get_action("group_list")
 
     if has_geographies:
         countries = []
         regions = []
 
-        priviliged_context = {"ignore_auth": True}
-
-        group_list_action = tk.get_action("group_list")
         group_list_data_dict = {
             "type": "geography",
             "groups": geography_names,
@@ -132,6 +137,25 @@ def _fix_geographies_field(data_dict):
         data_dict["groups"] = groups
         data_dict["geographies"] = countries
         data_dict["regions"] = regions
+    elif has_regions:
+        group_list_data_dict = {
+            "type": "geography",
+            "groups": region_names,
+            "include_extras": True,
+            "all_fields": True,
+            "include_groups": True
+        }
+        group_list = group_list_action(
+            priviliged_context, group_list_data_dict)
+
+        group_list_names = [x.get("name") for x in group_list]
+        for group_name in region_names:
+            if group_name not in group_list_names:
+                raise logic.ValidationError(
+                        {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
+
+        data_dict["regions"] = region_names
+
 
 
 def _update_contributors(context, data_dict, is_update=False):
