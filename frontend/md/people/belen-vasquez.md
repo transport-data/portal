@@ -1,7 +1,8 @@
 ---
-title: Daniel Bongardt
+title: Belén Vásquez
 info: German Development Cooperation (GIZ)
-image: /images/people/daniel-bongardt.png
+image: /images/people/belen-vasquez.png
 ---
 
-I am currently heading GIZ's global projects on transport and climate change TraCS and TRANSfer - both funded by the German Ministry for the Environment. From 2011 to 2015, I have lived in Beijing and headed various sustainable transport projects in China. Interested in a broad range of topics (e.g. urban mobility, freight and logistics, green hydrogen (PtX), electromobility), my passion is to understand and reduce transport emissions. Before joining GIZ in 2009, I researched sustainable mobility at the German think tank Wuppertal Institute for Climate, Environment and Energy.
+I am a Junior Advisor in Transport and Climate Change and an advocate for active mobility. I believe that when transport systems are thoughtfully designed, they can enhance quality of life and drive sustainable change. I am particularly interested in how data and emerging technologies can maximise impact.
+Having lived in Latin America, Europe, and Asia, I value international collaboration and have a deep appreciation for diverse local contexts.
