@@ -156,6 +156,13 @@ def _fix_geographies_field(data_dict):
 
         data_dict["regions"] = region_names
 
+    if has_geographies or has_regions:
+        groups = data_dict.get("groups", [])
+        groups_names_not_present_on_geographies_names = set(x.get("name") for x in groups) - set(geography_names + region_names)
+        geograhies_names = set(tk.get_action('group_list')(privileged_context, {'type': 'geography'}))
+        geographies_groups_not_present_on_the_dataset_geographies = geograhies_names & groups_names_not_present_on_geographies_names
+        data_dict["groups"] = [x for x in groups if x.get('name') not in geographies_groups_not_present_on_the_dataset_geographies]
+
 
 
 def _update_contributors(context, data_dict, is_update=False):
