@@ -40,7 +40,7 @@ Having lived in different cities around the world, I highly value international 
 The key components in each file are:
 
 - **title**: The person's name.
-- **image**: The person's image, which can be either a full URL or a relative link. If using a relative link, the image must be stored in the `/frontend/public` folder.
+- **image**: The person's image, which can be either a full URL or a relative link. If using a relative link, the image must be stored in the `/frontend/public/images/people` folder.
 - **info**: The organization the person belongs to.
 
 After these frontmatter sections, you can add the markdown content describing the person's bio, which may include headings, links, lists, and more.
