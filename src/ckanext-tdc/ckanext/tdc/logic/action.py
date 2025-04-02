@@ -5,7 +5,6 @@ import random
 import string
 import json
 import os.path as path
-from ckan.lib.search import rebuild
 from sqlalchemy import func
 from jinja2 import Environment, FileSystemLoader
 from socket import error as socket_error
@@ -80,19 +79,14 @@ def _fix_geographies_field(data_dict):
     to geographies and regions groups
     """
     geography_names = data_dict.get("geographies", [])
-    region_names = data_dict.get("regions", [])
 
     if isinstance(geography_names, str):
         geography_names = [geography_names]
 
-    if isinstance(region_names, str):
-        region_names = [region_names]
-
     has_geographies = isinstance(
         geography_names, list) and len(geography_names) > 0
-    has_regions = isinstance(region_names, list) and len(region_names) > 0
 
-    if has_geographies or has_regions:
+    if has_geographies:
         countries = []
         regions = []
 
@@ -101,7 +95,7 @@ def _fix_geographies_field(data_dict):
         group_list_action = tk.get_action("group_list")
         group_list_data_dict = {
             "type": "geography",
-            "groups": geography_names + region_names,
+            "groups": geography_names,
             "include_extras": True,
             "all_fields": True,
             "include_groups": True
@@ -110,7 +104,7 @@ def _fix_geographies_field(data_dict):
             priviliged_context, group_list_data_dict)
 
         group_list_names = [x.get("name") for x in group_list]
-        for group_name in geography_names + region_names:
+        for group_name in geography_names:
             if group_name not in group_list_names:
                 raise logic.ValidationError(
                         {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
