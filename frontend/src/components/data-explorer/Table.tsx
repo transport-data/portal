@@ -200,7 +200,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
                   className="truncate font-medium text-gray-900"
                 >
                   {typeof column.columnDef.header === "string"
-                    ? column.columnDef.header
+                    ? column.columnDef.header.replace("unsafe_", "")
                     : column.id}
                 </label>
               </div>
@@ -216,14 +216,14 @@ export function Table({ table, isLoading }: TableProps) {
   const numOfColumns = table.getAllColumns().length;
   return (
     <div className="flex max-w-full grow">
-      <table className="block shadow w-max">
+      <table className="block w-max shadow">
         <thead className="bg-gray-100 text-left">
           {table.getLeftHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((h) => (
                 <th
                   key={h.id}
-                  className="min-w-[200px] py-8 pl-12 text-sm text-gray-500 font-semibold"
+                  className="min-w-[200px] py-8 pl-12 text-sm font-semibold text-gray-500"
                 >
                   <Column h={h} />
                 </th>
@@ -255,7 +255,7 @@ export function Table({ table, isLoading }: TableProps) {
                   {hg.headers.map((h) => (
                     <th
                       key={h.id}
-                      className="min-w-[200px] py-8 pl-12 text-sm text-gray-500 font-semibold"
+                      className="min-w-[200px] py-8 pl-12 text-sm font-semibold text-gray-500"
                     >
                       <Column h={h} />
                     </th>
@@ -313,7 +313,10 @@ export function Table({ table, isLoading }: TableProps) {
 function Column({ h }: { h: Header<any, unknown> }) {
   return (
     <div className="relative flex items-center gap-x-2 pr-4">
-      {flexRender(h.column.columnDef.header, h.getContext())}
+      {flexRender(
+        h.column.columnDef.header?.replace("unsafe_", ""),
+        h.getContext()
+      )}
       {match(h.column.getIsSorted())
         .with(false, () => (
           <Tooltip content="Sort by this column">
@@ -427,7 +430,10 @@ function FilterForm({ column }: { column: ColumnType<any, unknown> }) {
     <FormProvider {...formObj}>
       <div className="flex flex-col gap-y-2 px-4 py-4">
         <div className="flex flex-col items-center justify-center gap-y-2">
-          <Filters datePicker={column.columnDef.meta?.type === "timestamp"} text={column.columnDef.meta?.type === 'text'} />
+          <Filters
+            datePicker={column.columnDef.meta?.type === "timestamp"}
+            text={column.columnDef.meta?.type === "text"}
+          />
         </div>
       </div>
     </FormProvider>
@@ -505,11 +511,11 @@ export default function Filters({
               },
             ].filter((o) => {
               if (!datePicker) {
-                  if (!text) {
-                    return o.value !== "ilike"
-                  }
-                  return true
-                };
+                if (!text) {
+                  return o.value !== "ilike";
+                }
+                return true;
+              }
               return datePicker && o.value !== "=" && o.value !== "!=";
             })}
             placeholder="Select a filter"
@@ -593,7 +599,7 @@ export function ListOfFilters({
             className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 px-3 py-1 shadow transition hover:bg-neutral-200"
           >
             <div className="font-['Acumin Pro SemiCondensed'] text-xs font-semibold leading-none text-black">
-              {f.id}
+              {f.id.replace("unsafe_", "")}
             </div>
             <Tooltip content="Remove filter">
               <button onClick={() => removeFilter(i)}>
