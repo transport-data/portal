@@ -81,7 +81,7 @@ export function MetadataForm({ disabled }: any) {
   };
 
   const datasetSchema = api.dataset.schema.useQuery();
-  console.log(formObj.watch("geographies"));
+
   return (
     <div className="w-full py-6">
       <div className="text-xl font-bold leading-normal text-primary">
