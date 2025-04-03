@@ -49,7 +49,9 @@ export default function DatasetsSection({
           </>
         ) : (
           datasets.map((dataset, i) => {
-            const [firstTag, secondTag, ...restTags] = dataset.topics || [];
+            const [firstTag, secondTag, ...restTags] = (dataset.tags || []).map(
+              (x) => x.display_name || x.name
+            );
             const regionsLength = dataset.regions?.length ?? 0;
             return (
               <div key={`recent-${i}`} className="">
