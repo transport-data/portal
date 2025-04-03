@@ -57,6 +57,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { GroupTree } from "@schema/group.schema";
 
 export function MetadataForm({ disabled }: any) {
   const formObj = useFormContext<DatasetFormType>();
@@ -64,7 +65,23 @@ export function MetadataForm({ disabled }: any) {
   const geographies = api.group.tree.useQuery({
     type: "geography",
   });
+
+  const formGeographies = formObj.watch("geographies") ?? [];
+
+  const getTooltipSelectionPrefix = (region: GroupTree, field: any) => {
+    if (region.name === "worldwide") {
+      return formGeographies.length > 0 ? "Remove" : "Select";
+    }
+
+    return region.children
+      .map((c) => c.name)
+      .every((c) => field.value.includes(c))
+      ? "Remove"
+      : "Select";
+  };
+
   const datasetSchema = api.dataset.schema.useQuery();
+  console.log(formObj.watch("geographies"));
   return (
     <div className="w-full py-6">
       <div className="text-xl font-bold leading-normal text-primary">
@@ -411,7 +428,7 @@ export function MetadataForm({ disabled }: any) {
                             disabled={disabled}
                             className={cn(
                               disabled && "cursor-not-allowed",
-                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary overflow-hidden",
+                              "w-full justify-start gap-x-2 overflow-hidden pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
                             )}
@@ -434,39 +451,45 @@ export function MetadataForm({ disabled }: any) {
                           <CommandInput placeholder="Search countries..." />
                           <CommandList>
                             <CommandEmpty>No country found</CommandEmpty>
-                            {geographies.map((r) => (
+                            {geographies.map((region) => (
                               <CommandGroup
-                                key={r.name}
+                                key={region.name}
                                 heading={
                                   <DefaultTooltip
-                                    content={`${
-                                      r.children
-                                        .map((c) => c.name)
-                                        .every((c) => field.value.includes(c))
-                                        ? "Remove"
-                                        : "Select"
-                                    } all countries in this region`}
+                                    content={`${getTooltipSelectionPrefix(
+                                      region,
+                                      field
+                                    )} all countries in this region`}
                                   >
                                     <span
                                       className="text-gray-600"
                                       onClick={() => {
-                                        const countries = r.children.map(
+                                        if (region.name === "worldwide") {
+                                          setValue(
+                                            "geographies",
+                                            formGeographies.length > 0
+                                              ? []
+                                              : countries.map((x) => x.name)
+                                          );
+                                          return;
+                                        }
+                                        const _countries = region.children.map(
                                           (c) => c.name
                                         );
                                         if (
-                                          countries.every((c) =>
+                                          _countries.every((c) =>
                                             field.value.includes(c)
                                           )
                                         ) {
                                           setValue(
                                             "geographies",
                                             field.value.filter(
-                                              (v) => !countries.includes(v)
+                                              (v) => !_countries.includes(v)
                                             )
                                           );
                                         } else {
                                           let newCountries =
-                                            field.value.concat(countries);
+                                            field.value.concat(_countries);
                                           newCountries = newCountries.filter(
                                             (v, i, a) => a.indexOf(v) === i
                                           );
@@ -474,13 +497,13 @@ export function MetadataForm({ disabled }: any) {
                                         }
                                       }}
                                     >
-                                      {r.title ?? r.name}
+                                      {region.title ?? region.name}
                                     </span>
                                   </DefaultTooltip>
                                 }
                                 className="cursor-pointer"
                               >
-                                {r.children.map((c) => (
+                                {region.children.map((c) => (
                                   <CommandItem
                                     value={c.name}
                                     key={c.name}
@@ -582,7 +605,7 @@ export function MetadataForm({ disabled }: any) {
                             role="combobox"
                             className={cn(
                               disabled && "cursor-not-allowed",
-                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary overflow-hidden",
+                              "w-full justify-start gap-x-2 overflow-hidden pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
                             )}
@@ -851,7 +874,7 @@ export function MetadataForm({ disabled }: any) {
                             disabled={disabled}
                             className={cn(
                               disabled && "cursor-not-allowed",
-                              "w-full justify-start gap-x-2 pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary overflow-hidden",
+                              "w-full justify-start gap-x-2 overflow-hidden pl-3 font-normal hover:border-primary hover:bg-transparent hover:text-primary",
                               (!field.value || field.value.length === 0) &&
                                 "text-gray-400"
                             )}
@@ -901,39 +924,39 @@ export function MetadataForm({ disabled }: any) {
                             {modes
                               .filter((s) => s.value !== "all")
                               .map((m) => (
-                              <CommandItem
-                                value={m.value}
-                                keywords={[m.label]}
-                                key={m.value}
-                                onSelect={() => {
-                                  match(field.value.includes(m.value))
-                                    .with(true, () =>
-                                      setValue(
-                                        "modes",
-                                        getValues("modes").filter(
-                                          (v) => v !== m.value
+                                <CommandItem
+                                  value={m.value}
+                                  keywords={[m.label]}
+                                  key={m.value}
+                                  onSelect={() => {
+                                    match(field.value.includes(m.value))
+                                      .with(true, () =>
+                                        setValue(
+                                          "modes",
+                                          getValues("modes").filter(
+                                            (v) => v !== m.value
+                                          )
                                         )
                                       )
-                                    )
-                                    .with(false, () =>
-                                      setValue(
-                                        "modes",
-                                        getValues("modes").concat(m.value)
-                                      )
-                                    );
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    field.value.includes(m.value)
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {m.label}
-                              </CommandItem>
-                            ))}
+                                      .with(false, () =>
+                                        setValue(
+                                          "modes",
+                                          getValues("modes").concat(m.value)
+                                        )
+                                      );
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value.includes(m.value)
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {m.label}
+                                </CommandItem>
+                              ))}
                           </CommandList>
                         </Command>
                       </PopoverContent>
