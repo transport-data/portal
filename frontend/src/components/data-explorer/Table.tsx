@@ -314,7 +314,9 @@ function Column({ h }: { h: Header<any, unknown> }) {
   return (
     <div className="relative flex items-center gap-x-2 pr-4">
       {flexRender(
-        h.column.columnDef.header?.replace("unsafe_", ""),
+        typeof h.column.columnDef.header === "string"
+          ? h.column.columnDef.header?.replace("unsafe_", "")
+          : h.column.columnDef.header,
         h.getContext()
       )}
       {match(h.column.getIsSorted())
