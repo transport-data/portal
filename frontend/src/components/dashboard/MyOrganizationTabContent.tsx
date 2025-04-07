@@ -1,5 +1,4 @@
-import { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
-import DashboardDatasetCard from "@components/_shared/DashboardDatasetCard";
+import DashboardDatasetCard, { DatasetsCardsLoading } from "@components/_shared/DashboardDatasetCard";
 import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import UserAvatar from "@components/_shared/UserAvatar";
 import {
@@ -9,6 +8,7 @@ import {
 } from "@components/ui/pagination";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import {
   DocumentReportIcon,
@@ -22,34 +22,17 @@ import { SearchDatasetType } from "@schema/dataset.schema";
 import { api } from "@utils/api";
 import { useEffect, useState } from "react";
 import JoinOrganizationModalButton from "./JoinOrganizationModal";
-import { useUserGlobalOrganizationRoles } from "@hooks/user";
-import { listGroups } from "@utils/group";
 
 const DATASETS_PER_PAGE = 9;
-const FACET_FIELDS = `["tags","frequency", "organization", "res_format", "metadata_created"]`
+const FACET_FIELDS = `["tags","frequency", "organization", "res_format", "metadata_created"]`;
 
-export async function getServerSideProps({ session }: any) {
-  const regions: Facet[] = [];
-  const countries: Facet[] = [];
-
-  const geographies = await listGroups({
-    type: "geography",
-    apiKey: session?.user.apikey ?? "",
-  });
-
-  geographies.forEach((x: any) =>
-    x.geography_type === "country"
-      ? countries.push({ count: 0, display_name: x.title, name: x.name })
-      : regions.push({ count: 0, display_name: x.title, name: x.name })
-  );
-
-  return {
-    props: { countries, regions },
-  };
-}
-
-
-export default ({countries, regions}: any) => {
+export default ({
+  countries,
+  regions,
+}: {
+  regions: Facet[];
+  countries: Facet[];
+}) => {
   const [contributors, setContributors] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
   const [tags, setTags] = useState<Facet[]>([]);
@@ -88,7 +71,7 @@ export default ({countries, regions}: any) => {
   const datasetCount = belongsToAnyOrg ? count : 0;
 
   const pages = new Array(
-    Math.ceil((datasetCount || 0) / DATASETS_PER_PAGE),
+    Math.ceil((datasetCount || 0) / DATASETS_PER_PAGE)
   ).fill(0);
 
   const resetFilter = () => {
@@ -134,8 +117,8 @@ export default ({countries, regions}: any) => {
           if (!orgs.length)
             setOrgs(
               facets[key].items?.filter((item: any) =>
-                userOrgs?.map((org) => org.name)?.includes(item?.name),
-              ),
+                userOrgs?.map((org) => org.name)?.includes(item?.name)
+              )
             );
           break;
         }
@@ -165,13 +148,13 @@ export default ({countries, regions}: any) => {
             });
             const [lastMonthFacet] = data.splice(
               data.findIndex((x) =>
-                x.display_name.toLowerCase().includes("last"),
+                x.display_name.toLowerCase().includes("last")
               ),
-              1,
+              1
             );
 
             data.sort(
-              (a, b) => Number(a.display_name) - Number(b.display_name),
+              (a, b) => Number(a.display_name) - Number(b.display_name)
             );
             data.splice(1, 0, lastMonthFacet!);
             setMetadataCreatedDates(data);
@@ -206,7 +189,7 @@ export default ({countries, regions}: any) => {
           countByYear.set(
             new Date().getFullYear().toString(),
             (countByYear.get(new Date().getFullYear().toString()) ?? 0) +
-              (countByYear.get(LAST_MONTH_KEY) ?? 0),
+              (countByYear.get(LAST_MONTH_KEY) ?? 0)
           );
 
           if (!countByYear.get(LAST_MONTH_KEY)) {
@@ -263,45 +246,45 @@ export default ({countries, regions}: any) => {
                     advancedQueries: [
                       //preserve other advancedQueries and remove "state" and "private"
                       ...(_value.advancedQueries ?? []).filter(
-                        (aq) => aq.key !== "state" && aq.key !== "private",
+                        (aq) => aq.key !== "state" && aq.key !== "private"
                       ),
                       ...[{ key: "private", values: ["(false)"] }],
                     ],
                   }
                 : selected === "private"
-                  ? {
-                      includePrivate: true,
-                      includeDrafts: false,
-                      advancedQueries: [
-                        //preserve other advancedQueries and remove "state" and "private"
-                        ...(_value.advancedQueries ?? []).filter(
-                          (aq) => aq.key !== "state" && aq.key !== "private",
-                        ),
-                        ...[{ key: "private", values: ["(true)"] }],
-                      ],
-                    }
-                  : selected === "draft"
-                    ? {
-                        includeDrafts: true,
-                        includePrivate: true,
-                        advancedQueries: [
-                          //preserve other advancedQueries and remove "state"
-                          ...(_value.advancedQueries ?? []).filter(
-                            (aq) => aq.key !== "state",
-                          ),
-                          ...[{ key: "state", values: ["draft"] }],
-                        ],
-                      }
-                    : {
-                        includeDrafts: true,
-                        includePrivate: true,
-                        advancedQueries: [
-                          //preserve other advancedQueries and remove "state" and "private"
-                          ...(_value.advancedQueries ?? []).filter(
-                            (aq) => aq.key !== "state" && aq.key !== "private",
-                          ),
-                        ],
-                      }),
+                ? {
+                    includePrivate: true,
+                    includeDrafts: false,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state" and "private"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state" && aq.key !== "private"
+                      ),
+                      ...[{ key: "private", values: ["(true)"] }],
+                    ],
+                  }
+                : selected === "draft"
+                ? {
+                    includeDrafts: true,
+                    includePrivate: true,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state"
+                      ),
+                      ...[{ key: "state", values: ["draft"] }],
+                    ],
+                  }
+                : {
+                    includeDrafts: true,
+                    includePrivate: true,
+                    advancedQueries: [
+                      //preserve other advancedQueries and remove "state" and "private"
+                      ...(_value.advancedQueries ?? []).filter(
+                        (aq) => aq.key !== "state" && aq.key !== "private"
+                      ),
+                    ],
+                  }),
               offset: 0,
             }));
             setCurrentPage(0);
@@ -337,7 +320,7 @@ export default ({countries, regions}: any) => {
               ...{
                 advancedQueries: [
                   ...(_value.advancedQueries ?? []).filter(
-                    (aq) => aq.key !== "contributors",
+                    (aq) => aq.key !== "contributors"
                   ),
                   ...(v === "*" ? [] : [{ key: "contributors", values: [v] }]),
                 ],
@@ -396,7 +379,7 @@ export default ({countries, regions}: any) => {
               {!!(belongsToAnyOrg && datasets?.length > 0) &&
                 datasets?.map((x) => {
                   const org = userOrgs?.find(
-                    (org) => org.name === x.organization?.name,
+                    (org) => org.name === x.organization?.name
                   );
                   const role = org?.capacity;
                   const canEdit = role === "admin" || role === "editor";
@@ -423,7 +406,7 @@ export default ({countries, regions}: any) => {
                         className={cn(
                           "flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700",
                           "rounded-s-lg px-2",
-                          currentPage === 0 ? "cursor-not-allowed" : "",
+                          currentPage === 0 ? "cursor-not-allowed" : ""
                         )}
                         onClick={() => {
                           setSearchFilter((oldV) => ({
@@ -450,15 +433,13 @@ export default ({countries, regions}: any) => {
                             }}
                             className={cn(
                               `flex h-8 cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 `,
-                              currentPage === i
-                                ? "cursor-auto bg-gray-100"
-                                : "",
+                              currentPage === i ? "cursor-auto bg-gray-100" : ""
                             )}
                           >
                             {i + 1}
                           </button>
                         </PaginationItem>
-                      ),
+                      )
                     )}
                     <PaginationItem>
                       <button
@@ -476,7 +457,7 @@ export default ({countries, regions}: any) => {
                           "rounded-e-lg px-2",
                           currentPage === pages.length - 1
                             ? "cursor-not-allowed"
-                            : "",
+                            : ""
                         )}
                       >
                         <ChevronRightIcon className="h-4 w-4" />
