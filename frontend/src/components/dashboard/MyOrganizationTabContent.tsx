@@ -23,18 +23,38 @@ import { api } from "@utils/api";
 import { useEffect, useState } from "react";
 import JoinOrganizationModalButton from "./JoinOrganizationModal";
 import { useUserGlobalOrganizationRoles } from "@hooks/user";
+import { listGroups } from "@utils/group";
 
 const DATASETS_PER_PAGE = 9;
-const FACET_FIELDS = `["tags", "frequency","regions", "geographies", "organization", "res_format", "metadata_created", "contributors"]`;
+const FACET_FIELDS = `["tags","frequency", "organization", "res_format", "metadata_created"]`
 
-export default () => {
+export async function getServerSideProps({ session }: any) {
+  const regions: Facet[] = [];
+  const countries: Facet[] = [];
+
+  const geographies = await listGroups({
+    type: "geography",
+    apiKey: session?.user.apikey ?? "",
+  });
+
+  geographies.forEach((x: any) =>
+    x.geography_type === "country"
+      ? countries.push({ count: 0, display_name: x.title, name: x.name })
+      : regions.push({ count: 0, display_name: x.title, name: x.name })
+  );
+
+  return {
+    props: { countries, regions },
+  };
+}
+
+
+export default ({countries, regions}: any) => {
   const [contributors, setContributors] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
   const [tags, setTags] = useState<Facet[]>([]);
   const [orgs, setOrgs] = useState<Facet[]>([]);
   const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
-  const [regions, setRegions] = useState<Facet[]>([]);
-  const [countries, setCountries] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
   const [visibility, setVisibility] = useState("*");
   const [contributor, setContributor] = useState("*");
@@ -121,14 +141,6 @@ export default () => {
         }
         case "tags": {
           if (!tags.length) setTags(facets[key].items);
-          break;
-        }
-        case "geographies": {
-          if (!countries.length) setCountries(facets[key].items);
-          break;
-        }
-        case "regions": {
-          if (!regions.length) setRegions(facets[key].items);
           break;
         }
         case "res_format": {
