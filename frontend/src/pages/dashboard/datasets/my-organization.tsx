@@ -1,23 +1,18 @@
-import type {
-  GetServerSideProps,
-  InferGetServerSidePropsType,
-  NextPage,
-} from "next";
-import { useSession } from "next-auth/react";
-import Loading from "@components/_shared/Loading";
-import { NextSeo } from "next-seo";
 import DashboardLayout from "@components/_shared/DashboardLayout";
+import { Facet } from "@components/_shared/DatasetsFilter";
+import Loading from "@components/_shared/Loading";
 import MyOrganizationTabContent from "@components/dashboard/MyOrganizationTabContent";
 import { listGroups } from "@utils/group";
-import { Facet } from "@components/_shared/DatasetsFilter";
+import type { InferGetStaticPropsType, NextPage } from "next";
+import { useSession } from "next-auth/react";
+import { NextSeo } from "next-seo";
 
-export async function getServerSideProps({ session }: any) {
+export async function getStaticProps() {
   const regions: Facet[] = [];
   const countries: Facet[] = [];
 
   const geographies = await listGroups({
     type: "geography",
-    apiKey: session?.user.apikey ?? "",
   });
 
   geographies.forEach((x: any) =>
@@ -28,11 +23,12 @@ export async function getServerSideProps({ session }: any) {
 
   return {
     props: { countries, regions },
+    revalidate: 120,
   };
 }
 
 const DatasetsDashboard: NextPage<
-  InferGetServerSidePropsType<typeof getServerSideProps>
+  InferGetStaticPropsType<typeof getStaticProps>
 > = ({ regions, countries }) => {
   const { data: sessionData } = useSession();
   if (!sessionData) return <Loading />;
