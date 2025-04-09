@@ -19,6 +19,12 @@ export default function PeopleSection({
           community.
         </Subheading>
       </div>
+      {/* New subheading added here */}
+      <div className="mt-[96px] text-center">
+        <h3 className="text-xl font-medium text-gray-700">
+          Current active members of TDC Working Groups
+        </h3>
+      </div>
       <div className="mt-[96px] grid grid-cols-1 gap-x-[32px] gap-y-[48px] md:grid-cols-3 lg:grid-cols-5">
         {people.map((person, index) => (
           <PersonCard
