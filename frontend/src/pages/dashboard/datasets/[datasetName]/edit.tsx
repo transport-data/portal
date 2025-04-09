@@ -124,7 +124,7 @@ const EditDatasetDashboard: NextPage<{
   fromDatasetsRequests: boolean;
 }> = ({ dataset, isUserAdminOfTheDatasetOrg, fromDatasetsRequests }) => {
   const { data: sessionData } = useSession();
-  const { canReviewDatasets } = useUserGlobalOrganizationRoles()
+  const { canReviewDatasets } = useUserGlobalOrganizationRoles();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const editDataset = api.dataset.patch.useMutation({
@@ -157,7 +157,7 @@ const EditDatasetDashboard: NextPage<{
       services: dataset.services ?? [],
       indicators: dataset.indicators ?? [],
       tags: dataset.tags ?? [],
-      resources: dataset.resources.map(r => ({
+      resources: dataset.resources.map((r) => ({
         id: r.id,
         name: r.name,
         package_id: r.package_id,
@@ -168,7 +168,7 @@ const EditDatasetDashboard: NextPage<{
         url: r.url,
         _datastore_active: r.datastore_active,
         hide_preview: r.hide_preview,
-        is_new: false
+        is_new: false,
       })),
       comments: dataset.comments
         ? dataset.comments.map((c) => ({
@@ -193,6 +193,28 @@ const EditDatasetDashboard: NextPage<{
   if (!sessionData) return <Loading />;
 
   function onSubmit(data: DatasetFormType) {
+    data.temporal_coverage_start = new Date(
+      Date.UTC(
+        data.temporal_coverage_start.getFullYear(),
+        data.temporal_coverage_start.getMonth(),
+        data.temporal_coverage_start.getDate(),
+        12,
+        0,
+        0,
+        0
+      )
+    );
+    data.temporal_coverage_end = new Date(
+      Date.UTC(
+        data.temporal_coverage_end.getFullYear(),
+        data.temporal_coverage_end.getMonth(),
+        data.temporal_coverage_end.getDate(),
+        12,
+        0,
+        0,
+        0
+      )
+    );
     return editDataset.mutate({
       ...data,
       state: "active",
@@ -436,7 +458,9 @@ const EditDatasetDashboard: NextPage<{
               {current.matches("uploads") && (
                 <>
                   <UploadsForm disabled={disabledForm} />
-                  {canReviewDatasets && <UntrackedContributorCheckbox form={form} />}
+                  {canReviewDatasets && (
+                    <UntrackedContributorCheckbox form={form} />
+                  )}
                   <div className="flex w-full flex-col gap-4 md:flex-row">
                     <SaveAsDraft />
                     <Button

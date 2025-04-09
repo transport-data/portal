@@ -47,6 +47,7 @@ import { getChoicesFromField } from "@utils/dataset";
 import { RelatedDatasetsField } from "./RelatedDatasetsField";
 import { IndicatorsField } from "./IndicatorField";
 import { UnitsField } from "./UnitsField";
+import { enUS } from "date-fns/locale";
 import { SourcesForm } from "./SourcesForm";
 import { CommentsForm } from "./CommentsForm";
 import { RTEForm } from "@components/ui/formRte";
@@ -320,7 +321,9 @@ export function MetadataForm({ disabled }: any) {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
+                    locale={enUS}
                     selected={field.value}
+                    defaultMonth={field.value ?? undefined}
                     onSelect={field.onChange}
                     fromYear={1000}
                     captionLayout="dropdown"
@@ -364,6 +367,8 @@ export function MetadataForm({ disabled }: any) {
                   <Calendar
                     mode="single"
                     selected={field.value}
+                    locale={enUS}
+                    defaultMonth={field.value ?? undefined}
                     onSelect={field.onChange}
                     fromYear={1970}
                     captionLayout="dropdown"

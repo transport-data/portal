@@ -76,7 +76,6 @@ export function GeneralForm({
     type: "topic",
   });
 
-  console.log("FORM OBJ", formObj.watch("private"));
   return (
     <div className="flex flex-col gap-y-4 py-4">
       <div className="text-xl font-bold leading-normal text-primary">

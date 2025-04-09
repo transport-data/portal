@@ -40,9 +40,12 @@ cwd = path.abspath(path.dirname(__file__))
 template_dir = path.join(cwd, '../templates/emails/')
 env = Environment(loader=FileSystemLoader(template_dir))
 
-privileged_context = {
-    "ignore_auth": True
-}
+
+def get_privileged_context():
+    return {
+        "ignore_auth": True,
+        'user': tk.current_user.id
+    }
 
 
 def _fix_topics_field(data_dict):
@@ -53,7 +56,7 @@ def _fix_topics_field(data_dict):
     topics_names = data_dict.get("topics", None)
 
     if topics_names is not None and len(topics_names) > 0:
-        priviliged_context = {"ignore_auth": True}
+        privileged_context = get_privileged_context()
 
         group_list_action = tk.get_action("group_list")
         group_list_data_dict = {
@@ -63,7 +66,7 @@ def _fix_topics_field(data_dict):
             "all_fields": True
         }
         group_list = group_list_action(
-            priviliged_context, group_list_data_dict)
+            privileged_context, group_list_data_dict)
 
         topic_groups = [{"name": x.get("name"), "type": "topic"}
                         for x in group_list]
@@ -91,7 +94,7 @@ def _fix_geographies_field(data_dict):
         geography_names, list) and len(geography_names) > 0
     has_regions = isinstance(region_names, list) and len(region_names) > 0
 
-    priviliged_context = {"ignore_auth": True}
+    privileged_context = get_privileged_context()
     group_list_action = tk.get_action("group_list")
 
     if has_geographies:
@@ -106,13 +109,13 @@ def _fix_geographies_field(data_dict):
             "include_groups": True
         }
         group_list = group_list_action(
-            priviliged_context, group_list_data_dict)
+            privileged_context, group_list_data_dict)
 
         group_list_names = [x.get("name") for x in group_list]
         for group_name in geography_names:
             if group_name not in group_list_names:
                 raise logic.ValidationError(
-                        {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
+                    {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
 
         for group in group_list:
             geography_type = group.get("geography_type")
@@ -146,23 +149,25 @@ def _fix_geographies_field(data_dict):
             "include_groups": True
         }
         group_list = group_list_action(
-            priviliged_context, group_list_data_dict)
+            privileged_context, group_list_data_dict)
 
         group_list_names = [x.get("name") for x in group_list]
         for group_name in region_names:
             if group_name not in group_list_names:
                 raise logic.ValidationError(
-                        {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
+                    {'geographies': ["Geography or region '{}' not found.".format(group_name)]})
 
         data_dict["regions"] = region_names
 
     if has_geographies or has_regions:
         groups = data_dict.get("groups", [])
-        groups_names_not_present_on_geographies_names = set(x.get("name") for x in groups) - set(geography_names + region_names)
-        geograhies_names = set(tk.get_action('group_list')(privileged_context, {'type': 'geography'}))
+        groups_names_not_present_on_geographies_names = set(
+            x.get("name") for x in groups) - set(geography_names + region_names)
+        geograhies_names = set(tk.get_action('group_list')(
+            get_privileged_context(), {'type': 'geography'}))
         geographies_groups_not_present_on_the_dataset_geographies = geograhies_names & groups_names_not_present_on_geographies_names
-        data_dict["groups"] = [x for x in groups if x.get('name') not in geographies_groups_not_present_on_the_dataset_geographies]
-
+        data_dict["groups"] = [x for x in groups if x.get(
+            'name') not in geographies_groups_not_present_on_the_dataset_geographies]
 
 
 def _update_contributors(context, data_dict, is_update=False):
@@ -170,7 +175,8 @@ def _update_contributors(context, data_dict, is_update=False):
     Whenever an update happens, contributors list
     is updated based on which user did the update
     """
-    prevent_contributors_update = context.get("prevent_contributors_update", False)
+    prevent_contributors_update = context.get(
+        "prevent_contributors_update", False)
 
     if prevent_contributors_update:
         return
@@ -188,9 +194,11 @@ def _update_contributors(context, data_dict, is_update=False):
         excluded_ids.extend(untracked_contributors_ids)
 
     try:
-        site_user = logic.get_action(u"get_site_user")(privileged_context, {})
+        site_user = logic.get_action(u"get_site_user")(
+            get_privileged_context(), {})
         excluded_ids.append(site_user.get("id"))
-        ckan_admin = user_show_action(privileged_context, {"id": "ckan_admin"})
+        ckan_admin = user_show_action(
+            get_privileged_context(), {"id": "ckan_admin"})
         excluded_ids.append(ckan_admin.get("id"))
     except Exception as e:
         log.error(e)
@@ -205,17 +213,19 @@ def _update_contributors(context, data_dict, is_update=False):
             "id": name_or_id
         }
         old_data_dict = package_show_action(
-            privileged_context, package_show_data_dict)
+            get_privileged_context(), package_show_data_dict)
         old_contributors = old_data_dict.get("contributors")
         new_contributors = list(set(old_contributors + [current_user_id]))
-        filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+        filtered_new_contributors = [
+            c for c in new_contributors if c not in excluded_ids]
 
         data_dict["contributors"] = filtered_new_contributors
 
         return new_contributors
 
     new_contributors = [current_user_id]
-    filtered_new_contributors = [c for c in new_contributors if c not in excluded_ids]
+    filtered_new_contributors = [
+        c for c in new_contributors if c not in excluded_ids]
     data_dict["contributors"] = filtered_new_contributors
 
 
@@ -231,7 +241,7 @@ def _fix_user_group_permission(data_dict):
     user_id = current_user.name
 
     if len(groups) > 0 and user_id:
-        priviliged_context = {"ignore_auth": True}
+        privileged_context = get_privileged_context()
         group_member_create_action = tk.get_action("group_member_create")
 
         for group in groups:
@@ -239,10 +249,10 @@ def _fix_user_group_permission(data_dict):
             capacity = users_role_for_group_or_org(group_id, user_id)
             if capacity not in ["member", "editor", "admin"]:
                 group_member_create_data_dict = {
-                        "id": group.get("name"),
-                        "username": user_id,
-                        "role": "member"}
-                group_member_create_action(priviliged_context,
+                    "id": group.get("name"),
+                    "username": user_id,
+                    "role": "member"}
+                group_member_create_action(privileged_context,
                                            group_member_create_data_dict)
 
 
@@ -257,7 +267,8 @@ def _fix_approval_workflow(context, data_dict, is_update):
     if is_update:
         dataset_id = data_dict.get("id")
         package_show_action = tk.get_action("package_show")
-        dataset = package_show_action(privileged_context, {"id": dataset_id})
+        dataset = package_show_action(
+            get_privileged_context(), {"id": dataset_id})
 
         old_dataset_is_private = dataset.get("private", None)
         if is_private is None and old_dataset_is_private is not None:
@@ -269,8 +280,10 @@ def _fix_approval_workflow(context, data_dict, is_update):
     user_is_admin = is_org_admin_or_sysadmin(owner_org, user_id)
 
     if not user_is_admin:
-        current_approval_contributors = dataset.get("current_approval_contributors", [])
-        data_dict["current_approval_contributors"] = list(set([user_id] + current_approval_contributors))
+        current_approval_contributors = dataset.get(
+            "current_approval_contributors", [])
+        data_dict["current_approval_contributors"] = list(
+            set([user_id] + current_approval_contributors))
         if is_private is False:
             data_dict["private"] = True
             data_dict["approval_status"] = "pending"
@@ -294,9 +307,11 @@ def _fix_approval_workflow(context, data_dict, is_update):
             if "approval_requested_by" in data_dict:
                 data_dict.pop("approval_requested_by")
 
-    clear_current_approval_contributors = context.get("clear_current_approval_contributors", False)
+    clear_current_approval_contributors = context.get(
+        "clear_current_approval_contributors", False)
     if clear_current_approval_contributors:
-        data_dict["previous_approval_contributors"] = data_dict.get("current_approval_contributors", [])
+        data_dict["previous_approval_contributors"] = data_dict.get(
+            "current_approval_contributors", [])
         data_dict["current_approval_contributors"] = []
 
     if is_update and user_is_admin and old_dataset_is_private and not is_private and data_dict.get('approval_status', False) != 'approved':
@@ -339,25 +354,30 @@ def package_create(up_func, context, data_dict):
 def package_delete(up_func, context, data_dict):
     package = tk.get_action('package_show')(context, {'id': data_dict['id']})
     package_search = tk.get_action('package_search')
-    search_result = package_search(context, {'fq': f"related_datasets:{package['name']}"})
+    search_result = package_search(
+        context, {'fq': f"related_datasets:{package['name']}"})
     for item in search_result.get('results', []):
         related_datasets = item.get('related_datasets', [])
         related_datasets.remove(package['name'])
-        tk.get_action('package_patch')({ "ignore_auth": True }, {'id': item['id'], 'related_datasets': related_datasets})
+        tk.get_action('package_patch')({"ignore_auth": True}, {
+            'id': item['id'], 'related_datasets': related_datasets})
     result = up_func(context, data_dict)
     return result
 
+
 @tk.chained_action
 def organization_update(up_func, context, data_dict):
-    before_update_org = tk.get_action('organization_show')(context, {'id': data_dict['id'], 'all_fields': True})
+    before_update_org = tk.get_action('organization_show')(
+        context, {'id': data_dict['id'], 'all_fields': True})
     result = up_func(context, data_dict)
     try:
-        if(result.get('name') != before_update_org.get('name')) or result.get('title') != before_update_org.get('title'):
+        if (result.get('name') != before_update_org.get('name')) or result.get('title') != before_update_org.get('title'):
             subprocess.Popen(["ckan", "search-index", "rebuild"])
     except Exception:
         return result
 
     return result
+
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
@@ -404,7 +424,7 @@ def _add_display_name_to_custom_group_facets(search_response):
                 all_facet_item_names.extend(names)
 
             if len(all_facet_item_names) > 0:
-                priviliged_context = {"ignore_auth": True}
+                privileged_context = get_privileged_context()
                 group_list_action = tk.get_action("group_list")
                 group_list_data_dict = {
                     "groups": all_facet_item_names,
@@ -412,7 +432,7 @@ def _add_display_name_to_custom_group_facets(search_response):
                     "type": "geography"
                 }
                 group_list = group_list_action(
-                    priviliged_context, group_list_data_dict)
+                    privileged_context, group_list_data_dict)
 
                 for facet in custom_group_facets:
                     for item in facet["items"]:
@@ -436,12 +456,12 @@ def _add_display_name_to_contributors_facets(search_response):
         search_facets = search_response["search_facets"]
 
         if "contributors" in search_facets:
-            priviliged_context = {"ignore_auth": True}
+            privileged_context = get_privileged_context()
             user_show_action = tk.get_action("user_show")
             contributors_facet = search_facets["contributors"]
             for contributor in contributors_facet["items"]:
                 name = contributor["name"]
-                user = user_show_action(priviliged_context, {"id": name})
+                user = user_show_action(privileged_context, {"id": name})
                 fullname = user.get("fullname")
                 display_name = user.get("display_name")
                 contributor["display_name"] = display_name or fullname or name
@@ -456,12 +476,12 @@ def _fix_facet_items_per_field_type(result):
 
     if len(search_facets) > 0:
         dataset_select_fields = {
-                df.get("field_name"): df
-                for df in dataset_schema["dataset_fields"]
-                if (
-                    df.get("preset") in ['multiple_select', 'select']
-                    and df.get("field_name") in search_facets
-                )
+            df.get("field_name"): df
+            for df in dataset_schema["dataset_fields"]
+            if (
+                df.get("preset") in ['multiple_select', 'select']
+                and df.get("field_name") in search_facets
+            )
         }
 
         for facet_name in dataset_select_fields:
@@ -469,8 +489,8 @@ def _fix_facet_items_per_field_type(result):
             search_facet = search_facets[facet_name]
             choices = dataset_field.get("choices")
             search_facet_items = {
-                    i.get("name"): i
-                    for i in search_facet["items"]
+                i.get("name"): i
+                for i in search_facet["items"]
             }
             search_facet["items"] = []
             for choice in choices:
@@ -571,7 +591,8 @@ def user_login(context, data_dict):
                 return generic_error_message
 
             if invite_id:
-                invited_ckan_user_q = session.query(model.User).filter(model.User.reset_key == invite_id)
+                invited_ckan_user_q = session.query(model.User).filter(
+                    model.User.reset_key == invite_id)
                 invited_ckan_user = invited_ckan_user_q.first()
                 if not invited_ckan_user:
                     error = {
@@ -580,8 +601,8 @@ def user_login(context, data_dict):
                     return error
 
                 email_already_used = session.query(model.User).filter(
-                        model.User.email == email,
-                        model.User.state == 'active').all()
+                    model.User.email == email,
+                    model.User.state == 'active').all()
 
                 if len(email_already_used) > 0:
                     error = {
@@ -633,7 +654,8 @@ def user_login(context, data_dict):
             plugin_extras = user.get("plugin_extras")
             onboarding_completed = False
             if plugin_extras:
-                onboarding_completed = plugin_extras.get("onboarding_completed", False)
+                onboarding_completed = plugin_extras.get(
+                    "onboarding_completed", False)
             user["onboarding_completed"] = onboarding_completed
 
             return json.loads(json.dumps(user))
@@ -642,7 +664,8 @@ def user_login(context, data_dict):
 
         model = context['model']
         if "@" in data_dict.get("id", ""):
-            user = session.query(model.User).filter(model.User.email == data_dict.get("id", "")).first()
+            user = session.query(model.User).filter(
+                model.User.email == data_dict.get("id", "")).first()
         else:
             user = model.User.get(data_dict['id'])
 
@@ -655,7 +678,8 @@ def user_login(context, data_dict):
             user = generate_token(context, user)
 
         if data_dict['password']:
-            identity = {'login': user['name'], 'password': data_dict['password']}
+            identity = {'login': user['name'],
+                        'password': data_dict['password']}
 
             auth = authenticator
 
@@ -801,7 +825,8 @@ def request_organization_owner(context, data_dict):
         'id': org_id,
         'include_users': True,
     }
-    org_dict = get_action('organization_show')({"ignore_auth": True}, data_dict)
+    org_dict = get_action('organization_show')(
+        {"ignore_auth": True}, data_dict)
     to_emails = [from_user.email]
     users = tk.get_action('user_list')({"ignore_auth": True})
     sysadmins_users = [user for user in users if user.get('sysadmin')]
@@ -812,7 +837,8 @@ def request_organization_owner(context, data_dict):
             to_emails.append(user_show.email)
 
     for email in set(to_emails):
-        send_email("organization_participation", email, from_user, message=message, organization=org_dict.get("name"))
+        send_email("organization_participation", email, from_user,
+                   message=message, organization=org_dict.get("name"))
 
     return "Request Sent Successfully"
 
@@ -837,8 +863,10 @@ def request_new_organization(context, data_dict):
         raise ValueError("Missing Parameters.")
 
     # get sysadmins emails
-    sysadmins = session.query(model.User).filter(model.User.sysadmin==True).all()
-    to_emails = [user.email for user in sysadmins if user.email] + [from_user.email]
+    sysadmins = session.query(model.User).filter(
+        model.User.sysadmin == True).all()
+    to_emails = [user.email for user in sysadmins if user.email] + \
+        [from_user.email]
 
     # send mails
     for email in to_emails:
@@ -880,8 +908,8 @@ def _add_contributors_data_to_dataset(dataset):
 
     contributor_ids = dataset.get("contributors", [])
     contributors_dict_list = [
-            user_show_action(privileged_context, {"id": id})
-            for id in contributor_ids]
+        user_show_action(privileged_context, {"id": id})
+        for id in contributor_ids]
 
     contributors_data = [{
         "fullname": contributor.get("fullname"),
@@ -941,7 +969,6 @@ def dataset_approval_update(context, data_dict):
     package_patch_action(context, package_patch_dict)
 
 
-
 def user_following_groups(context, data_dict):
     """
     Returns a list of group IDs the user is following within a given array of group-ids.
@@ -965,7 +992,8 @@ def user_following_groups(context, data_dict):
     for group_id in group_list:
         try:
             # Fetch followers of the group
-            result = get_action('group_follower_list')(context, {'id': group_id})
+            result = get_action('group_follower_list')(
+                context, {'id': group_id})
 
             # Add group to the list if the user is following it
             if any(follower['id'] == user_id for follower in result):
@@ -983,8 +1011,8 @@ def user_following_groups(context, data_dict):
 
 
 def get_invite_body(user,
-                    group_dict = None,
-                    role = None):
+                    group_dict=None,
+                    role=None):
     frontend_url = tk.config.get('ckan.frontend_portal_url', None)
     extra_vars = {
         'reset_link': "{}/auth/signup?invite_id={}".format(frontend_url, user.reset_key),
@@ -1006,8 +1034,8 @@ def get_invite_body(user,
 
 def send_invite(
         user,
-        group_dict = None,
-        role = None):
+        group_dict=None,
+        role=None):
     mailer.create_reset_key(user)
     body = get_invite_body(user, group_dict, role)
     extra_vars = {
@@ -1019,7 +1047,8 @@ def send_invite(
     subject = subject.split('\n')[0]
 
     # TODO: implement non-html body
-    mailer.mail_recipient(user.display_name, user.email, subject, "Invite", body_html=body)
+    mailer.mail_recipient(user.display_name, user.email,
+                          subject, "Invite", body_html=body)
 
 
 # Imported from ckan core user_invite
@@ -1082,7 +1111,8 @@ def resource_upsert_many(context, data_dict):
     """
     _resources = data_dict.get("resources")
     dataset_id = data_dict.get("dataset_id")
-    dataset_resources = get_action("package_show")(context, {"id": dataset_id}).get('resources', [])
+    dataset_resources = get_action("package_show")(
+        context, {"id": dataset_id}).get('resources', [])
     context["ignore_approval_status"] = True
     context["is_resource_create"] = True
     context["prevent_contributors_update"] = True
@@ -1100,6 +1130,8 @@ def resource_upsert_many(context, data_dict):
         else:
             return get_action("resource_create")(context, {**resource, **{"package_id": dataset_id}})
 
-    resources_to_update_or_create = [upsert(resource) for resource in _resources]
-    [get_action("resource_delete")(context, {"id": resource['id']}) for resource in dataset_resources if not _exists(resource, _resources)]
+    resources_to_update_or_create = [
+        upsert(resource) for resource in _resources]
+    [get_action("resource_delete")(context, {"id": resource['id']})
+     for resource in dataset_resources if not _exists(resource, _resources)]
     return resources_to_update_or_create
