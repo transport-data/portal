@@ -1,8 +1,10 @@
-FROM viderum/ckan:v2.11.0
+FROM ckan/ckan-base:2.11.2
 
-ENV CKAN_INI /srv/app/production.ini
+ENV CKAN_INI /srv/app/ckan.ini
 
 ENV CKANEXT_TDC_HASH 2792d5c6b18eba26f92fcffe6d882908ead15cfe
+
+USER root
 
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming' && \
@@ -26,9 +28,8 @@ RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d39
 RUN pip install boto3==1.35.77
 
 ## Install the 'patch' command
-USER root
+RUN apt-get update && apt-get install -y patch && rm -rf /var/lib/apt/lists/*
 
-RUN apk --no-cache add patch
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
     
