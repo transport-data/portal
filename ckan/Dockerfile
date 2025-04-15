@@ -1,5 +1,4 @@
-# FROM viderum/ckan:v2.11.0
-FROM ckan/ckan-base:2.11.2
+FROM viderum/ckan:v2.11.0
 
 ENV CKAN_INI /srv/app/production.ini
 
