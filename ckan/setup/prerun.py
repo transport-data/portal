@@ -27,6 +27,15 @@ def update_plugins():
     cmd = ["ckan", "config-tool", ckan_ini, "ckan.plugins = {}".format(plugins)]
     subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     print("[prerun] Plugins set.")
+    
+def set_variable():
+
+    plugins = os.environ.get("CKAN__PLUGINS", "")
+    print("[prerun] Setting the variables")
+    print(plugins)
+    cmd = ["ckan", "config-tool", ckan_ini, "ckan.auth.public_user_details = true"]
+    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    print("[prerun] Variables set.")
 
 
 def check_main_db_connection(retry=None):
@@ -206,6 +215,7 @@ if __name__ == "__main__":
         check_main_db_connection()
         init_db()
         update_plugins()
+        set_variable()
         check_datastore_db_connection()
         init_datastore_db()
         check_solr_connection()
