@@ -27,7 +27,7 @@ export default function Example() {
               href="/"
               className="rounded-md bg-secondary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-secondary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
             >
-              Go back home
+              Back to homepage
             </Link>
           </div>
         </div>
