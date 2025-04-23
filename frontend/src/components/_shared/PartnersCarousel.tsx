@@ -32,6 +32,8 @@ const images = [
   "/images/logos/partners/icct-colored.svg",
   "/images/logos/partners/the-world-bank-colored.svg",
   "/images/logos/partners/cgep-colored.svg",
+  "/images/sponsors/hvt.png",
+  "/images/sponsors/uk-international-development.png",
 ];
 
 const Carousel = () => {
