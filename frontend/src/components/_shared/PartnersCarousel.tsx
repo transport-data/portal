@@ -81,7 +81,7 @@ const Carousel = () => {
                 key={imgIndex}
                 src={image}
                 alt={`Partner logo ${imgIndex}`}
-                className="object-contain grayscale"
+                className="max-h-full max-w-full object-contain grayscale"
               />
             ))}
           </div>
