@@ -78,7 +78,7 @@ const Carousel = () => {
           <div
             className={cn(
               "flex h-full w-full items-center justify-center gap-8 overflow-hidden opacity-[0.75] lg:gap-0",
-              groups.length < 4 ? "md:justify-around" : "md:justify-between"
+              group.length < 3 ? "md:justify-around" : "md:justify-between"
             )}
           >
             {group.map((image: any, imgIndex: number) => (
