@@ -7,6 +7,7 @@
   - [Edit Topic](#edit-topic)
   - [List and Search Topics](#list-and-search-topics)
   - [Topics page](#topics-page)
+  - [Seed default topics](#seed-default-topics)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

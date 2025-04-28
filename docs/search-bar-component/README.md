@@ -2,12 +2,15 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Searchbar Component](#searchbar-component)
-  - [How it works](#how-it-works)
+    - [How it works](#how-it-works)
   - [Available Filters](#available-filters)
     - [How to edit filters description](#how-to-edit-filters-description)
   - [Example of search with applied filter](#example-of-search-with-applied-filter)
   - [Search without applying filters](#search-without-applying-filters)
   - [Recent Searches](#recent-searches)
+  - [Adding a New Filter Parameter to the `SearchBar` Component](#adding-a-new-filter-parameter-to-the-searchbar-component)
+    - [Step 1: Update the Search Request](#step-1-update-the-search-request)
+    - [Step 2: Configure the New Facet in the `facets` Variable](#step-2-configure-the-new-facet-in-the-facets-variable)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
