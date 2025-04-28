@@ -32,7 +32,7 @@ const docs = [
   {
     title: "HOWTO Create records using the TDC Portal",
     format: "PDF",
-    url: "https://transport-data--45.org.readthedocs.build/en/45/howto/portal.html",
+    url: "https://docs.transport-data.org/en/latest/howto/portal.html",
   },
   {
     title: "SDMX Technical Specifications",
