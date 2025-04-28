@@ -13,6 +13,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f
     pip3 install -e 'git+https://github.com/shubham-mahajan/ckanext-s3filestore.git@feature/r2support-ckan-2.11#egg=ckanext-s3filestore' && \
     pip3 install -e "git+https://github.com/transport-data/tdc-data-portal.git@${CKANEXT_TDC_HASH}#egg=ckanext-tdc&subdirectory=src/ckanext-tdc"
 
+RUN apt update && apt install -y --no-install-recommends procps postgresql-client
+
 ## Auth
 # RUN pip3 install --no-cache-dir -e git+https://github.com/datopian/ckanext-auth.git@v2.11#egg=ckanext-auth
 
