@@ -29,11 +29,12 @@ def update_plugins():
     print("[prerun] Plugins set.")
     
 def set_variable():
-
-    plugins = os.environ.get("CKAN__PLUGINS", "")
+    encode_secret = os.environ.get("CKAN___API_TOKEN__JWT__ENCODE__SECRET", "")
+    decode_secret = os.environ.get("CKAN___API_TOKEN__JWT__DECODE__SECRET", "")
     print("[prerun] Setting the variables")
-    print(plugins)
-    cmd = ["ckan", "config-tool", ckan_ini, "ckan.auth.public_user_details = true"]
+    cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.encode.secret = {}".format(encode_secret)]    
+    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.decode.secret = {}".format(decode_secret)]
     subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     print("[prerun] Variables set.")
 
