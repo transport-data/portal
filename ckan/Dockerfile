@@ -66,5 +66,3 @@ RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_groups = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.user_delete_organizations = false"
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
-
-USER root
