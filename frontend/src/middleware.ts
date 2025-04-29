@@ -13,9 +13,10 @@ export async function middleware(req: NextRequest) {
   let res;
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
     const signInUrl = new URL("/auth/signin", req.url);
+    const path = req.url.replace(/^https?:\/\/[^/]+/, "");
     signInUrl.searchParams.set(
       "callbackUrl",
-      `${process.env.NEXTAUTH_URL}/${req.url.replace(/^https?:\/\/[^/]+/, "")}`
+      `${process.env.NEXTAUTH_URL}${path[0] === "/" ? path : `/${path}`}`
     );
     res = NextResponse.redirect(signInUrl);
   } else if (onboardingCompleted == "false") {
