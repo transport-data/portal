@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
               >
                 High Volume Transport Applied Research Programme
               </a>
-              , managed by DT Global
+              , managed by DT Global.
             </p>
 
             <div className="flex items-center gap-6 mt-6 ">
