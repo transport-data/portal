@@ -13,7 +13,10 @@ export async function middleware(req: NextRequest) {
   let res;
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
     const signInUrl = new URL("/auth/signin", req.url);
-    signInUrl.searchParams.set("callbackUrl", req.url);
+    signInUrl.searchParams.set(
+      "callbackUrl",
+      `${process.env.NEXTAUTH_URL}/${req.url.replace(/^https?:\/\/[^/]+/, "")}`
+    );
     res = NextResponse.redirect(signInUrl);
   } else if (onboardingCompleted == "false") {
     const url = req.nextUrl.clone();

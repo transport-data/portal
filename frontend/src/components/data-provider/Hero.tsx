@@ -1,14 +1,7 @@
 import { Button } from "@components/ui/button";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 export default function Hero() {
-  const [url, setUrl] = useState<string | null>();
-
-  useEffect(() => {
-    setUrl(window.location.host)
-  }, [])
-
   return (
     <section className="pb-6 pt-[64px] md:pb-[96px]">
       <div className="container">
@@ -24,7 +17,7 @@ export default function Hero() {
               datasets.
             </p>
             <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
-              <Link href={`https://${url}/dashboard/datasets/create`}>Add Data to TDC</Link>
+              <Link href="/dashboard/datasets/create">Add Data to TDC</Link>
             </Button>
             <p className="font-semibold text-gray-500">
               Join the organisations which already provide data to TDC.
