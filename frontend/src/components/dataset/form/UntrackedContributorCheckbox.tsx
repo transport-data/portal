@@ -38,7 +38,7 @@ export default function UntrackedContributorCheckbox({
           <div className="space-y-1 leading-none">
             <FormLabel>
               <span className="text-primary">
-                Remove my user from the dataset contributors list
+                Select this option if you don't want to be listed as contributor to this dataset.
               </span>
             </FormLabel>
           </div>
