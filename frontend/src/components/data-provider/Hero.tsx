@@ -24,7 +24,7 @@ export default function Hero() {
               datasets.
             </p>
             <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
-              <Link href={`${url}/dashboard/datasets/create`}>Add Data to TDC</Link>
+              <Link href={`https://${url}/dashboard/datasets/create`}>Add Data to TDC</Link>
             </Button>
             <p className="font-semibold text-gray-500">
               Join the organisations which already provide data to TDC.
