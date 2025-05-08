@@ -130,6 +130,8 @@ dataset_fields:
       label: Water
     - value: aviation
       label: Aviation
+    - value: pipeline
+      label: Pipeline
 
   # NOTE: these options should be limited by Sector
 - field_name: modes
@@ -170,6 +172,8 @@ dataset_fields:
       label: Domestic aviation
     - value: international-aviation
       label: International aviation
+    - value: pipeline
+      label: Pipeline
 
 - field_name: services
   label: Services
