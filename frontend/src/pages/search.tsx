@@ -21,14 +21,72 @@ import { listGroups } from "@utils/group";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
 import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
+import CkanRequest from "@datopian/ckan-api-client-js";
+
+const SEARCH_FACET_FIELDS = `["tags","frequency", "organization", "res_format", "metadata_created"]`;
 
 export async function getServerSideProps({ query, session }: any) {
   const regions: Facet[] = [];
   const countries: Facet[] = [];
+  const sectors: Facet[] = [];
+  const services: Facet[] = [];
+  const modes: Facet[] = [];
 
-  const geographies = await listGroups({
-    type: "geography",
-    apiKey: session?.user.apikey ?? "",
+  const [
+    geographies,
+    {
+      result: { dataset_fields },
+    },
+  ] = await Promise.all([
+    listGroups({
+      type: "geography",
+      apiKey: session?.user.apikey ?? "",
+    }),
+    CkanRequest.get<{
+      result: {
+        dataset_fields: {
+          field_name: string;
+          choices: { value: string; label: string }[];
+        }[];
+      };
+    }>("scheming_dataset_schema_show?type=dataset"),
+  ]);
+
+  dataset_fields.forEach((x) => {
+    if (x.field_name === "sectors") {
+      sectors.push(
+        ...x.choices.map(
+          (x) =>
+            ({
+              display_name: x.label,
+              name: x.value,
+              count: 0,
+            } as Facet)
+        )
+      );
+    } else if (x.field_name === "services") {
+      services.push(
+        ...x.choices.map(
+          (x) =>
+            ({
+              display_name: x.label,
+              name: x.value,
+              count: 0,
+            } as Facet)
+        )
+      );
+    } else if (x.field_name === "modes") {
+      modes.push(
+        ...x.choices.map(
+          (x) =>
+            ({
+              display_name: x.label,
+              name: x.value,
+              count: 0,
+            } as Facet)
+        )
+      );
+    }
   });
 
   geographies.forEach((x: any) =>
@@ -38,7 +96,7 @@ export async function getServerSideProps({ query, session }: any) {
   );
 
   return {
-    props: { ...query, countries, regions },
+    props: { ...query, countries, regions, sectors, services, modes },
   };
 }
 
@@ -58,6 +116,9 @@ export default function DatasetSearch({
   countries,
   regions,
   mode,
+  modes,
+  services,
+  sectors,
   service,
   region,
   before,
@@ -67,12 +128,8 @@ export default function DatasetSearch({
   const showAdvancedFiltersOnLoad = region || country ? true : false;
 
   const defaultLocationValue = region || country ? "location" : "";
-
-  const [modes, setModes] = useState<Facet[]>([]);
-  const [services, setServices] = useState<Facet[]>([]);
   const [updateFrequencies, setUpdateFrequencies] = useState<Facet[]>([]);
   const [tags, setTags] = useState<Facet[]>([]);
-  const [sectors, setSectors] = useState<Facet[]>([]);
   const [orgs, setOrgs] = useState<Facet[]>([]);
   const [resourcesFormats, setResourcesFormats] = useState<Facet[]>([]);
   const [metadataCreatedDates, setMetadataCreatedDates] = useState<Facet[]>([]);
@@ -86,7 +143,7 @@ export default function DatasetSearch({
       limit: 9,
       private: true,
       sort: "score desc, metadata_modified desc",
-      facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
+      facetsFields: SEARCH_FACET_FIELDS,
     });
     setCurrentPage(0);
   };
@@ -107,7 +164,7 @@ export default function DatasetSearch({
     countries: country ? [country as string] : undefined,
     query: query as string,
     sort: "score desc, metadata_modified desc",
-    facetsFields: `["tags", "services", "modes", "sectors","frequency", "organization", "res_format", "metadata_created"]`,
+    facetsFields: SEARCH_FACET_FIELDS,
   });
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -139,27 +196,9 @@ export default function DatasetSearch({
           if (!resourcesFormats.length) setResourcesFormats(facets[key].items);
           break;
         }
-        case "modes": {
-          if (!modes.length) setModes(facets[key].items);
-          break;
-        }
-        case "services": {
-          if (!services.length) setServices(facets[key].items);
-          break;
-        }
         case "frequency": {
           if (!updateFrequencies.length)
             setUpdateFrequencies(facets[key].items);
-          break;
-        }
-        case "sectors": {
-          if (!sectors.length)
-            setSectors(
-              facets[key].items.filter(
-                (x: Facet) =>
-                  x.display_name.toLowerCase() !== "water_transportation"
-              )
-            );
           break;
         }
         case "metadata_created": {
