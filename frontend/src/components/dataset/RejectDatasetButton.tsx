@@ -1,13 +1,12 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import TextEditor from "@components/_shared/TextEditor";
 import { Button, LoaderButton } from "@components/ui/button";
@@ -40,7 +39,7 @@ export default function ({
     ],
   };
   const [open, setOpen] = useState(false);
-  const rejectDataset = api.dataset.reject.useMutation({
+  const { mutate, isLoading } = api.dataset.reject.useMutation({
     onSuccess: async () => {
       toast({
         description: "Succesfully rejected dataset",
@@ -58,6 +57,7 @@ export default function ({
       });
     },
   });
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
@@ -89,23 +89,19 @@ export default function ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="hover:bg-gray-500">
+          <AlertDialogCancel disabled={isLoading} className="hover:bg-gray-500">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <LoaderButton
-              loading={rejectDataset.isLoading}
-              disabled={!reason}
-              onClick={() =>
-                rejectDataset.mutate({ datasetId: id, reason: reason! })
-              }
-              className="bg-yellow-400 hover:bg-yellow-300"
-              id="confirmReject"
-              variant="default"
-            >
-              Reject
-            </LoaderButton>
-          </AlertDialogAction>
+          <LoaderButton
+            loading={isLoading}
+            disabled={!reason}
+            onClick={() => mutate({ datasetId: id, reason: reason! })}
+            className="bg-yellow-400 hover:bg-yellow-300"
+            id="confirmReject"
+            variant="default"
+          >
+            Reject
+          </LoaderButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
