@@ -297,7 +297,7 @@ export default function DatasetSearch({
   useEffect(() => {
     let foundData = false;
     if (searchFilter.sectors?.length && !foundData) {
-      const x = sectors.find((x) => x.name === searchFilter.sectors!.at(0));
+      const x = sectors.find((x: any) => x.name === searchFilter.sectors!.at(0));
       if (x) {
         foundData = true;
         setFacetDisplayName("sector");
@@ -308,7 +308,7 @@ export default function DatasetSearch({
     }
 
     if (searchFilter.modes?.length && !foundData) {
-      const x = modes.find((x) => x.name === searchFilter.modes!.at(0));
+      const x = modes.find((x: any) => x.name === searchFilter.modes!.at(0));
       if (x) {
         foundData = true;
         setFacetDisplayName("mode");
@@ -361,7 +361,7 @@ export default function DatasetSearch({
     }
 
     if (searchFilter.services?.length && !foundData) {
-      const x = services.find((x) => x.name === searchFilter.services!.at(0));
+      const x = services.find((x: any) => x.name === searchFilter.services!.at(0));
       if (x) {
         foundData = true;
         setFacetDisplayName("service");
