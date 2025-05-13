@@ -375,7 +375,11 @@ const EditDatasetDashboard: NextPage<{
                             role="alert"
                           >
                             <p className="font-bold">Rejection reason</p>
-                            <p>{dataset.approval_message}</p>
+                            <p
+                              dangerouslySetInnerHTML={{
+                                __html: dataset.approval_message,
+                              }}
+                            ></p>
                           </div>
                         )}
                       </div>

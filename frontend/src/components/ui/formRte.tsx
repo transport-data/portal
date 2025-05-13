@@ -23,7 +23,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
 import * as Icons from "./rteIcons";
 
-const MenuBar = ({ disabled }: any) => {
+export const RTEMenuBar = ({ disabled }: any) => {
   const { editor } = useCurrentEditor();
 
   if (!editor) {
@@ -193,7 +193,7 @@ export function RTEForm<T extends FieldValues>({
                 editorContainerProps={{
                   className: cn(disabled && "cursor-not-allowed opacity-60"),
                 }}
-                slotBefore={<MenuBar disabled={disabled} />}
+                slotBefore={<RTEMenuBar disabled={disabled} />}
                 extensions={extensions}
                 onUpdate={({ editor }) => field.onChange(editor.getHTML())}
                 content={field.value}
