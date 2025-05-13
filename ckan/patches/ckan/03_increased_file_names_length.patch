@@ -1,0 +1,13 @@
+diff --git a/ckan/ckan/lib/munge.py b/ckan/ckan/lib/munge.py
+index fa2089d54..540edcadf 100644
+--- a/ckan/ckan/lib/munge.py
++++ b/ckan/ckan/lib/munge.py
+@@ -16,7 +16,7 @@ from ckan.lib.io import decode_path
+ MAX_FILENAME_EXTENSION_LENGTH = 21
+ 
+ # Maximum total length of a filename (including extension)
+-MAX_FILENAME_TOTAL_LENGTH = 100
++MAX_FILENAME_TOTAL_LENGTH = 10100
+ 
+ # Minimum total length of a filename (including extension)
+ MIN_FILENAME_TOTAL_LENGTH = 3
