@@ -135,7 +135,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             Overview
           </h3>
           <p
-            className="prose max-w-lg text-gray-500"
+            className="prose max-w-lg text-primary"
             dangerouslySetInnerHTML={{
               __html: dataset.overview_text ?? "-",
             }}
