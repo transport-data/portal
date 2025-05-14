@@ -37,7 +37,7 @@ export default function ({
     ],
   };
   const [open, setOpen] = useState(false);
-  const approveDataset = api.dataset.approve.useMutation({
+  const { mutate, isLoading } = api.dataset.approve.useMutation({
     onSuccess: async () => {
       toast({
         description: "Succesfully approved dataset",
@@ -76,19 +76,17 @@ export default function ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="hover:bg-gray-500">
+          <AlertDialogCancel disabled={isLoading} className="hover:bg-gray-500">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <LoaderButton
-              loading={approveDataset.isLoading}
-              onClick={() => approveDataset.mutate(datasetId)}
-              id="confirmApproval"
-              variant="success"
-            >
-              Approve
-            </LoaderButton>
-          </AlertDialogAction>
+          <LoaderButton
+            loading={isLoading}
+            onClick={() => mutate(datasetId)}
+            id="confirmApproval"
+            variant="success"
+          >
+            Approve
+          </LoaderButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
