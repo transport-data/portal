@@ -60,7 +60,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
         .setLink({ href: url })
         .run();
       setOpen(false);
-    } catch (e) {
+    } catch (e: any) {
       toast({
         title: "Failed to add the link",
         description: e.message,
@@ -236,25 +236,6 @@ interface ControlleRTEEditorProps<T extends FieldValues> {
   placeholder?: string;
 }
 
-const isAllowedUri = (
-  url: string,
-  ctx?: any = { defaultProtocol: "https", defaultValidate: () => {} }
-) => {
-  try {
-    const parsedUrl = url.includes(":")
-      ? new URL(url)
-      : new URL(`${ctx.defaultProtocol}://${url}`);
-
-    if (!ctx.defaultValidate(parsedUrl.href)) {
-      return false;
-    }
-
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 export const extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
   TextStyle.configure({ types: [ListItem.name] } as any),
@@ -266,26 +247,11 @@ export const extensions = [
     autolink: true,
     defaultProtocol: "https",
     protocols: ["http", "https"],
-    isAllowedUri,
-    shouldAutoLink: (url) => {
-      try {
-        // construct URL
-        const parsedUrl = url.includes(":")
-          ? new URL(url)
-          : new URL(`https://${url}`);
-
-        // only auto-link if the domain is not in the disallowed list
-        const disallowedDomains = [
-          "example-no-autolink.com",
-          "another-no-autolink.com",
-        ];
-        const domain = parsedUrl.hostname;
-
-        return !disallowedDomains.includes(domain);
-      } catch {
-        return false;
-      }
-    },
+    validate: (url) =>
+      !url ||
+      new RegExp(
+        "^(https?)://(?:[a-zA-Z0-9-]+.)+[a-zA-Z]{2,}(?::d{1,5})?(?:/[^s]*)?$"
+      ).test(url),
   }),
   Bold,
   Underline,
