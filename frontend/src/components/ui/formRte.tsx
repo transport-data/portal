@@ -7,7 +7,6 @@ import {
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { toast } from "@components/ui/use-toast";
-import { LinkSlashIcon } from "@heroicons/react/20/solid";
 import { cn } from "@lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import Bold from "@tiptap/extension-bold";
@@ -47,13 +46,9 @@ export const RTEMenuBar = ({ disabled }: any) => {
   };
 
   const applyLink = () => {
-    if (url === null) {
-      return;
-    }
-
-    if (url === "") {
+    if (!url) {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
-
+      setOpen(false);
       return;
     }
 
@@ -74,9 +69,11 @@ export const RTEMenuBar = ({ disabled }: any) => {
     }
   };
 
-  const isURLValid = new RegExp(
-    "^(https?)://(?:[a-zA-Z0-9-]+.)+[a-zA-Z]{2,}(?::d{1,5})?(?:/[^s]*)?$"
-  ).test(url);
+  const isURLValid =
+    !url ||
+    new RegExp(
+      "^(https?)://(?:[a-zA-Z0-9-]+.)+[a-zA-Z]{2,}(?::d{1,5})?(?:/[^s]*)?$"
+    ).test(url);
 
   return (
     <>
@@ -108,18 +105,6 @@ export const RTEMenuBar = ({ disabled }: any) => {
             )}
           >
             <Icons.Link />
-          </button>
-          <button
-            aria-label="Link"
-            onClick={() => editor.chain().focus().unsetLink().run()}
-            disabled={!editor.isActive("link")}
-            className={cn(
-              disabled && "cursor-not-allowed",
-              "rounded-md p-1 hover:text-accent",
-              editor.isActive("link") ? "bg-gray-400 text-white" : ""
-            )}
-          >
-            <LinkSlashIcon width={14} height={14} />
           </button>
           <button
             disabled={disabled}
