@@ -133,7 +133,7 @@ export const SearchDatasetSchema = z.object({
   publicationDates: z.array(z.string()).optional(),
   resFormat: z.array(z.string()).optional(),
   type: z.array(z.string()).optional(),
-  private: z.boolean().optional(),
+  private: z.boolean().optional().default(true),
   includeDrafts: z.boolean().optional(),
   contributors: z.array(z.string()).optional(),
 });

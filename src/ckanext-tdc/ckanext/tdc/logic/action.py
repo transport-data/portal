@@ -257,7 +257,7 @@ def _fix_user_group_permission(data_dict):
 
 
 def _fix_approval_workflow(context, data_dict, is_update):
-    is_private = data_dict.get("private", None)
+    is_private = data_dict.get("private", True)
     if is_private is not None:
         is_private = tk.asbool(is_private)
     user_id = current_user.id
