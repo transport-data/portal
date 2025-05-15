@@ -240,6 +240,16 @@ input.remove-input-number-arrows[type="number"] {
     pointer-events: none;
   }
 
+  a {
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--purple-contrast);
+    }
+  }
+
   code {
     background-color: black;
     color: white;
