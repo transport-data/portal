@@ -189,8 +189,8 @@ export const RTEMenuBar = ({ disabled }: any) => {
       </div>
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed left-[50%] top-[30%] w-[90vw] max-w-md -translate-x-1/2 rounded bg-white p-6 shadow-lg">
+          <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/50" />
+          <Dialog.Content className="fixed left-[50%] top-[30%] z-[100] w-[90vw] max-w-md -translate-x-1/2 rounded bg-white p-6 shadow-lg">
             <Dialog.Title className="mb-2 text-xl font-semibold">
               Insert a link
             </Dialog.Title>
