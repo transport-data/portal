@@ -1,5 +1,5 @@
 ---
-title: Example 1: Access list of all datasets published on the TDC Portal 
+title: Example 1 - Access list of all datasets published on the TDC Portal 
 category: devs
 ---
 
