@@ -1,5 +1,5 @@
 ---
-title: Example 2: Show details of individual dataset on the TDC Portal 
+title: Example 2 - Show details of individual dataset on the TDC Portal 
 category: devs
 ---
 
