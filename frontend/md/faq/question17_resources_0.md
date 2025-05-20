@@ -20,7 +20,7 @@ Most interactions are done through GET (to retrieve data) and POST (to create or
 The following section provides some basic examples on how to use the TDC Portal via API. These examples can be executed by using the Windows or Unix / Linux command line 
 
 ~~~
-$ curl https://portal.transport-data.org/...
+$ curl https://ckan.tdc.prod.datopian.com/...
 ~~~
 
 or by pasting the URL in your browser.
