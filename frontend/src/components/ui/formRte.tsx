@@ -223,7 +223,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
                 : ""
             )}
           >
-            <Icons.ListItem />
+            <Icons.ListItem color="currentColor" />
           </button>
         </div>
       </div>
