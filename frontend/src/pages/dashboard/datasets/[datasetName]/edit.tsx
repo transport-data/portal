@@ -1,5 +1,3 @@
-import type { GetServerSidePropsContext, NextPage } from "next";
-import { useSession } from "next-auth/react";
 import { Form } from "@/components/ui/form";
 import { ErrorAlert } from "@components/_shared/Alerts";
 import Layout from "@components/_shared/Layout";
@@ -9,32 +7,34 @@ import { DeleteDatasetButton } from "@components/dataset/DeleteDatasetButton";
 import { GeneralForm } from "@components/dataset/form/General";
 import { MetadataForm } from "@components/dataset/form/Metadata";
 import { Steps } from "@components/dataset/form/Steps";
+import UntrackedContributorCheckbox from "@components/dataset/form/UntrackedContributorCheckbox";
 import { UploadsForm } from "@components/dataset/form/Uploads";
 import RejectDatasetButton from "@components/dataset/RejectDatasetButton";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
 import { Button, LoaderButton } from "@components/ui/button";
+import { DefaultTooltip } from "@components/ui/tooltip";
 import { toast } from "@components/ui/use-toast";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
 import { Dataset as TdcDataset } from "@interfaces/ckan/dataset.interface";
 import { cn } from "@lib/utils";
 import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
 import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { getServerAuthSession } from "@server/auth";
+import { TRPCClientErrorLike } from "@trpc/client";
 import { api } from "@utils/api";
 import { getDataset } from "@utils/dataset";
 import { listUserOrganizations } from "@utils/organization";
 import { useMachine } from "@xstate/react";
+import type { GetServerSidePropsContext, NextPage } from "next";
+import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { SaveDraftButton } from "../create";
-import { TRPCClientErrorLike } from "@trpc/client";
-import { DefaultTooltip } from "@components/ui/tooltip";
-import UntrackedContributorCheckbox from "@components/dataset/form/UntrackedContributorCheckbox";
-import { useUserGlobalOrganizationRoles } from "@hooks/user";
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ datasetName: string }>
@@ -124,7 +124,6 @@ const EditDatasetDashboard: NextPage<{
   fromDatasetsRequests: boolean;
 }> = ({ dataset, isUserAdminOfTheDatasetOrg, fromDatasetsRequests }) => {
   const { data: sessionData } = useSession();
-  const { canReviewDatasets } = useUserGlobalOrganizationRoles();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const editDataset = api.dataset.patch.useMutation({
@@ -190,6 +189,10 @@ const EditDatasetDashboard: NextPage<{
     },
   });
 
+  const { canReviewDatasets } = useUserGlobalOrganizationRoles(
+    form.watch("owner_org")
+  );
+
   if (!sessionData) return <Loading />;
 
   function onSubmit(data: DatasetFormType) {
@@ -215,6 +218,17 @@ const EditDatasetDashboard: NextPage<{
         0
       )
     );
+
+    if (!canReviewDatasets && data.untracked_contributors_ids?.length) {
+      const filteredContributors = data.untracked_contributors_ids.filter(
+        (x) => x !== sessionData?.user.id
+      );
+
+      form.setValue("untracked_contributors_ids", filteredContributors);
+
+      data.untracked_contributors_ids = filteredContributors;
+    }
+
     return editDataset.mutate({
       ...data,
       state: "active",

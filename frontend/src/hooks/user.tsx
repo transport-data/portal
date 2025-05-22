@@ -19,7 +19,7 @@ export function useUserIsSysadmin() {
   return isSysAdmin;
 }
 
-export function useUserGlobalOrganizationRoles() {
+export function useUserGlobalOrganizationRoles(selectedOrgId?: string) {
   const isSysadmin = useUserIsSysadmin();
   const userOrgs = useUserOrganizations();
 
@@ -38,7 +38,10 @@ export function useUserGlobalOrganizationRoles() {
     adminOrgs,
     canCreateDatasets:
       !!editorOrgs?.length || !!adminOrgs?.length || isSysadmin,
-    canReviewDatasets: !!adminOrgs?.length || isSysadmin,
+    canReviewDatasets:
+      !!adminOrgs.filter((x) =>
+        selectedOrgId ? [x.id, x.name].includes(selectedOrgId || "") : true
+      )?.length || isSysadmin,
     belongsToAnyOrg: !!userOrgs.length,
   };
 }

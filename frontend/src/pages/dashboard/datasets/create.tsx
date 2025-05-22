@@ -1,32 +1,32 @@
-import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
+import { Form } from "@/components/ui/form";
+import { ErrorAlert } from "@components/_shared/Alerts";
 import Loading from "@components/_shared/Loading";
+import { GeneralForm } from "@components/dataset/form/General";
+import { MetadataForm } from "@components/dataset/form/Metadata";
+import { Steps } from "@components/dataset/form/Steps";
+import UntrackedContributorCheckbox from "@components/dataset/form/UntrackedContributorCheckbox";
+import { UploadsForm } from "@components/dataset/form/Uploads";
+import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
+import { Button, LoaderButton } from "@components/ui/button";
+import { toast } from "@components/ui/use-toast";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useUserGlobalOrganizationRoles } from "@hooks/user";
+import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { slugify } from "@lib/utils";
+import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
+import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
+import { TRPCClientErrorLike } from "@trpc/client";
 import { api } from "@utils/api";
 import { useMachine } from "@xstate/react";
-import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import { formatIcon, slugify } from "@lib/utils";
-import { Steps } from "@components/dataset/form/Steps";
-import { MetadataForm } from "@components/dataset/form/Metadata";
-import { useForm, UseFormReturn, UseFormWatch } from "react-hook-form";
-import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "@/components/ui/form";
-import { Button, LoaderButton } from "@components/ui/button";
-import { GeneralForm } from "@components/dataset/form/General";
-import { UploadsForm } from "@components/dataset/form/Uploads";
-import { toast } from "@components/ui/use-toast";
-import { match } from "ts-pattern";
 import { useRouter } from "next/router";
-import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
-import { ErrorAlert } from "@components/_shared/Alerts";
-import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
-import { Dataset } from "@interfaces/ckan/dataset.interface";
-import { TRPCClientErrorLike } from "@trpc/client";
-import UntrackedContributorCheckbox from "@components/dataset/form/UntrackedContributorCheckbox";
-import { useUserGlobalOrganizationRoles } from "@hooks/user";
+import { useForm, UseFormReturn } from "react-hook-form";
+import { match } from "ts-pattern";
+import { v4 as uuidv4 } from "uuid";
 
 const docs = [
   {
@@ -49,7 +49,6 @@ const docs = [
 const CreateDatasetDashboard: NextPage = () => {
   const { data: sessionData } = useSession();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { canReviewDatasets } = useUserGlobalOrganizationRoles()
   const router = useRouter();
   const createDataset = api.dataset.create.useMutation({
     onSuccess: async (data) => {
@@ -88,12 +87,26 @@ const CreateDatasetDashboard: NextPage = () => {
       related_datasets: [],
     },
   });
+
+  const { canReviewDatasets } = useUserGlobalOrganizationRoles(form.watch('owner_org'))
+
   useEffect(() => {
     if (!form.formState.dirtyFields["name"])
       form.setValue("name", slugify(form.watch("title")));
   }, [form.watch("title")]);
+
   if (!sessionData) return <Loading />;
   function onSubmit(data: DatasetFormType) {
+    if (!canReviewDatasets && data.untracked_contributors_ids?.length) {
+      const filteredContributors = data.untracked_contributors_ids.filter(
+        (x) => x !== sessionData?.user.id
+      );
+
+      form.setValue("untracked_contributors_ids", filteredContributors);
+
+      data.untracked_contributors_ids = filteredContributors;
+    }
+
     return createDataset.mutate(data);
   }
   const currentStep = match(current.value)
