@@ -25,9 +25,49 @@ import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Plugin, PluginKey } from "prosemirror-state";
 import { useState } from "react";
 import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
 import * as Icons from "./rteIcons";
+
+import { Extension } from "@tiptap/core";
+
+const PlainTextPaste = Extension.create({
+  name: "plainTextPaste",
+
+  addOptions() {
+    return {
+      enabled: true,
+    };
+  },
+
+  addProseMirrorPlugins() {
+    const { enabled } = this.options;
+
+    return [
+      new Plugin({
+        key: new PluginKey("plainTextPaste"),
+        props: {
+          handlePaste: (view, event) => {
+            if (!enabled) {
+              return false;
+            }
+
+            event.preventDefault();
+            const text = event?.clipboardData?.getData("text/plain");
+
+            if (text) {
+              const { tr } = view.state;
+              view.dispatch(tr.insertText(text));
+            }
+
+            return true;
+          },
+        },
+      }),
+    ];
+  },
+});
 
 export const RTEMenuBar = ({ disabled }: any) => {
   const { editor } = useCurrentEditor();
@@ -237,6 +277,7 @@ interface ControlleRTEEditorProps<T extends FieldValues> {
 }
 
 export const extensions = [
+  PlainTextPaste,
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
   TextStyle.configure({ types: [ListItem.name] } as any),
   Document,
@@ -262,11 +303,11 @@ export const extensions = [
     heading: false,
     bulletList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
     orderedList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
   }),
   BulletList,
