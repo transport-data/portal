@@ -122,6 +122,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Code"
+            type="button"
             onClick={() => editor.chain().focus().toggleCode().run()}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -149,6 +150,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Code"
+            type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -165,6 +167,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Underline"
+            type="button"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -181,6 +184,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Italic"
+            type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -197,6 +201,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Strike"
+            type="button"
             onClick={() => editor.chain().focus().toggleStrike().run()}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -213,6 +218,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Bullet List"
+            type="button"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -223,7 +229,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
                 : ""
             )}
           >
-            <Icons.ListItem color="currentColor" />
+            <Icons.ListItem color="currentColor" width={14} height={14} />
           </button>
         </div>
       </div>
