@@ -20,6 +20,8 @@ export default function EventsSection({
 }: {
   events: Array<EventsProps>;
 }) {
+  const hasEvents = events.length > 0;
+  
   return (
     <section className="container flex flex-col pb-[96px]">
       <div className="mx-auto lg:max-w-[672px]">
@@ -29,15 +31,23 @@ export default function EventsSection({
           workshops, and community sessions around the TDC Portal and transport data.
         </Subheading>
       </div>
-      <div className="mb-[32px] mt-[96px] grid grid-cols-1 gap-x-[32px] gap-y-[48px] md:grid-cols-2">
-        {events.map((event, i) => (
-          <EventCard
-            key={`event-${i}`}
-            className="rounded-lg bg-white p-[24px] shadow-md"
-            {...event}
-          />
-        ))}
-      </div>
+
+      {hasEvents ? (
+        <div className="mb-[32px] mt-[96px] grid grid-cols-1 gap-x-[32px] gap-y-[48px] md:grid-cols-2">
+          {events.map((event, i) => (
+            <EventCard
+              key={`event-${i}`}
+              className="rounded-lg bg-white p-[24px] shadow-md"
+              {...event}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-[96px] mb-[32px] text-center text-gray-500">
+          Nothing scheduled just yet — but we’re working on new ways to connect and collaborate. Check back soon!
+        </div>
+      )}
+      
       <Link
         href="/events"
         className="flex items-center gap-[6px] self-center text-accent"
