@@ -11,7 +11,8 @@ export default function CommunitySection({}: {}) {
       <div className="mx-auto block lg:max-w-[672px]">
         <Heading>Our Community</Heading>
         <Subheading className="mt-4">
-          Join our active community on GitHub to engage in discussions about the TDC Portal and the transport data it brings together.
+          Join our active community on GitHub to engage in discussions about
+          the TDC Portal and the transport data it brings together.
         </Subheading>
         <div className="flex justify-center">
           <Button asChild className="mx-auto mt-[32px] inline-block">
