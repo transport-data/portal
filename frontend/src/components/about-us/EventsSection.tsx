@@ -25,8 +25,8 @@ export default function EventsSection({
       <div className="mx-auto lg:max-w-[672px]">
         <Heading>Events</Heading>
         <Subheading className="mt-4">
-          Unlocking the Potential of Transportation Data: Insights, Innovations,
-          and Best Practices for a Sustainable Future.
+          Explore opportunities to connect, collaborate, and contribute through upcoming events, 
+          workshops, and community sessions around the TDC Portal and transport data.
         </Subheading>
       </div>
       <div className="mb-[32px] mt-[96px] grid grid-cols-1 gap-x-[32px] gap-y-[48px] md:grid-cols-2">
