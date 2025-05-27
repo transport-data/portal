@@ -44,7 +44,10 @@ export default function EventsSection({
         </div>
       ) : (
         <div className="mt-[96px] mb-[32px] text-center text-gray-500">
-          Nothing scheduled just yet — but we’re working on new ways to connect and collaborate. Check back soon!
+          Nothing scheduled just yet — 
+          but we’re working on new ways to connect and collaborate. 
+          
+          Check back soon!
         </div>
       )}
       
