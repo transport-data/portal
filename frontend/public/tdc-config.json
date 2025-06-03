@@ -2,5 +2,9 @@
   "hero": {
     "path": "/images/video-thumbnail.png",
     "type": "image"
+  },
+  "video": {
+    "path": "/images/HowToAddData-Subtitles-720p-music.mp4",
+    "type": "mp4"
   }
 }
