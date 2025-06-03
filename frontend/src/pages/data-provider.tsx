@@ -29,8 +29,13 @@ export const getStaticProps = async () => {
   const faqsFiles = await mddb.getFiles({
     folder: "faq",
   });
+  const desiredFiles = ["faq/question10_submit-data.md", "faq/question12_submit-via-portal.md", "faq/question17_resources_4.md", "faq/question20_issues.md"];
   const faqs = faqsFiles
+    /* previously: added 5 last edited faqs
     ?.filter((f) => f.metadata?.category !== "intro")
+    */
+    // now: selection of specific faq questions regarding data submission
+    ?.filter((f) => desiredFiles.includes(f.file_path))
     .map((file) => {
       let source = fs.readFileSync(file.file_path, { encoding: "utf-8" });
       let stat = fs.statSync(file.file_path);
@@ -41,13 +46,15 @@ export const getStaticProps = async () => {
         source,
       } as Faq;
     })
+    /* previously: added 5 last edited faqs
     .sort(
       (a, b) =>
         new Date(b.modified ?? "").getTime() -
         new Date(a.modified ?? "").getTime()
     )
     .slice(0, 4);
-
+    */
+    
   return {
     props: {
       tdcConfig,
