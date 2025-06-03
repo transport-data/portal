@@ -75,7 +75,7 @@ export default function DataProviderPage({
           <Hero />
           <HowDatasetWorks />
           <AddDataSection />
-          <HowToAddData asset={tdcConfig.hero} />
+          <HowToAddData asset={tdcConfig.video} />
           <FaqsSection faqs={faqs} />
           <NewsLetterSignUpSection />
         </div>
