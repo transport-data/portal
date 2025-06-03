@@ -29,7 +29,7 @@ export const getStaticProps = async () => {
   const faqsFiles = await mddb.getFiles({
     folder: "faq",
   });
-  const desiredFiles = ["faq/question10_submit-data.md", "faq/question12_submit-via-portal.md", "faq/question17_resources_4.md", "faq/question20_issues.md"];
+  const desiredFiles = ["frontend/md/faq/question10_submit-data.md", "frontend/md/faq/question12_submit-via-portal.md", "frontend/md/faq/question17_resources_4.md", "frontend/md/faq/question20_issues.md"];
   const faqs = faqsFiles
     /* previously: added 5 last edited faqs
     ?.filter((f) => f.metadata?.category !== "intro")
