@@ -177,7 +177,7 @@ const CreateDatasetDashboard: NextPage = () => {
 
           <Steps currentStep={currentStep} />
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={(e) => e.preventDefault()}>
               {current.matches("general") && (
                 <>
                   <GeneralForm />
@@ -289,7 +289,8 @@ const CreateDatasetDashboard: NextPage = () => {
                     <LoaderButton
                       loading={createDataset.isLoading}
                       className="w-full"
-                      type="submit"
+                      type="button"
+                      onClick={() => form.handleSubmit(onSubmit)()}
                     >
                       Submit
                     </LoaderButton>

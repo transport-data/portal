@@ -407,7 +407,7 @@ const EditDatasetDashboard: NextPage<{
         <div className="container pb-16">
           <Steps currentStep={currentStep} />
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={(e) => e.preventDefault()}>
               {current.matches("general") && (
                 <>
                   <GeneralForm
@@ -498,7 +498,8 @@ const EditDatasetDashboard: NextPage<{
                             "w-full"
                           )}
                           loading={editDataset.isLoading}
-                          type="submit"
+                          type="button"
+                          onClick={() => form.handleSubmit(onSubmit)()}
                         >
                           Submit
                         </LoaderButton>
@@ -510,7 +511,8 @@ const EditDatasetDashboard: NextPage<{
                           "w-full"
                         )}
                         loading={editDataset.isLoading}
-                        type="submit"
+                        type="button"
+                        onClick={() => form.handleSubmit(onSubmit)()}
                       >
                         Submit
                       </LoaderButton>
