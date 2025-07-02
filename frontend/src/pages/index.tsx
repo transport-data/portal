@@ -55,7 +55,7 @@ export const getStaticProps = async () => {
     ?.filter((f) => f.metadata?.category !== "intro")
     */
     // now: selection of specific faq questions regarding data submission
-    ?.filter((f) => desiredFiles.includes(f.file_path))
+    ?.filter((f) => desiredFiles.includes(path.basename(f.file_path)))
     .map((file) => {
       let source = fs.readFileSync(file.file_path, { encoding: "utf-8" });
       let stat = fs.statSync(file.file_path);
