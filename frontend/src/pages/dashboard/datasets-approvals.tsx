@@ -11,7 +11,7 @@ export async function getServerSideProps(context: any) {
 
   const userOrgs = await listUserOrganizations({
     apiKey: session?.user.apikey || "",
-    id: session?.user.id || "",
+    id: session?.user.name ?? session?.user.id ?? "",
   });
 
   const adminOrEditorUserOrgs = userOrgs.filter((x) =>

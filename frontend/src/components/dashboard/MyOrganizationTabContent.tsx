@@ -207,7 +207,7 @@ export default ({
   }, [facets, userOrgs]);
 
   return (
-    <div className=" flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
+    <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:gap-8">
       <div className="order-1 space-y-12 text-ellipsis lg:max-w-[150px]">
         <SelectableItemsList
           items={[

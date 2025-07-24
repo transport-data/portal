@@ -54,7 +54,7 @@ export async function getServerSideProps(
 
   const userOrgs = await listUserOrganizations({
     apiKey: session?.user.apikey || "",
-    id: session?.user.id || "",
+    id: session?.user.name ?? session?.user.id ?? "",
   });
 
   const fromDatasetsRequests = !!context.query.fromDatasetsRequests;

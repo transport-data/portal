@@ -46,7 +46,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
     const userOrganizations = await listUserOrganizations({
       apiKey,
-      id: session?.user?.id || "",
+      id: session?.user?.name ?? session?.user?.id ?? "",
     });
 
     const userOrganizationsIds = userOrganizations.map((o) => o.id);
