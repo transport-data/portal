@@ -397,7 +397,7 @@ def _control_archived_datasets_visibility(data_dict):
     include_archived = tk.asbool(include_archived_param)
 
     if not include_archived:
-        if "fq" not in data_dict:
+        if not data_dict.get("fq"):
             data_dict["fq"] = ""
 
         data_dict["fq"] += " -is_archived:(true)"

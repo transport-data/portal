@@ -24,7 +24,7 @@ import { useEffect, useState } from "react";
 import JoinOrganizationModalButton from "./JoinOrganizationModal";
 
 const DATASETS_PER_PAGE = 9;
-const FACET_FIELDS = `["tags","frequency", "organization", "res_format", "metadata_created"]`;
+const FACET_FIELDS = `["tags", "frequency", "contributors", "organization", "res_format", "metadata_created"]`;
 
 export default ({
   countries,

@@ -143,7 +143,7 @@ export default (activity: DashboardNewsfeedCardProps) => {
   return (
     <div key={activity.id}>
       <div className="my-5 flex flex-row items-start">
-        <div className="mr-3 h-12 w-12 overflow-hidden rounded-full bg-gray-100">
+        <div className="mr-3 h-12 min-w-12 max-w-12 overflow-hidden rounded-full bg-gray-100">
           {activity?.user_data?.display_image ? (
             <img
               src={activity?.user_data?.display_image}
