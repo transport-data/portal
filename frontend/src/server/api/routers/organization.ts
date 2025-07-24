@@ -38,7 +38,7 @@ export const organizationRouter = createTRPCRouter({
     const user = ctx.session.user;
     const apiKey = user.apikey;
     const organizations = await listUserOrganizations({
-      id: user.id,
+      id: user.name ?? user.id,
       apiKey,
     });
     return organizations;
