@@ -20,9 +20,13 @@ export const organizationRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      if (input.parent === 'no-parent' || !input.parent) return await createOrganization({ apiKey, input });
-      const _organization = { ...input, groups: [{name: input.parent}] };
-      const organization = await createOrganization({ apiKey, input: _organization });
+      if (input.parent === "no-parent" || !input.parent)
+        return await createOrganization({ apiKey, input });
+      const _organization = { ...input, groups: [{ name: input.parent }] };
+      const organization = await createOrganization({
+        apiKey,
+        input: _organization,
+      });
       return organization;
     }),
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -37,10 +41,18 @@ export const organizationRouter = createTRPCRouter({
   listForUser: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
     const apiKey = user.apikey;
-    const organizations = await listUserOrganizations({
+    let organizations = await listUserOrganizations({
       id: user.name ?? user.id,
       apiKey,
     });
+
+    if (organizations.length === 0 && user.name) {
+      organizations = await listUserOrganizations({
+        id: user.id,
+        apiKey,
+      });
+    }
+
     return organizations;
   }),
   get: protectedProcedure
@@ -64,9 +76,13 @@ export const organizationRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      if (input.parent === 'no-parent' || !input.parent) return await patchOrganization({ apiKey, input });
-      const _organization = { ...input, groups: [{name: input.parent}] };
-      const organization = await patchOrganization({ apiKey, input: _organization });
+      if (input.parent === "no-parent" || !input.parent)
+        return await patchOrganization({ apiKey, input });
+      const _organization = { ...input, groups: [{ name: input.parent }] };
+      const organization = await patchOrganization({
+        apiKey,
+        input: _organization,
+      });
       return organization;
     }),
   delete: protectedProcedure
@@ -100,14 +116,14 @@ export const organizationRouter = createTRPCRouter({
     }),
 
   follow: protectedProcedure
-    .input(z.object({ dataset: z.string(), isFollowing:z.boolean() }))
+    .input(z.object({ dataset: z.string(), isFollowing: z.boolean() }))
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      const res = await followOrganization({ 
-        apiKey, 
+      const res = await followOrganization({
+        apiKey,
         isFollowing: input.isFollowing,
-        id: input.dataset 
+        id: input.dataset,
       });
 
       return res;
