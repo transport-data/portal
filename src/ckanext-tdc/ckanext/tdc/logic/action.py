@@ -466,12 +466,17 @@ def _add_display_name_to_contributors_facets(search_response):
             contributors_facet = search_facets["contributors"]
             for contributor in contributors_facet["items"]:
                 name = contributor["name"]
-                user = user_show_action({ "ignore_auth": True }, {"id": name})
-                fullname = user.get("fullname")
-                display_name = user.get("display_name")
-                contributor["display_name"] = display_name or fullname or name
-                image_display_url = user.get("image_display_url")
-                contributor["display_image"] = image_display_url
+                try:
+                    user = user_show_action({ "ignore_auth": True }, {"id": name})
+                    fullname = user.get("fullname")
+                    display_name = user.get("display_name")
+                    contributor["display_name"] = display_name or fullname or name
+                    image_display_url = user.get("image_display_url")
+                    contributor["display_image"] = image_display_url
+                except Exception as e:
+                    contributor["display_name"] = name
+                    contributor["display_image"] = None
+                    log.error(f"Error getting contributor {name}")
 
 
 def _fix_facet_items_per_field_type(result):
