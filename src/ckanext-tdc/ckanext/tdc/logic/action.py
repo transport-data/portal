@@ -466,7 +466,7 @@ def _add_display_name_to_contributors_facets(search_response):
             contributors_facet = search_facets["contributors"]
             for contributor in contributors_facet["items"]:
                 name = contributor["name"]
-                user = user_show_action(privileged_context, {"id": name})
+                user = user_show_action({ "ignore_auth": True }, {"id": name})
                 fullname = user.get("fullname")
                 display_name = user.get("display_name")
                 contributor["display_name"] = display_name or fullname or name
@@ -513,11 +513,18 @@ def _fix_facet_items_per_field_type(result):
 @tk.chained_action
 @tk.side_effect_free
 def package_search(up_func, context, data_dict):
+    log.info("Calling package_search")
     _control_archived_datasets_visibility(data_dict)
+    log.info("Controlled for archived datasets")
     result = up_func(context, data_dict)
+    log.info("Got result")
     _fix_facet_items_per_field_type(result)
+    log.info("Fixed facet items per field type")
     _add_display_name_to_custom_group_facets(result)
+    log.info("Added display name to custom group facets")
     _add_display_name_to_contributors_facets(result)
+    log.info("Added display name to contributors facets")
+    log.info("Done")
     return result
 
 
