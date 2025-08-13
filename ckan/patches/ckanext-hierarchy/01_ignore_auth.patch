@@ -1,0 +1,45 @@
+diff --git a/ckanext-hierarchy/ckanext/hierarchy/helpers.py b/ckanext-hierarchy/ckanext/hierarchy/helpers.py
+index ed6bd2b..f29e651 100644
+--- a/ckanext-hierarchy/ckanext/hierarchy/helpers.py
++++ b/ckanext-hierarchy/ckanext/hierarchy/helpers.py
+@@ -4,7 +4,7 @@ from ckan.common import request
+ 
+ 
+ def group_tree(organizations=[], type_='organization'):
+-    full_tree_list = p.toolkit.get_action('group_tree')({}, {'type': type_})
++    full_tree_list = p.toolkit.get_action('group_tree')({'ignore_auth': True}, {'type': type_})
+ 
+     if not organizations:
+         return full_tree_list
+@@ -41,7 +41,7 @@ def group_tree_filter(organizations, group_tree_list, highlight=False):
+ def group_tree_section(id_, type_='organization', include_parents=True,
+                        include_siblings=True):
+     return p.toolkit.get_action('group_tree_section')(
+-        {'include_parents': include_parents,
++        {'include_parents': include_parents, 'ignore_auth' : True,
+          'include_siblings': include_siblings},
+         {'id': id_, 'type': type_, })
+ 
+@@ -60,11 +60,11 @@ def group_tree_parents(id_):
+         'include_followers': False,
+         'include_tags': False
+     }
+-    tree_node = p.toolkit.get_action(action_name)({}, data_dict)
++    tree_node = p.toolkit.get_action(action_name)({'ignore_auth': True}, data_dict)
+     if (tree_node['groups']):
+         parent_id = tree_node['groups'][0]['name']
+         parent_node = \
+-            p.toolkit.get_action(action_name)({}, {'id': parent_id})
++            p.toolkit.get_action(action_name)({'ignore_auth': True}, {'id': parent_id})
+         return group_tree_parents(parent_id) + [parent_node]
+     else:
+         return []
+@@ -79,7 +79,7 @@ def group_tree_get_longname(id_, default="", type_='organization'):
+         'include_followers': False,
+         'include_tags': False
+     }
+-    tree_node = p.toolkit.get_action(action_name)({}, data_dict)
++    tree_node = p.toolkit.get_action(action_name)({'ignore_auth': True}, data_dict)
+     longname = tree_node.get("longname", default)
+     if not longname:
+         return default
