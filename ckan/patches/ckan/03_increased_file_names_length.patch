@@ -13,19 +13,20 @@ index fa2089d54..540edcadf 100644
  MIN_FILENAME_TOTAL_LENGTH = 3
 
 
-
 diff --git a/ckan/ckan/templates/organization/snippets/info.html b/ckan/ckan/templates/organization/snippets/info.html
-index 479407c3f..73abe9616 100644
+index 479407c3f..702f8fb84 100644
 --- a/ckan/ckan/templates/organization/snippets/info.html
 +++ b/ckan/ckan/templates/organization/snippets/info.html
-@@ -1,75 +1,32 @@
+@@ -1,75 +1,56 @@
  {#
 -  Embeds a organization within the sidebar of a page.
-+  Debug template to show organization dict keys
++  Debug template to show organization and package dict keys
  
    organization    - The organization dict.
++  pkg            - The package dict (optional).
  
-   {% snippet 'snippets/organization, organization=group_dict %}
+-  {% snippet 'snippets/organization, organization=group_dict %}
++  {% snippet 'snippets/organization, organization=group_dict, pkg=package_dict %}
  
    #}
 -{% set organization = organization or group%}
@@ -48,7 +49,40 @@ index 479407c3f..73abe9616 100644
 -      <h1 class="heading">{{ organization.title or organization.name }}
 -        {% if organization.state == 'deleted' %}
 -          [{{ _('Deleted') }}]
--        {% endif %}
++      <h2>Debug: Data Structure Information</h2>
++
++      <div class="debug-info">
++        <h3>Organization Keys:</h3>
++        <ul>
++        {% for key in organization.keys() %}
++          <li><strong>{{ key }}</strong>: {{ organization[key] }}</li>
++        {% endfor %}
++        </ul>
++
++        <h3>Organization Type:</h3>
++        <p>{{ organization.__class__.__name__ }}</p>
++
++        {% if pkg %}
++        <h3>Package (pkg) Keys:</h3>
++        <ul>
++        {% for key in pkg.keys() %}
++          <li><strong>{{ key }}</strong>: {{ pkg[key] }}</li>
++        {% endfor %}
++        </ul>
++
++        <h3>Package Type:</h3>
++        <p>{{ pkg.__class__.__name__ }}</p>
++
++        <h3>pkg.organization Keys:</h3>
++        {% if pkg.organization %}
++        <ul>
++        {% for key in pkg.organization.keys() %}
++          <li><strong>{{ key }}</strong>: {{ pkg.organization[key] }}</li>
++        {% endfor %}
++        </ul>
++        {% else %}
++        <p>pkg.organization is None or doesn't exist</p>
+         {% endif %}
 -      </h1>
 -      {% endblock %}
 -      {% block description %}
@@ -87,27 +121,30 @@ index 479407c3f..73abe9616 100644
 -            <div class="alert alert-danger">{{ error_message }}</div>
 -          {% endif %}
 -          {% snippet 'snippets/follow_button.html', am_following=am_following, obj_type='organization', obj_id=organization.id %}
--        {% endif %}
++        {% else %}
++        <p><em>pkg variable not passed to template</em></p>
+         {% endif %}
 -        {% endblock %}
 -      {% endif %}
 -      {% endblock %}
-+      <h2>Debug: Organization Dictionary Keys</h2>
-+      <div class="debug-info">
-+        <h3>Available Keys:</h3>
-+        <ul>
-+        {% for key in organization.keys() %}
-+          <li><strong>{{ key }}</strong>: {{ organization[key] }}</li>
-+        {% endfor %}
-+        </ul>
-+
-+        <h3>Dictionary Type:</h3>
-+        <p>{{ organization.__class__.__name__ }}</p>
-+
-+        <h3>Raw Dictionary:</h3>
-+        <pre>{{ organization }}</pre>
        </div>
      </div>
 +    </div>
    </section>
 -  {% endblock %}
 +{% endblock %}
+
+
+diff --git a/ckan/ckan/templates/package/read_base.html b/ckan/ckan/templates/package/read_base.html
+index 537cc4b21..8d1feacba 100644
+--- a/ckan/ckan/templates/package/read_base.html
++++ b/ckan/ckan/templates/package/read_base.html
+@@ -34,7 +34,7 @@
+   {% block package_organization %}
+     {% if pkg.organization %}
+       {% set org = h.get_organization(pkg.organization.id) %}
+-      {% snippet "organization/snippets/info.html", organization=org, show_nums=false, am_following=am_following %}
++      {% snippet "organization/snippets/info.html", organization=org, pkg=pkg, show_nums=false, am_following=am_following %}
+     {% endif %}
+   {% endblock %}
+ 
