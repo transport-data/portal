@@ -37,7 +37,7 @@ RUN chmod +x ${APP_DIR}/prerun.py
     
 ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat datatables_view image_view text_view s3filestore datastore datapusher activity envvars
 
-COPY patches/ckan/* ${APP_DIR}/patches/ckan/
+COPY patches/* ${APP_DIR}/patches/
 
 RUN for d in $APP_DIR/patches/*; do \
         for f in `ls $d/*.patch | sort -g`; do \
