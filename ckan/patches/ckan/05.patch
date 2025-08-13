@@ -11,3 +11,17 @@ index 537cc4b21..0d005fcce 100644
        {% snippet "organization/snippets/info.html", organization=org, show_nums=false, am_following=am_following %}
      {% endif %}
    {% endblock %}
+
+diff --git a/ckan/ckan/templates/organization/snippets/info.html b/ckan/ckan/templates/organization/snippets/info.html
+index 479407c3f..084018efb 100644
+--- a/ckan/ckan/templates/organization/snippets/info.html
++++ b/ckan/ckan/templates/organization/snippets/info.html
+@@ -6,7 +6,7 @@
+   {% snippet 'snippets/organization, organization=group_dict %}
+ 
+   #}
+-{% set organization = organization or group%}
++{% set organization = organization%}
+ {% set url = h.url_for(organization.type + '.read', id=organization.name, ) %}
+ {% set dataset_type = h.default_package_type() %}
+ 
