@@ -1,8 +1,12 @@
 diff --git a/ckanext-hierarchy/ckanext/hierarchy/helpers.py b/ckanext-hierarchy/ckanext/hierarchy/helpers.py
-index ed6bd2b..4e527a8 100644
+index ed6bd2b..39d3b3d 100644
 --- a/ckanext-hierarchy/ckanext/hierarchy/helpers.py
 +++ b/ckanext-hierarchy/ckanext/hierarchy/helpers.py
-@@ -4,7 +4,7 @@ from ckan.common import request
+@@ -1,10 +1,11 @@
+ import ckan.plugins as p
+ import ckan.model as model
+ from ckan.common import request
++from ckan.logic import check_access as _check_access
  
  
  def group_tree(organizations=[], type_='organization'):
@@ -11,11 +15,12 @@ index ed6bd2b..4e527a8 100644
  
      if not organizations:
          return full_tree_list
-@@ -60,11 +60,11 @@ def group_tree_parents(id_):
+@@ -60,11 +61,12 @@ def group_tree_parents(id_):
          'include_followers': False,
          'include_tags': False
      }
 -    tree_node = p.toolkit.get_action(action_name)({}, data_dict)
++    _check_access(action_name, {'ignore_auth': True})
 +    tree_node = p.toolkit.get_action(action_name)({'ignore_auth': True}, data_dict)
      if (tree_node['groups']):
          parent_id = tree_node['groups'][0]['name']
@@ -25,11 +30,12 @@ index ed6bd2b..4e527a8 100644
          return group_tree_parents(parent_id) + [parent_node]
      else:
          return []
-@@ -79,7 +79,7 @@ def group_tree_get_longname(id_, default="", type_='organization'):
+@@ -79,7 +81,8 @@ def group_tree_get_longname(id_, default="", type_='organization'):
          'include_followers': False,
          'include_tags': False
      }
 -    tree_node = p.toolkit.get_action(action_name)({}, data_dict)
++    _check_access(action_name, {'ignore_auth': True})
 +    tree_node = p.toolkit.get_action(action_name)({'ignore_auth': True}, data_dict)
      longname = tree_node.get("longname", default)
      if not longname:
