@@ -1,7 +1,7 @@
-diff --git a/ckanext/hierarchy/helpers.py b/ckanext/hierarchy/helpers.py
+diff --git a/ckanext/ckanext/hierarchy/helpers.py b/ckanext/ckanext/hierarchy/helpers.py
 index ed6bd2b..4e527a8 100644
---- a/ckanext/hierarchy/helpers.py
-+++ b/ckanext/hierarchy/helpers.py
+--- a/ckanext/ckanext/hierarchy/helpers.py
++++ b/ckanext/ckanext/hierarchy/helpers.py
 @@ -4,7 +4,7 @@ from ckan.common import request
  
  
