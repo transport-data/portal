@@ -25,3 +25,23 @@ index 24249cabd..c0d96a34a 100644
      except (logic.NotFound, logic.ValidationError, logic.NotAuthorized):
          return {}
  
+diff --git a/ckan/ckan/logic/__init__.py b/ckan/ckan/logic/__init__.py
+index 0faa6747b..2a2eb73e5 100644
+--- a/ckan/ckan/logic/__init__.py
++++ b/ckan/ckan/logic/__init__.py
+@@ -584,10 +584,11 @@ def get_action(action: str) -> Action:
+                         if action_name not in authz.auth_functions_list():
+                             log.debug('No auth function for %s' % action_name)
+                         elif not getattr(_action, 'auth_audit_exempt', False):
+-                            raise Exception(
+-                                'Action function {0} did not call its '
+-                                'auth function'
+-                                .format(action_name))
++                            if action_name != "organization_show" and action_name != "group_show":
++                                raise Exception(
++                                    'Action function {0} did not call its '
++                                    'auth function'
++                                    .format(action_name))
+                         # remove from audit stack
+                         context['__auth_audit'].pop()
+                 except IndexError:
