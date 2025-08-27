@@ -1,4 +1,5 @@
 import { extensions, RTEMenuBar } from "@components/ui/formRte";
+import Placeholder from "@tiptap/extension-placeholder";
 import { EditorProvider } from "@tiptap/react";
 
 export default ({
@@ -14,11 +15,18 @@ export default ({
   initialValue?: string;
   editable?: boolean;
 }) => {
+  const localExtenstions = [
+    ...extensions,
+    Placeholder.configure({
+      placeholder: placeholder ? placeholder : 'Text...',
+    }),
+  ];
+
   return (
     <div>
       <EditorProvider
         slotBefore={<RTEMenuBar />}
-        extensions={extensions}
+        extensions={localExtenstions}
         editorProps={{ attributes: { id: id || "" } }}
         onUpdate={({ editor }) => setText(editor.getHTML())}
         content={initialValue}
