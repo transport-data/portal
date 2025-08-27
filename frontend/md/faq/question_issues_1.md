@@ -20,7 +20,7 @@ __→ What happens next?__
 We will react to your ticket. If you have reported an issue, we will investigate and report on the progress in the ticket.
 
 
-### If you don't have a __Github account__:
+#### If you don't have a __Github account__:
 
 Contact us via 📧 [__contact@transport-data.org__](mailto:contact@transport-data.org), describing your issue or feedback. If possible, add details such as a screenshot, context information (e.g., browser, or system environment), or the steps to reproduce the issue.
 
@@ -29,4 +29,4 @@ __→ What happens next?__
 We will register the issue on GitHub on your behalf. If needed, we will follow up with you for additional details.
 If you have reported an issue, we will investigate and report on the progress in the ticket.
 
-### Thank you for helping us improve the TDC Portal!
+#### Thank you for helping us improve the TDC Portal!
