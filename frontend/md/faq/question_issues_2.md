@@ -1,6 +1,6 @@
 ---
-title: 7) How to contact the TDC team?
-category: getting_started
+title: How to contact the TDC team?
+category: issues
 ---
 
 For general inquiries, to join the initiative, or any other questions,
@@ -11,7 +11,6 @@ we encourage you to use our GitHub Discussions Page.
 This helps us respond faster and track all data-related feedback effectively.
 🔗 [GitHub Discussions Page](https://github.com/orgs/transport-data/discussions/categories/user-feedback)
 
-We appreciate your contributions and feedback!
+For further guidance, watch the [video tutorial](https://github.com/user-attachments/assets/28e4aecb-ba75-408c-897d-9c018a2c1efe) on this topic.
 
-[Video tutorial](https://github.com/user-attachments/assets/28e4aecb-ba75-408c-897d-9c018a2c1efe)
-
+#### We appreciate your contributions and feedback!
