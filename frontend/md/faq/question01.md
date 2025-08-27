@@ -1,6 +1,5 @@
 ---
 title: 1) How to search data on the platform?
-category: getting_started
 ---
 
 The TDC Portal provides multiple ways to query data. 
