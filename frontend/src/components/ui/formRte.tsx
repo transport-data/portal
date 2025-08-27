@@ -352,7 +352,7 @@ export function RTEForm<T extends FieldValues>({
                   className: cn(disabled && "cursor-not-allowed opacity-60"),
                 }}
                 slotBefore={<RTEMenuBar disabled={disabled} />}
-                extensions={localExtensions}
+                extensions={localExtensions as any}
                 onUpdate={({ editor }) => field.onChange(editor.getHTML())}
                 content={field.value}
               />
