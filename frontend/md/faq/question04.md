@@ -1,6 +1,5 @@
 ---
 title: 4) How to submit data?
-category: getting_started
 ---
 
 To submit data on the TDC Portal, you must first register an account. Refer to **Step 2** for guidance.
