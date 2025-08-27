@@ -21,17 +21,17 @@ import { Button } from "@/components/ui/button";
 import { ContactForm } from "@components/_shared/ContactForm";
 
 const categories = {
+  search: { title: "Searching and Using Datasets" },
+  submitting_data: { title: "Dataset Submission and Management" },
+  metadata: { title: "Metadata and Data Quality" },
+  licenses: { title: "Data Licenses and Sensitive Data" },
+  devs: { title: "Resources for Developers" },
+  issues: { title: "Contact, Issues and Feedback" },
   getting_started: { title: "Getting Started" },
   organizations: { title: "Organisations" },
-  submitting_data: { title: "Submitting Data" },
   sharing_data: { title: "Sharing and Using Data" },
   geodata: { title: "Geodata" },
-  search: { title: "Search" },
-  metadata: { title: "Metadata and Data Quality" },
-  devs: { title: "Resources for Developers" },
-  sensitive_data: { title: "Sensitive Data" },
-  licenses: { title: "Data Licenses" },
-  issues: { title: "Issues and Feedback" },
+  sensitive_data: { title: "Sensitive Data and Licensing" },
 };
 
 const breadcrumbs = [
