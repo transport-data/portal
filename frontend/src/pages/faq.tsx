@@ -23,12 +23,12 @@ import { ContactForm } from "@components/_shared/ContactForm";
 const categories = {
   search: { title: "Searching and Using Datasets" },
   submitting_data: { title: "Dataset Submission and Management" },
+  organizations: { title: "Organisations" },
   metadata: { title: "Metadata and Data Quality" },
   licenses: { title: "Data Licenses and Sensitive Data" },
   devs: { title: "Resources for Developers" },
   issues: { title: "Contact, Issues and Feedback" },
   getting_started: { title: "Getting Started" },
-  organizations: { title: "Organisations" },
   sharing_data: { title: "Sharing and Using Data" },
   geodata: { title: "Geodata" },
   sensitive_data: { title: "Sensitive Data and Licensing" },
