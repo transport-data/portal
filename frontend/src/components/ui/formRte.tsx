@@ -317,9 +317,6 @@ export const extensions = [
     },
   }),
   BulletList,
-  Placeholder.configure({
-    placeholder: "Rejection message to the dataset's creator...",
-  }),
   ListItem.configure({
     HTMLAttributes: {
       class: "list-disc",
@@ -335,6 +332,12 @@ export function RTEForm<T extends FieldValues>({
   placeholder,
   className,
 }: ControlleRTEEditorProps<T> & { disabled?: boolean }) {
+  const localExtensions = [
+    extensions,
+    Placeholder.configure({
+      placeholder: placeholder ? placeholder : "Text...",
+    }),
+  ];
   return (
     <div>
       <FormField
@@ -349,7 +352,7 @@ export function RTEForm<T extends FieldValues>({
                   className: cn(disabled && "cursor-not-allowed opacity-60"),
                 }}
                 slotBefore={<RTEMenuBar disabled={disabled} />}
-                extensions={extensions}
+                extensions={localExtensions}
                 onUpdate={({ editor }) => field.onChange(editor.getHTML())}
                 content={field.value}
               />

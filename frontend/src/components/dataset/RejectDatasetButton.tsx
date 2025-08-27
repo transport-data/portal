@@ -13,6 +13,7 @@ import { extensions, RTEMenuBar } from "@components/ui/formRte";
 import { toast } from "@components/ui/use-toast";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { SearchDatasetType } from "@schema/dataset.schema";
+import Placeholder from "@tiptap/extension-placeholder";
 import { EditorProvider } from "@tiptap/react";
 import { api } from "@utils/api";
 import { useSession } from "next-auth/react";
@@ -59,6 +60,13 @@ export default function ({
     },
   });
 
+  const localExtensions = [
+    ...extensions,
+    Placeholder.configure({
+      placeholder: "Rejection message to the dataset's creator...",
+    }),
+  ];
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
@@ -81,7 +89,7 @@ export default function ({
             <div className="mt-4">
               <EditorProvider
                 slotBefore={<RTEMenuBar />}
-                extensions={extensions}
+                extensions={localExtensions}
                 onUpdate={({ editor }) => setRejectReason(editor.getHTML())}
               />
             </div>
