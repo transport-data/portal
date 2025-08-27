@@ -27,11 +27,7 @@ const categories = {
   metadata: { title: "Metadata and Data Quality" },
   licenses: { title: "Data Licenses and Sensitive Data" },
   devs: { title: "Resources for Developers" },
-  issues: { title: "Contact, Issues and Feedback" },
-  getting_started: { title: "Getting Started" },
-  sharing_data: { title: "Sharing and Using Data" },
-  geodata: { title: "Geodata" },
-  sensitive_data: { title: "Sensitive Data and Licensing" },
+  issues: { title: "Contact, Issues and Feedback" }
 };
 
 const breadcrumbs = [
