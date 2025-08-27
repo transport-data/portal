@@ -16,4 +16,4 @@ If you select "**Publish Data**" in the form, your dataset will be sent to an ad
 
 If you experience any issues during the submission process, [please contact the TDC team](https://portal.transport-data.org/contact).
 
-[Video tutorial](https://github.com/user-attachments/assets/af8f70bd-b68d-4a25-bede-40c8739d22a6)
+Watch the [video tutorial](https://github.com/user-attachments/assets/af8f70bd-b68d-4a25-bede-40c8739d22a6) for further instructions.
