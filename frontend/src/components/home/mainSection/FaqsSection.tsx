@@ -18,7 +18,7 @@ export default function FaqsSection({ faqs }: { faqs: Faq[] }) {
   return (
     <div className="container py-[96px]">
       <div className="mx-auto text-center lg:max-w-[640px]">
-        <Heading>Frequently asked questions</Heading>
+        <Heading>Getting started</Heading>
       </div>
       <Accordion
         type="single"
