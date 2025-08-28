@@ -333,7 +333,7 @@ export function RTEForm<T extends FieldValues>({
   className,
 }: ControlleRTEEditorProps<T> & { disabled?: boolean }) {
   const localExtensions = [
-    extensions,
+    ...extensions,
     Placeholder.configure({
       placeholder: placeholder ? placeholder : "Text...",
     }),
@@ -352,7 +352,7 @@ export function RTEForm<T extends FieldValues>({
                   className: cn(disabled && "cursor-not-allowed opacity-60"),
                 }}
                 slotBefore={<RTEMenuBar disabled={disabled} />}
-                extensions={localExtensions as any}
+                extensions={localExtensions}
                 onUpdate={({ editor }) => field.onChange(editor.getHTML())}
                 content={field.value}
               />
