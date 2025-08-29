@@ -1,5 +1,5 @@
 ---
-title: How to publishing data via the API?
+title: How to submit data via the API?
 category: devs
 ---
 
