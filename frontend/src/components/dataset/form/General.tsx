@@ -133,7 +133,7 @@ export function GeneralForm({
               <FormDescription>
                 {editing
                   ? "Name cannot be changed once dataset is created."
-                  : "Name will be used in the URL of the dataset page. ex: datasets/{name}"}
+                  : "This will be used to create the dataset’s unique URL (e.g. https://portal.transport-data.org/datasets/{name}). Use a short, descriptive name without spaces or special characters."}
               </FormDescription>
             </FormItem>
           )}
