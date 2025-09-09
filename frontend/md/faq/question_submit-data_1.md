@@ -3,7 +3,7 @@ title: Who can submit data?
 category: submitting_data
 ---
 
-Anyone can view and download data from the TDC portal. However, registered users gain access to additional features and can submit their own data to the portal. You can register by clicking on the __Sign Up__ button, registering with your GitHub account, and select or create the organisation you are affiliated with. For any issues during registration, please contact our support team.
+Anyone can view and download data from the TDC portal. However, registered users gain access to additional features and can submit their own data to the portal. You can register by clicking on the [Sign Up](https://portal.transport-data.org/auth/signup) button, registering with your GitHub account, and select or create the organisation you are affiliated with. For any issues during registration, please contact our support team.
 
 Data submission is futher managed via the role-based authorization system, which grants different permissions to users in different roles. 
 
