@@ -20,7 +20,7 @@ export default function PopularDatasets({
           {datasets.map((dataset, index) => (
             <Link
               key={index}
-              href={`/@${dataset.organization?.name}/${dataset.name}`}
+              href={`/@${dataset.organization?.name?.toLowerCase()}/${dataset.name}`}
               className="block mt-6"
             >
               <DatasetLink

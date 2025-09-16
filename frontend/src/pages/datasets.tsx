@@ -114,7 +114,7 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                         <>
                           {gaData.map((item: any) => (
                             <Link
-                              href={`/@${item.organization?.name}/${item.name}`}
+                              href={`/@${item.organization?.name?.toLowerCase()}/${item.name}`}
                               key={`group-${item.name}`}
                               className="text-sm font-medium text-gray-500"
                             >
@@ -164,7 +164,7 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                         <>
                           {tdcHarmonizedDatasets.datasets.map((item) => (
                             <Link
-                              href={`/@${item.organization?.name}/${item.name}`}
+                              href={`/@${item.organization?.name?.toLowerCase()}/${item.name}`}
                               key={`group-${item.name}`}
                               className="text-sm font-medium text-gray-500"
                             >
@@ -263,7 +263,7 @@ function TopicCard({
               <>
                 {groupDetails.packages?.slice(0, 5).map((item) => (
                   <Link
-                    href={`/@${item.organization?.name}/${item.name}`}
+                    href={`/@${item.organization?.name?.toLowerCase()}/${item.name}`}
                     key={`group-${item.name}`}
                     className="text-sm font-medium text-gray-500"
                   >

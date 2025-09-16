@@ -28,7 +28,7 @@ export default function SearchDatasetItem({
       className="group flex gap-[12px] py-2"
       value={`${title} ${notes}`}
     >
-      <Link href={`/@${organization?.name}/${name}`}>
+      <Link href={`/@${organization?.name?.toLowerCase()}/${name}`}>
         <DatasetBadge tdc_category={tdc_category} />
         <div>
           <h5 className="text-sm font-normal text-gray-700 group-hover:text-white">

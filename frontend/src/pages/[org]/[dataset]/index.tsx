@@ -14,14 +14,30 @@ const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
 export async function getStaticPaths() {
   const ckan = new CKAN(backend_url);
-  const paths = (
-    await ckan.getDatasetsListWithDetails({ offset: 0, limit: 1000 })
-  ).map((dataset: DatasetType) => ({
-    params: {
-      dataset: dataset.name,
-      org: dataset.organization?.name ?? "no-org",
-    },
-  }));
+  const datasets = await ckan.getDatasetsListWithDetails({ offset: 0, limit: 1000 });
+  const paths = datasets.flatMap((dataset: DatasetType) => {
+    const orgName = dataset.organization?.name ?? "no-org";
+    return [
+      {
+        params: {
+          dataset: dataset.name,
+          org: `@${orgName.toLowerCase()}`,
+        },
+      },
+      {
+        params: {
+          dataset: dataset.name,
+          org: orgName,
+        },
+      },
+      {
+        params: {
+          dataset: dataset.name,
+          org: orgName.toUpperCase(),
+        },
+      },
+    ];
+  });
   return {
     paths,
     fallback: "blocking",

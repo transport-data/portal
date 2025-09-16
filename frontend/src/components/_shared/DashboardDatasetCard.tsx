@@ -99,7 +99,7 @@ export default function DashboardDatasetCard(props: DatasetCardProps) {
 
   return (
     <Link
-      href={`/@${organization?.name}/${name}${
+      href={`/@${organization?.name?.toLowerCase()}/${name}${
         isPrivate || state === "draft" ? "/private" : ""
       }`}
       className="dataset-card flex w-full cursor-pointer gap-3 lg:gap-6"

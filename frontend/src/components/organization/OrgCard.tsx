@@ -27,7 +27,7 @@ export default function GroupCard({
       <p className="font-inter mb-6 mt-1 line-clamp-2 text-sm font-medium">
         {description}
       </p>
-      <Link href={`/@${name}`}>
+      <Link href={`/@${name.toLowerCase()}`}>
         <span className="font-inter cursor-pointer text-sm font-medium text-accent">
           View -&gt;
         </span>

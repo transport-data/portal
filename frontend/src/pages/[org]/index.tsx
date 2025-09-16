@@ -14,9 +14,11 @@ const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 export async function getStaticPaths() {
   const ckan = new CKAN(backend_url);
   const orgList = await ckan.getOrgList();
-  const paths = orgList.map((org: string) => ({
-    params: { org: org },
-  }));
+  const paths = orgList.flatMap((org: string) => [
+    { params: { org: `@${org.toLowerCase()}` } },
+    { params: { org: org } },
+    { params: { org: org.toUpperCase() } },
+  ]);
   return {
     paths,
     fallback: "blocking",
@@ -78,10 +80,7 @@ export default function OrgPage({
           <div className="grid-rows-datasetpage-hero grid">
             <section className="col-span-full row-start-1 row-end-3">
               <div
-                className="flex h-full flex-col bg-black bg-cover bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: "url('/images/backgrounds/SearchHero.avif')",
-                }}
+                className="flex h-full flex-col bg-gradient-to-br from-slate-700 to-slate-900"
               >
                 <OrgNavCrumbs
                   org={{

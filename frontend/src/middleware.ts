@@ -10,6 +10,22 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const onboardingCompleted = getCookie("onboarding_completed", { req });
 
+  // Handle organization URL canonicalization
+  const orgUrlMatch = pathname.match(/^\/(@?[^\/]+)(\/.*)?$/);
+  if (orgUrlMatch) {
+    const [, orgPart, rest = ""] = orgUrlMatch;
+
+    // If URL doesn't start with @ or contains uppercase, redirect to @lowercase
+    if (!orgPart.startsWith("@") || /[A-Z]/.test(orgPart)) {
+      const canonicalOrg = orgPart.startsWith("@")
+        ? `@${orgPart.slice(1).toLowerCase()}`
+        : `@${orgPart.toLowerCase()}`;
+      const canonicalUrl = new URL(req.url);
+      canonicalUrl.pathname = `/${canonicalOrg}${rest}`;
+      return NextResponse.redirect(canonicalUrl, 301);
+    }
+  }
+
   let res;
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
     const signInUrl = new URL("/auth/signin", req.url);
@@ -39,5 +55,9 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: protectedRoutes.flatMap((route) => [route, `${route}/:path*`]),
+  matcher: [
+    ...protectedRoutes.flatMap((route) => [route, `${route}/:path*`]),
+    // Organization URLs pattern matching
+    "/((?!api|_next/static|_next/image|favicon.ico|images|styles|dashboard|auth|onboarding|search|datasets|organizations|groups|geography|partners|about-us|contact|events|faq|privacy-policy|terms-and-conditions|unauthorized|404).*)",
+  ],
 };

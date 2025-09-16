@@ -31,7 +31,7 @@ export default function OrgNavCrumbs({
             Organisations
           </Link>
           {org.name && org.title && (
-            <Link href={`/@${org.name}`} className="font-semibold text-white">
+            <Link href={`/@${org.name.toLowerCase()}`} className="font-semibold text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

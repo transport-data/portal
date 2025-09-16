@@ -81,7 +81,7 @@ export default function DatasetCard({
   }
 
   let href = `${urlPrefix}${urlFormat}`;
-  href = href.replace(/\{org\}/g, dataset.organization?.name ?? '');
+  href = href.replace(/\{org\}/g, dataset.organization?.name?.toLowerCase() ?? '');
   href = href.replace(/\{dataset\}/g, dataset?.name);
 
   return (

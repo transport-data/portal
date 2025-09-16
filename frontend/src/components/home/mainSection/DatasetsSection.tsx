@@ -114,7 +114,7 @@ export default function DatasetsSection({
                   </Tooltip>
 
                   {/*Title*/}
-                  <Link href={`@${dataset.organization?.name}/${dataset.name}`}>
+                  <Link href={`/@${dataset.organization?.name?.toLowerCase()}/${dataset.name}`}>
                     <h4 className="text-2xl font-bold leading-tight">
                       {dataset.title}
                     </h4>
@@ -182,7 +182,7 @@ export default function DatasetsSection({
                     asChild
                   >
                     <Link
-                      href={`@${dataset.organization?.name}/${dataset.name}`}
+                      href={`/@${dataset.organization?.name?.toLowerCase()}/${dataset.name}`}
                     >
                       Show Dataset
                       <ArrowRightIcon width={20} />
