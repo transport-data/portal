@@ -16,7 +16,7 @@ export async function middleware(req: NextRequest) {
     const [, orgPart, rest = ""] = orgUrlMatch;
 
     // If URL doesn't start with @ or contains uppercase, redirect to @lowercase
-    if (!orgPart.startsWith("@") || /[A-Z]/.test(orgPart)) {
+    if (orgPart && (!orgPart.startsWith("@") || /[A-Z]/.test(orgPart))) {
       const canonicalOrg = orgPart.startsWith("@")
         ? `@${orgPart.slice(1).toLowerCase()}`
         : `@${orgPart.toLowerCase()}`;
@@ -56,7 +56,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    ...protectedRoutes.flatMap((route) => [route, `${route}/:path*`]),
+    "/dashboard/:path*",
+    "/onboarding/:path*",
     // Organization URLs pattern matching
     "/((?!api|_next/static|_next/image|favicon.ico|images|styles|dashboard|auth|onboarding|search|datasets|organizations|groups|geography|partners|about-us|contact|events|faq|privacy-policy|terms-and-conditions|unauthorized|404).*)",
   ],
