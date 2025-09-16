@@ -124,7 +124,16 @@ export default function IndexDatasetPage({
                                             aria-hidden="true"
                                             className="mb-1 mr-1.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500"
                                         />
-                                        {dataset.organization?.title || dataset.organization?.name}
+                                        {dataset.organization?.name ? (
+                                            <Link
+                                                href={`/@${dataset.organization.name.toLowerCase()}`}
+                                                className="hover:underline"
+                                            >
+                                                {dataset.organization?.title || dataset.organization?.name}
+                                            </Link>
+                                        ) : (
+                                            dataset.organization?.title || dataset.organization?.name
+                                        )}
                                     </div>
                                     <div className="mt-2.5 hidden text-center font-['Inter'] text-xs font-medium leading-none text-gray-500 lg:block">
                                         •

@@ -37,7 +37,14 @@ export default function SearchDatasetItem({
           <div className="flex flex-col flex-wrap gap-x-[8px] gap-y-1 text-xs font-medium text-gray-500 group-hover:text-slate-300 sm:flex-row">
             <div className="flex gap-[4px]">
               <BuildingLibraryIcon width={14} />
-              {organization?.title}
+              {organization?.title && (
+                <Link
+                  href={`/@${organization.name?.toLowerCase()}`}
+                  className="hover:underline group-hover:text-slate-300"
+                >
+                  {organization.title}
+                </Link>
+              )}
             </div>
             <span className="hidden sm:block">•</span>
             <div className="flex gap-[4px]">

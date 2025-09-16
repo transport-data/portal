@@ -140,7 +140,14 @@ export default function DatasetsSection({
                   <div className="mt-auto flex flex-col gap-[8px] text-xs font-medium text-gray-500 ">
                     <div className="flex items-center gap-[4px]">
                       <BuildingLibraryIcon width={14} />
-                      <span>{dataset.organization?.title}</span>
+                      {dataset.organization?.title && (
+                        <Link
+                          href={`/@${dataset.organization.name?.toLowerCase()}`}
+                          className="hover:underline"
+                        >
+                          {dataset.organization.title}
+                        </Link>
+                      )}
                     </div>
 
                     {dataset.metadata_modified && (

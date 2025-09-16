@@ -47,9 +47,16 @@ export default function DatasetCard({
                   ]
                 } px-4 py-1 rounded-full text-xs`}
               >
-                {dataset.organization
-                  ? dataset.organization.title
-                  : 'No organisation'}
+                {dataset.organization ? (
+                  <Link
+                    href={`/@${dataset.organization.name?.toLowerCase()}`}
+                    className="hover:underline"
+                  >
+                    {dataset.organization.title}
+                  </Link>
+                ) : (
+                  'No organisation'
+                )}
               </span>
             )}
             <span
@@ -66,9 +73,16 @@ export default function DatasetCard({
           <>
             {showOrg !== false && (
               <span className="bg-gray-200 px-4 py-1 rounded-full text-xs">
-                {dataset.organization
-                  ? dataset.organization.title
-                  : 'No organisation'}
+                {dataset.organization ? (
+                  <Link
+                    href={`/@${dataset.organization.name?.toLowerCase()}`}
+                    className="hover:underline"
+                  >
+                    {dataset.organization.title}
+                  </Link>
+                ) : (
+                  'No organisation'
+                )}
               </span>
             )}
             <span className="bg-gray-200 px-4 py-1 rounded-full text-xs">
