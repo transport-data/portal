@@ -86,7 +86,7 @@ export default function OrgPage({
                 <TopBar />
                 <div
                   className="grid mx-auto items-center grow custom-container grow"
-                  style={{ marginBlock: "8rem" }}
+                  style={{ marginBlock: "4rem" }}
                 >
                   <div className="col-span-1">
                     <h1 className="text-6xl font-black text-white">
