@@ -8,7 +8,6 @@ import {
   CKAN
 } from "@portaljs/ckan";
 import styles from "@/styles/DatasetInfo.module.scss";
-import GroupNavCrumbs from "../../components/groups/individualPage/GroupNavCrumbs";
 import GroupInfo from "../../components/groups/individualPage/GroupInfo";
 import getConfig from 'next/config';
 import { env } from "@env.mjs";
@@ -85,12 +84,6 @@ export default function OrgPage({
                 }}
               >
                 <TopBar />
-                <GroupNavCrumbs
-                  group={{
-                    name: group?.name,
-                    title: group?.title,
-                  }}
-                />
                 <div
                   className="grid mx-auto items-center grow custom-container grow"
                   style={{ marginBlock: "8rem" }}

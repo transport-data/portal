@@ -1,6 +1,5 @@
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
-import OrgNavCrumbs from "../../components/organization/individualPage/OrgNavCrumbs";
 import OrgInfo from "../../components/organization/individualPage/OrgInfo";
 import Layout from "../../components/_shared/Layout";
 import Tabs from "../../components/_shared/TabsPublic";
@@ -80,14 +79,9 @@ export default function OrgPage({
           <div className="grid-rows-datasetpage-hero grid">
             <section className="col-span-full row-start-1 row-end-3">
               <div
-                className="flex h-full flex-col bg-gradient-to-br from-slate-700 to-slate-900"
+                style={{ 'background': 'rgb(227, 249, 237);' }}
+                className="flex h-full flex-col"
               >
-                <OrgNavCrumbs
-                  org={{
-                    name: org?.name,
-                    title: org?.title,
-                  }}
-                />
                 <div
                   className="custom-container mx-auto grid grow items-center"
                   style={{ marginBlock: "8rem" }}
@@ -100,7 +94,7 @@ export default function OrgPage({
                 </div>
               </div>
             </section>
-            <section className="col-span-full row-span-2 row-start-2 grid">
+            <section className="col-span-full row-span-2 row-start-2 grid" style={{ 'background': 'rgb(227, 249, 237);' }}>
               <div className="custom-container">
                 {org && (
                   <main className={styles.main}>
