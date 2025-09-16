@@ -80,7 +80,7 @@ export default function OrgPage({
             <section className="col-span-full row-start-1 row-end-3">
               <div
                 style={{ 'background': 'rgb(227, 249, 237);' }}
-                className="flex h-full flex-col"
+                className="flex h-full flex-col bg-[rgb(227, 249, 237)]"
               >
                 <div
                   className="custom-container mx-auto grid grow items-center"
@@ -94,7 +94,7 @@ export default function OrgPage({
                 </div>
               </div>
             </section>
-            <section className="col-span-full row-span-2 row-start-2 grid" style={{ 'background': 'rgb(227, 249, 237);' }}>
+            <section className="col-span-full row-span-2 row-start-2 grid bg-[rgb(227, 249, 237)]" style={{ 'background': 'rgb(227, 249, 237);' }}>
               <div className="custom-container">
                 {org && (
                   <main className={styles.main}>
