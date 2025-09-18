@@ -30,7 +30,7 @@ export async function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = "/dashboard/newsfeed";
     res = NextResponse.rewrite(url);
-  } else  if (orgUrlMatch) {
+  } else if (orgUrlMatch) {
     const [, orgPart, rest = ""] = orgUrlMatch;
 
     if (orgPart && (!orgPart.startsWith("@") || /[A-Z]/.test(orgPart))) {
@@ -39,7 +39,7 @@ export async function middleware(req: NextRequest) {
         : `@${orgPart.toLowerCase()}`;
       const canonicalUrl = new URL(req.url);
       canonicalUrl.pathname = `/${canonicalOrg}${rest}`;
-      return NextResponse.redirect(canonicalUrl, 301);
+      res = NextResponse.redirect(canonicalUrl, 301);
     }
   } else {
     res = NextResponse.next();
