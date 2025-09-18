@@ -39,7 +39,8 @@ export async function middleware(req: NextRequest) {
         : `@${orgPart.toLowerCase()}`;
       const canonicalUrl = new URL(req.url);
       canonicalUrl.pathname = `/${canonicalOrg}${rest}`;
-      res = NextResponse.redirect(canonicalUrl, 301);
+      clearAllAuxAuthCookies({ req, res });
+      return NextResponse.redirect(canonicalUrl, 301);
     }
   } else {
     res = NextResponse.next();
