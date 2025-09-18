@@ -9,22 +9,7 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
   const { pathname } = req.nextUrl;
   const onboardingCompleted = getCookie("onboarding_completed", { req });
-
-  // Handle organization URL canonicalization
   const orgUrlMatch = pathname.match(/^\/(@?[^\/]+)(\/.*)?$/);
-  if (orgUrlMatch) {
-    const [, orgPart, rest = ""] = orgUrlMatch;
-
-    // If URL doesn't start with @ or contains uppercase, redirect to @lowercase
-    if (orgPart && (!orgPart.startsWith("@") || /[A-Z]/.test(orgPart))) {
-      const canonicalOrg = orgPart.startsWith("@")
-        ? `@${orgPart.slice(1).toLowerCase()}`
-        : `@${orgPart.toLowerCase()}`;
-      const canonicalUrl = new URL(req.url);
-      canonicalUrl.pathname = `/${canonicalOrg}${rest}`;
-      return NextResponse.redirect(canonicalUrl, 301);
-    }
-  }
 
   let res;
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
@@ -45,6 +30,17 @@ export async function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = "/dashboard/newsfeed";
     res = NextResponse.rewrite(url);
+  } else  if (orgUrlMatch) {
+    const [, orgPart, rest = ""] = orgUrlMatch;
+
+    if (orgPart && (!orgPart.startsWith("@") || /[A-Z]/.test(orgPart))) {
+      const canonicalOrg = orgPart.startsWith("@")
+        ? `@${orgPart.slice(1).toLowerCase()}`
+        : `@${orgPart.toLowerCase()}`;
+      const canonicalUrl = new URL(req.url);
+      canonicalUrl.pathname = `/${canonicalOrg}${rest}`;
+      return NextResponse.redirect(canonicalUrl, 301);
+    }
   } else {
     res = NextResponse.next();
   }
