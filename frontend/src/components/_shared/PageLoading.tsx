@@ -10,13 +10,20 @@ export default function PageLoading() {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
+    let forceEndTimer: NodeJS.Timeout;
 
     const start = () => {
       timer = setTimeout(() => setLoading(true), LOADER_THRESHOLD);
+
+      // Force end loading after 15 seconds as a safety mechanism
+      forceEndTimer = setTimeout(() => {
+        setLoading(false);
+      }, 15000);
     };
 
     const end = () => {
       if (timer) clearTimeout(timer);
+      if (forceEndTimer) clearTimeout(forceEndTimer);
       setLoading(false);
     };
 
@@ -30,6 +37,7 @@ export default function PageLoading() {
       router.events.off("routeChangeError", end);
 
       if (timer) clearTimeout(timer);
+      if (forceEndTimer) clearTimeout(forceEndTimer);
     };
   }, [router.events]);
 
