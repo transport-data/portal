@@ -13,18 +13,20 @@ export default function PageLoading() {
     let forceEndTimer: NodeJS.Timeout;
 
     const start = () => {
-      timer = setTimeout(() => setLoading(true), LOADER_THRESHOLD);
+      timer = setTimeout(() => {
+        requestAnimationFrame(() => setLoading(true));
+      }, LOADER_THRESHOLD);
 
-      // Force end loading after 15 seconds as a safety mechanism
+      // Force end loading after 10 seconds as a safety mechanism
       forceEndTimer = setTimeout(() => {
-        setLoading(false);
+        requestAnimationFrame(() => setLoading(false));
       }, 10000);
     };
 
     const end = () => {
       if (timer) clearTimeout(timer);
       if (forceEndTimer) clearTimeout(forceEndTimer);
-      setLoading(false);
+      requestAnimationFrame(() => setLoading(false));
     };
 
     router.events.on("routeChangeStart", start);
