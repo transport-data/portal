@@ -5,7 +5,7 @@ import { TDCIcon } from "@lib/icons";
 const LOADER_THRESHOLD = 250;
 
 export default function PageLoading() {
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,8 +19,6 @@ export default function PageLoading() {
       if (timer) clearTimeout(timer);
       setLoading(false);
     };
-    if (router.isReady) setLoading(false);
-    else start();
 
     router.events.on("routeChangeStart", start);
     router.events.on("routeChangeComplete", end);
@@ -33,7 +31,7 @@ export default function PageLoading() {
 
       if (timer) clearTimeout(timer);
     };
-  }, [router.events, router.isReady]);
+  }, [router.events]);
 
   if (!isLoading) return <div></div>;
 
