@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import { TDCIcon } from "@lib/icons";
 
 const LOADER_THRESHOLD = 300; // milliseconds before showing loader
 const FORCE_END_TIMEOUT = 10000; // fallback timeout in ms
