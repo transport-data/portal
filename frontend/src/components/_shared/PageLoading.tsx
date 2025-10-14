@@ -13,36 +13,51 @@ export default function PageLoading() {
 
   useEffect(() => {
     const start = () => {
+      console.log('[PageLoading] routeChangeStart - URL:', router.asPath);
+
       // Clear any existing timers before setting new ones
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (forceEndRef.current) clearTimeout(forceEndRef.current);
+      if (timerRef.current) {
+        console.log('[PageLoading] Clearing existing timer');
+        clearTimeout(timerRef.current);
+      }
+      if (forceEndRef.current) {
+        console.log('[PageLoading] Clearing existing forceEnd timer');
+        clearTimeout(forceEndRef.current);
+      }
 
       // Delay showing loader to avoid flashing on quick transitions
       timerRef.current = setTimeout(() => {
+        console.log('[PageLoading] Setting isLoading to TRUE');
         requestAnimationFrame(() => setLoading(true));
       }, LOADER_THRESHOLD);
 
       // Safety: force stop loading after 10s no matter what
       forceEndRef.current = setTimeout(() => {
+        console.log('[PageLoading] Force ending loading after timeout');
         requestAnimationFrame(() => setLoading(false));
       }, FORCE_END_TIMEOUT);
     };
 
     const end = () => {
+      console.log('[PageLoading] routeChangeComplete/Error - URL:', router.asPath);
+
       if (timerRef.current) clearTimeout(timerRef.current);
       if (forceEndRef.current) clearTimeout(forceEndRef.current);
       timerRef.current = null;
       forceEndRef.current = null;
 
+      console.log('[PageLoading] Setting isLoading to FALSE');
       // Smooth out flicker
       requestAnimationFrame(() => setLoading(false));
     };
 
+    console.log('[PageLoading] Setting up router event listeners');
     router.events.on("routeChangeStart", start);
     router.events.on("routeChangeComplete", end);
     router.events.on("routeChangeError", end);
 
     return () => {
+      console.log('[PageLoading] Cleaning up event listeners');
       router.events.off("routeChangeStart", start);
       router.events.off("routeChangeComplete", end);
       router.events.off("routeChangeError", end);
@@ -50,7 +65,7 @@ export default function PageLoading() {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (forceEndRef.current) clearTimeout(forceEndRef.current);
     };
-  }, [router.events]);
+  }, [router.events, router.asPath]);
 
   // Render overlay only when loading
   return (
