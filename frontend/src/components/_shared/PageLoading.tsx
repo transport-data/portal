@@ -18,7 +18,7 @@ export default function PageLoading() {
       // Force end loading after 15 seconds as a safety mechanism
       forceEndTimer = setTimeout(() => {
         setLoading(false);
-      }, 15000);
+      }, 10000);
     };
 
     const end = () => {
