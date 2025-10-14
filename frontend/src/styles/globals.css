@@ -425,7 +425,7 @@ div.w-fit[data-testid="flowbite-tooltip-target"] {
 }
 
 .overview-field .ProseMirror {
-  height: 300px;
+  min-height: 300px;
 }
 
 .progress {
