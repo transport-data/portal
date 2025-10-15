@@ -1,50 +1,74 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 import { TDCIcon } from "@lib/icons";
 
-const LOADER_THRESHOLD = 250;
+const LOADER_THRESHOLD = 300; // milliseconds before showing loader
+const FORCE_END_TIMEOUT = 10000; // fallback timeout in ms
 
 export default function PageLoading() {
   const [isLoading, setLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    let forceEndTimer: NodeJS.Timeout;
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const forceEndRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
     const start = () => {
-      timer = setTimeout(() => {
+      console.log('[PageLoading] routeChangeStart - URL:', router.asPath);
+
+      // Clear any existing timers before setting new ones
+      if (timerRef.current) {
+        console.log('[PageLoading] Clearing existing timer');
+        clearTimeout(timerRef.current);
+      }
+      if (forceEndRef.current) {
+        console.log('[PageLoading] Clearing existing forceEnd timer');
+        clearTimeout(forceEndRef.current);
+      }
+
+      // Delay showing loader to avoid flashing on quick transitions
+      timerRef.current = setTimeout(() => {
+        console.log('[PageLoading] Setting isLoading to TRUE');
         requestAnimationFrame(() => setLoading(true));
       }, LOADER_THRESHOLD);
 
-      // Force end loading after 10 seconds as a safety mechanism
-      forceEndTimer = setTimeout(() => {
+      // Safety: force stop loading after 10s no matter what
+      forceEndRef.current = setTimeout(() => {
+        console.log('[PageLoading] Force ending loading after timeout');
         requestAnimationFrame(() => setLoading(false));
-      }, 10000);
+      }, FORCE_END_TIMEOUT);
     };
 
     const end = () => {
-      if (timer) clearTimeout(timer);
-      if (forceEndTimer) clearTimeout(forceEndTimer);
+      console.log('[PageLoading] routeChangeComplete/Error - URL:', router.asPath);
+
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (forceEndRef.current) clearTimeout(forceEndRef.current);
+      timerRef.current = null;
+      forceEndRef.current = null;
+
+      console.log('[PageLoading] Setting isLoading to FALSE');
+      // Smooth out flicker
       requestAnimationFrame(() => setLoading(false));
     };
 
+    console.log('[PageLoading] Setting up router event listeners');
     router.events.on("routeChangeStart", start);
     router.events.on("routeChangeComplete", end);
     router.events.on("routeChangeError", end);
 
     return () => {
+      console.log('[PageLoading] Cleaning up event listeners');
       router.events.off("routeChangeStart", start);
       router.events.off("routeChangeComplete", end);
       router.events.off("routeChangeError", end);
 
-      if (timer) clearTimeout(timer);
-      if (forceEndTimer) clearTimeout(forceEndTimer);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (forceEndRef.current) clearTimeout(forceEndRef.current);
     };
-  }, [router.events]);
+  }, [router.events, router.asPath]);
 
-  if (!isLoading) return <div></div>;
-
+  // Render overlay only when loading
   return (
     isLoading && (
       <div className="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-start bg-[rgba(255,255,255,.4)] duration-500 animate-in fade-in">
