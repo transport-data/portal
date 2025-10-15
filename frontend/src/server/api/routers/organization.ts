@@ -80,7 +80,7 @@ export const organizationRouter = createTRPCRouter({
       const apiKey = user.apikey;
       if (input.parent === "no-parent" || !input.parent) {
           const result = await patchOrganization({ apiKey, input });
-          await revalidatePath(`/@${result.name}`);
+          await revalidatePath(`/@${result.name.toLowerCase()}`);
           return result
       }
 
