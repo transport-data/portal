@@ -124,7 +124,7 @@ function capitalize(text:string) {
 
 
 export async function revalidatePath(path: string) {
-  await fetch(`${env.NEXTAUTH_URL}/api/revalidate?path=${path}`, {
+  await fetch(`${process.env.NEXTAUTH_URL}/api/revalidate?path=${path}`, {
     headers: { Authorization: env.SYS_ADMIN_API_KEY },
   });
 }
