@@ -6,7 +6,7 @@
   },
   {
     "image": "/images/logos/partners/caf-colored.svg",
-    "name": "CAF - Banco de desarrollo de América Latina",
+    "name": "CAF - Development Bank of Latin America and the Caribbean",
     "url": "https://www.caf.com"
   },
   {
@@ -103,6 +103,11 @@
     "image": "/images/sponsors/uk-international-development.png",
     "name": "UK AID",
     "url": "https://www.gov.uk/government/organisations/foreign-commonwealth-development-office"
+  },
+  {
+    "image": "/images/logos/partners/zulip-org-logo.png",
+    "name": "Zulip",
+    "url": "https://zulip.com/"
   }
   
 
