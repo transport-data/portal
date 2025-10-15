@@ -43,6 +43,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (!org) {
     return {
       notFound: true,
+      revalidate: 60 * 5
     };
   }
   return {
