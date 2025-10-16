@@ -31,7 +31,8 @@ export default function AboutUsPage({}) {
             <br></br>
             For general inquiries, to join the initiative, or any other
             questions,
-            <br></br>please feel free to reach out to us via 📧 Email:
+            <br></br>please feel free to reach out to us via 
+            <br></br>📧 Email:
           </p>
           <Link
             className="text-base font-semibold"
@@ -58,6 +59,25 @@ export default function AboutUsPage({}) {
             >
               🔗 GitHub Discussions Page
             </Link>
+          </p>
+        </section>
+        <section className="container mb-[96px] mt-10 text-center">
+          <h1 className="mb-2 text-xl font-bold leading-[28px] text-gray-900">
+            The TDCI is on Zulip!
+          </h1>
+          <p className="mb-2 text-gray-500">
+            Chat with us via<br></br>
+            <Link
+              className="mt-2 inline-block text-base font-semibold text-gray-900"
+              href="https://transport-data.zulipchat.com/"
+              target="_blank"
+            >
+              💬 our open Zulip channel!
+            </Link>
+            This is the most direct way to reach out to our team and will help us 
+            <br></br>respond faster to feedback and questions. 
+            <br></br>Zulip is a 100% open-source platform supporting non-profit 
+            <br></br>organisations and initiatives such as the TDCI.
           </p>
           <p className="text-gray-500">
             We appreciate your contributions and feedback!
