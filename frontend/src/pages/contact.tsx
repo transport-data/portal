@@ -69,6 +69,9 @@ export default function AboutUsPage({}) {
               🔗 GitHub Discussions Page
             </Link>
           </p>
+          <p className="text-gray-500">
+            We appreciate your contributions and feedback!
+          </p>
         </section>
         <section className="container mb-[96px] mt-10 text-center">
           <div className="m-auto mb-[16px] flex w-fit flex-col items-center justify-center rounded-[8px] bg-gray-100 p-2 text-gray-500">
@@ -81,26 +84,23 @@ export default function AboutUsPage({}) {
             />
           </div>
           <h1 className="mb-2 text-xl font-bold leading-[28px] text-gray-900">
-            The TDCI is on Zulip!
+            The TDCI is on Zulip
           </h1>
           <p className="mb-2 text-gray-500">
-            Chat with us via<br></br>
-            <Link
-              className="mt-2 inline-block text-base font-semibold text-gray-900"
-              href="https://transport-data.zulipchat.com/"
-              target="_blank"
-            >
-              💬 our open Zulip channel!
-            </Link>
+            💬 Chat with us via our open Zulip channel!<br></br>
           </p>
           <p className="mb-2 text-gray-500">
             This is the most direct way to reach out to our team and will help us 
             <br></br>respond faster to feedback and questions. 
             <br></br>Zulip is a 100% open-source platform supporting non-profit 
-            <br></br>organisations and initiatives such as the TDCI.
-          </p>
-          <p className="text-gray-500">
-            We appreciate your contributions and feedback!
+            <br></br>organisations and initiatives such as the TDCI.<br></br>
+            <Link
+                className="mt-2 inline-block text-base font-semibold text-gray-900"
+                href="https://transport-data.zulipchat.com/"
+                target="_blank"
+              >
+              🔗 transport-data.zulipchat.com
+            </Link>
           </p>
         </section>
         <NewsLetterSection />
