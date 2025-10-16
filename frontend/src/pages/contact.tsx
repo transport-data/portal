@@ -31,14 +31,13 @@ export default function AboutUsPage({}) {
             <br></br>
             For general inquiries, to join the initiative, or any other
             questions,
-            <br></br>please feel free to reach out to us via 
-            <br></br>📧 Email:
+            <br></br>please feel free to reach out to us via
           </p>
           <Link
             className="text-base font-semibold"
             href="mailto:contact@transport-data.org"
           >
-            contact@transport-data.org
+            📧 contact@transport-data.org
           </Link>
         </section>
         <section className="container mb-[96px] mt-10 text-center">
