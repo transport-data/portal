@@ -42,6 +42,15 @@ export default function AboutUsPage({}) {
           </Link>
         </section>
         <section className="container mb-[96px] mt-10 text-center">
+          <div className="m-auto mb-[16px] flex w-fit flex-col items-center justify-center rounded-[8px] bg-gray-100 p-2 text-gray-500">
+            <img
+              src="/images/logos/partners/github_PNG80.png"
+              alt="GitHub"
+              width={38}
+              height={38}
+              className="object-contain"
+            />
+          </div>
           <h1 className="mb-2 text-xl font-bold leading-[28px] text-gray-900">
             Data-Related Issues
           </h1>
@@ -62,6 +71,14 @@ export default function AboutUsPage({}) {
           </p>
         </section>
         <section className="container mb-[96px] mt-10 text-center">
+          <div className="m-auto mb-[16px] flex w-fit flex-col items-center justify-center rounded-[8px] bg-gray-100 p-2 text-gray-500">
+            <img
+              src="/images/logos/partners/zulip-icon.png"
+              alt="GitHub"
+              width={38}
+              height={38}
+              className="object-contain"
+            />
           <h1 className="mb-2 text-xl font-bold leading-[28px] text-gray-900">
             The TDCI is on Zulip!
           </h1>
@@ -74,6 +91,8 @@ export default function AboutUsPage({}) {
             >
               💬 our open Zulip channel!
             </Link>
+          </p>
+          <p className="mb-2 text-gray-500">
             This is the most direct way to reach out to our team and will help us 
             <br></br>respond faster to feedback and questions. 
             <br></br>Zulip is a 100% open-source platform supporting non-profit 
