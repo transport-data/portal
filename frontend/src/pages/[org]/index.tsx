@@ -43,7 +43,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (!org) {
     return {
       notFound: true,
-      revalidate: 60 * 5
+      revalidate: 60 * 5,
     };
   }
   return {
@@ -77,37 +77,33 @@ export default function OrgPage({
       </Head>
       {org && (
         <Layout>
-          <div className="grid-rows-datasetpage-hero grid">
-            <section className="col-span-full row-start-1 row-end-3">
-              <div
-                style={{ 'background': 'rgb(227, 249, 237)' }}
-                className="flex h-full flex-col bg-[rgb(227, 249, 237)]"
-              >
-                <div
-                  className="custom-container mx-auto grid grow items-center"
-                  style={{ marginBlock: "4rem" }}
-                >
-                  <div className="col-span-1">
-                    <h1 className="text-6xl font-black text-white">
-                      {org.title}
-                    </h1>
+          <section>
+            <div
+              style={{ background: "rgb(227, 249, 237)" }}
+              className="bg-[rgb(227, 249, 237)] flex h-full flex-col"
+            >
+              <div className="custom-container mx-auto pt-16 pb-4">
+                  <h1 className="text-4xl font-black text-gray-900">
+                    {org.title}
+                  </h1>
+              </div>
+            </div>
+          </section>
+          <section
+            className="bg-[rgb(227, 249, 237)] col-span-full row-span-2 row-start-2 grid"
+            style={{ background: "rgb(227, 249, 237)" }}
+          >
+            <div className="custom-container">
+              {org && (
+                <main className={styles.main}>
+                  <OrgInfo org={org} />
+                  <div>
+                    <Tabs items={tabs} />
                   </div>
-                </div>
-              </div>
-            </section>
-            <section className="col-span-full row-span-2 row-start-2 grid bg-[rgb(227, 249, 237)]" style={{ 'background': 'rgb(227, 249, 237)' }}>
-              <div className="custom-container">
-                {org && (
-                  <main className={styles.main}>
-                    <OrgInfo org={org} />
-                    <div>
-                      <Tabs items={tabs} />
-                    </div>
-                  </main>
-                )}
-              </div>
-            </section>
-          </div>
+                </main>
+              )}
+            </div>
+          </section>
         </Layout>
       )}
     </>
