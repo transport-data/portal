@@ -79,6 +79,7 @@ export default function AboutUsPage({}) {
               height={38}
               className="object-contain"
             />
+          </div>
           <h1 className="mb-2 text-xl font-bold leading-[28px] text-gray-900">
             The TDCI is on Zulip!
           </h1>
