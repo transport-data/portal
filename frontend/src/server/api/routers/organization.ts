@@ -1,4 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { env } from "@env.mjs";
+import { revalidatePath } from "@lib/utils";
 import { OrganizationSchema } from "@schema/organization.schema";
 import { MemberEditSchema } from "@schema/user.schema";
 import {
@@ -76,13 +78,19 @@ export const organizationRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       const apiKey = user.apikey;
-      if (input.parent === "no-parent" || !input.parent)
-        return await patchOrganization({ apiKey, input });
+      if (input.parent === "no-parent" || !input.parent) {
+          const result = await patchOrganization({ apiKey, input });
+          await revalidatePath(`/@${result.name.toLowerCase()}`);
+          return result
+      }
+
       const _organization = { ...input, groups: [{ name: input.parent }] };
       const organization = await patchOrganization({
         apiKey,
         input: _organization,
       });
+
+      await revalidatePath(`/@${organization.name.toLowerCase()}`);
       return organization;
     }),
   delete: protectedProcedure

@@ -1,3 +1,4 @@
+import { env } from "@env.mjs";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -119,4 +120,11 @@ function capitalize(text:string) {
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+
+export async function revalidatePath(path: string) {
+  await fetch(`${process.env.NEXTAUTH_URL}/api/revalidate?path=${path}`, {
+    headers: { Authorization: env.SYS_ADMIN_API_KEY },
+  });
 }
