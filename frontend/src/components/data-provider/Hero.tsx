@@ -47,7 +47,7 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/irf-colored.svg"}
+            src={"/images/logos/partners/irf-colored.png"}
           />
           <img
             className="object-contain"
