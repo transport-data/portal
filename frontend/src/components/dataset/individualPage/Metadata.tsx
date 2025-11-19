@@ -123,10 +123,10 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
   const datasetRegion = !dataset.regions
     ? null
     : dataset.regions.length === 0
-    ? null
-    : dataset.regions.length === 1
-    ? (dataset.regions[0] as string)
-    : "Worldwide";
+      ? null
+      : dataset.regions.length === 1
+        ? (dataset.regions[0] as string)
+        : "Worldwide";
   return (
     <div className="min-h-[500px] bg-gray-50">
       <div className="container grid py-8 lg:grid-cols-2">
@@ -257,7 +257,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             {datasetRegion && geographies && (
               <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
                 {datasetRegion &&
-                geographies.find((g) => g.name === datasetRegion)?.title
+                  geographies.find((g) => g.name === datasetRegion)?.title
                   ? geographies.find((g) => g.name === datasetRegion)?.title
                   : "Worldwide"}
               </dd>
@@ -313,56 +313,46 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
               {
                 type: "quotation",
                 label: "APA",
-                content: `${getLastNameAndInitials(dataset)}. (${
-                  dataset.metadata_created
-                    ? new Date(dataset.metadata_created).getFullYear()
+                content: `${getLastNameAndInitials(dataset)}. (${dataset.metadata_modified
+                    ? new Date(dataset.metadata_modified).getFullYear()
                     : "n.d"
-                }). <i> ${dataset.title ?? dataset.name}</i> [Data set]. ${
-                  dataset.organization?.display_name ??
+                  }). <i> ${dataset.title ?? dataset.name}</i> [Data set]. ${dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
-                }. ${typeof window !== "undefined" && window.location.href}`,
+                  }. ${typeof window !== "undefined" && window.location.href}`,
               },
               {
                 type: "quotation",
                 label: "MLA",
-                content: `${getLastNameAndFirstName(dataset)}. <i>${
-                  dataset.title ?? dataset.name
-                }</i>, ${
-                  dataset.organization?.display_name ??
+                content: `${getLastNameAndFirstName(dataset)}. <i>${dataset.title ?? dataset.name
+                  }</i>, ${dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
-                }, ${
-                  dataset.metadata_created
-                    ? new Date(dataset.metadata_created).getFullYear()
+                  }, ${dataset.metadata_modified
+                    ? new Date(dataset.metadata_modified).getFullYear()
                     : "(n.d)"
-                }, ${typeof window !== "undefined" && window.location.href}`,
+                  }, ${typeof window !== "undefined" && window.location.href}`,
               },
               {
                 type: "quotation",
                 label: "Chicago",
-                content: `${getLastNameAndFirstName(dataset)}. <i>${
-                  dataset.title ?? dataset.name
-                }</i>. ${
-                  dataset.metadata_created
-                    ? new Date(dataset.metadata_created).getFullYear()
+                content: `${getLastNameAndFirstName(dataset)}. <i>${dataset.title ?? dataset.name
+                  }</i>. ${dataset.metadata_modified
+                    ? new Date(dataset.metadata_modified).getFullYear()
                     : "(n.d)"
-                }. ${
-                  dataset.organization?.display_name ??
+                  }. ${dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
-                }. ${typeof window !== "undefined" && window.location.href}`,
+                  }. ${typeof window !== "undefined" && window.location.href}`,
               },
               {
                 type: "quotation",
                 label: "Harvard",
-                content: `${getLastNameAndInitials(dataset)}. (${
-                  dataset.metadata_created
-                    ? new Date(dataset.metadata_created).getFullYear()
+                content: `${getLastNameAndInitials(dataset)}. (${dataset.metadata_modified
+                    ? new Date(dataset.metadata_modified).getFullYear()
                     : "n.d"
-                }). '${dataset.title ?? dataset.name}'. Available at: ${
-                  typeof window !== "undefined" && window.location.href
-                }`,
+                  }). '${dataset.title ?? dataset.name}'. Available at: ${typeof window !== "undefined" && window.location.href
+                  }`,
               },
             ]}
           />
@@ -373,20 +363,18 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 type: "code",
                 label: "BibTex",
                 content: `
-@techreport{${
-                  slugify(
-                    (dataset.creator_user?.fullname ?? "TDC").replaceAll(
-                      " ",
-                      ""
-                    )
-                  ) + new Date(dataset.metadata_created as string).getFullYear()
-                },
+@techreport{${slugify(
+                  (dataset.creator_user?.fullname ?? "TDC").replaceAll(
+                    " ",
+                    ""
+                  )
+                ) + new Date(dataset.metadata_modified as string).getFullYear()
+                  },
    author = {${bibtexAuthor(dataset)}},
-   year = ${new Date(dataset.metadata_created as string).getFullYear()},
+   year = ${new Date(dataset.metadata_modified as string).getFullYear()},
    title = {${dataset.title ?? dataset.name}},
-   institution = {${
-     dataset.organization?.title ?? dataset.organization?.name ?? "TDC"
-   }},
+   institution = {${dataset.organization?.title ?? dataset.organization?.name ?? "TDC"
+                  }},
    url = {${typeof window !== "undefined" && window.location.href}}
 }
 `,
