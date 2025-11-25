@@ -13,7 +13,7 @@ const images = [
   "/images/logos/partners/ebrd-colored.svg",
   "/images/logos/partners/solcat-colored.svg",
   "/images/logos/partners/fia-colored.svg",
-  "/images/logos/partners/irf-colored.png",
+  "/images/logos/partners/irf-colored.svg",
   "/images/logos/partners/chalmers-colored.svg",
   "/images/logos/partners/fdm-colored.svg",
   "/images/logos/partners/iiasa-colored.svg",
