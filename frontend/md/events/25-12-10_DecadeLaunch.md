@@ -8,6 +8,6 @@ location: New York
 link: https://sdgs.un.org/sustainabletransportlaunch
 ---
 
-The TDCI has submitted a Voluntary Committment to support the implementation of the UN Decade of Sustainable Transport, as a means of collaboration, capacity strengthing and progress tracking through open and reliable data. The commitment will be presented as part of the Decade Launch in New York on 10th December 2025. 
+The Transport Data Commons Initiative has submitted a Voluntary Commitment to support the implementation of the UN Decade of Sustainable Transport, contributing through collaboration, capacity strengthening, and progress tracking based on open and reliable data. This commitment will be presented during the official launch of the Decade in New York on 10 December 2025. 
 
-Follow the live stream through the public [UNTV channel](https://webtv.un.org/en) (no registration required)!
+Follow the live stream through the public UNTV channel: [https://webtv.un.org/en](https://webtv.un.org/en) (no registration required)
