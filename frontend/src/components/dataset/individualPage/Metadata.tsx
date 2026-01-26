@@ -173,7 +173,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             <dt className="text-sm font-medium leading-6 text-primary">URL</dt>
             {dataset.url ? (
               <dd className="mt-1 flex flex-wrap gap-2 text-sm leading-6 text-gray-500 sm:mt-2">
-                <a className="text-accent underline" href={dataset.url}>
+                <a className="text-accent break-all underline" href={dataset.url}>
                   {dataset.url}
                 </a>
               </dd>
