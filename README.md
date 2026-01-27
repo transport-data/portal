@@ -46,6 +46,7 @@ Instructions on how to use the final product once deployed can be found in the [
 - [23. Account settings](/docs/settings/README.md)
 - [24. Newsletter section](/docs/newsletter/README.md)
 - [25. Page loading](/docs/page-loading-component/README.md)
+- [26. Visualization Showroom](/docs/showroom/README.md)
 
 ## 2. Quickstart
 
