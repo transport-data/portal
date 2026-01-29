@@ -29,6 +29,7 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { useState } from "react";
 import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
 import * as Icons from "./rteIcons";
+import { getMarkRange } from "@tiptap/core";
 
 import { Extension } from "@tiptap/core";
 
@@ -77,15 +78,60 @@ export const RTEMenuBar = ({ disabled }: any) => {
   }
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
 
-  const handleOpenLinkDialog = () => {
+  const handleOpenLinkDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     if (!editor) return;
-    const previousUrl = editor.getAttributes("link").href || "";
-    setUrl(previousUrl);
+
+    const { state } = editor;
+    const { from, to, $from } = state.selection;
+    const hasSelection = from !== to;
+
+    // Get selected text or current link text
+    let selectedText = "";
+    let currentUrl = "";
+
+    if (editor.isActive("link")) {
+      // Editing existing link - get the full link range
+      currentUrl = editor.getAttributes("link").href || "";
+
+      // Use getMarkRange to get the full extent of the link mark
+      const linkType = state.schema.marks.link;
+      const range = getMarkRange($from, linkType);
+
+      if (range) {
+        selectedText = state.doc.textBetween(range.from, range.to, " ");
+      } else {
+        // Fallback to current selection
+        selectedText = state.doc.textBetween(from, to, " ");
+      }
+    } else if (hasSelection) {
+      // Creating new link from selection
+      selectedText = state.doc.textBetween(from, to, " ");
+    }
+
+    setLinkText(selectedText);
+    setUrl(currentUrl);
     setOpen(true);
   };
 
+  const handleUnlink = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!editor) return;
+    editor.chain().focus().unsetLink().run();
+  };
+
   const applyLink = () => {
+    if (!editor) return;
+
+    // If both URL and text are empty, just close
+    if (!url && !linkText) {
+      setOpen(false);
+      return;
+    }
+
+    // If URL is empty but we have text, remove the link
     if (!url) {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       setOpen(false);
@@ -93,13 +139,67 @@ export const RTEMenuBar = ({ disabled }: any) => {
     }
 
     try {
-      editor
-        .chain()
-        .focus()
-        .extendMarkRange("link")
-        .setLink({ href: url })
-        .run();
+      const { from, to, empty } = editor.state.selection;
+
+      if (editor.isActive("link")) {
+        // Editing existing link - replace text and URL
+        editor
+          .chain()
+          .focus()
+          .extendMarkRange("link")
+          .deleteSelection()
+          .insertContent([
+            {
+              type: "text",
+              marks: [{ type: "link", attrs: { href: url } }],
+              text: linkText,
+            },
+            {
+              type: "text",
+              text: " ",
+            },
+          ])
+          .run();
+      } else if (!empty) {
+        // Has selection - replace selected text with link
+        editor
+          .chain()
+          .focus()
+          .deleteSelection()
+          .insertContent([
+            {
+              type: "text",
+              marks: [{ type: "link", attrs: { href: url } }],
+              text: linkText,
+            },
+            {
+              type: "text",
+              text: " ",
+            },
+          ])
+          .run();
+      } else {
+        // No selection - insert new link at cursor
+        editor
+          .chain()
+          .focus()
+          .insertContent([
+            {
+              type: "text",
+              marks: [{ type: "link", attrs: { href: url } }],
+              text: linkText,
+            },
+            {
+              type: "text",
+              text: " ",
+            },
+          ])
+          .run();
+      }
+
       setOpen(false);
+      setUrl("");
+      setLinkText("");
     } catch (e: any) {
       toast({
         title: "Failed to add the link",
@@ -112,8 +212,10 @@ export const RTEMenuBar = ({ disabled }: any) => {
   const isURLValid =
     !url ||
     new RegExp(
-      "^(https?)://(?:[a-zA-Z0-9-]+.)+[a-zA-Z]{2,}(?::d{1,5})?(?:/[^s]*)?$"
+      "^(https?)://(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}(?::\\d{1,5})?(?:/[^\\s]*)?$"
     ).test(url);
+
+  const canApply = linkText.trim() !== "" && (url === "" || isURLValid);
 
   return (
     <>
@@ -138,6 +240,7 @@ export const RTEMenuBar = ({ disabled }: any) => {
           <button
             disabled={disabled}
             aria-label="Link"
+            type="button"
             onClick={handleOpenLinkDialog}
             className={cn(
               disabled && "cursor-not-allowed",
@@ -147,6 +250,20 @@ export const RTEMenuBar = ({ disabled }: any) => {
           >
             <Icons.Link />
           </button>
+          {editor.isActive("link") && (
+            <button
+              disabled={disabled}
+              aria-label="Remove Link"
+              type="button"
+              onClick={handleUnlink}
+              className={cn(
+                disabled && "cursor-not-allowed",
+                "rounded-md p-1 hover:text-accent hover:text-red-500"
+              )}
+            >
+              <Icons.Unlink />
+            </button>
+          )}
           <button
             disabled={disabled}
             aria-label="Code"
@@ -237,31 +354,64 @@ export const RTEMenuBar = ({ disabled }: any) => {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/50" />
           <Dialog.Content className="fixed left-[50%] top-[30%] z-[100] w-[90vw] max-w-md -translate-x-1/2 rounded bg-white p-6 shadow-lg">
-            <Dialog.Title className="mb-2 text-xl font-semibold">
-              Insert a link
+            <Dialog.Title className="mb-4 text-xl font-semibold">
+              {editor.isActive("link") ? "Edit link" : "Insert link"}
             </Dialog.Title>
-            <Input
-              disabled={disabled}
-              className={cn(disabled && "cursor-not-allowed")}
-              type="url"
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com"
-              value={url}
-            />
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Text
+                </label>
+                <Input
+                  disabled={disabled}
+                  className={cn(disabled && "cursor-not-allowed")}
+                  type="text"
+                  onChange={(e) => setLinkText(e.target.value)}
+                  placeholder="Link text"
+                  value={linkText}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  URL
+                </label>
+                <Input
+                  disabled={disabled}
+                  className={cn(
+                    disabled && "cursor-not-allowed",
+                    !isURLValid && url !== "" && "border-red-500"
+                  )}
+                  type="url"
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://example.com"
+                  value={url}
+                />
+                {!isURLValid && url !== "" && (
+                  <p className="mt-1 text-xs text-red-500">
+                    Please enter a valid URL
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
               <Button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  setUrl("");
+                  setLinkText("");
+                }}
                 className="rounded bg-gray-200 px-4 py-2 hover:bg-gray-500"
               >
                 Cancel
               </Button>
               <Button
                 type="button"
-                disabled={!isURLValid}
+                disabled={!canApply}
                 onClick={applyLink}
                 className={cn(
-                  !isURLValid ? "cursor-not-allowed opacity-70" : ""
+                  !canApply ? "cursor-not-allowed opacity-70" : ""
                 )}
               >
                 Apply
@@ -289,7 +439,9 @@ export const extensions = [
   Document,
   Paragraph,
   Text,
-  Link.configure({
+  Link.extend({
+    inclusive: false,
+  }).configure({
     openOnClick: false,
     autolink: true,
     defaultProtocol: "https",
@@ -297,14 +449,14 @@ export const extensions = [
     validate: (url) =>
       !url ||
       new RegExp(
-        "^(https?)://(?:[a-zA-Z0-9-]+.)+[a-zA-Z]{2,}(?::d{1,5})?(?:/[^s]*)?$"
+        "^(https?)://(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}(?:\\d{1,5})?(?:/[^\\s]*)?$"
       ).test(url),
   }),
-  Bold,
-  Underline,
-  Italic,
-  Strike,
-  Code,
+  Bold.extend({ inclusive: false }),
+  Underline.extend({ inclusive: false }),
+  Italic.extend({ inclusive: false }),
+  Strike.extend({ inclusive: false }),
+  Code.extend({ inclusive: false }),
   StarterKit.configure({
     heading: false,
     bulletList: {
