@@ -98,12 +98,18 @@ export const RTEMenuBar = ({ disabled }: any) => {
 
       // Use getMarkRange to get the full extent of the link mark
       const linkType = state.schema.marks.link;
-      const range = getMarkRange($from, linkType);
 
-      if (range) {
-        selectedText = state.doc.textBetween(range.from, range.to, " ");
+      if (linkType) {
+        const range = getMarkRange($from, linkType);
+
+        if (range) {
+          selectedText = state.doc.textBetween(range.from, range.to, " ");
+        } else {
+          // Fallback to current selection
+          selectedText = state.doc.textBetween(from, to, " ");
+        }
       } else {
-        // Fallback to current selection
+        // Fallback if link type doesn't exist
         selectedText = state.doc.textBetween(from, to, " ");
       }
     } else if (hasSelection) {
