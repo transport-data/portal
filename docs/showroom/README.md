@@ -43,15 +43,15 @@ The showroom provides:
 
 ### Quick Start (3 Steps)
 
-1. **Get your Tableau share link**
-   - Go to your Tableau Public dashboard
+1. **Get your Tableau/PowerBI share link**
+   - Go to your Tableau/PowerBI Public dashboard
    - Click the **Share** button
    - Click **Copy Link**
 
 2. **Edit the config file**
    - Open `frontend/src/config/visualizations.ts`
    - Copy the template at the bottom of the file
-   - Paste your share link into `extractTableauUrl()`
+   - Paste your share link into `extractUrl()`
 
 3. **Add dataset references**
    - Link to the TDC datasets you used
@@ -99,7 +99,7 @@ Scroll to the bottom of `visualizations.ts` and find the commented template:
   tags: ["Urban", "Mobility", "Emissions"],  // Add relevant tags
   
   // STEP A: Paste your Tableau share link
-  embedUrl: extractTableauUrl(
+  embedUrl: extractUrl(
     `https://public.tableau.com/views/YourWorkbook/YourView?:display_count=n&:origin=viz_share_link`
   ),
   
@@ -158,7 +158,7 @@ npm run dev
 | `id` | string | Unique identifier (lowercase-with-dashes) | `"ndc-transport-tracker"` |
 | `title` | string | Dashboard title shown in gallery | `"Transport Measures in NDCs"` |
 | `description` | string | Brief description of the dashboard | `"Analysis of transport mitigation..."` |
-| `embedUrl` | string | Embed URL (use `extractTableauUrl()`) | See examples below |
+| `embedUrl` | string | Embed URL (use `extractUrl()`) | See examples below |
 | `datasets` | array | Array of dataset references (min: 1) | See datasets section |
 
 ### Optional Fields
@@ -198,19 +198,9 @@ datasets: [
 **Method 1: Share Link (Easiest)**
 
 ```typescript
-embedUrl: extractTableauUrl(
+embedUrl: extractUrl(
   `https://public.tableau.com/views/YourWorkbook/ViewName?:display_count=n&:origin=viz_share_link`
 ),
-```
-
-**Method 2: Full Embed Code**
-
-```typescript
-embedUrl: extractTableauUrl(`
-  <div class='tableauPlaceholder' id='viz1234'>
-    ... paste entire embed code from Tableau ...
-  </div>
-`),
 ```
 
 **Auto-extract thumbnail:**
@@ -223,10 +213,30 @@ thumbnailUrl: extractTableauThumbnail(
 
 ### ✅ Power BI
 
+**Share Link Method:**
+
+1. Open your Power BI report
+2. Click **File** → **Share** → **Embed report**
+3. Copy the link (starts with `https://app.powerbi.com/view?r=...`)
+4. Paste into config:
+
 ```typescript
-embedUrl: "https://app.powerbi.com/view?r=YOUR_REPORT_ID",
-thumbnailUrl: "/images/showroom/powerbi-dashboard.png",  // Use custom screenshot
+embedUrl: extractUrl(
+  `https://app.powerbi.com/view?r=YOUR_ENCODED_TOKEN`
+),
 ```
+
+**⚠️ Note:** Power BI doesn't provide automatic thumbnails. You must use a screenshot:
+
+```typescript
+thumbnailUrl: "/images/showroom/your-powerbi-dashboard.png",
+```
+
+**How to create a thumbnail:**
+1. Take a screenshot of your Power BI dashboard
+2. Crop to ~1200x675px (16:9 ratio)
+3. Save as PNG to: `frontend/public/images/showroom/your-dashboard.png`
+4. Reference in config as shown above
 
 ### ✅ Other iframe-embeddable platforms
 
@@ -321,7 +331,7 @@ frontend/
   description: "Real-time monitoring of transport emissions in major cities worldwide.",
   tags: ["Emissions", "Urban", "Climate"],
   
-  embedUrl: extractTableauUrl(
+  embedUrl: extractUrl(
     `https://public.tableau.com/views/UrbanEmissions/Dashboard1`
   ),
   
@@ -350,7 +360,9 @@ frontend/
   description: "Overview of freight movements, modal shifts, and logistics efficiency.",
   tags: ["Freight", "Logistics", "Trade"],
   
-  embedUrl: "https://app.powerbi.com/view?r=abc123def456",
+  embedUrl: extractUrl( 
+    "https://app.powerbi.com/view?r=abc123def456",
+  ),
   
   thumbnailUrl: "/images/showroom/freight-dashboard.png",
   
@@ -379,23 +391,22 @@ frontend/
   description: "Comprehensive analysis covering all transport modes, infrastructure, and policy measures.",
   tags: ["Germany", "Policy", "Infrastructure"],
   
-  embedUrl: extractTableauUrl(
-    `https://public.tableau.com/views/GermanyTransport/Report`
+  embedUrl: extractUrl(
+    `https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9`
   ),
   
-  thumbnailUrl: extractTableauThumbnail(
-    `https://public.tableau.com/views/GermanyTransport/Report`
-  ),
+  // Power BI requires custom thumbnail
+  thumbnailUrl: "/images/showroom/freight-dashboard.png",
   
   datasets: [
     {
-      title: "Germany Transport Statistics",
-      url: "https://portal.transport-data.org/@destatis/transport-stats"
+      title: "Freight Movement Data",
+      url: "https://portal.transport-data.org/@freight/movements"
     }
   ],
   
-  aspectRatio: "free",
-  minHeightPx: 1200,  // Taller dashboard needs more height
+  externalLink: "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
+  aspectRatio: "16:9",
 },
 ```
 

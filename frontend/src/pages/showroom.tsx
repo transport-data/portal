@@ -189,125 +189,110 @@ export default function ShowroomPage() {
                 {/* Modal for expanded view */}
                 {selectedVisualization && (
                     <div
-                        className="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-2 md:p-4"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-0"
                         onClick={() => setSelectedViz(null)}
                     >
-                        {/* Centered container with flexible sizing */}
-                        <div className="flex min-h-screen items-center justify-center p-2 md:p-4">
-                            <div
-                                className="relative w-full max-w-[98vw] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
-                                style={{
-                                    maxHeight: "98vh"
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {/* Modal Header - Fixed height */}
-                                <div className="flex-shrink-0 border-b border-gray-200 bg-white px-4 py-3 md:px-6 md:py-4">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1 min-w-0 pr-4">
-                                            <h3 className="text-lg md:text-xl font-bold text-gray-900 truncate">
-                                                {selectedVisualization.title}
-                                            </h3>
-                                            <p className="mt-1 text-xs md:text-sm text-gray-500 line-clamp-2">
-                                                {selectedVisualization.description}
-                                            </p>
-                                        </div>
-                                        <button
-                                            onClick={() => setSelectedViz(null)}
-                                            className="flex-shrink-0 rounded-md p-1.5 md:p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                        {/* Modal container - fixed size, no overflow */}
+                        <div
+                            className="relative flex flex-col bg-white rounded-lg shadow-2xl"
+                            style={{
+                                width: "95vw",
+                                height: "95vh",
+                                maxWidth: "1600px",
+                                maxHeight: "95vh"
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Modal Header - Fixed height */}
+                            <div className="flex-shrink-0 border-b border-gray-200 bg-white px-4 py-3 md:px-6 md:py-4">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1 min-w-0 pr-4">
+                                        <h3 className="text-lg md:text-xl font-bold text-gray-900 truncate">
+                                            {selectedVisualization.title}
+                                        </h3>
+                                        <p className="mt-1 text-xs md:text-sm text-gray-500 line-clamp-2">
+                                            {selectedVisualization.description}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => setSelectedViz(null)}
+                                        className="flex-shrink-0 rounded-md p-1.5 md:p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                                    >
+                                        <svg
+                                            className="h-5 w-5 md:h-6 md:w-6"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
                                         >
-                                            <svg
-                                                className="h-5 w-5 md:h-6 md:w-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    {/* Tags and external link */}
-                                    <div className="mt-2 md:mt-4 flex flex-wrap items-center gap-2 md:gap-4">
-                                        {selectedVisualization.tags && selectedVisualization.tags.length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {selectedVisualization.tags.map((tag) => (
-                                                    <span
-                                                        key={tag}
-                                                        className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {selectedVisualization.externalLink && (
-                                            <a
-                                                href={selectedVisualization.externalLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center text-xs md:text-sm text-accent hover:underline whitespace-nowrap"
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <ExternalLink className="mr-1 h-3 w-3 md:h-4 md:w-4" />
-                                                Open in new tab
-                                            </a>
-                                        )}
-                                    </div>
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </button>
                                 </div>
 
-                                {/* Modal Body - Flexible iframe container */}
-                                <div className="flex-1 bg-gray-50 overflow-auto">
-                                    <div className="w-full h-full flex items-center justify-center p-2">
-                                        <iframe
-                                            src={selectedVisualization.embedUrl}
-                                            title={selectedVisualization.title}
-                                            className="border-0 rounded"
-                                            style={{
-                                                // Make iframe fill available space while maintaining reasonable size
-                                                width: "100%",
-                                                maxWidth: "1400px",
-                                                height: selectedVisualization.aspectRatio === "free" 
-                                                    ? `${selectedVisualization.minHeightPx ?? 900}px`
-                                                    : selectedVisualization.aspectRatio === "4:3"
-                                                    ? "min(calc(100vw * 0.75), 1050px)" // 4:3 ratio, max 1400*0.75
-                                                    : selectedVisualization.aspectRatio === "21:9"
-                                                    ? "min(calc(100vw * 0.43), 602px)"  // 21:9 ratio, max 1400*0.43
-                                                    : "min(calc(100vw * 0.56), 800px)", // 16:9 ratio, max 1400*0.56
-                                                minHeight: "500px",
-                                            }}
-                                            allowFullScreen
-                                            referrerPolicy="no-referrer"
-                                            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Modal Footer - Fixed height, scrollable if needed */}
-                                <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-3 md:px-6 md:py-4 max-h-32 overflow-y-auto">
-                                    <h4 className="text-xs md:text-sm font-bold text-gray-900">
-                                        Datasets used:
-                                    </h4>
-                                    <ul className="mt-1 md:mt-2 space-y-1">
-                                        {selectedVisualization.datasets.map((ds, idx) => (
-                                            <li key={`${selectedVisualization.id}-${ds.url}-${idx}`}>
-                                                <a
-                                                    href={ds.url}
-                                                    className="text-xs md:text-sm text-accent hover:underline break-words"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={(e) => e.stopPropagation()}
+                                {/* Tags and external link */}
+                                <div className="mt-2 md:mt-3 flex flex-wrap items-center gap-2 md:gap-3">
+                                    {selectedVisualization.tags && selectedVisualization.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {selectedVisualization.tags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
                                                 >
-                                                    {ds.title}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {selectedVisualization.externalLink && (
+                                        <a
+                                            href={selectedVisualization.externalLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center text-xs md:text-sm text-accent hover:underline whitespace-nowrap"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <ExternalLink className="mr-1 h-3 w-3 md:h-4 md:w-4" />
+                                            Open in new tab
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Modal Body - Flexible iframe container (NO SCROLLBAR) */}
+                            <div className="flex-1 bg-gray-50 overflow-hidden">
+                                <iframe
+                                    src={selectedVisualization.embedUrl}
+                                    title={selectedVisualization.title}
+                                    className="w-full h-full border-0"
+                                    allowFullScreen
+                                    referrerPolicy="no-referrer"
+                                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                />
+                            </div>
+
+                            {/* Modal Footer - Fixed height */}
+                            <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-3 md:px-6 md:py-4">
+                                <h4 className="text-xs md:text-sm font-bold text-gray-900">
+                                    Datasets used:
+                                </h4>
+                                <div className="mt-1 md:mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                                    {selectedVisualization.datasets.map((ds, idx) => (
+                                        <a
+                                            key={`${selectedVisualization.id}-${ds.url}-${idx}`}
+                                            href={ds.url}
+                                            className="text-xs md:text-sm text-accent hover:underline"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            {ds.title}
+                                        </a>
+                                    ))}
                                 </div>
                             </div>
                         </div>

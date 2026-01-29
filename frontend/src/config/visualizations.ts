@@ -57,13 +57,32 @@ export type Visualization = {
 };
 
 /**
- * Helper function: Extract Tableau embed URL from full embed code OR share link
- * @param input - Can be: full embed code, share link, or direct embed URL
+ * Helper function: Extract embed URL from Tableau OR Power BI
+ * @param input - Can be: Tableau embed code/share link, Power BI share link, or direct embed URL
  * @returns Clean embed URL ready to use in iframe
  */
-export function extractTableauUrl(input: string): string {
+export function extractUrl(input: string): string {
   // Clean up the input
   const trimmed = input.trim();
+  
+  // NEW: Check if it's a Power BI link first
+  if (trimmed.includes('app.powerbi.com/view')) {
+    let url = trimmed;
+    
+    // Extract URL if it's wrapped in HTML
+    const urlMatch = trimmed.match(/https?:\/\/[^\s'"<>]+/);
+    if (urlMatch) {
+      url = urlMatch[0];
+    }
+    
+    // Ensure it has the base structure
+    if (!url.startsWith('http')) {
+      url = 'https://' + url;
+    }
+    
+    // Power BI URLs work as-is for embedding
+    return url;
+  }
   
   // Method 1: If it's a Tableau share link (contains /views/)
   if (trimmed.includes('public.tableau.com/views/') || trimmed.includes('public.tableau.com/shared/')) {
@@ -136,15 +155,20 @@ export function extractTableauUrl(input: string): string {
     return url;
   }
   
-  throw new Error('Could not extract Tableau URL. Please provide a share link, embed code, or direct URL.');
+  throw new Error('Could not extract embed URL. Please provide a Tableau or Power BI share link.');
 }
 
 /**
- * Helper function: Extract or construct Tableau thumbnail URL
+ * Helper function: Extract thumbnail URL from Tableau or Power BI
  * @param input - Can be: embed code, share link, or workbook ID
  * @returns Thumbnail URL or undefined
  */
 export function extractTableauThumbnail(input: string): string | undefined {
+  // Power BI doesn't provide thumbnail URLs - return undefined
+  if (input.includes('app.powerbi.com')) {
+    return undefined;
+  }
+  
   // Method 1: Extract from <param name='static_image'>
   const thumbnailMatch = input.match(/name='static_image'\s+value='([^']+)'/);
   if (thumbnailMatch) {
@@ -185,15 +209,13 @@ export const VISUALIZATIONS: Visualization[] = [
     id: "tableau-ndc-measures",
     title: "Transport Mitigation Measures in NDCs",
     description:
-      "Interactive Tableau dashboard exploring transport mitigation measures in NDCs as provided by data in NDC Tracker.",
+      "See how countries include transport measures in their national climate plans (NDCs). Based on each country's latest available NDC, the chart shows the share featuring each transport measure type and the top five countries by category.",
     tags: ["GHG", "NDC", "Climate", "Policy"],
     
-    // EASIEST METHOD: Just paste the Tableau Share Link!
-    embedUrl: extractTableauUrl(
+    embedUrl: extractUrl(
       `https://public.tableau.com/shared/RQD536548?:display_count=n&:origin=viz_share_link`
     ),
     
-    // Thumbnail - provide manually or use extractTableauThumbnail with embed code
     thumbnailUrl: "https://public.tableau.com/static/images/RQ/RQD536548/1.png",
     
     datasets: [
@@ -211,30 +233,14 @@ export const VISUALIZATIONS: Visualization[] = [
     title: "Vehicle stock and new registrations by powertrain | Germany",
     description:
       "The data are based on an analysis conducted by the ifeu - Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD) and information from the German Federal Motor Transport Authority (KBA). Vehicle stock figures refer to January 1 of each year, while new registrations are reported as of December 31. The sharp decline in new registrations in 2020 is primarily attributable to the effects of the COVID-19 pandemic.",
-    tags: ["Cars", "Truck", "Germany"],
+    tags: ["Cars", "Trucks", "Germany"],
     
-    // STEP 1: Get share link from Tableau
-    // Go to your dashboard → Share button → Copy Link
-    // Paste it here:
-    embedUrl: extractTableauUrl(
+    embedUrl: extractUrl(
       `https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
     ),
     
-    // STEP 2: Thumbnail options (choose one):
-    
-    // Option A: Auto-construct (works for most Tableau Public dashboards)
-    // thumbnailUrl: extractTableauThumbnail(`https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`),
-    
-    // Option B: Provide direct thumbnail URL
-    // thumbnailUrl: "https://public.tableau.com/static/images/XX/YourWorkbook/1.png",
-    
-    // Option C: Use your own screenshot
     thumbnailUrl: "/images/showroom/vehicles-germany-ifeu.png",
     
-    // Option D: No thumbnail (shows placeholder)
-    // thumbnailUrl: undefined,
-    
-    // STEP 3: Link to datasets used
     datasets: [
       {
         title: "New registrations - road vehicle in Germany",
@@ -246,12 +252,34 @@ export const VISUALIZATIONS: Visualization[] = [
       }
     ],
     
-    // Optional:
     externalLink: "https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
     aspectRatio: "16:9",
   },
 
-  /*
+  {
+    id: "powerbi-g20", 
+    title: "G20 Transport Sector Dashboard",
+    description: "The dashboard consolidates a structured collection of transport-related indicators for G20 member countries. It integrates data on population, urbanisation, mobility patterns, energy use, greenhouse gas emissions, electric vehicle deployment, national and NDC transport targets, biofuels, subsidies, hydrogen, batteries, and relevant policies.",
+    tags: ["G20", "NDC", "Climate"],
+    
+    embedUrl: extractUrl(
+      `https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9`
+    ),
+    
+    thumbnailUrl: "/images/showroom/g20-dashboard.png",
+    
+    datasets: [
+      {
+        title: "Transport Sector Country Factsheets",
+        url: "https://portal.transport-data.org/@agora-verkehrswende/g20-countries-transport-and-climate-action-snapshot"
+      }
+    ],
+    
+    externalLink: "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
+    aspectRatio: "16:9",
+  },
+
+  /* EXAMPLE
   {
     id: "tableau-eu-superstore",
     title: "EU Superstore Sales Dashboard",
@@ -260,7 +288,7 @@ export const VISUALIZATIONS: Visualization[] = [
     tags: ["Tableau", "Example", "Sales"],
     
     // Just paste the share link!
-    embedUrl: extractTableauUrl(
+    embedUrl: extractUrl(
       `https://public.tableau.com/views/EUSuperstoreDashboard_16685220141570/White_Mode?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
     ),
     
@@ -291,25 +319,32 @@ export const VISUALIZATIONS: Visualization[] = [
     description: "Describe what insights this dashboard provides.",
     tags: ["tag1", "tag2"],
     
-    // STEP 1: Get share link from Tableau
+    // STEP 1: Get share link
+    // 
+    // FOR TABLEAU:
     // Go to your dashboard → Share button → Copy Link
+    // 
+    // FOR POWER BI:
+    // Go to your dashboard → File → Share → Embed report → Copy the link
+    // (Or use the view link directly from app.powerbi.com/view?r=...)
+    //
     // Paste it here:
-    embedUrl: extractTableauUrl(
-      `PASTE_YOUR_TABLEAU_SHARE_LINK_HERE`
+    embedUrl: extractUrl(
+      `PASTE_YOUR_TABLEAU_OR_POWERBI_SHARE_LINK_HERE`
     ),
     
     // STEP 2: Thumbnail options (choose one):
     
-    // Option A: Auto-construct (works for most Tableau Public dashboards)
-    thumbnailUrl: extractTableauThumbnail(`PASTE_YOUR_SHARE_LINK_HERE`),
+    // Option A: Auto-construct (works for Tableau Public only)
+    thumbnailUrl: extractTableauThumbnail(`PASTE_TABLEAU_LINK_HERE`),
     
-    // Option B: Provide direct thumbnail URL
-    // thumbnailUrl: "https://public.tableau.com/static/images/XX/YourWorkbook/1.png",
+    // Option B: Use a screenshot (works for both Tableau and Power BI)
+    // 1. Take a screenshot of your dashboard
+    // 2. Save to: /public/images/showroom/your-dashboard.png
+    // 3. Reference it:
+    // thumbnailUrl: "/images/showroom/your-dashboard.png",
     
-    // Option C: Use your own screenshot
-    // thumbnailUrl: "/images/showroom/my-dashboard.png",
-    
-    // Option D: No thumbnail (shows placeholder)
+    // Option C: No thumbnail (shows placeholder)
     // thumbnailUrl: undefined,
     
     // STEP 3: Link to datasets used
