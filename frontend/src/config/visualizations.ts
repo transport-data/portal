@@ -232,7 +232,7 @@ export const VISUALIZATIONS: Visualization[] = [
     id: "ifeu-vehicles-germany",
     title: "Vehicle stock and new registrations by powertrain | Germany",
     description:
-      "The data are based on an analysis conducted by the ifeu - Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD) and information from the German Federal Motor Transport Authority (KBA). Vehicle stock figures refer to January 1 of each year, while new registrations are reported as of December 31. The sharp decline in new registrations in 2020 is primarily attributable to the effects of the COVID-19 pandemic.",
+      "The data are based on an analysis conducted by the ifeu - Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD) and information from the German Federal Motor Transport Authority (KBA). Vehicle stock and new registrations refer to December 31 of each year. The sharp decline in new registrations in 2020 is primarily attributable to the effects of the COVID-19 pandemic.",
     tags: ["Cars", "Trucks", "Germany"],
     
     embedUrl: extractUrl(
