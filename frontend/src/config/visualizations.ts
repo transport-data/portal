@@ -223,13 +223,13 @@ export const VISUALIZATIONS: Visualization[] = [
     // STEP 2: Thumbnail options (choose one):
     
     // Option A: Auto-construct (works for most Tableau Public dashboards)
-    thumbnailUrl: extractTableauThumbnail(`https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`),
+    // thumbnailUrl: extractTableauThumbnail(`https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`),
     
     // Option B: Provide direct thumbnail URL
     // thumbnailUrl: "https://public.tableau.com/static/images/XX/YourWorkbook/1.png",
     
     // Option C: Use your own screenshot
-    // thumbnailUrl: "/images/showroom/my-dashboard.png",
+    thumbnailUrl: "/images/showroom/vehicles-germany-ifeu.png",
     
     // Option D: No thumbnail (shows placeholder)
     // thumbnailUrl: undefined,
