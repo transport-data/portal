@@ -190,10 +190,6 @@ def _update_contributors(context, data_dict, is_update=False):
 
     untracked_contributors_ids = data_dict.get(
         "untracked_contributors_ids", [])
-    list_user_orgs = tk.get_action('organization_list_for_user')
-    if current_user_id in untracked_contributors_ids and len([org for org in list_user_orgs(
-            context, {'id': current_user_id, 'limit': 1000}) if data_dict.get('owner_org') in [org.get('id'), org.get('name')]]):
-        untracked_contributors_ids = [contributor_id for contributor_id in untracked_contributors_ids if contributor_id != current_user_id]
 
     if len(untracked_contributors_ids):
         excluded_ids.extend(untracked_contributors_ids)
