@@ -26,7 +26,7 @@ export default function UntrackedContributorCheckbox({
             <Checkbox
               checked={!!(field.value && field.value?.length > 0)}
               onCheckedChange={(e) => {
-                const isChecked = (e?.target as any).checked;
+                const isChecked = (e.currentTarget as HTMLInputElement).checked;
                 let untrackedUserIds: Array<string> = [];
                 if (isChecked) {
                   untrackedUserIds = [user?.id as string];
