@@ -216,7 +216,8 @@ export const VISUALIZATIONS: Visualization[] = [
       `https://public.tableau.com/shared/RQD536548?:display_count=n&:origin=viz_share_link`
     ),
     
-    thumbnailUrl: "https://public.tableau.com/static/images/RQ/RQD536548/1.png",
+    // thumbnailUrl: "https://public.tableau.com/static/images/RQ/RQD536548/1.png",
+    thumbnailUrl: "/images/showroom/ndc-measures.png",
     
     datasets: [
       {
