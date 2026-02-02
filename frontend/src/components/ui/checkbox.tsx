@@ -12,7 +12,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         checked={checked}
-        onClick={onCheckedChange}
+        onChange={onCheckedChange}
         type="checkbox"
         className={cn(
           "h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent",
