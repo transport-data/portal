@@ -191,13 +191,8 @@ def _update_contributors(context, data_dict, is_update=False):
     untracked_contributors_ids = data_dict.get(
         "untracked_contributors_ids", [])
 
-    log.info("[CONTRIBUTORS] _update_contributors called")
-    log.info(f"[CONTRIBUTORS] current_user_id: {current_user_id}")
-    log.info(f"[CONTRIBUTORS] untracked_contributors_ids: {untracked_contributors_ids}")
-
     if len(untracked_contributors_ids):
         excluded_ids.extend(untracked_contributors_ids)
-        log.info(f"[CONTRIBUTORS] excluded_ids after adding untracked: {excluded_ids}")
 
     try:
         site_user = logic.get_action(u"get_site_user")(
@@ -233,10 +228,6 @@ def _update_contributors(context, data_dict, is_update=False):
     filtered_new_contributors = [
         c for c in new_contributors if c not in excluded_ids]
     data_dict["contributors"] = filtered_new_contributors
-
-    log.info(f"[CONTRIBUTORS] Creating new dataset - new_contributors: {new_contributors}")
-    log.info(f"[CONTRIBUTORS] Creating new dataset - filtered_new_contributors: {filtered_new_contributors}")
-    log.info(f"[CONTRIBUTORS] Creating new dataset - excluded_ids: {excluded_ids}")
 
 
 def _fix_user_group_permission(data_dict):
