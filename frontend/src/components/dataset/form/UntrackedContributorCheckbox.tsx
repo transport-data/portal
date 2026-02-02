@@ -26,9 +26,12 @@ export default function UntrackedContributorCheckbox({
             <Checkbox
               checked={!!(field.value && field.value?.length > 0)}
               onCheckedChange={(e) => {
-                const isChecked = (e.currentTarget as HTMLInputElement).checked;
+                // For click events, the checked state hasn't updated yet
+                // So we need to invert the current checked state
+                const checkbox = e.currentTarget as HTMLInputElement;
+                const willBeChecked = !checkbox.checked;
                 let untrackedUserIds: Array<string> = [];
-                if (isChecked) {
+                if (willBeChecked) {
                   untrackedUserIds = [user?.id as string];
                 }
                 field.onChange(untrackedUserIds);
