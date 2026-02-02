@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  onCheckedChange?: (e: React.MouseEvent<HTMLInputElement>) => void;
+  onCheckedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, InputProps>(
