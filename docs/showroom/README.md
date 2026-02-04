@@ -49,7 +49,7 @@ The showroom provides:
    - Click **Copy Link**
 
 2. **Edit the config file**
-   - Open `frontend/src/config/visualizations.ts`
+   - Open `frontend/src/config/visualizations.ts` [link](https://github.com/transport-data/portal/blob/main/frontend/src/config/visualizations.ts)
    - Copy the template at the bottom of the file
    - Paste your share link into `extractUrl()`
 
@@ -378,34 +378,6 @@ frontend/
   ],
   
   externalLink: "https://app.powerbi.com/view?r=abc123def456",
-  aspectRatio: "16:9",
-},
-```
-
-### Example 3: Free Aspect Ratio for Tall Dashboards
-
-```typescript
-{
-  id: "detailed-country-report",
-  title: "Transport Sector Deep Dive - Germany",
-  description: "Comprehensive analysis covering all transport modes, infrastructure, and policy measures.",
-  tags: ["Germany", "Policy", "Infrastructure"],
-  
-  embedUrl: extractUrl(
-    `https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9`
-  ),
-  
-  // Power BI requires custom thumbnail
-  thumbnailUrl: "/images/showroom/freight-dashboard.png",
-  
-  datasets: [
-    {
-      title: "Freight Movement Data",
-      url: "https://portal.transport-data.org/@freight/movements"
-    }
-  ],
-  
-  externalLink: "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
   aspectRatio: "16:9",
 },
 ```
