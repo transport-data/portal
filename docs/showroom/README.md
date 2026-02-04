@@ -49,7 +49,7 @@ The showroom provides:
    - Click **Copy Link**
 
 2. **Edit the config file**
-   - Open `frontend/src/config/visualizations.ts`
+   - Open `frontend/src/config/visualizations.ts` [link](https://github.com/transport-data/portal/blob/main/frontend/src/config/visualizations.ts)
    - Copy the template at the bottom of the file
    - Paste your share link into `extractUrl()`
 
