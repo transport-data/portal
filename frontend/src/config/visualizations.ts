@@ -240,7 +240,7 @@ export const VISUALIZATIONS: Visualization[] = [
       `https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
     ),
     
-    thumbnailUrl: "/images/showroom/vehicles-germany-ifeu.png",
+    thumbnailUrl: "/images/showroom/ifeu-dashboard.png",
     
     datasets: [
       {
@@ -256,7 +256,7 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
     aspectRatio: "16:9",
   },
-
+  
   {
     id: "powerbi-g20", 
     title: "G20 Transport Sector Dashboard",
