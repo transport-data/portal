@@ -156,6 +156,7 @@ const EditDatasetDashboard: NextPage<{
       services: dataset.services ?? [],
       indicators: dataset.indicators ?? [],
       tags: dataset.tags ?? [],
+      untracked_contributors_ids: dataset.untracked_contributors_ids ?? [],
       resources: dataset.resources.map((r) => ({
         id: r.id,
         name: r.name,

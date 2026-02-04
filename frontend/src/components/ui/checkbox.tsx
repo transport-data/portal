@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  onCheckedChange?: (e: React.MouseEvent<HTMLInputElement>) => void;
+  onCheckedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, InputProps>(
@@ -12,7 +12,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         checked={checked}
-        onClick={onCheckedChange}
+        onChange={onCheckedChange}
         type="checkbox"
         className={cn(
           "h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent",

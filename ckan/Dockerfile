@@ -2,7 +2,7 @@ FROM ckan/ckan-base:2.11.4
 
 ENV CKAN_INI /srv/app/ckan.ini
 
-ENV CKANEXT_TDC_HASH 2c29cb2d6916e135e65f2243083a90369c7b9847
+ENV CKANEXT_TDC_HASH 93e47b62adccdf5c4760fbcfad475ef68df68e13
 
 USER root
 
@@ -26,7 +26,7 @@ RUN  pip3 install -e git+https://github.com/ckan/ckanext-dcat.git@v2.0.0#egg=cka
 RUN  pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git@abb4e2d3961a88c2622e4b4bdec1d711b677dc7c#egg=ckanext-hierarchy && \
     pip3 install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/abb4e2d3961a88c2622e4b4bdec1d711b677dc7c/requirements.txt
 
-# Fixes an error related to s3filestore plugin in the r2support-ckan-2.11 branch 
+# Fixes an error related to s3filestore plugin in the r2support-ckan-2.11 branch
 RUN pip install boto3==1.35.77
 
 ## Install the 'patch' command
@@ -34,15 +34,15 @@ RUN apt-get update && apt-get install -y patch && rm -rf /var/lib/apt/lists/*
 
 COPY setup/prerun.py ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/prerun.py
-    
+
 ENV CKAN__PLUGINS tdc hierarchy_display scheming_datasets scheming_groups scheming_organizations dcat datatables_view image_view text_view s3filestore datastore datapusher activity envvars
 
 COPY patches ${APP_DIR}/patches
 
 RUN for d in $APP_DIR/patches/*; do \
-        for f in `ls $d/*.patch | sort -g`; do \
-			cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; cd ${APP_DIR}/src && git apply --ignore-space-change --ignore-whitespace "$f" ; \
-        done ; \
+    for f in `ls $d/*.patch | sort -g`; do \
+    cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; cd ${APP_DIR}/src && git apply --ignore-space-change --ignore-whitespace "$f" ; \
+    done ; \
     done
 
 

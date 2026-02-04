@@ -75,6 +75,7 @@ export interface Dataset {
   geographies?: string[];
   regions?: string[];
   contributors: string[];
+  untracked_contributors_ids?: string[];
 }
 
 export interface Resource {

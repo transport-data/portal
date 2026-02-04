@@ -85,6 +85,7 @@ const CreateDatasetDashboard: NextPage = () => {
       units: [],
       indicators: [],
       related_datasets: [],
+      untracked_contributors_ids: [],
     },
   });
 
