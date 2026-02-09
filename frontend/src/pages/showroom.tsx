@@ -265,14 +265,23 @@ export default function ShowroomPage() {
 
                             {/* Modal Body - Flexible iframe container (NO SCROLLBAR) */}
                             <div className="flex-1 bg-gray-50 overflow-hidden">
-                                <iframe
-                                    src={selectedVisualization.embedUrl}
-                                    title={selectedVisualization.title}
-                                    className="w-full h-full border-0"
-                                    allowFullScreen
-                                    referrerPolicy="no-referrer"
-                                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                                />
+                                {/* Wrapper with minimum width to force desktop view */}
+                                <div className="w-full h-full overflow-auto">
+                                    <iframe
+                                        src={selectedVisualization.embedUrl}
+                                        title={selectedVisualization.title}
+                                        className="border-0"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            minWidth: "1024px",  // Force desktop breakpoint
+                                            minHeight: "768px"   // Ensure enough height
+                                        }}
+                                        allowFullScreen
+                                        referrerPolicy="no-referrer"
+                                        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                    />
+                                </div>
                             </div>
 
                             {/* Modal Footer - Fixed height */}
