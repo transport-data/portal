@@ -382,34 +382,6 @@ frontend/
 },
 ```
 
-### Example 3: Free Aspect Ratio for Tall Dashboards
-
-```typescript
-{
-  id: "detailed-country-report",
-  title: "Transport Sector Deep Dive - Germany",
-  description: "Comprehensive analysis covering all transport modes, infrastructure, and policy measures.",
-  tags: ["Germany", "Policy", "Infrastructure"],
-  
-  embedUrl: extractUrl(
-    `https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9`
-  ),
-  
-  // Power BI requires custom thumbnail
-  thumbnailUrl: "/images/showroom/freight-dashboard.png",
-  
-  datasets: [
-    {
-      title: "Freight Movement Data",
-      url: "https://portal.transport-data.org/@freight/movements"
-    }
-  ],
-  
-  externalLink: "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
-  aspectRatio: "16:9",
-},
-```
-
 ---
 
 ## Questions?
