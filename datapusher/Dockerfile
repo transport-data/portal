@@ -26,7 +26,7 @@ ENV CFG_DIR=/etc/ckan/datapusher
 WORKDIR ${SRC_DIR}
 
 
-# Set the locale         
+# Set the locale
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y locales
 RUN sed -i "/$LC_ALL/s/^# //g" /etc/locale.gen
@@ -37,17 +37,17 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 
 # Install apt-utils and other dependencies
 RUN apt-get install --no-install-recommends -y \
-   apt-utils \
-   build-essential \
-   libxslt1-dev \
-   libxml2-dev \
-   libffi-dev \
-   wget \
-   curl \
-   unzip \
-   git \
-   libpq-dev \
-   file
+    apt-utils \
+    build-essential \
+    libxslt1-dev \
+    libxml2-dev \
+    libffi-dev \
+    wget \
+    curl \
+    unzip \
+    git \
+    libpq-dev \
+    file
 
 # Install Python 3.9 (check if it's available in the default repo first)
 # If not available, use the previously added PPA
@@ -76,7 +76,7 @@ RUN python3 -m venv ${VENV}
 RUN ${VENV}/bin/pip install uwsgi
 
 
-#install tests 
+#install tests
 #Add custom values before installing tests https://github.com/dathere/testing-datapusher-plus.git
 #and unable the script in startup.sh
 #RUN git clone --branch master https://github.com/dathere/testing-datapusher-plus.git
@@ -85,13 +85,13 @@ RUN ${VENV}/bin/pip install uwsgi
 
 
 #INSTALL DATAPUSHER-PLUS FROM SOURCE REPO
-RUN git clone --branch 0.15.0 https://github.com/datHere/datapusher-plus
+RUN git clone --branch tdc-workaround https://github.com/Gutts-n/datapusher-plus
 RUN cd ${SRC_DIR}/datapusher-plus && \
-   ${VENV}/bin/pip install -r requirements-dev.txt && \
-   ${VENV}/bin/pip install -e . 
+    ${VENV}/bin/pip install -r requirements-dev.txt && \
+    ${VENV}/bin/pip install -e .
 
-   
-RUN ${VENV}/bin/pip install Flask==2.3.3 
+
+RUN ${VENV}/bin/pip install Flask==2.3.3
 RUN ${VENV}/bin/pip install Werkzeug==2.3.0
 
 
@@ -102,7 +102,7 @@ COPY example.env ${SRC_DIR}/datapusher-plus/datapusher/.env
 ENV JOB_CONFIG=${SRC_DIR}/datapusher-plus/datapusher/.env
 
 
- 
+
 RUN curl https://raw.githubusercontent.com/dathere/datapusher-plus/0.15.0/deployment/datapusher-uwsgi.ini -o ${CFG_DIR}/uwsgi.ini
 
 
