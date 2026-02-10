@@ -7,6 +7,15 @@ import { Button } from "@components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { ArrowUpTrayIcon } from "@heroicons/react/20/solid";
 import { cn } from "@lib/utils";
+import * as XLSX from "xlsx";
+
+const EXCEL_EXTENSIONS = ["xls", "xlsx", "xlsm", "xlsb"];
+
+export interface FileWithSheets {
+  file: File;
+  sheets: string[];
+  proceed: () => void;
+}
 
 export function FileUploader({
   onUploadSuccess,
@@ -14,12 +23,14 @@ export function FileUploader({
   onUploadStart,
   id,
   children,
+  onFileWithMultipleSheets,
 }: {
   id: string;
   disabled?: boolean;
   onUploadSuccess: (result: UploadResult) => void;
   onUploadStart?: () => void;
   children: React.ReactNode;
+  onFileWithMultipleSheets?: (data: FileWithSheets) => void;
 }) {
   const [key, setKey] = useState<string | null>(null);
   const [uploading, setIsUploading] = useState(false);
@@ -60,27 +71,54 @@ export function FileUploader({
     });
   }
 
-  function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files;
-    console.log("FILES", files);
-    if (!files || !files[0]) return;
+  function addFileToUppy(file: File) {
     try {
       uppy.addFile({
-        name: files[0].name,
-        type: files[0].type,
-        data: files[0],
+        name: file.name,
+        type: file.type,
+        data: file,
       });
     } catch (e) {
       const firstFile = uppy.getFiles()[0];
       uppy.removeFile(firstFile?.id ?? "");
       uppy.addFile({
-        name: files[0].name,
-        type: files[0].type,
-        data: files[0],
+        name: file.name,
+        type: file.type,
+        data: file,
       });
     }
     setIsUploading(true);
     upload();
+  }
+
+  function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    console.log("FILES", files);
+    if (!files || !files[0]) return;
+
+    const file = files[0];
+    const fileExtension = file.name.split(".").pop()?.toLowerCase() ?? "";
+
+    if (EXCEL_EXTENSIONS.includes(fileExtension) && onFileWithMultipleSheets) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = new Uint8Array(event.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array", bookSheets: true });
+          const sheets = workbook.SheetNames;
+          if (sheets.length > 1) {
+            onFileWithMultipleSheets({ file, sheets, proceed: () => addFileToUppy(file) });
+            return;
+          }
+        } catch (err) {
+          console.error("Error reading Excel file sheets:", err);
+        }
+        addFileToUppy(file);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      addFileToUppy(file);
+    }
   }
 
   return (

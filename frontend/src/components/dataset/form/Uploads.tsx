@@ -11,6 +11,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@components/ui/button";
+import { Label } from "@components/ui/label";
 import Spinner from "@components/_shared/Spinner";
 import { env } from "@env.mjs";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -20,7 +30,7 @@ import { UploadResult } from "@uppy/core";
 import { api } from "@utils/api";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { P, match } from "ts-pattern";
-import { FileUploader } from "./FileUploader";
+import { FileUploader, FileWithSheets } from "./FileUploader";
 import { EyeOffIcon } from "lucide-react";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { DefaultTooltip } from "@components/ui/tooltip";
@@ -44,8 +54,66 @@ export function UploadsForm({ disabled }: any) {
   });
   const docs = fields.filter((f) => f.resource_type === "documentation");
   const files = fields.filter((f) => f.resource_type === "data");
+
+  const [pendingFile, setPendingFile] = useState<FileWithSheets | null>(null);
+  const [selectedSheet, setSelectedSheet] = useState<number>(0);
+
+  function handleFileWithMultipleSheets(data: FileWithSheets) {
+    setPendingFile(data);
+    setSelectedSheet(0);
+  }
+
+  function handleSheetConfirm() {
+    pendingFile?.proceed();
+    setPendingFile(null);
+  }
+
+  function handleSheetCancel() {
+    setPendingFile(null);
+  }
   return (
     <div className="py-4">
+      <Dialog
+        open={!!pendingFile}
+        onOpenChange={(open) => !open && handleSheetCancel()}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Excel Sheet</DialogTitle>
+            <DialogDescription>
+              This file has {pendingFile?.sheets.length} sheets. Select which
+              one to ingest into the datastore.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2">
+            <Label className="mb-2 block">Sheet</Label>
+            <Select
+              value={selectedSheet.toString()}
+              onValueChange={(val) => setSelectedSheet(parseInt(val))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a sheet" />
+              </SelectTrigger>
+              <SelectContent>
+                {pendingFile?.sheets.map((sheet, idx) => (
+                  <SelectItem key={idx} value={idx.toString()}>
+                    {sheet}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={handleSheetCancel}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleSheetConfirm}>
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="pb-4 text-xl font-bold leading-normal text-primary">
         Upload dataset files & documentation
       </div>
@@ -59,6 +127,7 @@ export function UploadsForm({ disabled }: any) {
             <FileUploader
               disabled={disabled}
               id="files-upload"
+              onFileWithMultipleSheets={handleFileWithMultipleSheets}
               onUploadSuccess={(response: UploadResult) => {
                 let url = response.successful[0]?.uploadURL as string;
                 console.log("RESPONSE", response.successful[0]);
@@ -78,6 +147,8 @@ export function UploadsForm({ disabled }: any) {
                   format: response.successful[0]?.extension ?? "",
                   hide_preview: false,
                   is_new: true,
+                  excel_sheet_index: selectedSheet,
+                  excel_sheet_name: pendingFile?.sheets[selectedSheet],
                 });
               }}
             >
@@ -120,6 +191,11 @@ export function UploadsForm({ disabled }: any) {
                             <span className="truncate font-medium">
                               {r.name ?? getFileName(r.url ?? "")}
                             </span>
+                            {r.excel_sheet_name && (
+                              <span className="text-xs text-gray-500">
+                                Sheet: {r.excel_sheet_name}
+                              </span>
+                            )}
                             {r.size && (
                               <span className="flex-shrink-0 text-gray-400">
                                 {formatBytes(r.size)}
