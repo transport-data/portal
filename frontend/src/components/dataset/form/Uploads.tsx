@@ -20,11 +20,11 @@ import { UploadResult } from "@uppy/core";
 import { api } from "@utils/api";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { P, match } from "ts-pattern";
-import { FileUploader } from "./FileUploader";
+import { FileUploader, FileWithSheets } from "./FileUploader";
 import { EyeOffIcon } from "lucide-react";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { DefaultTooltip } from "@components/ui/tooltip";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function findIndex<T>(arr: T[], predicate: (item: T) => boolean): number {
   for (let i = 0; i < arr.length; i++) {
@@ -39,11 +39,22 @@ export function UploadsForm({ disabled }: any) {
   const form = useFormContext<DatasetFormType>();
   const licenses = api.dataset.listLicenses.useQuery();
   const { fields, append, remove } = useFieldArray({
-    control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
-    name: "resources", // unique name for your Field Array
+    control: form.control,
+    name: "resources",
   });
   const docs = fields.filter((f) => f.resource_type === "documentation");
   const files = fields.filter((f) => f.resource_type === "data");
+
+  const sheetsByFileRef = useRef<Record<string, string[]>>({});
+  const [sheetsByFile, setSheetsByFile] = useState<Record<string, string[]>>(
+    {},
+  );
+
+  function handleFileWithMultipleSheets(data: FileWithSheets) {
+    sheetsByFileRef.current[data.file.name] = data.sheets;
+    setSheetsByFile((prev) => ({ ...prev, [data.file.name]: data.sheets }));
+  }
+
   return (
     <div className="py-4">
       <div className="pb-4 text-xl font-bold leading-normal text-primary">
@@ -59,18 +70,20 @@ export function UploadsForm({ disabled }: any) {
             <FileUploader
               disabled={disabled}
               id="files-upload"
+              onFileWithMultipleSheets={handleFileWithMultipleSheets}
               onUploadSuccess={(response: UploadResult) => {
                 let url = response.successful[0]?.uploadURL as string;
-                console.log("RESPONSE", response.successful[0]);
                 const urlParts = url.split("/");
                 const resourceId = urlParts[urlParts.length - 2];
                 const fileName = urlParts[urlParts.length - 1];
                 url = `${env.NEXT_PUBLIC_CKAN_URL}/dataset/${form.getValues(
                   "id",
                 )}/resource/${resourceId}/${fileName ?? ""}`;
+                const uploadedName = response.successful[0]?.name ?? "";
+                const sheets = sheetsByFileRef.current[uploadedName] ?? [];
                 append({
                   id: resourceId,
-                  name: response.successful[0]?.name ?? "",
+                  name: uploadedName,
                   url: url as string,
                   url_type: "upload",
                   resource_type: "data",
@@ -78,6 +91,8 @@ export function UploadsForm({ disabled }: any) {
                   format: response.successful[0]?.extension ?? "",
                   hide_preview: false,
                   is_new: true,
+                  excel_sheet_index: sheets.length > 0 ? 0 : undefined,
+                  excel_sheet_name: sheets[0],
                 });
               }}
             >
@@ -105,6 +120,10 @@ export function UploadsForm({ disabled }: any) {
                     const notNewTabular = !r.is_new && !!r._datastore_active;
                     const displayHidePreview = isNewTabular || notNewTabular;
 
+                    const fileSheets = sheetsByFile[r.name ?? ""];
+                    const showSheetSelector =
+                      !!r.is_new && !!fileSheets && fileSheets.length > 0;
+
                     return (
                       <li
                         key={r.id}
@@ -120,6 +139,54 @@ export function UploadsForm({ disabled }: any) {
                             <span className="truncate font-medium">
                               {r.name ?? getFileName(r.url ?? "")}
                             </span>
+                            {showSheetSelector ? (
+                              <FormField
+                                control={form.control}
+                                name={`resources.${_index}.excel_sheet_index`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <DefaultTooltip content="Select which sheet will be ingested into the datastore and displayed on the resource preview page">
+                                    <div className="flex items-center gap-x-2 pt-1">
+                                      <span className="whitespace-nowrap text-xs text-gray-500">
+                                        Sheet:
+                                      </span>
+                                      <Select
+                                        value={field.value?.toString() ?? "0"}
+                                        onValueChange={(val) => {
+                                          const idx = parseInt(val);
+                                          field.onChange(idx);
+                                          form.setValue(
+                                            `resources.${_index}.excel_sheet_name`,
+                                            fileSheets[idx] ?? "",
+                                          );
+                                        }}
+                                      >
+                                        <SelectTrigger className="h-7 py-0 text-xs">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {fileSheets.map((sheet, idx) => (
+                                            <SelectItem
+                                              key={idx}
+                                              value={idx.toString()}
+                                            >
+                                              {sheet}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    </DefaultTooltip>
+                                  </FormItem>
+                                )}
+                              />
+                            ) : (
+                              r.excel_sheet_name && (
+                                <span className="text-xs text-gray-500">
+                                  Sheet: {r.excel_sheet_name}
+                                </span>
+                              )
+                            )}
                             {r.size && (
                               <span className="flex-shrink-0 text-gray-400">
                                 {formatBytes(r.size)}

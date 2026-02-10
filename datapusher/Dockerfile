@@ -37,17 +37,17 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 
 # Install apt-utils and other dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    apt-utils \
-    build-essential \
-    libxslt1-dev \
-    libxml2-dev \
-    libffi-dev \
-    wget \
-    curl \
-    unzip \
-    git \
-    libpq-dev \
-    file
+   apt-utils \
+   build-essential \
+   libxslt1-dev \
+   libxml2-dev \
+   libffi-dev \
+   wget \
+   curl \
+   unzip \
+   git \
+   libpq-dev \
+   file
 
 # Install Python 3.9 (check if it's available in the default repo first)
 # If not available, use the previously added PPA
@@ -102,7 +102,7 @@ COPY example.env ${SRC_DIR}/datapusher-plus/datapusher/.env
 ENV JOB_CONFIG=${SRC_DIR}/datapusher-plus/datapusher/.env
 
 
-
+ 
 RUN curl https://raw.githubusercontent.com/Gutts-n/datapusher-plus/tdc-workaround/deployment/datapusher-uwsgi.ini -o ${CFG_DIR}/uwsgi.ini
 
 
