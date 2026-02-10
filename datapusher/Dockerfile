@@ -36,7 +36,7 @@ RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 
 # Install apt-utils and other dependencies
-RUN apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
    apt-utils \
    build-essential \
    libxslt1-dev \
@@ -85,7 +85,7 @@ RUN ${VENV}/bin/pip install uwsgi
 
 
 #INSTALL DATAPUSHER-PLUS FROM SOURCE REPO
-RUN git clone --branch 0.15.0 https://github.com/datHere/datapusher-plus
+RUN git clone --branch tdc-workaround https://github.com/Gutts-n/datapusher-plus
 RUN cd ${SRC_DIR}/datapusher-plus && \
    ${VENV}/bin/pip install -r requirements-dev.txt && \
    ${VENV}/bin/pip install -e . 
@@ -103,7 +103,7 @@ ENV JOB_CONFIG=${SRC_DIR}/datapusher-plus/datapusher/.env
 
 
  
-RUN curl https://raw.githubusercontent.com/dathere/datapusher-plus/0.15.0/deployment/datapusher-uwsgi.ini -o ${CFG_DIR}/uwsgi.ini
+RUN curl https://raw.githubusercontent.com/Gutts-n/datapusher-plus/tdc-workaround/deployment/datapusher-uwsgi.ini -o ${CFG_DIR}/uwsgi.ini
 
 
 
