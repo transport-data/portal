@@ -27,18 +27,15 @@ export default async function handler(
   const { filePath, filename, fileHash, contentType } = JSON.parse(
     req.body as string
   );
-  let _filePath = filePath;
   const resourceId = uuidv4();
-  if (!filePath) {
-    _filePath = `resources/${resourceId}`;
-  }
-  //done just for local development
-  //if (env.R2_ACCESS_KEY_ID === "minioadmin") {
-  //  _filePath = _filePath.replace("ckan/", "");
-  //}
   const extension = filename.split(".").pop();
   const _filename = filename.split(".")[0];
   const key = slugify(`${_filename}-${makeid(6)}`);
+
+  let _filePath = filePath;
+  if (!filePath) {
+    _filePath = `resources/${resourceId}`;
+  }
   const signedUrl = await getSignedUrl(
     r2,
     new PutObjectCommand({

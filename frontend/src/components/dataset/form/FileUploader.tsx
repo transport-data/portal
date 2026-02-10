@@ -9,12 +9,11 @@ import { ArrowUpTrayIcon } from "@heroicons/react/20/solid";
 import { cn } from "@lib/utils";
 import * as XLSX from "xlsx";
 
-const EXCEL_EXTENSIONS = ["xls", "xlsx", "xlsm", "xlsb"];
+const SPREADSHEET_EXTENSIONS = ["xls", "xlsx", "xlsm", "xlsb", "ods"];
 
 export interface FileWithSheets {
   file: File;
   sheets: string[];
-  proceed: () => void;
 }
 
 export function FileUploader({
@@ -93,25 +92,23 @@ export function FileUploader({
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
-    console.log("FILES", files);
     if (!files || !files[0]) return;
 
     const file = files[0];
     const fileExtension = file.name.split(".").pop()?.toLowerCase() ?? "";
 
-    if (EXCEL_EXTENSIONS.includes(fileExtension) && onFileWithMultipleSheets) {
+    if (SPREADSHEET_EXTENSIONS.includes(fileExtension) && onFileWithMultipleSheets) {
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
           const data = new Uint8Array(event.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: "array", bookSheets: true });
           const sheets = workbook.SheetNames;
-          if (sheets.length > 1) {
-            onFileWithMultipleSheets({ file, sheets, proceed: () => addFileToUppy(file) });
-            return;
+          if (sheets.length >= 1) {
+            onFileWithMultipleSheets({ file, sheets });
           }
         } catch (err) {
-          console.error("Error reading Excel file sheets:", err);
+          console.error("[FileUploader] Error reading spreadsheet:", err);
         }
         addFileToUppy(file);
       };
@@ -141,7 +138,6 @@ export function FileUploader({
                 e.preventDefault();
               }}
               onDrop={(e) => {
-                console.log("TESTING", e.dataTransfer.files[0]);
                 e.preventDefault();
                 onInputChange({
                   target: {
