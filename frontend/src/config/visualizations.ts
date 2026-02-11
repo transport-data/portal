@@ -127,52 +127,6 @@ export function extractUrl(input: string): string {
   throw new Error('Could not extract embed URL. Please provide a Tableau or Power BI share link.');
 }
 
-/**
- * Helper function: Extract thumbnail URL from Tableau or Power BI
- * @param input - Can be: embed code, share link, or workbook ID
- * @returns Thumbnail URL or undefined
- */
-export function extractTableauThumbnail(input: string): string | undefined {
-  // Power BI doesn't provide thumbnail URLs - return undefined
-  if (input.includes('app.powerbi.com')) {
-    return undefined;
-  }
-  
-  // Method 1: Extract from <param name='static_image'>
-  const thumbnailMatch = input.match(/name='static_image'\s+value='([^']+)'/);
-  if (thumbnailMatch) {
-    const thumbnail = thumbnailMatch[1];
-    if (thumbnail) {
-      return thumbnail
-        .replace(/&#47;/g, '/')
-        .replace(/&amp;/g, '&');
-    }
-  }
-  
-  // Method 2: Extract from noscript <img>
-  const imgMatch = input.match(/src='([^']+\.png)'/);
-  if (imgMatch) {
-    const imgSrc = imgMatch[1];
-    if (imgSrc) {
-      return imgSrc
-        .replace(/&#47;/g, '/')
-        .replace(/&amp;/g, '&')
-        .replace(/_rss\.png$/, '.png'); // Remove _rss suffix if present
-    }
-  }
-  
-  // Method 3: Construct from share link URL
-  // Format: https://public.tableau.com/views/WorkbookName/ViewName
-  const viewMatch = input.match(/\/views\/([^\/\?]+)\/([^\/\?&]+)/);
-  if (viewMatch) {
-    const workbookId = viewMatch[1];
-    const viewName = viewMatch[2];
-    return `https://public.tableau.com/static/images/${workbookId?.substring(0, 2)}/${workbookId}/${viewName}/1.png`;
-  }
-  
-  return undefined;
-}
-
 export const VISUALIZATIONS: Visualization[] = [
   {
     id: "tableau-ndc-measures",
@@ -268,6 +222,30 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "https://public.tableau.com/views/NDCgenerations/TransportMeasures?:embed=y&:sid=&:redirect=auth&language=en-GB&:display_count=n&:origin=viz_share_link",
   },
 
+  {
+    id: "age-distrib",
+    title: "Age distribution of car stock 2024 in Germany",
+    description: "The data are based on an analysis conducted by the ifeu - Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD) and information from the German Federal Motor Transport Authority (KBA). In Germany, half of the stock is below 10 years of age, but almost 5 million cars remain in the stock which are more than 20 years old. This leads to the fact that the average age of cars is 10.6 years in 2024.",
+    tags: ["age distribution", "car stock in Germany"],
+    
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // Option A: Auto-construct (works for Tableau Public only)
+    thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    
+    datasets: [
+      {
+        title: "Age Distribution",
+        url: https://portal.transport-data.org/@ifeu/vehicle-age-road-transport-germany
+      }
+    ],
+    
+    externalLink: "https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
+  },
+
+
 
   // ========================================
   // EASY TEMPLATE FOR ADDING NEW DASHBOARDS
@@ -278,7 +256,7 @@ export const VISUALIZATIONS: Visualization[] = [
     title: "Your Dashboard Title",
     description: "Describe what insights this dashboard provides.",
     // Option A: Auto-fetch tags from datasets
-    tags: 'auto', // 🔄 Will auto-fetch tags from referenced datasets (if supported by the dataset config)
+    tags: 'auto', // Will auto-fetch tags from referenced datasets (if supported by the dataset config)
     // Option B: Manual tags
     tags: ["tag1", "tag2"],
     
@@ -298,10 +276,10 @@ export const VISUALIZATIONS: Visualization[] = [
     
     // STEP 2: Thumbnail options (choose one):
     
-    // Option A: Auto-construct (works for Tableau Public only)
-    thumbnailUrl: extractTableauThumbnail(`PASTE_TABLEAU_LINK_HERE`),
+    // Option A: Provide direct web link to thumbnauil image
+    thumbnailUrl: `PASTE_LINK_HERE`,
     
-    // Option B: Use a screenshot (works for both Tableau and Power BI)
+    // Option B: Use a screenshot
     // 1. Take a screenshot of your dashboard
     // 2. Save to: /public/images/showroom/your-dashboard.png
     // 3. Reference it:
