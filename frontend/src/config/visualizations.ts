@@ -7,54 +7,23 @@ export type DatasetRef = {
   url: string;
 };
 
-export type Visualization = {
+export interface Visualization {
   id: string;
   title: string;
   description: string;
-  tags?: string[];
-
-  /**
-   * Use EMBED URLs only (iframe-ready).
-   * 
-   * EASY METHOD: Just paste the entire Tableau embed code here, 
-   * and we'll extract the URL automatically!
-   * 
-   * Example: embedUrl: extractTableauUrl(`<div class='tableauPlaceholder'...></div>`)
-   * 
-   * Or provide the direct URL:
-   * - Tableau: "https://public.tableau.com/views/..."
-   * - Power BI: "https://app.powerbi.com/view?r=..."
-   */
   embedUrl: string;
-
-  /**
-   * Thumbnail image for gallery view (before clicking to expand)
-   * - Option 1: Use extractTableauThumbnail() to auto-extract from embed code
-   * - Option 2: Take a screenshot and place in /public/images/showroom/
-   * - Option 3: Leave empty to show a placeholder
-   */
-  thumbnailUrl?: string;
-
-  /** Every visualization MUST reference at least one dataset used. */
-  datasets: DatasetRef[];
-
-  /**
-   * Optional: Direct link to open dashboard in external site
-   */
   externalLink?: string;
-
+  thumbnailUrl?: string;
+  datasets: { title: string; url: string }[];
   /**
-   * Optional: Aspect ratio for the modal/expanded view
-   * Default is "16:9" (widescreen)
+   * Tags for categorization
+   * - Set to 'auto' to fetch from referenced datasets at build time
+   * - Provide string array for manual tags
+   * - Leave undefined for no tags
    */
-  aspectRatio?: "16:9" | "4:3" | "21:9" | "free";
-  
-  /**
-   * Only needed if aspectRatio is "free"
-   * Specifies minimum height in pixels for the iframe
-   */
-  minHeightPx?: number;
-};
+  tags?: string[] | 'auto';
+  type?: 'iframe' | 'pdf'; // Add this line
+}
 
 /**
  * Helper function: Extract embed URL from Tableau OR Power BI
@@ -210,7 +179,7 @@ export const VISUALIZATIONS: Visualization[] = [
     title: "Transport Mitigation Measures in NDCs",
     description:
       "See how countries include transport measures in their national climate plans (NDCs). Based on each country's latest available NDC, the chart shows the share featuring each transport measure type and the top five countries by category.",
-    tags: ["GHG", "NDC", "Climate", "Policy"],
+    tags: 'auto',
     
     embedUrl: extractUrl(
       `https://public.tableau.com/shared/RQD536548?:display_count=n&:origin=viz_share_link`
@@ -222,11 +191,10 @@ export const VISUALIZATIONS: Visualization[] = [
     datasets: [
       {
         title: "NDC Transport Tracker",
-        url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
+        url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker",
       },
     ],
     
-    aspectRatio: "16:9",
     externalLink: "https://public.tableau.com/shared/RQD536548?:display_count=n&:origin=viz_share_link",
   },
   {
@@ -234,7 +202,7 @@ export const VISUALIZATIONS: Visualization[] = [
     title: "Vehicle stock and new registrations by powertrain | Germany",
     description:
       "The data are based on an analysis conducted by the ifeu - Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD) and information from the German Federal Motor Transport Authority (KBA). Vehicle stock and new registrations refer to December 31 of each year. The sharp decline in new registrations in 2020 is primarily attributable to the effects of the COVID-19 pandemic.",
-    tags: ["Cars", "Trucks", "Germany"],
+    tags: 'auto',
     
     embedUrl: extractUrl(
       `https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
@@ -254,15 +222,14 @@ export const VISUALIZATIONS: Visualization[] = [
     ],
     
     externalLink: "https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
-    aspectRatio: "16:9",
   },
   
   {
     id: "powerbi-g20", 
     title: "G20 Transport Sector Dashboard",
     description: "The dashboard consolidates a structured collection of transport-related indicators for G20 member countries. It integrates data on population, urbanisation, mobility patterns, energy use, greenhouse gas emissions, electric vehicle deployment, national and NDC transport targets, biofuels, subsidies, hydrogen, batteries, and relevant policies.",
-    tags: ["G20", "NDC", "Climate"],
-    
+    tags: ["G20", "Policy", "Custom"],  
+
     embedUrl: extractUrl(
       `https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9`
     ),
@@ -277,38 +244,30 @@ export const VISUALIZATIONS: Visualization[] = [
     ],
     
     externalLink: "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
-    aspectRatio: "16:9",
   },
 
-  /* EXAMPLE
   {
-    id: "tableau-eu-superstore",
-    title: "EU Superstore Sales Dashboard",
-    description: 
-      "Example dashboard visualizing sales performance, profit margins, and shipping metrics across European regions. Demonstrates interactive filtering and drill-down capabilities.",
-    tags: ["Tableau", "Example", "Sales"],
+    id: "ndc-generations",
+    title: "Transport content in NDC generations",
+    description: "See the growth of Transport Targets in NDC generations globally and regions.",
+    tags: 'auto',  
     
-    // Just paste the share link!
     embedUrl: extractUrl(
-      `https://public.tableau.com/views/EUSuperstoreDashboard_16685220141570/White_Mode?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+      `https://public.tableau.com/views/NDCgenerations/TransportMeasures?:embed=y&:sid=&:redirect=auth&language=en-GB&:display_count=n&:origin=viz_share_link`
     ),
     
-    // Auto-construct thumbnail from share link
-    thumbnailUrl: extractTableauThumbnail(
-      `https://public.tableau.com/views/EUSuperstoreDashboard_16685220141570/White_Mode?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
-    ),
+    thumbnailUrl: "/images/showroom/ndc-generations.png",
     
     datasets: [
       {
-        title: "Sample Superstore Dataset",
-        url: "https://public.tableau.com/app/learn/sample-data"
-      }
+        title: "NDC Transport Tracker",
+        url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
+      },
     ],
     
-    aspectRatio: "16:9",
-    externalLink: "https://public.tableau.com/views/EUSuperstoreDashboard_16685220141570/White_Mode"
+    externalLink: "https://public.tableau.com/views/NDCgenerations/TransportMeasures?:embed=y&:sid=&:redirect=auth&language=en-GB&:display_count=n&:origin=viz_share_link",
   },
-  */
+
 
   // ========================================
   // EASY TEMPLATE FOR ADDING NEW DASHBOARDS
@@ -318,6 +277,9 @@ export const VISUALIZATIONS: Visualization[] = [
     id: "unique-id-here",
     title: "Your Dashboard Title",
     description: "Describe what insights this dashboard provides.",
+    // Option A: Auto-fetch tags from datasets
+    tags: 'auto', // 🔄 Will auto-fetch tags from referenced datasets (if supported by the dataset config)
+    // Option B: Manual tags
     tags: ["tag1", "tag2"],
     
     // STEP 1: Get share link
@@ -358,7 +320,24 @@ export const VISUALIZATIONS: Visualization[] = [
     
     // Optional:
     externalLink: "PASTE_YOUR_SHARE_LINK_HERE",
-    aspectRatio: "16:9",
   },
   */
+
+  // Add your PDF
+  {
+    id: 'guidance-vehicle-stock',
+    title: 'Guidance: Vehicle Stock and New Registrations',
+    description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
+    embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
+    type: 'pdf',
+    thumbnailUrl: '/images/showroom/guidance-vehicle-thumb.png', // Add your thumbnail
+    externalLink: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
+    datasets: [
+      {
+        title: 'Vehicle stock and new registrations by powertrain | Germany',
+        url: 'https://portal.transport-data.org/@tdc/new-registrations-road-vehicle-in-germany'
+      }
+    ],
+    tags: 'auto' // Will fetch tags from the dataset
+  },
 ];
