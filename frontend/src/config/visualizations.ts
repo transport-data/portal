@@ -22,7 +22,7 @@ export interface Visualization {
    * - Leave undefined for no tags
    */
   tags?: string[] | 'auto';
-  type?: 'iframe' | 'pdf'; // Add this line
+  type?: 'iframe' | 'pdf';
 }
 
 /**
@@ -323,7 +323,7 @@ export const VISUALIZATIONS: Visualization[] = [
   },
   */
 
-  // Add your PDF
+  // Add PDF
   {
     id: 'guidance-vehicle-stock',
     title: 'Guidance: Vehicle Stock and New Registrations',
