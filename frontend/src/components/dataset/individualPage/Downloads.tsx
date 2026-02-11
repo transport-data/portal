@@ -37,6 +37,13 @@ const isDownloadable = (url: string) => {
   return lastPart.includes(".");
 };
 
+const normalizeDownloadUrl = (url: string) => {
+  if (url.endsWith('.r')) {
+    return url.slice(0, -2) + '.R';
+  }
+  return url;
+};
+
 function PrivateLink({
   resource,
   onClick,
@@ -108,7 +115,7 @@ function ResourceCard({
             />
           ) : (
             <a
-              href={resource.url}
+              href={normalizeDownloadUrl(resource.url ?? "")}
               onClick={() =>
                 datasetDownloadEvent({
                   datasetTitle: dataset.title,
@@ -294,7 +301,7 @@ export function Downloads({ dataset }: { dataset: Dataset }) {
                         <PrivateLink resource={r} />
                       ) : (
                         <a
-                          href={r.url}
+                          href={normalizeDownloadUrl(r.url ?? "")}
                           className="font-medium text-primary hover:text-accent"
                         >
                           {isDownloadable(r.url ?? "") ? (

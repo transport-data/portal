@@ -100,4 +100,6 @@ export interface Resource {
     state?: "active" | "inactive" | "deleted";
     url?: string;
     url_type?: string;
+    excel_sheet_index?: number;
+    excel_sheet_name?: string;
 }

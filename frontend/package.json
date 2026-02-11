@@ -19,7 +19,7 @@
     "test:notrecorded": "cypress run",
     "test:recorded-parallel": "cypress run --record --key 9b3fe9b0-b8ef-4e2d-895f-17f0a6cc5031 --parallel"
   },
-   "overrides": {
+  "overrides": {
     "glob": "^10.5.0"
   },
   "dependencies": {
@@ -139,6 +139,7 @@
     "ts-pattern": "^5.0.5",
     "uuid": "^9.0.0",
     "vaul": "^1.1.1",
+    "xlsx": "^0.18.5",
     "xstate": "^4.38.2",
     "zod": "^3.21.4"
   },
