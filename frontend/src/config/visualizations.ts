@@ -280,6 +280,55 @@ export const VISUALIZATIONS: Visualization[] = [
     aspectRatio: "16:9",
   },
 
+  {
+    id: "Age distrib",
+    title: "Age distribution of car stock 2024 in Germany",
+    description: "The data are based on an analysis conducted by the ifeu - Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD) and information from the German Federal Motor Transport Authority (KBA). In Germany, half of the stock is below 10 years of age, but almost 5 million cars remain in the stock which are more than 20 years old. This leads to the fact that the average age of cars is 10.6 years in 2024.",
+    tags: ["age distribution", "car stock in Germany"],
+    
+    // STEP 1: Get share link
+    // 
+    // FOR TABLEAU:
+    // Go to your dashboard → Share button → Copy Link
+    // 
+    // FOR POWER BI:
+    // Go to your dashboard → File → Share → Embed report → Copy the link
+    // (Or use the view link directly from app.powerbi.com/view?r=...)
+    //
+    // Paste it here:
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // STEP 2: Thumbnail options (choose one):
+    
+    // Option A: Auto-construct (works for Tableau Public only)
+    thumbnailUrl: extractTableauThumbnail(`https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`),
+    
+    // Option B: Use a screenshot (works for both Tableau and Power BI)
+    // 1. Take a screenshot of your dashboard
+    // 2. Save to: /public/images/showroom/your-dashboard.png
+    // 3. Reference it:
+    // thumbnailUrl: "/images/showroom/your-dashboard.png",
+    
+    // Option C: No thumbnail (shows placeholder)
+    // thumbnailUrl: undefined,
+    
+    // STEP 3: Link to datasets used
+    datasets: [
+      {
+        title: "Age Distribution",
+        url: "https://portal.transport-data.org/@ifeu/vehicle-age-road-transport-germany"
+      }
+    ],
+    
+    // Optional:
+    externalLink: "PASTE_YOUR_SHARE_LINK_HERE",
+    aspectRatio: "16:9",
+  },
+  */
+];
+
   /* EXAMPLE
   {
     id: "tableau-eu-superstore",
