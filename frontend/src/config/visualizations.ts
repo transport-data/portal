@@ -232,9 +232,9 @@ export const VISUALIZATIONS: Visualization[] = [
       `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
     ),
     
-    // Option A: Auto-construct (works for Tableau Public only)
-    thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
-    
+    // thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    thumbnailUrl: "/images/showroom/agedistributioncomparisonnewregvs_stock.png",
+
     datasets: [
       {
         title: "Age Distribution",
@@ -252,7 +252,7 @@ export const VISUALIZATIONS: Visualization[] = [
   // ========================================
   /*
   {
-    id: "unique-id-here",
+    id: "unique-id-here", //no spaces!
     title: "Your Dashboard Title",
     description: "Describe what insights this dashboard provides.",
     // Option A: Auto-fetch tags from datasets
