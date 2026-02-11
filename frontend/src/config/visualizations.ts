@@ -238,7 +238,7 @@ export const VISUALIZATIONS: Visualization[] = [
     datasets: [
       {
         title: "Age Distribution",
-        url: https://portal.transport-data.org/@ifeu/vehicle-age-road-transport-germany
+        url: "https://portal.transport-data.org/@ifeu/vehicle-age-road-transport-germany"
       }
     ],
     
