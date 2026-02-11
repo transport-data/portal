@@ -78,6 +78,6 @@ export const config = {
     "/dashboard/:path*",
     "/onboarding/:path*",
     // Organization URLs pattern matching
-    "/((?!api|_next/static|_next/image|favicon.ico|images|styles|dashboard|onboarding|auth|search|datasets|organizations|groups|geography|partners|about-us|contact|events|data-provider|faq|privacy-policy|terms-and-conditions|unauthorized|404|showroom).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|images|styles|dashboard|onboarding|auth|search|datasets|organizations|groups|geography|partners|about-us|contact|events|data-provider|faq|privacy-policy|terms-and-conditions|unauthorized|404|showroom|pdfs).*)",
   ],
 };

@@ -7,11 +7,14 @@ export type DatasetRef = {
   url: string;
 };
 
-export type Visualization = {
+export interface Visualization {
   id: string;
   title: string;
   description: string;
-  
+  embedUrl: string;
+  externalLink?: string;
+  thumbnailUrl?: string;
+  datasets: { title: string; url: string }[];
   /**
    * Tags for categorization
    * - Set to 'auto' to fetch from referenced datasets at build time
@@ -19,14 +22,8 @@ export type Visualization = {
    * - Leave undefined for no tags
    */
   tags?: string[] | 'auto';
-  
-  embedUrl: string;
-  thumbnailUrl?: string;
-  datasets: DatasetRef[];
-  externalLink?: string;
-  aspectRatio?: "16:9" | "4:3" | "21:9" | "free";
-  minHeightPx?: number;
-};
+  type?: 'iframe' | 'pdf'; // Add this line
+}
 
 /**
  * Helper function: Extract embed URL from Tableau OR Power BI
@@ -198,7 +195,6 @@ export const VISUALIZATIONS: Visualization[] = [
       },
     ],
     
-    aspectRatio: "16:9",
     externalLink: "https://public.tableau.com/shared/RQD536548?:display_count=n&:origin=viz_share_link",
   },
   {
@@ -226,7 +222,6 @@ export const VISUALIZATIONS: Visualization[] = [
     ],
     
     externalLink: "https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
-    aspectRatio: "16:9",
   },
   
   {
@@ -249,7 +244,6 @@ export const VISUALIZATIONS: Visualization[] = [
     ],
     
     externalLink: "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
-    aspectRatio: "16:9",
   },
 
   {
@@ -272,7 +266,6 @@ export const VISUALIZATIONS: Visualization[] = [
     ],
     
     externalLink: "https://public.tableau.com/views/NDCgenerations/TransportMeasures?:embed=y&:sid=&:redirect=auth&language=en-GB&:display_count=n&:origin=viz_share_link",
-    aspectRatio: "16:9",
   },
 
 
@@ -327,7 +320,24 @@ export const VISUALIZATIONS: Visualization[] = [
     
     // Optional:
     externalLink: "PASTE_YOUR_SHARE_LINK_HERE",
-    aspectRatio: "16:9",
   },
   */
+
+  // Add your PDF
+  {
+    id: 'guidance-vehicle-stock',
+    title: 'Guidance: Vehicle Stock and New Registrations',
+    description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
+    embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
+    type: 'pdf',
+    thumbnailUrl: '/images/showroom/guidance-vehicle-thumb.png', // Add your thumbnail
+    externalLink: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
+    datasets: [
+      {
+        title: 'Vehicle stock and new registrations by powertrain | Germany',
+        url: 'https://portal.transport-data.org/@tdc/new-registrations-road-vehicle-in-germany'
+      }
+    ],
+    tags: 'auto' // Will fetch tags from the dataset
+  },
 ];

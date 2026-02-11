@@ -31,7 +31,7 @@ interface CKANResponse {
 export function extractDatasetId(url: string): string | null {
   // Match pattern: /@orgname/dataset-id or /dataset/dataset-id
   const match = url.match(/\/@[^\/]+\/([^\/\?#]+)|\/dataset\/([^\/\?#]+)/);
-  return match ? (match[1] || match[2]) : null;
+  return match ? (match[1] || match[2] || null) : null;
 }
 
 /**
