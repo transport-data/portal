@@ -312,8 +312,8 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
     datasets: [
       {
-        title: 'Vehicle stock and new registrations by powertrain | Germany',
-        url: 'https://portal.transport-data.org/@tdc/new-registrations-road-vehicle-in-germany'
+        title: 'Passenger Cars Registrations and Stock, Nigeria 2005-2019',
+        url: 'https://portal.transport-data.org/@oica/passenger-cars-registrations-and-stock-nigeria-2005-2019'
       }
     ],
     tags: 'auto' // Will fetch tags from the dataset
