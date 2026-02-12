@@ -17,10 +17,14 @@ const Footer: React.FC = () => {
         name: "Geography",
         href: "/geography",
       },
+      { 
+        name: "Licenses",
+        href: "/licenses",
+      },
       {
         name: "FAQ",
         href: "/faq",
-      },
+      }
     ],
     organisation: [
       { name: "About Us", href: "/about-us" },

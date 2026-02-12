@@ -39,6 +39,7 @@ Instructions on how to use the final product once deployed can be found in the [
     - [18.2. FAQ](/docs/static-pages/faq/README.md)
     - [18.3. People](/docs/static-pages/people/README.md)
     - [18.4. Testimonials](/docs/static-pages/testimonials/README.md)
+    - [18.5. Licenses](/docs/static-pages/licenses/README.md)
 - [19. Create/Edit/Delete Topics](/docs/topics/README.md)
 - [20. Approval Workflow](/docs/approval-workflow/README.md)
 - [21. Data Provider Page](/docs/data-provider/README.md)
