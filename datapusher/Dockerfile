@@ -94,6 +94,11 @@ RUN cd ${SRC_DIR}/datapusher-plus && \
 RUN ${VENV}/bin/pip install Flask==2.3.3
 RUN ${VENV}/bin/pip install Werkzeug==2.3.0
 
+# Patch ckanserviceprovider to use pool_pre_ping so stale connections from
+# Cloud SQL are detected and replaced instead of causing 500 errors.
+RUN sed -i 's/sqlalchemy.create_engine(uri, echo=echo, convert_unicode=True)/sqlalchemy.create_engine(uri, echo=echo, convert_unicode=True, pool_pre_ping=True)/' \
+    ${VENV}/lib/python3.9/site-packages/ckanserviceprovider/db.py
+
 
 
 #SETUP CONFIG/SETTINGS.PY
