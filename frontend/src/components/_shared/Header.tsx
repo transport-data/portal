@@ -30,6 +30,10 @@ const navigation = [
     name: "Data Provider",
   },
   {
+    href: "/showroom",
+    name: "Showroom",
+  },
+  {
     href: "/about-us",
     name: "About Us",
   },

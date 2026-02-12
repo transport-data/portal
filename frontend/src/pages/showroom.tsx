@@ -258,9 +258,10 @@ export default function ShowroomPage({ visualizations }: ShowroomProps) {
                     <h3 className="text-lg md:text-xl font-bold text-gray-900 truncate">
                       {selectedVisualization.title}
                     </h3>
-                    <p className="mt-1 text-xs md:text-sm text-gray-500 line-clamp-2">
-                      {selectedVisualization.description}
-                    </p>
+                    {/* Hiding the description on the modal header */}
+                    {/* <p className="mt-1 text-xs md:text-sm text-gray-500 line-clamp-2">
+                        {selectedVisualization.description}
+                    </p> */}
                   </div>
                   <button
                     onClick={() => setSelectedViz(null)}
