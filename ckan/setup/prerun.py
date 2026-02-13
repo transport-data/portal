@@ -121,7 +121,7 @@ def init_db():
         subprocess.check_output(db_command, stderr=subprocess.STDOUT)
         print("[prerun] Initializing or upgrading db - end")
     except subprocess.CalledProcessError as e:
-        if "OperationalError" in e.output:
+        if b"OperationalError" in e.output:
             print(e.output)
             print("[prerun] Database not ready, waiting a bit before exit...")
             time.sleep(5)
@@ -224,9 +224,9 @@ if __name__ == "__main__":
         print("[prerun] Maintenance mode, skipping setup...")
     else:
         check_main_db_connection()
-        init_db()
         update_plugins()
         set_variable()
+        init_db()
         check_datastore_db_connection()
         init_datastore_db()
         check_solr_connection()
