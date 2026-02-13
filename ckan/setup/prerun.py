@@ -31,11 +31,21 @@ def update_plugins():
 def set_variable():
     encode_secret = os.environ.get("CKAN___API_TOKEN__JWT__ENCODE__SECRET", "")
     decode_secret = os.environ.get("CKAN___API_TOKEN__JWT__DECODE__SECRET", "")
+    secret_key = os.environ.get("CKAN___SECRET_KEY", "")
+    wtf_csrf_secret_key = os.environ.get("CKAN___WTF_CSRF_SECRET_KEY", "")
     print("[prerun] Setting the variables")
-    cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.encode.secret = {}".format(encode_secret)]    
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.decode.secret = {}".format(decode_secret)]
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if encode_secret:
+        cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.encode.secret = {}".format(encode_secret)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if decode_secret:
+        cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.decode.secret = {}".format(decode_secret)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if secret_key:
+        cmd = ["ckan", "config-tool", ckan_ini, "SECRET_KEY = {}".format(secret_key)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if wtf_csrf_secret_key:
+        cmd = ["ckan", "config-tool", ckan_ini, "WTF_CSRF_SECRET_KEY = {}".format(wtf_csrf_secret_key)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     print("[prerun] Variables set.")
 
 
