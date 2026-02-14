@@ -33,6 +33,7 @@ def set_variable():
     decode_secret = os.environ.get("CKAN___API_TOKEN__JWT__DECODE__SECRET", "")
     secret_key = os.environ.get("CKAN___SECRET_KEY", "")
     wtf_csrf_secret_key = os.environ.get("CKAN___WTF_CSRF_SECRET_KEY", "")
+    datapusher_api_token = os.environ.get("CKAN__DATAPUSHER__API_TOKEN", "")
     print("[prerun] Setting the variables")
     if encode_secret:
         cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.encode.secret = {}".format(encode_secret)]
@@ -45,6 +46,9 @@ def set_variable():
         subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     if wtf_csrf_secret_key:
         cmd = ["ckan", "config-tool", ckan_ini, "WTF_CSRF_SECRET_KEY = {}".format(wtf_csrf_secret_key)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if datapusher_api_token:
+        cmd = ["ckan", "config-tool", ckan_ini, "ckan.datapusher.api_token = {}".format(datapusher_api_token)]
         subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     print("[prerun] Variables set.")
 
