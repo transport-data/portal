@@ -18,15 +18,7 @@ export function DatasetPreview({ dataset }: { dataset: Dataset }) {
   const [currentResource, setCurrentResource] = useState(
     resources[0]?.id ?? "",
   );
-  if (dataset.tdc_category === "tdc_harmonized") {
-    return (
-      <div className="hard-gradient-gray-to-white flex min-h-[500px] flex-col">
-        <div className="flex h-full grow flex-col">
-          {currentResource && <PivotTable resourceId={currentResource} />}
-        </div>
-      </div>
-    );
-  }
+
   return (
     <div className="min-h-[500px] bg-gray-50">
       <div className="container py-8">
