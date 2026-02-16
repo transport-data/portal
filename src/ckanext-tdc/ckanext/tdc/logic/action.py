@@ -332,15 +332,19 @@ def _before_dataset_create_or_update(context, data_dict, is_update=False):
     _fix_approval_workflow(context, data_dict, is_update=is_update)
 
 
-def _submit_dataset_resources_to_datapusher(dataset):
+def _submit_dataset_resources_to_datapusher(dataset, is_update=False):
     resources = dataset.get("resources", [])
     for resource in resources:
-        if resource.get("resource_type") == "data":
-            DatapusherPlugin()._submit_to_datapusher(resource)
+        if resource.get("resource_type") != "data":
+            continue
+        if is_update and not resource.get("upload_to_datastore"):
+            continue
+        DatapusherPlugin()._submit_to_datapusher(resource)
+
 
 
 def _after_dataset_create_or_update(context, data_dict, is_update=False):
-    _submit_dataset_resources_to_datapusher(data_dict)
+    _submit_dataset_resources_to_datapusher(data_dict, is_update=is_update)
 
 
 @tk.chained_action

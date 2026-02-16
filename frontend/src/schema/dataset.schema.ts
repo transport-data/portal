@@ -13,6 +13,7 @@ export const ResourceSchema = z.object({
   hide_preview: z.boolean().default(false),
   is_new: z.boolean().optional(), // Not stored on DB
   _datastore_active: z.boolean().optional(), // Not stored on DB
+  upload_to_datastore: z.boolean().optional(), // Not stored on DB
   excel_sheet_index: z.number().optional(), // Sheet index for Excel files
   excel_sheet_name: z.string().optional(), // Sheet name for display
 });
