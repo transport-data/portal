@@ -1151,4 +1151,24 @@ def resource_upsert_many(context, data_dict):
         upsert(resource) for resource in _resources]
     [get_action("resource_delete")(context, {"id": resource['id']})
      for resource in dataset_resources if not _exists(resource, _resources)]
+
+    for resource in _resources:
+        if resource.get("upload_to_datastore") and not resource.get("datastore_active"):
+            resource_id = resource.get("id")
+            if not resource_id:
+                continue
+            try:
+                task = get_action("task_status_show")(
+                    {"ignore_auth": True},
+                    {"entity_id": resource_id, "task_type": "datapusher", "key": "datapusher"}
+                )
+                if task.get("state") in ("pending", "submitting"):
+                    get_action("task_status_update")(
+                        {"ignore_auth": True},
+                        {**task, "state": "error", "error": "Manually reset to allow re-submission"}
+                    )
+            except tk.ObjectNotFound:
+                pass
+            DatapusherPlugin()._submit_to_datapusher(resource)
+
     return resources_to_update_or_create
