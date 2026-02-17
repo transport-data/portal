@@ -7,6 +7,7 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   transpilePackages: [
+    // tiptap
     "@tiptap/pm",
     "@tiptap/core",
     "@tiptap/react",
@@ -27,6 +28,29 @@ const config = {
     "@tiptap/extension-strike",
     "@tiptap/extension-text",
     "@tiptap/extension-underline",
+    // date / ui packages with many small ESM files
+    "date-fns",
+    "lucide-react",
+    "@heroicons/react",
+    "@radix-ui/react-accordion",
+    "@radix-ui/react-alert-dialog",
+    "@radix-ui/react-avatar",
+    "@radix-ui/react-checkbox",
+    "@radix-ui/react-dialog",
+    "@radix-ui/react-dropdown-menu",
+    "@radix-ui/react-icons",
+    "@radix-ui/react-label",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-radio-group",
+    "@radix-ui/react-scroll-area",
+    "@radix-ui/react-select",
+    "@radix-ui/react-slot",
+    "@radix-ui/react-tabs",
+    "@radix-ui/react-toast",
+    "@radix-ui/react-tooltip",
+    "@tanstack/react-query",
+    "@tanstack/react-table",
+    "recharts",
   ],
   images: {
     unoptimized: true,
