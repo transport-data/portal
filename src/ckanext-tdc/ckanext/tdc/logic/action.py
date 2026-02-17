@@ -1140,9 +1140,24 @@ def resource_upsert_many(context, data_dict):
                 return True
         return False
 
+    _TRACKED_FIELDS = [
+        'name', 'url', 'url_type', 'format', 'size', 'resource_type',
+        'hide_preview', 'description', 'mimetype', 'mimetype_inner',
+        'hash', 'position', 'state', 'cache_url', 'cache_last_updated',
+        'package_id', 'excel_sheet_index', 'excel_sheet_name',
+    ]
+
+    def _has_changed(resource, existing):
+        return any(resource.get(f) != existing.get(f) for f in _TRACKED_FIELDS)
+
     def upsert(resource):
         exists = _exists(resource, dataset_resources)
         if exists:
+            existing = next(
+                (r for r in dataset_resources if r['id'] == resource.get('id')), None
+            )
+            if existing and not _has_changed(resource, existing):
+                return existing
             return get_action("resource_patch")(context, resource)
         else:
             return get_action("resource_create")(context, {**resource, **{"package_id": dataset_id}})
@@ -1152,6 +1167,7 @@ def resource_upsert_many(context, data_dict):
     [get_action("resource_delete")(context, {"id": resource['id']})
      for resource in dataset_resources if not _exists(resource, _resources)]
 
+    resources_for_datapusher = []
     for resource in _resources:
         if resource.get("upload_to_datastore") and not resource.get("datastore_active"):
             resource_id = resource.get("id")
@@ -1169,6 +1185,23 @@ def resource_upsert_many(context, data_dict):
                     )
             except tk.ObjectNotFound:
                 pass
-            DatapusherPlugin()._submit_to_datapusher(resource)
+            resources_for_datapusher.append(resource)
+
+    if resources_for_datapusher:
+        import threading
+
+        def _submit_in_background(resources):
+            for r in resources:
+                try:
+                    DatapusherPlugin()._submit_to_datapusher(r)
+                except Exception as e:
+                    log.error("Error submitting resource %s to datapusher: %s", r.get("id"), e)
+
+        thread = threading.Thread(
+            target=_submit_in_background,
+            args=(resources_for_datapusher,),
+            daemon=True,
+        )
+        thread.start()
 
     return resources_to_update_or_create
