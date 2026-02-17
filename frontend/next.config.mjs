@@ -6,6 +6,28 @@ await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  transpilePackages: [
+    "@tiptap/pm",
+    "@tiptap/core",
+    "@tiptap/react",
+    "@tiptap/starter-kit",
+    "@tiptap/extension-bold",
+    "@tiptap/extension-bubble-menu",
+    "@tiptap/extension-bullet-list",
+    "@tiptap/extension-code",
+    "@tiptap/extension-code-block-lowlight",
+    "@tiptap/extension-color",
+    "@tiptap/extension-document",
+    "@tiptap/extension-history",
+    "@tiptap/extension-italic",
+    "@tiptap/extension-link",
+    "@tiptap/extension-list-item",
+    "@tiptap/extension-paragraph",
+    "@tiptap/extension-placeholder",
+    "@tiptap/extension-strike",
+    "@tiptap/extension-text",
+    "@tiptap/extension-underline",
+  ],
   images: {
     unoptimized: true,
     loader: "custom",
