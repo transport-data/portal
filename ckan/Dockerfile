@@ -2,7 +2,7 @@ FROM ckan/ckan-base:2.11.4
 
 ENV CKAN_INI /srv/app/ckan.ini
 
-ENV CKANEXT_TDC_HASH 4c52fe46e51c191f21e108d53e9f66642924d91c
+ENV CKANEXT_TDC_HASH a545d3fcea6f8b67bc9f7807bfb8b7aa74fcc02c
 
 USER root
 
