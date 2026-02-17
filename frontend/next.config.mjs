@@ -48,8 +48,6 @@ const config = {
     "@radix-ui/react-tabs",
     "@radix-ui/react-toast",
     "@radix-ui/react-tooltip",
-    "@tanstack/react-query",
-    "@tanstack/react-table",
     "recharts",
   ],
   images: {
