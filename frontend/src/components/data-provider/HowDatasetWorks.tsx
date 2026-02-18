@@ -7,10 +7,10 @@ export default () => {
     <div className="py-6 text-gray-500 lg:py-[96px]">
       <div>
         <h1 id="how-tdc-datasets-work" className="text-4xl font-extrabold text-gray-900">
-          How TDC datasets work
+          How the TDC categorizes data
         </h1>
         <p className="mt-4 text-xl font-normal text-gray-500">
-          TDC hosts a diverse range of dataset types with differing variety of
+          The TDC hosts a diverse range of dataset types with differing variety of
           scope and standardisation, providing a comprehensive resource for
           analysing and addressing sustainable transportation challenges.
         </p>
@@ -70,7 +70,7 @@ const cards = [
     <section className="space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Public Data</h1>
       <p>
-        Data from open public repositories collected and aggregated by TDC for
+        Datasets from open public repositories collected and aggregated by TDC for
         ease of access.
       </p>
       <p className="flex items-center gap-2.5">

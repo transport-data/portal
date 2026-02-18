@@ -7,6 +7,7 @@ import ContributeSection from "@components/home/mainSection/ContributeSection";
 import FaqsSection from "@components/home/mainSection/FaqsSection";
 import TestimonialsSection from "@components/home/mainSection/TestimonialsSection";
 import NewsLetterSignUpSection from "@components/_shared/NewsletterSection";
+import WelcomeDialog from "@components/home/WelcomeDialog";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { getSession } from "next-auth/react";
 import { searchDatasets } from "@utils/dataset";
@@ -106,6 +107,9 @@ export default function Home({
         <meta name="description" content="Transport Data Commons" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      
+      <WelcomeDialog />
+      
       <Layout>
         <Hero asset={tdcConfig.hero} />
         <DatasetsSection
