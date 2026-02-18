@@ -18,7 +18,7 @@ export default function Hero() {
               datasets.
             </p>
             <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
-              <a href="https://civicrm.changing-transport.org/form/tdci-newsletter">Start Contributing Data</a>
+              <a href="https://civicrm.changing-transport.org/form/tdci-newsletter" target="_blank" rel="noopener noreferrer">Start Contributing Data</a>
             </Button>
             <p className="font-semibold text-gray-500">
               Join the organisations which already share their data via the TDC.
