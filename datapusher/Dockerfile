@@ -87,6 +87,7 @@ RUN ${VENV}/bin/pip install uwsgi
 #INSTALL DATAPUSHER-PLUS FROM SOURCE REPO
 RUN git clone --branch tdc-workaround https://github.com/Gutts-n/datapusher-plus
 RUN cd ${SRC_DIR}/datapusher-plus && \
+    git fetch --all && \
     git checkout 8a6e7757359d682b27e10d2b3714d1c4ab377b91 && \
     ${VENV}/bin/pip install -r requirements-dev.txt && \
     ${VENV}/bin/pip install -e .
