@@ -22,7 +22,8 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { P, match } from "ts-pattern";
 import { FileUploader, FileWithSheets } from "./FileUploader";
 import { EyeOffIcon } from "lucide-react";
-import { EyeIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowUpTrayIcon as ArrowUpTrayIconSolid } from "@heroicons/react/24/solid";
 import { DefaultTooltip } from "@components/ui/tooltip";
 import { useRef, useState } from "react";
 
@@ -119,6 +120,7 @@ export function UploadsForm({ disabled }: any) {
                     const isNewTabular = r.is_new && isTabular;
                     const notNewTabular = !r.is_new && !!r._datastore_active;
                     const displayHidePreview = isNewTabular || notNewTabular;
+                    const displayUploadToDatastore = !r.is_new && isTabular && !r._datastore_active;
 
                     const fileSheets = sheetsByFile[r.name ?? ""];
                     const showSheetSelector =
@@ -230,6 +232,41 @@ export function UploadsForm({ disabled }: any) {
                               );
                             }}
                           />
+
+                          {displayUploadToDatastore && (
+                            <FormField
+                              control={form.control}
+                              name={`resources.${_index}.upload_to_datastore`}
+                              render={({ field }) => {
+                                const tooltip = field.value
+                                  ? "Will be uploaded to datastore on save. Click to cancel."
+                                  : "Click to upload this file to the datastore on save";
+                                return (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      field.onChange(!field.value);
+                                    }}
+                                    type="button"
+                                    className={cn(
+                                      "rounded-md p-1 transition-colors",
+                                      field.value
+                                        ? "bg-accent text-white"
+                                        : "text-gray-500 hover:text-accent",
+                                    )}
+                                  >
+                                    <DefaultTooltip content={tooltip}>
+                                      {field.value ? (
+                                        <ArrowUpTrayIconSolid className="h-5 w-5" />
+                                      ) : (
+                                        <ArrowUpTrayIcon className="h-5 w-5" />
+                                      )}
+                                    </DefaultTooltip>
+                                  </button>
+                                );
+                              }}
+                            />
+                          )}
 
                           <button
                             onClick={(e) => {

@@ -169,6 +169,7 @@ const EditDatasetDashboard: NextPage<{
         _datastore_active: r.datastore_active,
         hide_preview: r.hide_preview,
         is_new: false,
+        upload_to_datastore: false,
       })),
       comments: dataset.comments
         ? dataset.comments.map((c) => ({

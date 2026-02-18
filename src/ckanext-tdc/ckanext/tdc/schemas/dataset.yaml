@@ -328,3 +328,9 @@ resource_fields:
 - field_name: hide_preview
   label: Hide preview
   output_validators: scheming_load_json
+
+- field_name: upload_to_datastore
+  label: Upload to datastore
+  validators: ignore_missing boolean_validator
+  output_validators: scheming_load_json
+  form_snippet: null

@@ -182,7 +182,7 @@ export const VISUALIZATIONS: Visualization[] = [
     id: "powerbi-g20", 
     title: "G20 Transport Sector Dashboard",
     description: "The dashboard consolidates a structured collection of transport-related indicators for G20 member countries. It integrates data on population, urbanisation, mobility patterns, energy use, greenhouse gas emissions, electric vehicle deployment, national and NDC transport targets, biofuels, subsidies, hydrogen, batteries, and relevant policies.",
-    tags: ["G20", "Policy", "Custom"],  
+    tags: 'auto', 
 
     embedUrl: extractUrl(
       `https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9`

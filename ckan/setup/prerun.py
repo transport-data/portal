@@ -31,11 +31,25 @@ def update_plugins():
 def set_variable():
     encode_secret = os.environ.get("CKAN___API_TOKEN__JWT__ENCODE__SECRET", "")
     decode_secret = os.environ.get("CKAN___API_TOKEN__JWT__DECODE__SECRET", "")
+    secret_key = os.environ.get("CKAN___SECRET_KEY", "")
+    wtf_csrf_secret_key = os.environ.get("CKAN___WTF_CSRF_SECRET_KEY", "")
+    datapusher_api_token = os.environ.get("CKAN__DATAPUSHER__API_TOKEN", "")
     print("[prerun] Setting the variables")
-    cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.encode.secret = {}".format(encode_secret)]    
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.decode.secret = {}".format(decode_secret)]
-    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if encode_secret:
+        cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.encode.secret = {}".format(encode_secret)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if decode_secret:
+        cmd = ["ckan", "config-tool", ckan_ini, "api_token.jwt.decode.secret = {}".format(decode_secret)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if secret_key:
+        cmd = ["ckan", "config-tool", ckan_ini, "SECRET_KEY = {}".format(secret_key)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if wtf_csrf_secret_key:
+        cmd = ["ckan", "config-tool", ckan_ini, "WTF_CSRF_SECRET_KEY = {}".format(wtf_csrf_secret_key)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    if datapusher_api_token:
+        cmd = ["ckan", "config-tool", ckan_ini, "ckan.datapusher.api_token = {}".format(datapusher_api_token)]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     print("[prerun] Variables set.")
 
 
@@ -111,7 +125,7 @@ def init_db():
         subprocess.check_output(db_command, stderr=subprocess.STDOUT)
         print("[prerun] Initializing or upgrading db - end")
     except subprocess.CalledProcessError as e:
-        if "OperationalError" in e.output:
+        if b"OperationalError" in e.output:
             print(e.output)
             print("[prerun] Database not ready, waiting a bit before exit...")
             time.sleep(5)
@@ -214,9 +228,9 @@ if __name__ == "__main__":
         print("[prerun] Maintenance mode, skipping setup...")
     else:
         check_main_db_connection()
-        init_db()
         update_plugins()
         set_variable()
+        init_db()
         check_datastore_db_connection()
         init_datastore_db()
         check_solr_connection()

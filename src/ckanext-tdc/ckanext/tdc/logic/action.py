@@ -332,15 +332,19 @@ def _before_dataset_create_or_update(context, data_dict, is_update=False):
     _fix_approval_workflow(context, data_dict, is_update=is_update)
 
 
-def _submit_dataset_resources_to_datapusher(dataset):
+def _submit_dataset_resources_to_datapusher(dataset, is_update=False):
     resources = dataset.get("resources", [])
     for resource in resources:
-        if resource.get("resource_type") == "data":
-            DatapusherPlugin()._submit_to_datapusher(resource)
+        if resource.get("resource_type") != "data":
+            continue
+        if is_update and not resource.get("upload_to_datastore"):
+            continue
+        DatapusherPlugin()._submit_to_datapusher(resource)
+
 
 
 def _after_dataset_create_or_update(context, data_dict, is_update=False):
-    _submit_dataset_resources_to_datapusher(data_dict)
+    _submit_dataset_resources_to_datapusher(data_dict, is_update=is_update)
 
 
 @tk.chained_action
@@ -1136,9 +1140,24 @@ def resource_upsert_many(context, data_dict):
                 return True
         return False
 
+    _TRACKED_FIELDS = [
+        'name', 'url', 'url_type', 'format', 'size', 'resource_type',
+        'hide_preview', 'description', 'mimetype', 'mimetype_inner',
+        'hash', 'position', 'state', 'cache_url', 'cache_last_updated',
+        'package_id', 'excel_sheet_index', 'excel_sheet_name',
+    ]
+
+    def _has_changed(resource, existing):
+        return any(resource.get(f) != existing.get(f) for f in _TRACKED_FIELDS)
+
     def upsert(resource):
         exists = _exists(resource, dataset_resources)
         if exists:
+            existing = next(
+                (r for r in dataset_resources if r['id'] == resource.get('id')), None
+            )
+            if existing and not _has_changed(resource, existing):
+                return existing
             return get_action("resource_patch")(context, resource)
         else:
             return get_action("resource_create")(context, {**resource, **{"package_id": dataset_id}})
@@ -1147,4 +1166,42 @@ def resource_upsert_many(context, data_dict):
         upsert(resource) for resource in _resources]
     [get_action("resource_delete")(context, {"id": resource['id']})
      for resource in dataset_resources if not _exists(resource, _resources)]
+
+    resources_for_datapusher = []
+    for resource in _resources:
+        if resource.get("upload_to_datastore") and not resource.get("datastore_active"):
+            resource_id = resource.get("id")
+            if not resource_id:
+                continue
+            try:
+                task = get_action("task_status_show")(
+                    {"ignore_auth": True},
+                    {"entity_id": resource_id, "task_type": "datapusher", "key": "datapusher"}
+                )
+                if task.get("state") in ("pending", "submitting"):
+                    get_action("task_status_update")(
+                        {"ignore_auth": True},
+                        {**task, "state": "error", "error": "Manually reset to allow re-submission"}
+                    )
+            except tk.ObjectNotFound:
+                pass
+            resources_for_datapusher.append(resource)
+
+    if resources_for_datapusher:
+        import threading
+
+        def _submit_in_background(resources):
+            for r in resources:
+                try:
+                    DatapusherPlugin()._submit_to_datapusher(r)
+                except Exception as e:
+                    log.error("Error submitting resource %s to datapusher: %s", r.get("id"), e)
+
+        thread = threading.Thread(
+            target=_submit_in_background,
+            args=(resources_for_datapusher,),
+            daemon=True,
+        )
+        thread.start()
+
     return resources_to_update_or_create
