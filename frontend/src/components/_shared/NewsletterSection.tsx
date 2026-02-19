@@ -48,13 +48,17 @@ export default function NewsLetterSection() {
             insights by signing up for the Transport Data Commons newsletter
             today!
           </p>
-          <Button asChild className="tdc-newsletter">
-            <Link
-              href="https://civicrm.changing-transport.org/form/tdci-newsletter"
-              target="_blank"
-            >
-              Join Newsletter
-            </Link>
+          <Button
+            className="tdc-newsletter"
+            onClick={() =>
+              window.open(
+                "https://civicrm.changing-transport.org/form/tdci-newsletter",
+                "newsletter",
+                "width=600,height=700,scrollbars=yes,resizable=yes"
+              )
+            }
+          >
+            Join Newsletter
           </Button>
         </div>
       </div>

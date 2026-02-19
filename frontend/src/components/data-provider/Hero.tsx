@@ -2,6 +2,13 @@ import { Button } from "@components/ui/button";
 import Link from "next/link";
 import { Building2 } from "lucide-react";
 
+const openNewsletterForm = () =>
+  window.open(
+    "https://civicrm.changing-transport.org/form/tdci-newsletter",
+    "newsletter",
+    "width=600,height=700,scrollbars=yes,resizable=yes"
+  );
+
 export default function Hero() {
   return (
     <section className="pb-6 pt-[64px] md:pb-[96px]">
@@ -17,8 +24,8 @@ export default function Hero() {
               by contributing your own transportation-related
               datasets.
             </p>
-            <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
-              <a href="https://civicrm.changing-transport.org/form/tdci-newsletter" target="_blank" rel="noopener noreferrer">Start Contributing Data</a>
+            <Button onClick={openNewsletterForm} className="mb-16 bg-[#006064] px-6 py-3.5">
+              Start Contributing Data
             </Button>
             <p className="font-semibold text-gray-500">
               Join the organisations which already share their data via the TDC.
@@ -94,17 +101,10 @@ export default function Hero() {
               </p>
             </div>
           </div>
-          <Button asChild className="shrink-0 bg-white text-[#006064] hover:bg-white/90 px-6 py-3 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105">
-            <a
-              href="https://civicrm.changing-transport.org/form/tdci-newsletter"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2"
-            >
+          <Button onClick={openNewsletterForm} className="shrink-0 bg-white text-[#006064] hover:bg-white/90 px-6 py-3 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105 inline-flex items-center gap-2">
               <Building2 className="h-4 w-4" />
               Register my Organisation
-            </a>
-          </Button>
+            </Button>
         </div>
       </div>
     </section>
