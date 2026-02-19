@@ -268,7 +268,28 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/CarstockinAfricancountriescomparisonofdatasourcesfromTransportStarterDataKits/Dashboard1",
   },
 
+{
+    id: "Veh_Stock_Nigeria",
+    title: "Stock and new registrations of passenger cars in Nigeria",
+    description: "The analysis is based on data published on the TDC Portal.",
+    tags: ["Vehicle Stock", "Africa","Nigeria","New registrations"],
+    
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/StockandnewregistrationsofpassengercarsNigeria/Stock_newregistrations?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    thumbnailUrl: "/images/showroom/Stock_new%20registrations.png",
 
+    datasets: [
+      {
+        title: "Passenger Cars Registrations and Stock, Nigeria 2005-2019",
+        url: "https://portal.transport-data.org/@oica/passenger-cars-registrations-and-stock-nigeria-2005-2019?org=OICA&amp;amp;dataset=passenger-cars-registrations-and-stock-nigeria-2005-2019"
+      }
+    ],
+    
+    externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/StockandnewregistrationsofpassengercarsNigeria/Stock_newregistrations#1",
+  },
   // ========================================
   // EASY TEMPLATE FOR ADDING NEW DASHBOARDS
   // ========================================
@@ -326,7 +347,7 @@ export const VISUALIZATIONS: Visualization[] = [
   // Add PDF
   {
     id: 'guidance-vehicle-stock',
-    title: 'Guidance: Vehicle Stock and New Registrations',
+    title: 'Guidance n°1:  national road vehicle fleet and registration for a bottom-up inventory',
     description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
     embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
     type: 'pdf',
