@@ -62,8 +62,8 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
 
   const usersOptions =
     users
-      ?.filter((x) => !orgUsers?.some((a) => a.id === x.id))
-      .map((user) => ({
+      ?.filter((x: User) => !orgUsers?.some((a: User) => a.id === x.id))
+      .map((user: User) => ({
         value: user.id,
         label: `${user.display_name} ${user.name === user.display_name ?'' : `- ${user.name}`}`,
       })) || [];
@@ -76,7 +76,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
 
   function userAlreadyExists(email: string) {
     if (!users) return true;
-    return users?.some((u) => u.email === email);
+    return users?.some((u: User) => u.email === email);
   }
 
   const defaultValues = { group_id: "" };
@@ -102,7 +102,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
         } the ${
           typeof response === "string"
             ? response
-            : usersOptions.find((u) => formObj.getValues("user") === u.value)
+            : usersOptions.find((u: { value: string; label: string }) => formObj.getValues("user") === u.value)
                 ?.label ??
               response?.display_name ??
               response?.name ??
@@ -154,9 +154,9 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                           !field.value && "text-gray-400"
                         )}
                       >
-                        {usersOptions.find((u) => u.value === field.value)
+                        {usersOptions.find((u: { value: string; label: string }) => u.value === field.value)
                           ?.label
-                          ? usersOptions.find((u) => u.value === field.value)
+                          ? usersOptions.find((u: { value: string; label: string }) => u.value === field.value)
                               ?.label
                           : field.value && field.value.length > 0
                           ? `Add "${field.value}"`
@@ -194,7 +194,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                                 Add {searchedUser}
                               </CommandItem>
                             )}
-                          {usersOptions.map((u) => (
+                          {usersOptions.map((u: { value: string; label: string }) => (
                             <CommandItem
                               value={u.value}
                               keywords={[u.label]}

@@ -103,7 +103,7 @@ export const UsersTable: React.FC = () => {
                 <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
                   {users && (
                     <>
-                      {users.map((user) => (
+                      {users.map((user: User) => (
                         <tr
                           key={user.name}
                           className={

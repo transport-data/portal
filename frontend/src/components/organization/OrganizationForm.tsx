@@ -2,6 +2,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import type { UseFormReturn } from "react-hook-form";
 import { inputStyle } from "../../styles/formStyles";
 import type { OrganizationFormType } from "@schema/organization.schema";
+import { Organization } from "@portaljs/ckan";
 import {
   Form,
   FormControl,
@@ -116,8 +117,8 @@ export const OrganizationForm: React.FC<{
                     <SelectContent>
                       <SelectItem value="no-parent">No parent</SelectItem>
                       {data
-                        .filter((org) => org.name !== watch("name"))
-                        .map((org, index) => (
+                        .filter((org: Organization) => org.name !== watch("name"))
+                        .map((org: Organization, index: number) => (
                           <SelectItem key={index} value={org.name}>
                             {org.title ?? org.display_name ?? org.name}
                           </SelectItem>

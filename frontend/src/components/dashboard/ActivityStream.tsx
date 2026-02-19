@@ -6,7 +6,7 @@ export default function ActivityStream() {
   const { data: { results: activities, count } = {}, error: activitiesError } =
     api.user.listDashboardActivities.useQuery({});
 
-  const usersIds = new Set((activities ?? []).map((a) => a.user_id));
+  const usersIds = new Set<string>((activities ?? []).map((a: Activity) => a.user_id));
   const { data: users } = api.user.getUsersByIds.useQuery({
     ids: [...usersIds],
   });

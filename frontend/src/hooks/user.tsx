@@ -39,7 +39,7 @@ export function useUserGlobalOrganizationRoles(selectedOrgId?: string) {
     canCreateDatasets:
       !!editorOrgs?.length || !!adminOrgs?.length || isSysadmin,
     canReviewDatasets:
-      !!adminOrgs.filter((x) =>
+      !!adminOrgs.filter((x: UserOrganization) =>
         selectedOrgId ? [x.id, x.name].includes(selectedOrgId || "") : true
       )?.length || isSysadmin,
     belongsToAnyOrg: !!userOrgs.length,

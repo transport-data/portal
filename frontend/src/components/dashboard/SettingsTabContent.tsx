@@ -3,6 +3,7 @@ import { useState } from "react";
 import { api } from "@utils/api";
 import ApiTokensTab, { Token } from "./ApiTokensTab";
 import SysadminMangementTab from "./SysadminMangementTab";
+import { User as CkanUser } from "@portaljs/ckan";
 import {
   SuccessAlert,
   ErrorAlert,
@@ -34,9 +35,9 @@ export default () => {
     );
   const { data: allUsers } = api.user.list.useQuery();
   const adminUsers = allUsers?.filter(
-    (user) => user.sysadmin === true && user.id !== sessionData?.user.id
+    (user: CkanUser) => user.sysadmin === true && user.id !== sessionData?.user.id
   );
-  const nonAdminUsers = allUsers?.filter((user) => user.sysadmin === false);
+  const nonAdminUsers = allUsers?.filter((user: CkanUser) => user.sysadmin === false);
   return (
     <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:gap-8">
       <div className="mt-5 text-sm">
