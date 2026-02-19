@@ -245,6 +245,28 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
   },
 
+  {
+    id: "Veh_Stock_TSDK",
+    title: "Car stock in African countries – comparison of data sources from Transport Starter Data Kits",
+    description: "The analysis is based on data published on the TDC Portal (original source: Transport Starter Data Kits). The graphic compares historical car stock data gathered from various sources for selected countries in Africa. Certain values may differ for the same country depending on the source.",
+    tags: ["Vehicle Stock", "Africa","Starter Data Kits"],
+    
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/CarstockinAfricancountriescomparisonofdatasourcesfromTransportStarterDataKits/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    thumbnailUrl: "/images/showroom/Vehstock_TDK.png",
+
+    datasets: [
+      {
+        title: "Vehicle Stock from Transport Starter Data Kits",
+        url: "https://portal.transport-data.org/@ccg/vehicle-stock-from-ccg-transport-starter-data-kits"
+      }
+    ],
+    
+    externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/CarstockinAfricancountriescomparisonofdatasourcesfromTransportStarterDataKits/Dashboard1",
+  },
 
 
   // ========================================
