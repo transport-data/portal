@@ -1,4 +1,4 @@
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 import { env } from "@env.mjs";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
 import { User } from "@interfaces/ckan/user.interface";

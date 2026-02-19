@@ -3,7 +3,7 @@ import { CkanResponse } from "@schema/ckan.schema";
 import NextAuth, { User } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   ckanUserLoginWithGithub,

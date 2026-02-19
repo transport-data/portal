@@ -1,7 +1,7 @@
 import { type User } from "@interfaces/ckan/user.interface";
 import { type CkanResponse } from "@schema/ckan.schema";
 import { type UserFormType } from "@schema/user.schema";
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 
 export const listUsers = async ({ apiKey }: { apiKey: string }) => {
   const users = await CkanRequest.get<CkanResponse<User[]>>("user_list", {

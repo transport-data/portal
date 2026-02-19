@@ -10,7 +10,7 @@ import {
 import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "@/env.mjs";
 import type { CkanResponse } from "@schema/ckan.schema";
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

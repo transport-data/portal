@@ -1,4 +1,4 @@
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 import { GroupFormType, type Group, GroupTree } from "@schema/group.schema";
 import { FollowGroupSchema } from "@schema/onboarding.schema";
 import { type CkanResponse } from "@schema/ckan.schema";

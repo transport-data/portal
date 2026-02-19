@@ -1,6 +1,6 @@
 import { type User } from "@portaljs/ckan";
 import { type CkanResponse } from "@schema/ckan.schema";
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 import {
   OrganizationFormType,
   type Organization,

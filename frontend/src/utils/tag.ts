@@ -1,5 +1,5 @@
 import { CkanResponse } from "@components/data-explorer/ckan.interface";
-import CkanRequest from "@datopian/ckan-api-client-js";
+import CkanRequest from "~/lib/ckan-request";
 
 export const listTags = async ({
   apiKey,
