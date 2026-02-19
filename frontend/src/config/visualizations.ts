@@ -290,6 +290,41 @@ export const VISUALIZATIONS: Visualization[] = [
     
     externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/StockandnewregistrationsofpassengercarsNigeria/Stock_newregistrations#1",
   },
+
+  {
+    id: "Keyfig_Germany",
+    title: "Comparison of road transport key figures | Germany",
+    description: "The data are based on an analysis conducted by the ifeu – Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD).",
+    tags: ["Vehicle Stock", "Transport performance","Mileage","Energy consumption","GHG emissions"],
+    
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/ComparisonofroadtransportkeyfiguresGermany/Roadtransport?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    thumbnailUrl: "/images/showroom/Road%20transport.png",
+
+    datasets: [
+      {
+        title: "Mileage - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/mileage-road-transport-germany?org=IFEU&dataset=mileage-road-transport-germany"
+      },
+      {
+        title: "Transport performances - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/transport-performances-road-transport-germany?org=IFEU&dataset=transport-performances-road-transport-germany"
+      },
+       {
+         title: "Energy consumption - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/energy-consumption-road-transport-germany?org=IFEU&dataset=energy-consumption-road-transport-germany"
+      },
+       {
+         title: "GHG emissions - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/ghg-emissions-road-transport-germany?org=IFEU&dataset=ghg-emissions-road-transport-germany"
+      }
+    ],
+    
+    externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/ComparisonofroadtransportkeyfiguresGermany/Roadtransport#1",
+  },
   // ========================================
   // EASY TEMPLATE FOR ADDING NEW DASHBOARDS
   // ========================================
