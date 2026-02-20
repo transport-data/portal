@@ -3,7 +3,7 @@ import type { InferGetServerSidePropsType, NextPage } from "next";
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import NewsFeedTabContent from "@components/dashboard/NewsFeedTabContent";
 import { getServerAuthSession } from "@server/auth";
-import { listUserOrganizations } from "@utils/organization";
+import { listUserOrganizations, UserOrganization } from "@utils/organization";
 import { NextSeo } from "next-seo";
 
 export async function getServerSideProps(context: any) {
@@ -14,7 +14,7 @@ export async function getServerSideProps(context: any) {
     id: session?.user.name ?? session?.user.id ?? "",
   });
 
-  const adminOrEditorUserOrgs = userOrgs.filter((x) =>
+  const adminOrEditorUserOrgs = userOrgs.filter((x: UserOrganization) =>
     ["admin", "editor"].includes(x.capacity)
   );
 
@@ -30,7 +30,7 @@ const NewsFeedDashboard: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ adminOrEditorUserOrgs, isSysAdmin }) => {
   const adminOrEditorUserByOrg = new Map<string, "admin" | "editor">();
-  adminOrEditorUserOrgs.forEach((x) =>
+  adminOrEditorUserOrgs.forEach((x: UserOrganization) =>
     adminOrEditorUserByOrg.set(x.id, x.capacity as any)
   );
   return (

@@ -1,7 +1,7 @@
 import { appRouter } from "@/server/api/root";
 import Heading from "@components/_shared/Heading";
 import { Skeleton } from "@components/ui/skeleton";
-import { Group } from "@portaljs/ckan";
+import { Group, Dataset } from "@portaljs/ckan";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { api } from "@utils/api";
 import { listGroups } from "@utils/group";
@@ -191,7 +191,7 @@ InferGetServerSidePropsType<typeof getStaticProps>): JSX.Element {
                 </div>
               </div>
               {!isCardsLoading || !listOfTopics ? (
-                listOfTopics?.map((group) => (
+                listOfTopics?.map((group: Group) => (
                   <TopicCard
                     key={group.id}
                     group={group}
@@ -261,7 +261,7 @@ function TopicCard({
           <ul className="flex flex-col gap-[12px]">
             {!isLoading ? (
               <>
-                {groupDetails.packages?.slice(0, 5).map((item) => (
+                {groupDetails.packages?.slice(0, 5).map((item: Dataset) => (
                   <Link
                     href={`/@${item.organization?.name?.toLowerCase()}/${item.name}`}
                     key={`group-${item.name}`}

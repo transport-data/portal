@@ -16,7 +16,8 @@ import { ReactNode, useEffect, useState, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { listGroups } from "@utils/group";
-import { listOrganizations, listUserOrganizations } from "@utils/organization";
+import { listOrganizations, listUserOrganizations, UserOrganization } from "@utils/organization";
+import { Organization, Group } from "@portaljs/ckan";
 import { api } from "@utils/api";
 import { toast } from "@/components/ui/use-toast";
 import React from "react";
@@ -49,9 +50,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       id: session?.user?.name ?? session?.user?.id ?? "",
     });
 
-    const userOrganizationsIds = userOrganizations.map((o) => o.id);
+    const userOrganizationsIds = userOrganizations.map((o: UserOrganization) => o.id);
 
-    organizationsData.forEach((o) => {
+    organizationsData.forEach((o: any) => {
       if (userOrganizationsIds.includes(o.id)) {
         o.is_user_member = true;
       }
@@ -82,7 +83,7 @@ export default function OnboardingPage({
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
-  const userOrg = organizationsData?.find((o) => o?.is_user_member);
+  const userOrg = organizationsData?.find((o: any) => o?.is_user_member);
 
   const form = useForm<OnboardingFormType>({
     defaultValues: {
@@ -128,7 +129,7 @@ export default function OnboardingPage({
 
   const [locations, setLocations] = useState(
     locationData
-      ? locationData.map((loc) => ({
+      ? locationData.map((loc: Group) => ({
           id: loc.id,
           name: loc.display_name,
           selected: false,
@@ -138,7 +139,7 @@ export default function OnboardingPage({
 
   const [organizations, setOrganizations] = useState(
     organizationsData
-      ? organizationsData.map((org) => ({
+      ? organizationsData.map((org: any) => ({
           id: org.id,
           name: org.display_name,
           selected: false,
@@ -148,7 +149,7 @@ export default function OnboardingPage({
 
   const [topics, setTopics] = useState(
     topicsData
-      ? topicsData.map((topic) => ({
+      ? topicsData.map((topic: Group) => ({
           id: topic.id,
           name: topic.display_name,
           selected: false,
@@ -178,7 +179,7 @@ export default function OnboardingPage({
   useEffect(() => {
     if (userFollowee && !isLoading) {
       const selectedLocations = locationData
-        ? locationData.map((loc) => ({
+        ? locationData.map((loc: Group) => ({
             id: loc.id,
             name: loc.display_name,
             selected: userFollowee.some(
@@ -190,7 +191,7 @@ export default function OnboardingPage({
           }))
         : [];
       const selectedOrganizations = organizationsData
-        ? organizationsData.map((org) => ({
+        ? organizationsData.map((org: any) => ({
             id: org.id,
             name: org.display_name,
             selected: userFollowee.some(
@@ -200,7 +201,7 @@ export default function OnboardingPage({
           }))
         : [];
       const selectedTopics = topicsData
-        ? topicsData.map((topic) => ({
+        ? topicsData.map((topic: Group) => ({
             id: topic.id,
             name: topic.display_name,
             selected: userFollowee.some(

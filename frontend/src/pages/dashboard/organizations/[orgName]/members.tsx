@@ -13,6 +13,7 @@ import { useState } from "react";
 import { InviteUserForm } from "@components/user/InviteUserForm";
 import OrganizationUsersTable from "@components/organization/OrganizationUsersTable";
 import { NextSeo } from "next-seo";
+import { User as CkanUserType } from "@interfaces/ckan/user.interface";
 import Layout from "@components/_shared/Layout";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { DefaultBreadCrumb } from "@components/ui/breadcrumb";
@@ -103,7 +104,7 @@ const OrganizationMembersPage: NextPage<OrganizationMembersPageProps> = ({
         setShow={setIsInvitingUser}
         title="Add member"
       >
-        <InviteUserForm groupId={organization.id} orgUsers={organization.users ?? []} />
+        <InviteUserForm groupId={organization.id} orgUsers={(organization.users ?? []) as CkanUserType[]} />
       </Modal>
     </>
   );

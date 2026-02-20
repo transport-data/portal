@@ -1,5 +1,5 @@
 import { CkanResponse } from "@components/data-explorer/ckan.interface";
-import CkanRequest from "~/lib/ckan-request";
+import CkanRequest from "@lib/ckan-request";
 
 export const listTags = async ({
   apiKey,

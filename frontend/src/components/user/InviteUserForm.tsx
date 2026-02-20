@@ -4,7 +4,7 @@ import { Button } from "@components/ui/button";
 import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "@portaljs/ckan";
+import { User as CkanUserType } from "@interfaces/ckan/user.interface";
 import { UserInviteFormType, UserInviteSchema } from "@schema/user.schema";
 import { inputStyle, selectStyle } from "@styles/formStyles";
 import { api } from "@utils/api";
@@ -47,7 +47,7 @@ import { toast } from "@/components/ui/use-toast";
 
 interface InviteUserFormProps {
   groupId: string;
-  orgUsers: User[];
+  orgUsers: CkanUserType[];
 }
 
 export const InviteUserForm: React.FC<InviteUserFormProps> = ({
@@ -62,8 +62,8 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
 
   const usersOptions =
     users
-      ?.filter((x: User) => !orgUsers?.some((a: User) => a.id === x.id))
-      .map((user: User) => ({
+      ?.filter((x: CkanUserType) => !orgUsers?.some((a: CkanUserType) => a.id === x.id))
+      .map((user: CkanUserType) => ({
         value: user.id,
         label: `${user.display_name} ${user.name === user.display_name ?'' : `- ${user.name}`}`,
       })) || [];
@@ -76,7 +76,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
 
   function userAlreadyExists(email: string) {
     if (!users) return true;
-    return users?.some((u: User) => u.email === email);
+    return users?.some((u: CkanUserType) => u.email === email);
   }
 
   const defaultValues = { group_id: "" };
@@ -102,7 +102,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
         } the ${
           typeof response === "string"
             ? response
-            : usersOptions.find((u: { value: string; label: string }) => formObj.getValues("user") === u.value)
+            : usersOptions.find((u: { value: string | undefined; label: string }) => formObj.getValues("user") === u.value)
                 ?.label ??
               response?.display_name ??
               response?.name ??
@@ -154,9 +154,9 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                           !field.value && "text-gray-400"
                         )}
                       >
-                        {usersOptions.find((u: { value: string; label: string }) => u.value === field.value)
+                        {usersOptions.find((u: { value: string | undefined; label: string }) => u.value === field.value)
                           ?.label
-                          ? usersOptions.find((u: { value: string; label: string }) => u.value === field.value)
+                          ? usersOptions.find((u: { value: string | undefined; label: string }) => u.value === field.value)
                               ?.label
                           : field.value && field.value.length > 0
                           ? `Add "${field.value}"`
@@ -194,7 +194,7 @@ export const InviteUserForm: React.FC<InviteUserFormProps> = ({
                                 Add {searchedUser}
                               </CommandItem>
                             )}
-                          {usersOptions.map((u: { value: string; label: string }) => (
+                          {usersOptions.map((u: { value: string | undefined; label: string }) => (
                             <CommandItem
                               value={u.value}
                               keywords={[u.label]}

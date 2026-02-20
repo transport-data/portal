@@ -21,7 +21,7 @@ import { listGroups } from "@utils/group";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
 import DateQuickFilterDropdown from "@components/ui/date-quick-filter-dropdown";
-import CkanRequest from "~/lib/ckan-request";
+import CkanRequest from "@lib/ckan-request";
 
 const SEARCH_FACET_FIELDS = `["tags","frequency", "organization", "res_format", "metadata_created"]`;
 

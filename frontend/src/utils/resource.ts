@@ -4,7 +4,7 @@ import { env } from "@env.mjs";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import S3 from "@server/r2";
 import { ResourceFormType } from "@schema/dataset.schema";
-import CkanRequest from "~/lib/ckan-request";
+import CkanRequest from "@lib/ckan-request";
 import { CkanResponse } from "@schema/ckan.schema";
 import { Resource } from "@portaljs/ckan";
 

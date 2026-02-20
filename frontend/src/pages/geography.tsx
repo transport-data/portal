@@ -22,7 +22,7 @@ export async function getStaticProps() {
       showCoordinates: !!env.NEXT_PUBLIC_SHOW_GEOGRAPHY_MAP,
       limit: 350,
     })
-  ).filter((country) => {
+  ).filter((country: any) => {
     if (country.geography_type === "country") {
       let letter = country.title[0]!.toLowerCase();
       if (letter === "Å".toLowerCase()) letter = "a";

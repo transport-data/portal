@@ -3,7 +3,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import CkanRequest, { CkanRequestError } from "~/lib/ckan-request";
+import CkanRequest, { CkanRequestError } from "@lib/ckan-request";
 import { env } from "@env.mjs";
 import { ApprovalStatus } from "@interfaces/ckan/dataset.interface";
 import { type User } from "@interfaces/ckan/user.interface";

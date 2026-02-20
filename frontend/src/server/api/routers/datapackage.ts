@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/await-thenable */
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import CkanRequest from "~/lib/ckan-request";
+import CkanRequest from "@lib/ckan-request";
 import type { Dataset } from "@portaljs/ckan";
 import type { CkanResponse } from "@schema/ckan.schema";
 import { z } from "zod";
