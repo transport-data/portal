@@ -386,7 +386,7 @@ export const VISUALIZATIONS: Visualization[] = [
     description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
     embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
     type: 'pdf',
-    thumbnailUrl: '/images/showroom/Guidance%201_image.png', // Add your thumbnail
+    thumbnailUrl: '/images/showroom/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', // Add your thumbnail
     externalLink: 'pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
     datasets: [
       {
