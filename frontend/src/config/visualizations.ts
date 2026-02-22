@@ -386,8 +386,8 @@ export const VISUALIZATIONS: Visualization[] = [
     description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
     embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
     type: 'pdf',
-    thumbnailUrl: '/images/showroom/guidance-vehicle-thumb.png', // Add your thumbnail
-    externalLink: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
+    thumbnailUrl: '/images/showroom/Guidance%201_image.png', // Add your thumbnail
+    externalLink: 'pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
     datasets: [
       {
         title: 'Passenger Cars Registrations and Stock, Nigeria 2005-2019',
