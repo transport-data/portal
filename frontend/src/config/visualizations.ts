@@ -384,10 +384,10 @@ export const VISUALIZATIONS: Visualization[] = [
     id: 'guidance-vehicle-stock',
     title: 'Guidance n°1:  national road vehicle fleet and registration for a bottom-up inventory',
     description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
-    embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
+    embedUrl: '/pdfs/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', 
     type: 'pdf',
-    thumbnailUrl: '/images/showroom/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', // Add your thumbnail
-    externalLink: 'pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
+    thumbnailUrl: '/images/showroom/Guidance 1_image.png', // Add your thumbnail 
+    externalLink: '/pdfs/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', // For download
     datasets: [
       {
         title: 'Passenger Cars Registrations and Stock, Nigeria 2005-2019',
