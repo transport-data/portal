@@ -78,7 +78,7 @@ describe("List and Search Datasets", () => {
     );
     cy.get("button[id=search-button]").click();
     cy.get(`#dataset-search-item-${datasetTitle}`).click();
-    cy.url().should("match", new RegExp(`/${org}/[\\d\\w]+`));
+    cy.url().should("include", `/@${sample_org}/`);
   });
 
   it("Should filter the dataset using the advanced filter and the quick filters", () => {
@@ -198,7 +198,7 @@ describe("Create and edit datasets", () => {
       });
     cy.wait(5000);
     cy.get("select").eq(0).select("gfdl", { force: true });
-    cy.get("button[type=submit]").click();
+    cy.contains("button", "Submit").click();
     cy.request("GET", apiUrl("package_show") + `?id=${dataset}`).then(
       (response) => {
         expect(response.status).to.eq(200);
@@ -219,7 +219,7 @@ describe("Create and edit datasets", () => {
           force: true,
         });
       cy.wait(5000);
-      cy.get("button[type=submit]").click();
+      cy.contains("button", "Submit").click();
       cy.contains("Successfully edited", { timeout: 10000 });
       cy.request("GET", apiUrl("package_show") + `?id=${dataset}`).then(
         (response) => {

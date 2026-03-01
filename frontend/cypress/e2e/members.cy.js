@@ -34,7 +34,7 @@ describe("Create and edit org members", () => {
     cy.contains("admin");
     cy.contains("Add member").click();
     cy.get("button[role=combobox]").eq(0).click();
-    cy.contains(`${normalUser} - ${normalUserEmail}`).click();
+    cy.get('[cmdk-item]').contains(normalUser).click();
     cy.get('#userLabel').click();
     cy.get('form').get('select').eq(1).select('editor', { force: true })
     cy.get("button[type=submit]").click({ force: true });

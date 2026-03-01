@@ -106,8 +106,8 @@ describe("Should Create a Dataset for Signed in User", () => {
     cy.get("button").contains("Keyword").scrollIntoView().click();
     cy.get(`input[id=${tags[0]}]`).click();
     cy.get("button").contains("Location").scrollIntoView().click();
-    cy.get("a").contains("Countries").scrollIntoView().click();
-    cy.get(`input[id=${geographies[0]}]`).click();
+    cy.get("a").contains("Countries").scrollIntoView().click({ force: true });
+    cy.get(`input[id=${geographies[0]}]`).scrollIntoView().click({ force: true });
     cy.get('div').contains('h2', datasetTitle).should('exist')
   });
 

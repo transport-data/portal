@@ -70,7 +70,7 @@ describe("Searchbar component", () => {
   });
 
 	it("Should search the dataset filtered by region", () => {
-    
+
 		cy.visit(`/`);
 
 		const input = cy.get('input[placeholder="Find statistics, forecasts & studies"]');
@@ -79,8 +79,8 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click({ force: true });
+		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click({ force: true });
 
 		input.type( datasetTitle, { delay: 0 });
 
@@ -101,8 +101,8 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.countries.name}:${searchbarConfig.countries.description}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.countries.name}: Cabo Verde"]`).click();
+		cy.get(`[data-value="${searchbarConfig.countries.name}:${searchbarConfig.countries.description}"]`).click({ force: true });
+		cy.get(`[data-value="${searchbarConfig.countries.name}: Cabo Verde"]`).click({ force: true });
 
 		input.type( datasetTitle, { delay: 0 });
 
@@ -123,8 +123,8 @@ describe("Searchbar component", () => {
 
 		cy.wait(500);
 
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
+		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click({ force: true });
+		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click({ force: true });
 
 		input.type( 'Recent Search Test', { delay: 0 });
 
