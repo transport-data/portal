@@ -57,12 +57,6 @@ describe("onboarding flow", () => {
     cy.contains("Skip").click();
     cy.contains("Find your organisation");
 
-    // button should be disabled
-    //    cy.get('button[type="submit"]')
-    //    .should('be.visible')
-    //    .and('be.disabled')
-
-    cy.get('button[type="button"]').click();
     // type organization name
     cy.get('input[placeholder="Select an organisation"]').type(
       "Your Organisation Name"

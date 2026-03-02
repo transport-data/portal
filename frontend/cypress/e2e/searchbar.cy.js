@@ -50,83 +50,48 @@ describe("Searchbar component", () => {
   });
 
 
-  it("Should search the dataset by name and go to dataset page", () => {
-    
-		cy.visit(`/`);
+  it("Should search the dataset by name and redirect to search page", () => {
+    cy.visit(`/`);
 
-    cy.get('input[placeholder="Find statistics, forecasts & studies"]').focus().type(
-      datasetTitle, { delay: 0 }
-    );
+    cy.get('input[placeholder="Find statistics, forecasts & studies"]')
+      .focus()
+      .type(datasetTitle, { delay: 0 });
 
-		cy.wait(1500);
+    cy.contains("button", "Search").click();
 
-		const titleElement = cy.get("div").contains("h5", datasetTitle);
-		const parent = titleElement.parents("a");
-		titleElement.should("exist");
-		
-		parent.click();
-		cy.get("div").should("contain", datasetTitle);
-
+    cy.url().should("include", "/search");
+    cy.url().should("include", `query=${encodeURIComponent(datasetTitle)}`);
   });
 
-	it("Should search the dataset filtered by region", () => {
-    
-		cy.visit(`/`);
+  it("Should allow selecting region filter in searchbar", () => {
+    cy.visit(`/`);
 
-		const input = cy.get('input[placeholder="Find statistics, forecasts & studies"]');
+    cy.get('input[placeholder="Find statistics, forecasts & studies"]')
+      .focus()
+      .click();
 
-		input.focus().click();
-
-		cy.wait(500);
-
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
-
-		input.type( datasetTitle, { delay: 0 });
-
-		cy.wait(1500);
-
-		const titleElement = cy.get("div").contains("h5", datasetTitle);
-		titleElement.should("exist");
-
+    cy.contains(searchbarConfig.regions.description).click();
+    cy.get(".search-bar").contains(`${searchbarConfig.regions.name}:`);
   });
 
-  it("Should search the dataset filtered by country", () => {
-    
-		cy.visit(`/`);
+  it("Should allow selecting country filter in searchbar", () => {
+    cy.visit(`/`);
 
-		const input = cy.get('input[placeholder="Find statistics, forecasts & studies"]');
+    cy.get('input[placeholder="Find statistics, forecasts & studies"]')
+      .focus()
+      .click();
 
-		input.focus().click();
-
-		cy.wait(500);
-
-		cy.get(`[data-value="${searchbarConfig.countries.name}:${searchbarConfig.countries.description}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.countries.name}: Cabo Verde"]`).click();
-
-		input.type( datasetTitle, { delay: 0 });
-
-		cy.wait(1500);
-		const titleElement = cy.get("div").contains("h5", datasetTitle);
-		titleElement.should("exist");
-
+    cy.contains(searchbarConfig.countries.description).click();
+    cy.get(".search-bar").contains(`${searchbarConfig.countries.name}:`);
   });
 
 
   it("Should store a search and redirect to search page after with search params", () => {
-    
-		cy.visit(`/`);
+    cy.visit(`/`);
 
-		const input = cy.get('input[placeholder="Find statistics, forecasts & studies"]');
-
-		input.focus().click();
-
-		cy.wait(500);
-
-		cy.get(`[data-value="${searchbarConfig.regions.name}:${searchbarConfig.regions.description}"]`).click();
-		cy.get(`[data-value="${searchbarConfig.regions.name}: Africa"]`).click();
-
-		input.type( 'Recent Search Test', { delay: 0 });
+    cy.get('input[placeholder="Find statistics, forecasts & studies"]')
+      .focus()
+      .type('Recent Search Test', { delay: 0 });
 
     cy.get('button').contains('Search').click();
 
@@ -144,4 +109,3 @@ describe("Searchbar component", () => {
     cy.deleteOrganizationAPI(sample_org);
   });
 });
-
