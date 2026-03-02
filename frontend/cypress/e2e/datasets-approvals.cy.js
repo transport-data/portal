@@ -100,10 +100,10 @@ const editorUser = describe("Dataset Approval", () => {
       `a[href="/dashboard/datasets/${privateDatasetName}/edit?fromDatasetsRequests=true"]`
     ).click();
     cy.get("#rejectButton").click();
-    cy.get('[role="alertdialog"] .tiptap.ProseMirror')
-      .first()
-      .type(rejectMessage);
-    cy.get("#confirmReject").click();
+    cy.get('[role="alertdialog"]').within(() => {
+      cy.get(".tiptap.ProseMirror").click().type(rejectMessage);
+      cy.get("#confirmReject").should("not.be.disabled").click();
+    });
 
     // TODO this doesn't work in the actions environment because the CKAN throws an error trying to send an email to the admin org,
     // breaking the reject flow

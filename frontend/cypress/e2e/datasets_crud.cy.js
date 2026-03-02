@@ -77,7 +77,7 @@ describe("List and Search Datasets", () => {
       datasetTitle
     );
     cy.get("button[id=search-button]").click();
-    cy.contains("h5", datasetTitle).should("be.visible").closest("a").click();
+    cy.get(`a[href*="/${datasetName}"]`).first().should("be.visible").click();
     cy.url().should("include", `/${datasetName}`);
   });
 
