@@ -77,8 +77,8 @@ describe("List and Search Datasets", () => {
       datasetTitle
     );
     cy.get("button[id=search-button]").click();
-    cy.get(`#dataset-search-item-${datasetTitle}`).click();
-    cy.url().should("include", `/@${sample_org}/`);
+    cy.contains("h5", datasetTitle).should("be.visible").closest("a").click();
+    cy.url().should("include", `/${datasetName}`);
   });
 
   it("Should filter the dataset using the advanced filter and the quick filters", () => {
