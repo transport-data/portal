@@ -45,7 +45,7 @@ function headersFromOptions(options?: Record<string, unknown>) {
 }
 
 const CkanRequestWithUrl = {
-  post: async <T>(action: string, options?: Record<string, unknown>): Promise<{ result: T; success: boolean }> => {
+  post: async <T = any>(action: string, options?: Record<string, unknown>): Promise<T> => {
     const timeout = (options as any)?.timeout ?? DEFAULT_TIMEOUT;
     const url = `${ckanUrl}/api/3/action/${action}`;
 
@@ -62,12 +62,12 @@ const CkanRequestWithUrl = {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new CkanRequestError(data.error?.message ?? 'Request failed', data);
+      throw new CkanRequestError(data);
     }
 
-    return data;
+    return data as T;
   },
-  get: async <T>(action: string, options?: Record<string, unknown>): Promise<{ result: T; success: boolean }> => {
+  get: async <T = any>(action: string, options?: Record<string, unknown>): Promise<T> => {
     const timeout = (options as any)?.timeout ?? DEFAULT_TIMEOUT;
     const url = `${ckanUrl}/api/3/action/${action}`;
 
@@ -83,10 +83,10 @@ const CkanRequestWithUrl = {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new CkanRequestError(data.error?.message ?? 'Request failed', data);
+      throw new CkanRequestError(data);
     }
 
-    return data;
+    return data as T;
   },
 };
 
