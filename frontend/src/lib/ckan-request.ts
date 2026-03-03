@@ -4,11 +4,22 @@ import CkanRequest, { CkanRequestError } from "@datopian/ckan-api-client-js";
 // otherwise fall back to NEXT_PUBLIC_CKAN_URL (public URL)
 const ckanUrl = process.env.CKAN_URL ?? process.env.NEXT_PUBLIC_CKAN_URL;
 
+// Default timeout of 120 seconds (120000ms) for long-running operations like resource_upsert_many
+const DEFAULT_TIMEOUT = 120000;
+
 const CkanRequestWithUrl = {
   post: <T>(action: string, options?: Record<string, unknown>) =>
-    CkanRequest.post<T>(action, { ...options, ckanUrl }),
+    CkanRequest.post<T>(action, {
+      ...options,
+      ckanUrl,
+      timeout: options?.timeout ?? DEFAULT_TIMEOUT
+    }),
   get: <T>(action: string, options?: Record<string, unknown>) =>
-    CkanRequest.get<T>(action, { ...options, ckanUrl }),
+    CkanRequest.get<T>(action, {
+      ...options,
+      ckanUrl,
+      timeout: options?.timeout ?? DEFAULT_TIMEOUT
+    }),
 };
 
 export { CkanRequestError };
