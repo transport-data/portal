@@ -12,14 +12,14 @@ const CkanRequestWithUrl = {
     CkanRequest.post<T>(action, {
       ...options,
       ckanUrl,
-      timeout: options?.timeout ?? DEFAULT_TIMEOUT
-    }),
+      timeout: (options as any)?.timeout ?? DEFAULT_TIMEOUT
+    } as any),
   get: <T>(action: string, options?: Record<string, unknown>) =>
     CkanRequest.get<T>(action, {
       ...options,
       ckanUrl,
-      timeout: options?.timeout ?? DEFAULT_TIMEOUT
-    }),
+      timeout: (options as any)?.timeout ?? DEFAULT_TIMEOUT
+    } as any),
 };
 
 export { CkanRequestError };
