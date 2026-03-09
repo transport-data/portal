@@ -45,6 +45,25 @@ const apiUrl = (path) => {
   return `${Cypress.config("apiUrl")}/api/3/action/${path}`;
 };
 
+const setWelcomeDialogState = (win) => {
+  win.localStorage.setItem("hasSeenWelcome", "true");
+};
+
+Cypress.Commands.overwrite("visit", (originalFn, url, options = {}) => {
+  const originalOnBeforeLoad = options.onBeforeLoad;
+
+  return originalFn(url, {
+    ...options,
+    onBeforeLoad: (win) => {
+      setWelcomeDialogState(win);
+
+      if (originalOnBeforeLoad) {
+        originalOnBeforeLoad(win);
+      }
+    },
+  });
+});
+
 function printAccessibilityViolations(violations) {
   cy.task(
     "table",
