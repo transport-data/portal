@@ -42,3 +42,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 markdown.db
+
+cypress.config.js
