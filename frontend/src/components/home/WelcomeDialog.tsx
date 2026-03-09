@@ -49,13 +49,13 @@ export default function WelcomeDialog() {
 
       {/* Dialog */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
           <div
-            className="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="relative w-full max-w-4xl max-h-[90vh] overflow-x-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Full Header */}
-            <div className="relative bg-[#006064] px-8 py-8 md:px-12 md:py-10">
+            <div className="relative bg-[#006064] px-6 py-6 md:px-12 md:py-10">
               {/* Decorative circles */}
               <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/5" />
               <div className="absolute -bottom-10 right-24 h-28 w-28 rounded-full bg-white/5" />
@@ -80,7 +80,7 @@ export default function WelcomeDialog() {
                   className="brightness-0 invert"
                 />
                 <div className="h-0.5 w-12 rounded-full bg-[#DFF64D]" />
-                <h2 className="text-2xl font-bold text-white md:text-3xl">
+                <h2 className="text-xl font-bold text-white md:text-3xl">
                   Welcome to the Transport Data Commons
                 </h2>
                 <p className="text-base text-white/75">
@@ -90,15 +90,15 @@ export default function WelcomeDialog() {
             </div>
 
             {/* Cards */}
-            <div className="grid md:grid-cols-2">
+            <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
               {/* Data User Card */}
               <Link
                 href="/datasets"
                 onClick={() => handleChoice("user")}
-                className="group relative flex flex-col overflow-hidden border-r border-gray-100 transition-all hover:bg-[#006064]/5"
+                className="group relative flex flex-col overflow-hidden transition-all hover:bg-[#006064]/5"
               >
                 {/* Illustration */}
-                <div className="relative w-full h-64 overflow-hidden bg-[#EBF8FF]">
+                <div className="relative w-full h-40 sm:h-52 md:h-64 overflow-hidden bg-[#EBF8FF]">
                   <Image
                     src="/images/data-user-viz.png"
                     alt="Data User"
@@ -111,7 +111,7 @@ export default function WelcomeDialog() {
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-col px-7 pb-7 pt-2">
+                <div className="flex flex-col px-5 pb-5 pt-2 md:px-7 md:pb-7">
                   <div className="mb-2 inline-flex w-fit rounded-full bg-[#006064]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#006064]">
                     Data User
                   </div>
@@ -140,7 +140,7 @@ export default function WelcomeDialog() {
                 className="group relative flex flex-col overflow-hidden transition-all hover:bg-[#DFF64D]/5"
               >
                 {/* Illustration */}
-                <div className="relative w-full h-64 overflow-hidden bg-[#EBF8FF]">
+                <div className="relative w-full h-40 sm:h-52 md:h-64 overflow-hidden bg-[#EBF8FF]">
                   <Image
                     src="/images/data-provider-viz.png"
                     alt="Data Provider"
@@ -153,7 +153,7 @@ export default function WelcomeDialog() {
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-col px-7 pb-7 pt-2">
+                <div className="flex flex-col px-5 pb-5 pt-2 md:px-7 md:pb-7">
                   <div className="mb-2 inline-flex w-fit rounded-full bg-[#DFF64D]/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#006064]">
                     Data Provider
                   </div>
