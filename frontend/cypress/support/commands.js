@@ -49,11 +49,12 @@ const setWelcomeDialogState = (win) => {
   win.localStorage.setItem("hasSeenWelcome", "true");
 };
 
-Cypress.Commands.overwrite("visit", (originalFn, url, options = {}) => {
-  const originalOnBeforeLoad = options.onBeforeLoad;
-
-  return originalFn(url, {
-    ...options,
+Cypress.Commands.overwrite("visit", (originalFn, urlOrOptions, options = {}) => {
+  const visitOptions =
+    typeof urlOrOptions === "object" ? urlOrOptions : options;
+  const originalOnBeforeLoad = visitOptions.onBeforeLoad;
+  const nextOptions = {
+    ...visitOptions,
     onBeforeLoad: (win) => {
       setWelcomeDialogState(win);
 
@@ -61,7 +62,13 @@ Cypress.Commands.overwrite("visit", (originalFn, url, options = {}) => {
         originalOnBeforeLoad(win);
       }
     },
-  });
+  };
+
+  if (typeof urlOrOptions === "object") {
+    return originalFn(nextOptions);
+  }
+
+  return originalFn(urlOrOptions, nextOptions);
 });
 
 function printAccessibilityViolations(violations) {
