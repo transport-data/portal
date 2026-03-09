@@ -68,7 +68,7 @@ const Footer: React.FC = () => {
       */
       {
         name: "linkedin",
-        href: "https://www.linkedin.com",
+        href: "https://www.linkedin.com/company/transport-data-commons",
         icon: (props: IconProps) => (
           <svg
             width="48"

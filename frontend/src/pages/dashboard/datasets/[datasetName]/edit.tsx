@@ -25,7 +25,7 @@ import { getServerAuthSession } from "@server/auth";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { api } from "@utils/api";
 import { getDataset } from "@utils/dataset";
-import { listUserOrganizations } from "@utils/organization";
+import { listUserOrganizations, UserOrganization } from "@utils/organization";
 import { useMachine } from "@xstate/react";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useSession } from "next-auth/react";
@@ -59,7 +59,7 @@ export async function getServerSideProps(
 
   const fromDatasetsRequests = !!context.query.fromDatasetsRequests;
   const userOrganization = userOrgs.find(
-    (x) => x.id === dataset.organization?.id
+    (x: UserOrganization) => x.id === dataset.organization?.id
   );
 
   if (

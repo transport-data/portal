@@ -16,6 +16,7 @@ import { prettifyDateString } from "@utils/prettifyDateString";
 import { getChoicesFromField } from "@utils/dataset";
 import { slugify } from "@lib/utils";
 import { ScrollArea } from "@components/ui/scroll-area";
+import { GroupTree } from "@schema/group.schema";
 
 function getLastNameAndInitials(dataset: Dataset) {
   if (!dataset.contributors_data || dataset.contributors_data.length === 0)
@@ -257,8 +258,8 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             {datasetRegion && geographies && (
               <dd className="mt-1 text-sm leading-6 text-gray-500 sm:mt-2">
                 {datasetRegion &&
-                  geographies.find((g) => g.name === datasetRegion)?.title
-                  ? geographies.find((g) => g.name === datasetRegion)?.title
+                  geographies.find((g: GroupTree) => g.name === datasetRegion)?.title
+                  ? geographies.find((g: GroupTree) => g.name === datasetRegion)?.title
                   : "Worldwide"}
               </dd>
             )}

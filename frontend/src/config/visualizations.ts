@@ -268,7 +268,63 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/CarstockinAfricancountriescomparisonofdatasourcesfromTransportStarterDataKits/Dashboard1",
   },
 
+{
+    id: "Veh_Stock_Nigeria",
+    title: "Stock and new registrations of passenger cars in Nigeria",
+    description: "The analysis is based on data published on the TDC Portal.",
+    tags: ["Vehicle Stock", "Africa","Nigeria","New registrations"],
+    
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/StockandnewregistrationsofpassengercarsNigeria/Stock_newregistrations?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    thumbnailUrl: "/images/showroom/Stock_new%20registrations.png",
 
+    datasets: [
+      {
+        title: "Passenger Cars Registrations and Stock, Nigeria 2005-2019",
+        url: "https://portal.transport-data.org/@oica/passenger-cars-registrations-and-stock-nigeria-2005-2019?org=OICA&amp;amp;dataset=passenger-cars-registrations-and-stock-nigeria-2005-2019"
+      }
+    ],
+    
+    externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/StockandnewregistrationsofpassengercarsNigeria/Stock_newregistrations#1",
+  },
+
+  {
+    id: "Keyfig_Germany",
+    title: "Comparison of road transport key figures | Germany",
+    description: "The data are based on an analysis conducted by the ifeu – Institute for Energy and Environmental Research Heidelberg, using the German Emission Inventory Model (TREMOD).",
+    tags: ["Vehicle Stock", "Transport performance","Mileage","Energy consumption","GHG emissions"],
+    
+    embedUrl: extractUrl(
+      `https://public.tableau.com/views/ComparisonofroadtransportkeyfiguresGermany/Roadtransport?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link`
+    ),
+    
+    // thumbnailUrl: `https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock.png`,
+    thumbnailUrl: "/images/showroom/Road%20transport.png",
+
+    datasets: [
+      {
+        title: "Mileage - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/mileage-road-transport-germany?org=IFEU&dataset=mileage-road-transport-germany"
+      },
+      {
+        title: "Transport performances - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/transport-performances-road-transport-germany?org=IFEU&dataset=transport-performances-road-transport-germany"
+      },
+       {
+         title: "Energy consumption - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/energy-consumption-road-transport-germany?org=IFEU&dataset=energy-consumption-road-transport-germany"
+      },
+       {
+         title: "GHG emissions - Road Transport Germany",
+        url: "https://portal.transport-data.org/@ifeu/ghg-emissions-road-transport-germany?org=IFEU&dataset=ghg-emissions-road-transport-germany"
+      }
+    ],
+    
+    externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/ComparisonofroadtransportkeyfiguresGermany/Roadtransport#1",
+  },
   // ========================================
   // EASY TEMPLATE FOR ADDING NEW DASHBOARDS
   // ========================================
@@ -326,12 +382,12 @@ export const VISUALIZATIONS: Visualization[] = [
   // Add PDF
   {
     id: 'guidance-vehicle-stock',
-    title: 'Guidance: Vehicle Stock and New Registrations',
+    title: 'Guidance n°1:  national road vehicle fleet and registration for a bottom-up inventory',
     description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
-    embedUrl: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf',
+    embedUrl: '/pdfs/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', 
     type: 'pdf',
-    thumbnailUrl: '/images/showroom/guidance-vehicle-thumb.png', // Add your thumbnail
-    externalLink: '/pdfs/Guidance1-vehicle-stock-and-new-registrations.pdf', // For download
+    thumbnailUrl: '/images/showroom/Guidance 1_image.png', // Add your thumbnail 
+    externalLink: '/pdfs/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', // For download
     datasets: [
       {
         title: 'Passenger Cars Registrations and Stock, Nigeria 2005-2019',

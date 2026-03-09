@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import DashboardTopicCard, {
   DashboardTopicCardProps } from "@components/_shared/DashboardTopicCard";
+import { Group } from "@portaljs/ckan";
 import SimpleSearchInput from "@components/ui/simple-search-input";
 import { Button } from "@components/ui/button";
 import { api } from "@utils/api";
@@ -33,7 +34,7 @@ export default () => {
     }
     return miniSearch.search(searchText, { prefix: true }).map(result => {
       // Map MiniSearch result to the format expected by DashboardTopicCard
-      const group = groupsData?.find(g => g.id === result.id);
+      const group = groupsData?.find((g: Group) => g.id === result.id);
       // Ensure all required fields are present
       return group || {} as DashboardTopicCardProps;
     });
@@ -72,7 +73,7 @@ export default () => {
         <div className="col-span-10">
           <section className="flex flex-col gap-4">
             {paginatedData.length > 0 ? (
-              paginatedData.map((group) => (
+              paginatedData.map((group: DashboardTopicCardProps) => (
                 <div key={group?.id}>
                   <DashboardTopicCard {...group} />
                 </div>

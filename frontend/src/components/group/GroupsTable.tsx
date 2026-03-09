@@ -114,7 +114,7 @@ export const GroupsTable: React.FC<{ publicUrl: string }> = ({ publicUrl }) => {
                 <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
                   {groups && (
                     <>
-                      {groups.map((group) => (
+                      {groups.map((group: Group) => (
                         <tr
                           key={group.name}
                           className={

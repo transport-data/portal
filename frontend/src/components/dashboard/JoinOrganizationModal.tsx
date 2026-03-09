@@ -19,6 +19,7 @@ import {
   OrganizationFormType,
   OrganizationSchema,
 } from "@schema/organization.schema";
+import { Organization } from "@portaljs/ckan";
 import { Form, FormField } from "@components/ui/form";
 import { useForm, UseFormReturn } from "react-hook-form";
 import TextDivisor from "@components/_shared/TextDivisor";
@@ -208,7 +209,7 @@ function JoinOrganizationForm({
     error: userOrgsError,
   } = api.organization.listForUser.useQuery();
 
-  const userOrganizationsIds = userOrgs?.map((o) => o.id);
+  const userOrganizationsIds = userOrgs?.map((o: Organization) => o.id);
 
   const isLoading = isLoadingOrgs || isLoadingUserOrgs;
   const error = errorOrgs ?? userOrgsError;

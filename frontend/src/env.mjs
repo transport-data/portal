@@ -32,7 +32,8 @@ export const env = createEnv({
     GA_PRIVATE_KEY: z.string(),
     GA_PRIVATE_KEY_ID: z.string(),
     GA_PROPERTY_ID: z.string(),
-    FRONTEND_AUTH_SECRET: z.string()
+    FRONTEND_AUTH_SECRET: z.string(),
+    CKAN_URL: z.string().url().optional(),
   },
 
   /**
@@ -74,7 +75,8 @@ export const env = createEnv({
     GA_PRIVATE_KEY: process.env.GA_PRIVATE_KEY,
     GA_PRIVATE_KEY_ID: process.env.GA_PRIVATE_KEY_ID,
     GA_PROPERTY_ID: process.env.GA_PROPERTY_ID,
-    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+    CKAN_URL: process.env.CKAN_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

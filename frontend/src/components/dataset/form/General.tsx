@@ -42,6 +42,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { P, match } from "ts-pattern";
+import { Organization, Group } from "@portaljs/ckan";
 
 export function GeneralForm({
   editing = false,
@@ -179,12 +180,12 @@ export function GeneralForm({
                       </FormControl>
                       <SelectContent>
                         {data
-                          .filter((x) => {
+                          .filter((x: Organization) => {
                             if (!isUserOrganization(x)) return true
                             return ["admin", "editor"].includes(x.capacity)
                           }
                           )
-                          .map((group, index) => (
+                          .map((group: Organization, index: number) => (
                             <SelectItem key={index} value={group.id}>
                               {group.title ?? group.display_name ?? group.name}
                             </SelectItem>
@@ -264,8 +265,8 @@ export function GeneralForm({
                         >
                           {field.value && field.value.length > 0
                             ? data
-                                .filter((c) => field.value.includes(c.name))
-                                ?.map((v) => v.title ?? v.name)
+                                .filter((c: Group) => field.value.includes(c.name))
+                                ?.map((v: Group) => v.title ?? v.name)
                                 .join(", ")
                                 .slice(0, 50)
                             : "Select topics"}
@@ -283,7 +284,7 @@ export function GeneralForm({
                         />
                         <CommandList>
                           <CommandEmpty>No topic found</CommandEmpty>
-                          {data.map((t) => (
+                          {data.map((t: Group) => (
                             <CommandItem
                               disabled={disabled}
                               value={t.name}
@@ -497,7 +498,7 @@ export function GeneralForm({
                             },
                             ({ data }) => (
                               <CommandGroup>
-                                {data.map((t) => (
+                                {data.map((t: string) => (
                                   <CommandItem
                                     disabled={
                                       field.value.some((_t) => _t.name === t) ||

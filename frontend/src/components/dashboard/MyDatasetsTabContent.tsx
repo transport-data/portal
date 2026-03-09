@@ -5,6 +5,7 @@ import DatasetsFilter, { Facet } from "@components/_shared/DatasetsFilter";
 import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { useSession } from "next-auth/react";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { Organization } from "@portaljs/ckan";
 import { useEffect, useState } from "react";
 import { SearchDatasetType } from "@schema/dataset.schema";
 import {
@@ -102,7 +103,7 @@ export default function MyDatasetsTabContent() {
           if (!orgs.length)
             setOrgs(
               facets[key].items?.filter((item: any) =>
-                userOrgs?.map((org) => org.name)?.includes(item?.name),
+                userOrgs?.map((org: Organization) => org.name)?.includes(item?.name),
               ),
             );
           break;

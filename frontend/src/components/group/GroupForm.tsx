@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GroupFormType } from "@schema/group.schema";
+import { Group } from "@portaljs/ckan";
 
 export const GroupForm: React.FC<{
   formObj: UseFormReturn<GroupFormType>;
@@ -124,8 +125,8 @@ export const GroupForm: React.FC<{
                     <SelectContent>
                       <SelectItem value="no-parent">No parent</SelectItem>
                       {data
-                        .filter((group) => group.name !== watch("name"))
-                        .map((group, index) => (
+                        .filter((group: Group) => group.name !== watch("name"))
+                        .map((group: Group, index: number) => (
                           <SelectItem key={index} value={group.name}>
                             {group.title ?? group.display_name ?? group.name}
                           </SelectItem>

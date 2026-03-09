@@ -9,6 +9,7 @@ import {
 } from "@schema/dataset.schema";
 import classNames from "@utils/classnames";
 import { api } from "@utils/api";
+import { Group, Organization } from "@portaljs/ckan";
 
 export const SearchDatasetForm: React.FC<{
   setDatasetSearch: Dispatch<SetStateAction<SearchDatasetType>>;
@@ -23,7 +24,7 @@ export const SearchDatasetForm: React.FC<{
   });
 
   const groupOptions = groups
-    ? groups.map((group) => ({
+    ? groups.map((group: Group) => ({
         value: group.name,
         label: group.title,
       }))
@@ -32,7 +33,7 @@ export const SearchDatasetForm: React.FC<{
   const { data: organizations } = api.organization.list.useQuery();
 
   const organizationOptions = organizations
-    ? organizations.map((organization) => ({
+    ? organizations.map((organization: Organization) => ({
         value: organization.name,
         label: organization.title,
       }))

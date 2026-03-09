@@ -422,7 +422,7 @@ export function MetadataForm({ disabled }: any) {
                   data: P.select("geographies"),
                 },
                 ({ geographies }) => {
-                  const countries = geographies.flatMap((c) => c.children);
+                  const countries = geographies.flatMap((c: GroupTree) => c.children);
                   return (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -441,8 +441,8 @@ export function MetadataForm({ disabled }: any) {
                             <FlagIcon className="h-4 w-4" />
                             {field.value && field.value.length > 0
                               ? countries
-                                  .filter((c) => field.value.includes(c.name))
-                                  ?.map((v) => v.title ?? v.name)
+                                  .filter((c: GroupTree) => field.value.includes(c.name))
+                                  ?.map((v: GroupTree) => v.title ?? v.name)
                                   .join(", ")
                               : "Select country"}
                           </Button>
@@ -456,7 +456,7 @@ export function MetadataForm({ disabled }: any) {
                           <CommandInput placeholder="Search countries..." />
                           <CommandList>
                             <CommandEmpty>No country found</CommandEmpty>
-                            {geographies.map((region) => (
+                            {geographies.map((region: GroupTree) => (
                               <CommandGroup
                                 key={region.name}
                                 heading={
@@ -474,7 +474,7 @@ export function MetadataForm({ disabled }: any) {
                                             "geographies",
                                             formGeographies.length > 0
                                               ? []
-                                              : countries.map((x) => x.name)
+                                              : countries.map((x: GroupTree) => x.name)
                                           );
                                           return;
                                         }

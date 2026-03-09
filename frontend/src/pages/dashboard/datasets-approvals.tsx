@@ -4,7 +4,7 @@ import { NextSeo } from "next-seo";
 import DashboardLayout from "@components/_shared/DashboardLayout";
 import MyDatasetsRequestsTabContent from "@components/dashboard/DatasetsApprovalTabContent";
 import { getServerAuthSession } from "@server/auth";
-import { listUserOrganizations } from "@utils/organization";
+import { listUserOrganizations, UserOrganization } from "@utils/organization";
 
 export async function getServerSideProps(context: any) {
   const session = await getServerAuthSession(context);
@@ -14,7 +14,7 @@ export async function getServerSideProps(context: any) {
     id: session?.user.name ?? session?.user.id ?? "",
   });
 
-  const adminOrEditorUserOrgs = userOrgs.filter((x) =>
+  const adminOrEditorUserOrgs = userOrgs.filter((x: UserOrganization) =>
     ["admin", "editor"].includes(x.capacity),
   );
 

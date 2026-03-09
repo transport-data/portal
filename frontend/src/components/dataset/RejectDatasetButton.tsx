@@ -99,14 +99,12 @@ export default function ({
           <AlertDialogCancel disabled={isLoading} className="hover:bg-gray-500">
             Cancel
           </AlertDialogCancel>
-          <LoaderButton
-            loading={isLoading}
-            disabled={
-              reason ? reason.length > 0 && reason.trim() !== "<p></p>" : false
-            }
-            onClick={() => mutate({ datasetId: id, reason: reason! })}
-            className="bg-yellow-400 hover:bg-yellow-300"
-            id="confirmReject"
+            <LoaderButton
+              loading={isLoading}
+              disabled={!reason || reason.trim() === "<p></p>"}
+              onClick={() => mutate({ datasetId: id, reason: reason! })}
+              className="bg-yellow-400 hover:bg-yellow-300"
+              id="confirmReject"
             variant="default"
           >
             Reject

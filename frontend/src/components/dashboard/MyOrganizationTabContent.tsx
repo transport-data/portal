@@ -10,6 +10,7 @@ import { SelectableItemsList } from "@components/ui/selectable-items-list";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useUserGlobalOrganizationRoles } from "@hooks/user";
 import { Dataset } from "@interfaces/ckan/dataset.interface";
+import { Organization } from "@portaljs/ckan";
 import {
   DocumentReportIcon,
   DocumentSearchIcon,
@@ -117,7 +118,7 @@ export default ({
           if (!orgs.length)
             setOrgs(
               facets[key].items?.filter((item: any) =>
-                userOrgs?.map((org) => org.name)?.includes(item?.name)
+                userOrgs?.map((org: Organization) => org.name)?.includes(item?.name)
               )
             );
           break;
@@ -379,7 +380,7 @@ export default ({
               {!!(belongsToAnyOrg && datasets?.length > 0) &&
                 datasets?.map((x) => {
                   const org = userOrgs?.find(
-                    (org) => org.name === x.organization?.name
+                    (org: Organization) => org.name === x.organization?.name
                   );
                   const role = org?.capacity;
                   const canEdit = role === "admin" || role === "editor";

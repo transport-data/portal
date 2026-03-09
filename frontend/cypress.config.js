@@ -15,6 +15,7 @@ export default defineConfig({
     GROUP_NAME_SUFFIX: "-group-test",
     DATASET_NAME_SUFFIX: "-dataset-test",
     REPORT_NAME_SUFFIX: "-report-test",
+    USER_NAME_SUFFIX: "-test",
   },
   e2e: {
     baseUrl: "http://127.0.0.1:3000",
