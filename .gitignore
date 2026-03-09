@@ -9,7 +9,6 @@ _solr/schema.xml
 _src/*
 local/*
 .env
-cypress.config.js
 package-lock.json
 
 # remove node_modules
