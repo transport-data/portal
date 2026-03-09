@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { pageview } from "@utils/ga";
 import PageLoading from "@components/_shared/PageLoading";
+import WelcomeDialog from "@components/home/WelcomeDialog";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
@@ -84,6 +85,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <div className={inter.className}>
           <Component {...pageProps} />
         </div>
+        <WelcomeDialog />
       </SessionProvider>
       <PageLoading />
     </ThemeProvider>
