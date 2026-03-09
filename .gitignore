@@ -1,6 +1,7 @@
 # generic
 .DS_Store
 .vagrant
+*.Zone.Identifier
 
 # code & config
 _service-provider/*
@@ -8,6 +9,8 @@ _solr/schema.xml
 _src/*
 local/*
 .env
+cypress.config.js
+package-lock.json
 
 # remove node_modules
 node_modules/*
