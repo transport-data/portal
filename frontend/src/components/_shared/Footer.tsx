@@ -51,6 +51,7 @@ const Footer: React.FC = () => {
           </svg>
         ),
       },
+      /*
       {
         name: "twitter",
         href: "https://twitter.com",
@@ -64,6 +65,7 @@ const Footer: React.FC = () => {
           </svg>
         ),
       },
+      */
       {
         name: "linkedin",
         href: "https://www.linkedin.com",
