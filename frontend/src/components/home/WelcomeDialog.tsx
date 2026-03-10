@@ -94,7 +94,7 @@ export default function WelcomeDialog() {
               {/* Data User Card */}
               <Link
                 href="/datasets"
-                onClick={() => handleChoice("user")}
+                onClick={() => { handleChoice("user"); handleClose(); }}
                 className="group relative flex flex-col overflow-hidden transition-all hover:bg-[#006064]/5"
               >
                 {/* Illustration */}
@@ -136,7 +136,7 @@ export default function WelcomeDialog() {
               {/* Data Provider Card */}
               <Link
                 href="/data-provider"
-                onClick={() => handleChoice("provider")}
+                onClick={() => { handleChoice("provider"); handleClose(); }}
                 className="group relative flex flex-col overflow-hidden transition-all hover:bg-[#DFF64D]/5"
               >
                 {/* Illustration */}
@@ -178,12 +178,13 @@ export default function WelcomeDialog() {
 
             {/* Footer */}
             <div className="border-t border-gray-100 px-8 py-3 text-center">
-              <button
+              <Link
+                href="/"
                 onClick={handleClose}
                 className="text-sm text-gray-400 transition-colors hover:text-gray-600"
               >
                 Skip and explore the homepage →
-              </button>
+              </Link>
             </div>
           </div>
         </div>
