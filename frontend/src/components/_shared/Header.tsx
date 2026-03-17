@@ -19,19 +19,23 @@ import Link from "next/link";
 const navigation = [
   {
     href: "/datasets",
-    name: "Datasets",
+    name: "Search",
   },
   {
     href: "/geography",
-    name: "Geography",
+    name: "Map",
   },
   {
     href: "/data-provider",
-    name: "Data Provider",
+    name: "Data Providers",
   },
   {
     href: "/showroom",
     name: "Showroom",
+  },
+  { 
+    href: "/knowledge-hub",
+    name: "Knowledge Hub", 
   },
   {
     href: "/about-us",

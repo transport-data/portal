@@ -22,7 +22,6 @@ export interface Visualization {
    * - Leave undefined for no tags
    */
   tags?: string[] | 'auto';
-  type?: 'iframe' | 'pdf';
 }
 
 /**
@@ -378,22 +377,4 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "PASTE_YOUR_SHARE_LINK_HERE",
   },
   */
-
-  // Add PDF
-  {
-    id: 'guidance-vehicle-stock',
-    title: 'Guidance n°1:  national road vehicle fleet and registration for a bottom-up inventory',
-    description: 'Comprehensive guidance document for collecting and analyzing vehicle stock and new registration data.',
-    embedUrl: '/pdfs/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', 
-    type: 'pdf',
-    thumbnailUrl: '/images/showroom/Guidance 1_image.png', // Add your thumbnail 
-    externalLink: '/pdfs/Guidance 1 national road vehicle fleet and registration for a bottom-up inventory.pdf', // For download
-    datasets: [
-      {
-        title: 'Passenger Cars Registrations and Stock, Nigeria 2005-2019',
-        url: 'https://portal.transport-data.org/@oica/passenger-cars-registrations-and-stock-nigeria-2005-2019'
-      }
-    ],
-    tags: 'auto' // Will fetch tags from the dataset
-  },
 ];

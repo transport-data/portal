@@ -285,35 +285,22 @@ export default function ShowroomPage({ visualizations }: ShowroomProps) {
 
                 {/* Tags and actions - Add type guard */}
                 <div className="mt-2 md:mt-3 flex flex-wrap items-center gap-2 md:gap-3">
-                  {selectedVisualization.tags && Array.isArray(selectedVisualization.tags) && selectedVisualization.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedVisualization.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Download button for PDFs */}
-                  {selectedVisualization.type === 'pdf' && (
-                    <a
-                      href={selectedVisualization.embedUrl}
-                      download
-                      className="inline-flex items-center rounded-md bg-accent px-3 py-1.5 text-xs md:text-sm font-medium text-white hover:bg-accent/90"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download PDF
-                    </a>
-                  )}
-                  
-                  {selectedVisualization.externalLink && selectedVisualization.type !== 'pdf' && (
+                  {selectedVisualization.tags &&
+                    Array.isArray(selectedVisualization.tags) &&
+                    selectedVisualization.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedVisualization.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                  {selectedVisualization.externalLink && (
                     <a
                       href={selectedVisualization.externalLink}
                       target="_blank"
@@ -328,41 +315,29 @@ export default function ShowroomPage({ visualizations }: ShowroomProps) {
                 </div>
               </div>
 
-              {/* Modal Body - Different rendering for PDFs vs Dashboards */}
+              {/* Modal Body - dashboards only */}
               <div className="flex-1 bg-gray-50 overflow-hidden">
-                {selectedVisualization.type === 'pdf' ? (
-                  // PDF viewer - simpler iframe, no sandbox restrictions
+                <div className="w-full h-full overflow-auto">
                   <iframe
-                    src={`${selectedVisualization.embedUrl}#view=FitH`}
+                    src={selectedVisualization.embedUrl}
                     title={selectedVisualization.title}
-                    className="w-full h-full border-0"
+                    className="border-0"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      minWidth: "1024px", // Force desktop breakpoint
+                      minHeight: "768px", // Ensure enough height
+                    }}
+                    allowFullScreen
+                    referrerPolicy="no-referrer"
+                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                   />
-                ) : (
-                  // Dashboard viewer - preserve existing desktop layout functionality
-                  <div className="w-full h-full overflow-auto">
-                    <iframe
-                      src={selectedVisualization.embedUrl}
-                      title={selectedVisualization.title}
-                      className="border-0"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        minWidth: "1024px",  // Force desktop breakpoint
-                        minHeight: "768px"   // Ensure enough height
-                      }}
-                      allowFullScreen
-                      referrerPolicy="no-referrer"
-                      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                    />
-                  </div>
-                )}
+                </div>
               </div>
 
               {/* Modal Footer - Fixed height */}
               <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-3 md:px-6 md:py-4">
-                <h4 className="text-xs md:text-sm font-bold text-gray-900">
-                  {selectedVisualization.type === 'pdf' ? 'Related datasets:' : 'Datasets used:'}
-                </h4>
+                <h4 className="text-xs md:text-sm font-bold text-gray-900">Datasets used:</h4>
                 <div className="mt-1 md:mt-2 flex flex-wrap gap-x-4 gap-y-1">
                   {selectedVisualization.datasets.map((ds, idx) => (
                     <a
