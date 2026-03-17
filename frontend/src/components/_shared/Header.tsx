@@ -134,12 +134,17 @@ export default function Header({
               </div>
             ) : session?.user ? (
               <div className="relative flex items-center gap-[12px]">
-                <Link
-                  target="_blank"
-                  href="https://civicrm.changing-transport.org/form/tdci-newsletter"
+                <button
+                  onClick={() =>
+                    window.open(
+                      "https://civicrm.changing-transport.org/form/tdci-newsletter",
+                      "newsletter",
+                      "width=600,height=700,scrollbars=yes,resizable=yes"
+                    )
+                  }
                 >
                   <BellIcon width={22} className="text-gray-500" />
-                </Link>
+                </button>
 
                 <button onClick={handleToggleDropdown}>
                   <Avatar className="h-[32px] w-[32px]">
