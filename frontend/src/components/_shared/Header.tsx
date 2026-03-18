@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import { Skeleton } from "@components/ui/skeleton";
 import UserMenuDropdown from "./UserMenuDropDown";
-import { Disclosure } from "@headlessui/react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { BellIcon } from "@lib/icons";
 import { Bell, BellDotIcon, LogOutIcon } from "lucide-react";
@@ -16,14 +17,15 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
+/* For mobile layout */
 const navigation = [
   {
     href: "/datasets",
-    name: "Search",
+    name: "Datasets",
   },
   {
     href: "/geography",
-    name: "Map",
+    name: "Geography",
   },
   {
     href: "/data-provider",
@@ -44,6 +46,42 @@ const navigation = [
   {
     href: "/faq",
     name: "FAQ",
+  },
+];
+
+const navGroups = [
+  {
+    title: "Datasets",
+    href: "/datasets",
+    items: [
+      { name: "Topics", href: "/datasets" },
+      { name: "Geography", href: "/geography" },
+    ],
+  },
+  {
+    title: "Contributors",
+    href: "/data-provider",
+    items: [
+      { name: "Data Providers", href: "/data-provider" },
+      { name: "Partners", href: "/partners" },
+    ],
+  },
+  {
+    title: "Discover",
+    href: "/showroom",
+    items: [
+      { name: "Showroom", href: "/showroom" },
+      { name: "Knowledge Hub", href: "/knowledge-hub" },
+    ],
+  },
+  {
+    title: "More",
+    href: "/about-us",
+    items: [
+      { name: "About Us", href: "/about-us" },
+      { name: "FAQ", href: "/faq" },
+      { name: "Contact", href: "/contact" },
+    ],
   },
 ];
 
@@ -116,15 +154,42 @@ export default function Header({
                 height={32}
               />
             </Link>
-            <div className="ml-6 hidden space-x-6 lg:flex xl:ml-8 xl:space-x-8">
-              {navigation.map((nav, i) => (
-                <Link
-                  key={i}
-                  className="font-medium text-gray-900"
-                  href={nav.href}
-                >
-                  {nav.name}
-                </Link>
+            <div className="ml-6 hidden items-center gap-6 lg:flex xl:ml-8 xl:gap-8">
+              {navGroups.map((group) => (
+                <Menu as="div" key={group.title} className="relative">
+                  <Menu.Button className="inline-flex items-center gap-2 font-medium text-gray-900">
+                    <span>{group.title}</span>
+                    <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                  </Menu.Button>
+
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute left-0 top-full z-20 mt-3 w-44 origin-top-left rounded-md bg-white p-2 shadow-lg focus:outline-none">
+                      {group.items.map((item) => (
+                        <Menu.Item key={item.href}>
+                          {({ active }) => (
+                            <Link
+                              href={item.href}
+                              className={
+                                "block rounded px-3 py-2 text-sm " +
+                                (active ? "bg-gray-50 text-gray-900" : "text-gray-700")
+                              }
+                            >
+                              {item.name}
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      ))}
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
               ))}
             </div>
           </div>
