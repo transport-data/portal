@@ -67,7 +67,7 @@ const navGroups = [
     ],
   },
   {
-    title: "Discover",
+    title: "Insights",
     href: "/showroom",
     items: [
       { name: "Showroom", href: "/showroom" },
