@@ -324,6 +324,27 @@ export const VISUALIZATIONS: Visualization[] = [
     
     externalLink: "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/ComparisonofroadtransportkeyfiguresGermany/Roadtransport#1",
   },
+
+  {
+    id: "tumi-fuel-prices",
+    title: "TUMI Fuel Price App",
+    description:
+      "The fuel price dashboard provides insights into global fuel prices. Explore fuel prices worldwide, analyze country-specific data, and track trends over time.",
+    tags: ["fuel", "prices", "energy"],
+    
+    embedUrl: "https://fuelprices.app/",
+    
+    thumbnailUrl: "/images/showroom/fuelprice-app.png",
+    
+    datasets: [
+      {
+        title: "TUMI Mobility Data Hub",
+        url: "https://portal.transport-data.org/@tumi/tumi-mobility-data-hub"
+      }
+    ],
+    
+    externalLink: "https://fuelprices.app/",
+  },
   // ========================================
   // EASY TEMPLATE FOR ADDING NEW DASHBOARDS
   // ========================================
