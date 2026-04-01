@@ -327,7 +327,7 @@ export const VISUALIZATIONS: Visualization[] = [
 
   {
     id: "tumi-fuel-prices",
-    title: "Global Fuel Prices Dashboard",
+    title: "TUMI Fuel Price App",
     description:
       "The fuel price dashboard provides insights into global fuel prices. Explore fuel prices worldwide, analyze country-specific data, and track trends over time.",
     tags: ["fuel", "prices", "energy"],
