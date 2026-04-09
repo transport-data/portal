@@ -5,7 +5,7 @@ from: 2026-04-13
 to: 2026-04-13
 organization: TDC
 location: MS Teams
-link: https://www.linkedin.com/company/transport-data-commons
+link: https://www.linkedin.com/events/transportdatacommonsglobalcommu7448014316110450689/
 ---
 
-Almost two months after the TDC Global Launch in Glasgow, the TDc community will meet again virtually to welcome new members to the initiative, reflect on the key outcomes from Glasgow (the Glasgow Declaration) and jointly agree on the next steps for the TDC. You'll find the calendar invite and more information soon on our Zulip channel and LinkedIn page.
+Almost two months after the TDC Global Launch in Glasgow, the TDC community will meet again virtually to welcome new members to the initiative, reflect on the key outcomes from Glasgow (the Glasgow Declaration) and jointly agree on the next steps for the TDC. You'll find the calendar invite and more information on our LinkedIn page and Zulip channel.
