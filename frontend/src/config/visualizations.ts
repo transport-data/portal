@@ -186,9 +186,9 @@ export const VISUALIZATIONS: Visualization[] = [
     description: "Regional Insights on Transport in Third-Generation NDCs.",
     tags: 'auto', 
     embedUrl: extractUrl(
-      `https://nikolamedi.github.io/ndc-transport-regions/`
+      "https://nikolamedi.github.io/ndc-transport-regions/"
     ),
-    thumbnailUrl: `/images/showroom/ndc-regional.png`,
+    thumbnailUrl: "/images/showroom/ndc-regional.png",
     datasets: [
       {
         title: "NDC Transport Tracker",
