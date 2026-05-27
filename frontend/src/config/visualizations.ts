@@ -192,7 +192,8 @@ export const VISUALIZATIONS: Visualization[] = [
         title: "NDC Transport Tracker",
         url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
       }
-    ]
+    ],
+    externalLink: "https://nikolamedi.github.io/ndc-transport-regions/",
   },
   {
     id: "tumi-fuel-prices",
