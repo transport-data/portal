@@ -185,7 +185,7 @@ export const VISUALIZATIONS: Visualization[] = [
     title: "Regional Insights on Transport in Third-Generation NDCs",
     description: "Regional Insights on Transport in Third-Generation NDCs.",
     tags: 'auto', 
-    embedUrl: "https://nikolamedi.github.io/ndc-transport-regions/",
+    embedUrl: "https://slocat-partnership.github.io/ndc-transport-regions/",
     thumbnailUrl: "/images/showroom/ndc-regional.png",
     datasets: [
       {
@@ -193,7 +193,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
       }
     ],
-    externalLink: "https://nikolamedi.github.io/ndc-transport-regions/",
+    externalLink: "https://slocat-partnership.github.io/ndc-transport-regions/",
   },
   {
     id: "tumi-fuel-prices",
