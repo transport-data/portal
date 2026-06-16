@@ -1,4 +1,4 @@
-FROM ckan/ckan-base:2.11.4
+FROM ckan/ckan-base:2.11.5
 
 ENV CKAN_INI /srv/app/ckan.ini
 
