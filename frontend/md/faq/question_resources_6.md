@@ -15,7 +15,7 @@ To publish data to the TDC Portal via the API, you need an API key to authentica
 
 4. After selecting "Create Token", your API key will be displayed on your settings page.
 
-__Important:__ Make sure to copy and save it now, as you won't be able to see it again. Keep this key secure and do not share it publicly. You can always create a new token, in case you lost your previous key.
+__Important:__ Make sure to copy and save it now, as you __won't be able to see it again__. Keep this key secure and do not share it publicly. You can always create a new token, in case you lost your previous key. You need to have at least editor rights for a organsation to submit data.
 
 #### Use your API key in requests:
 Include your API key in the HTTP header when making API calls. Here’s an example using curl to create a new dataset, using the [package_create](https://docs.ckan.org/en/2.9/api/#ckan.logic.action.create.package_create) command:
@@ -30,5 +30,7 @@ curl -X POST https://ckan.tdc.prod.datopian.com/api/3/action/package_create \
         "description": "This is a sample dataset created via the API."
       }'
 ~~~
+
+__Read the following guide__ for a [complete code example](https://github.com/transport-data/portal/tree/main/src/ckanext-tdc/ckanext/tdc/data-integration).
 
 You can also use Python (with the requests library), Postman, or other tools to send similar requests. See the following documentation for example scripts for the [creation of packages](https://github.com/transport-data/portal/blob/main/src/ckanext-tdc/ckanext/tdc/data-integration/README.md#package-create) and [resources](https://github.com/transport-data/portal/blob/main/src/ckanext-tdc/ckanext/tdc/data-integration/README.md#resource-create) with Python.
