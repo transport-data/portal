@@ -1,14 +1,17 @@
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
+import { useEffect, useState } from "react";
 import OrgInfo from "../../components/organization/individualPage/OrgInfo";
 import Layout from "../../components/_shared/Layout";
-import Tabs from "../../components/_shared/TabsPublic";
 import { CKAN } from "@portaljs/ckan";
 import styles from "@/styles/DatasetInfo.module.scss";
 import DatasetList from "../../components/_shared/DatasetList";
-import getConfig from "next/config";
 import { env } from "@env.mjs";
+import { searchDatasets } from "@utils/dataset";
+import { api } from "@utils/api";
+import type { Dataset } from "@interfaces/ckan/dataset.interface";
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
+const DATASETS_PAGE_SIZE = 10;
 
 export async function getStaticPaths() {
   const ckan = new CKAN(backend_url);
@@ -34,18 +37,22 @@ export const getStaticProps: GetStaticProps = async (context) => {
   orgName = orgName.includes("@") ? orgName.split("@")[1] : orgName;
   const ckan = new CKAN(backend_url);
   let org = await ckan.getOrgDetails(orgName ?? "");
-  if (org?.packages) {
-    const packagesWithResources = await Promise.all(
-      org.packages.map(async (dataset) => ckan.getDatasetDetails(dataset.name))
-    );
-    org = { ...org, packages: packagesWithResources };
-  }
   if (!org) {
     return {
       notFound: true,
       revalidate: 60 * 5,
     };
   }
+  const { datasets, count } = await searchDatasets({
+    options: {
+      orgs: [org.name],
+      offset: 0,
+      limit: DATASETS_PAGE_SIZE,
+      private: true,
+      sort: "metadata_modified desc",
+    },
+  });
+  org = { ...(org as any), packages: datasets, package_count: count };
   return {
     props: {
       org,
@@ -57,17 +64,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export default function OrgPage({
   org,
 }: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
-  const tabs = [
-    {
-      id: "datasets",
-      content: org.packages ? (
-        <DatasetList datasets={org.packages ? org.packages : []} />
-      ) : (
-        ""
-      ),
-      title: "Datasets",
-    },
-  ];
   return (
     <>
       <Head>
@@ -82,10 +78,10 @@ export default function OrgPage({
               style={{ background: "rgb(227, 249, 237)" }}
               className="bg-[rgb(227, 249, 237)] flex h-full flex-col"
             >
-              <div className="custom-container mx-auto pt-16 pb-4">
-                  <h1 className="text-4xl font-black text-gray-900">
-                    {org.title}
-                  </h1>
+              <div className="custom-container mx-auto pb-4 pt-16">
+                <h1 className="text-4xl font-black text-gray-900">
+                  {org.title}
+                </h1>
               </div>
             </div>
           </section>
@@ -98,7 +94,11 @@ export default function OrgPage({
                 <main className={styles.main}>
                   <OrgInfo org={org} />
                   <div>
-                    <Tabs items={tabs} />
+                    <OrgDatasets
+                      orgName={org.name}
+                      initialDatasets={org.packages ?? []}
+                      initialCount={org.package_count ?? 0}
+                    />
                   </div>
                 </main>
               )}
@@ -107,5 +107,153 @@ export default function OrgPage({
         </Layout>
       )}
     </>
+  );
+}
+
+function OrgDatasets({
+  orgName,
+  initialDatasets,
+  initialCount,
+}: {
+  orgName: string;
+  initialDatasets: Array<Dataset>;
+  initialCount: number;
+}) {
+  const [page, setPage] = useState(0);
+  const [datasets, setDatasets] = useState(initialDatasets);
+  const [totalCount, setTotalCount] = useState(initialCount);
+
+  const { data, isFetching } = api.dataset.search.useQuery(
+    {
+      orgs: [orgName],
+      offset: page * DATASETS_PAGE_SIZE,
+      limit: DATASETS_PAGE_SIZE,
+      private: true,
+      sort: "metadata_modified desc",
+    },
+    { keepPreviousData: true },
+  );
+
+  useEffect(() => {
+    if (!data) return;
+
+    setTotalCount(data.count);
+    setDatasets(data.datasets);
+  }, [data, page]);
+
+  const totalPages = Math.ceil(totalCount / DATASETS_PAGE_SIZE);
+  const currentPage = page + 1;
+  const pageNumbers = getPaginationItems(currentPage, totalPages);
+
+  const goToPage = (pageNumber: number) => {
+    setPage(pageNumber - 1);
+  };
+
+  return (
+    <section className="flex w-full flex-col gap-y-6 py-8">
+      <div className="border-b border-[#00bbc2] pb-3">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Datasets ({totalCount})
+        </h2>
+      </div>
+      <DatasetList datasets={datasets as any} />
+      {totalPages > 1 && (
+        <nav
+          className="flex flex-wrap items-center justify-center gap-2"
+          aria-label="Dataset pagination"
+        >
+          <PaginationButton
+            disabled={page === 0 || isFetching}
+            onClick={() => goToPage(currentPage - 1)}
+          >
+            Prev
+          </PaginationButton>
+          {pageNumbers.map((pageNumber, index) =>
+            pageNumber === "ellipsis" ? (
+              <span
+                key={`ellipsis-${index}`}
+                className="px-2 text-sm font-semibold text-gray-500"
+              >
+                ...
+              </span>
+            ) : (
+              <PaginationButton
+                key={pageNumber}
+                active={pageNumber === currentPage}
+                disabled={isFetching}
+                onClick={() => goToPage(pageNumber)}
+              >
+                {pageNumber}
+              </PaginationButton>
+            ),
+          )}
+          <PaginationButton
+            disabled={currentPage === totalPages || isFetching}
+            onClick={() => goToPage(currentPage + 1)}
+          >
+            Next
+          </PaginationButton>
+        </nav>
+      )}
+    </section>
+  );
+}
+
+function getPaginationItems(currentPage: number, totalPages: number) {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, "ellipsis", totalPages] as const;
+  }
+
+  if (currentPage >= totalPages - 3) {
+    return [
+      1,
+      "ellipsis",
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ] as const;
+  }
+
+  return [
+    1,
+    "ellipsis",
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    "ellipsis",
+    totalPages,
+  ] as const;
+}
+
+function PaginationButton({
+  active = false,
+  children,
+  disabled = false,
+  onClick,
+}: {
+  active?: boolean;
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-current={active ? "page" : undefined}
+      className={`rounded-md border px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+        active
+          ? "border-[#00BF7F] bg-[#00BF7F] text-white"
+          : "border-gray-200 bg-white text-gray-700 hover:border-[#00BF7F] hover:text-[#007f55]"
+      }`}
+      disabled={disabled || active}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 }

@@ -6,7 +6,7 @@ interface DatasetListProps {
 }
 export default function DatasetList({ datasets }: DatasetListProps) {
   return (
-    <div className="py-8 w-full max-h-[600px] flex flex-col gap-y-4">
+    <div className="flex w-full flex-col gap-y-4 py-8">
       {datasets.map((dataset: Dataset) => (
         <DatasetCard key={dataset.id} dataset={dataset} showOrg={false} />
       ))}
