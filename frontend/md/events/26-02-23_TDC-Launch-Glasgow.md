@@ -2,7 +2,7 @@
 title: TDC Global Launch
 image: images/events/TDC-Global-Launch-2026.webp
 from: 2026-02-23
-to: 2025-02-24
+to: 2026-02-24
 organization: Strathclyde University
 location: Glasgow
 link: https://www.eventbrite.co.uk/e/transport-data-commons-tdc-global-launch-2026-tickets-1976323577020
