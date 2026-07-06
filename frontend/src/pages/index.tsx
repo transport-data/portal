@@ -3,6 +3,7 @@ import Head from "next/head";
 import Hero from "../components/home/heroSection/Hero";
 import Layout from "../components/_shared/Layout";
 import DatasetsSection from "@components/home/mainSection/DatasetsSection";
+import GlasgowDeclarationSection from "@components/home/mainSection/GlasgowDeclarationSection";
 import ContributeSection from "@components/home/mainSection/ContributeSection";
 import FaqsSection from "@components/home/mainSection/FaqsSection";
 import TestimonialsSection from "@components/home/mainSection/TestimonialsSection";
@@ -112,6 +113,7 @@ export default function Home({
       
       <Layout>
         <Hero asset={tdcConfig.hero} />
+        <GlasgowDeclarationSection />
         <DatasetsSection
           datasets={data?.datasets ?? []}
           isLoading={isLoading}
