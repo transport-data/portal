@@ -79,6 +79,7 @@ const navGroups = [
     href: "/about-us",
     items: [
       { name: "About Us", href: "/about-us" },
+      { name: "Events", href: "/events" },
       { name: "FAQ", href: "/faq" },
       { name: "Contact", href: "/contact" },
     ],
