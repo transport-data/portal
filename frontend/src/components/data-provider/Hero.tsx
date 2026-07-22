@@ -71,7 +71,7 @@ export default function Hero() {
           />
           <img
             className="object-contain"
-            src={"/images/logos/partners/tumi-colored.svg"}
+            src={"/images/logos/partners/tumi_logo_rgb_brightbg.png"}
           />
           <img
             className="object-contain w-32 h-16"
