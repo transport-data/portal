@@ -85,6 +85,10 @@ export default function Hero() {
             className="object-contain w-32 h-16"
             src={"/images/logos/partners/climate-trace-colored.png"}
           />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/global_alliance_logo.svg"}
+          />
         </div>
         {/* Organisation CTA */}
         <div className="mt-12 flex flex-col items-center justify-between gap-6 rounded-2xl bg-gradient-to-r from-[#006064] to-[#00838f] px-8 py-8 shadow-lg sm:flex-row">
