@@ -34,6 +34,7 @@ const images = [
   "/images/logos/partners/cgep-colored.svg",
   "/images/sponsors/hvt.png",
   "/images/sponsors/uk-international-development.png",
+  "/images/logos/partners/global_alliance_logo.svg",
 ];
 
 const Carousel = () => {
