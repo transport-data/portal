@@ -1,11 +1,15 @@
+import { useState } from "react";
 import Image from "next/image";
 import { format } from "timeago.js";
 import { Tag } from "@portaljs/ckan";
 import { Organization } from "@portaljs/ckan";
 
 export default function OrgInfo({ org }: { org: Organization }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const packageCount = (org as Organization & { package_count?: number })
     .package_count;
+  const descriptionText = org.description?.replace(/<\/?[^>]+(>|$)/g, "") || "No description";
+  const shouldShowToggle = descriptionText.length > 180;
 
   return (
     <div className="flex flex-col">
@@ -54,9 +58,22 @@ export default function OrgInfo({ org }: { org: Organization }) {
         </span>
       </div>
       <div className="my-4 border-y py-4">
-        <p className="line-clamp-4 text-sm font-normal text-stone-500">
-          {org.description?.replace(/<\/?[^>]+(>|$)/g, "") || "No description"}
+        <p
+          className={`text-sm font-normal text-stone-500 whitespace-pre-line ${
+            isExpanded ? "" : "line-clamp-4"
+          }`}
+        >
+          {descriptionText}
         </p>
+        {shouldShowToggle && (
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="mt-2 text-sm font-medium text-accent underline-offset-2 hover:underline"
+          >
+            {isExpanded ? "Show less" : "Show more"}
+          </button>
+        )}
       </div>
       <div className="flex flex-wrap gap-1">
         {org.tags?.map((tag: Tag) => (
