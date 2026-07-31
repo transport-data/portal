@@ -413,10 +413,6 @@ export function GeneralForm({
             </div>
             <FormDescription>Publish your data to make it visible to other users outside of your organisation.</FormDescription>
           </FormItem>
-          <FormDescription>
-          Note: Before this dataset is published it will be reviewed by an admin from your organisation. You won't be able to edit it during the review. 
-          To ensure compliance with TDC metadata standards, TDC may review and modify metadata after submission.
-          </FormDescription>
         )}
       />
       <div className="flex flex-col gap-y-2">
