@@ -341,7 +341,7 @@ export function GeneralForm({
         <RTEForm
           disabled={disabled}
           name="notes"
-          placeholder="Write a short description of this dataset (max 500 chars)"
+          placeholder="Write a short description of this dataset (max. 500 characters)"
           formObj={formObj}
         />
       </div>
@@ -411,8 +411,12 @@ export function GeneralForm({
                 )}
               </FormLabel>
             </div>
-            <FormDescription>Publish your data to make it visible outside to other users outside of your organisation.</FormDescription>
+            <FormDescription>Publish your data to make it visible to other users outside of your organisation.</FormDescription>
           </FormItem>
+          <FormDescription>
+          Note: Before this dataset is published it will be reviewed by an admin from your organisation. You won't be able to edit it during the review. 
+          To ensure compliance with TDC metadata standards, TDC may review and modify metadata after submission.
+          </FormDescription>
         )}
       />
       <div className="flex flex-col gap-y-2">
