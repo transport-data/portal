@@ -71,7 +71,7 @@ export default ({
         />
         <div className="pb-1 text-sm text-[#6B7280]">
           <label htmlFor="confirmationWorkingForTheOrg">
-            I confirm that I am a member of this organisation.
+            I confirm that entitled to publish data from this organisation, or acting as a TDC editor for public data provided by this organisation.
           </label>
         </div>
       </div>
