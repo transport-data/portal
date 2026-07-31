@@ -341,7 +341,7 @@ export function GeneralForm({
         <RTEForm
           disabled={disabled}
           name="notes"
-          placeholder="Write a short description of this dataset"
+          placeholder="Write a short description of this dataset (max 500 chars)"
           formObj={formObj}
         />
       </div>
@@ -373,6 +373,7 @@ export function GeneralForm({
             <div className="space-y-1 leading-none">
               <FormLabel>Is this dataset archived?</FormLabel>
             </div>
+            <FormDescription>An archived record is stored on TDC but not shown in the public listing of records.</FormDescription>
           </FormItem>
         )}
       />
@@ -400,9 +401,8 @@ export function GeneralForm({
                     {!isUserAdminOfTheDatasetOrg && (
                       <span className=" text-gray-500">
                         {" "}
-                        Note: Before this dataset is published it will be
-                        reviewed by an Admin from your organisation. You won't
-                        be able to edit it during the review.
+                        Note: Before this dataset is published it will be reviewed by an admin from your organisation. You won't
+                        be able to edit it during the review. To ensure compliance with TDC metadata standards, TDC may review and modify metadata after submission.
                       </span>
                     )}
                   </>
@@ -411,6 +411,7 @@ export function GeneralForm({
                 )}
               </FormLabel>
             </div>
+            <FormDescription>Publish your data to make it visible outside to other users outside of your organisation.</FormDescription>
           </FormItem>
         )}
       />
