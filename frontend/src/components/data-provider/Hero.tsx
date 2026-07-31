@@ -24,8 +24,8 @@ export default function Hero() {
               by contributing your own transportation-related
               datasets.
             </p>
-            <Button onClick={openNewsletterForm} className="mb-16 bg-[#006064] px-6 py-3.5">
-              Start Contributing Data
+            <Button asChild className="mb-16 bg-[#006064] px-6 py-3.5">
+              <Link href="/dashboard/datasets/create">Start Contributing Data</Link>
             </Button>
             <p className="font-semibold text-gray-500">
               Join the organisations which already share their data via the TDC.
@@ -105,10 +105,10 @@ export default function Hero() {
               </p>
             </div>
           </div>
-          <Button onClick={openNewsletterForm} className="shrink-0 bg-white text-[#006064] hover:bg-white/90 px-6 py-3 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105 inline-flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Register my Organisation
-            </Button>
+          <Button className="shrink-0 bg-white text-[#006064] hover:bg-white/90 px-6 py-3 font-semibold shadow-md hover:shadow-lg transition-all hover:scale-105 inline-flex items-center gap-2">
+             <Building2 className="h-4 w-4" />
+             <Link href="/dashboard/organizations">Register my Organisation</Link>
+          </Button>
         </div>
       </div>
     </section>
