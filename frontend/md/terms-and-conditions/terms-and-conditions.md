@@ -2,7 +2,7 @@
 title: Terms and Conditions
 ---
 
-*Last Updated: \[11 November, 2024\]*
+*Last Updated: \[29 July, 2026\]*
 
 Welcome to Transport Data Commons. These Terms and Conditions ("Terms") govern your access to and use of our website and services (collectively, the "Portal"). By accessing or using the Portal, you agree to be bound by these Terms. If you do not agree with any part of these Terms, please discontinue use of the Portal.
 
@@ -41,6 +41,12 @@ Under this license, you are free to:
 
 You must provide appropriate credit, a link to the license, and indicate if changes were made. You may do so in any reasonable manner but not in any way that suggests the licensor endorses you or your use.
 
+#### 3.3. Submission and Management of Metadata
+
+By submitting, registering or publishing a dataset on the Portal, you confirm that you are authorized to provide the associated metadata and grant the Transport Data Commons the right to host, reproduce, display and maintain that metadata as part of the Portal.
+
+To improve data quality, consistency, discoverability and compliance with TDC metadata standards, TDC may review and modify metadata _without_ obtaining the data provider’s prior approval or contacting the provider before each modification.
+
 ### 4\. Intellectual Property Rights
 
 Except for the open data, all content, features, and functionality on the Portal—including but not limited to text, graphics, logos, and software—are the exclusive property of Transport Data Commons Initiative, the members of the initiative  or its licensors and are protected by intellectual property laws.
@@ -57,11 +63,11 @@ We do not guarantee that the Portal will be secure, error-free, or available at 
 
 ### 6\. Limitation of Liability
 
-To the fullest extent permitted by law, \[Transport Data Commons\] shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Portal.
+To the fullest extent permitted by law, Transport Data Commons shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Portal.
 
 ### 7\. Indemnification
 
-You agree to defend, indemnify, and hold harmless \[Transport Data Commons\], its affiliates, and their respective officers, directors, employees, and agents from and against any claims, liabilities, damages, judgments, awards, losses, or expenses arising out of your violation of these Terms.
+You agree to defend, indemnify, and hold harmless Transport Data Commons, its affiliates, and their respective officers, directors, employees, and agents from and against any claims, liabilities, damages, judgments, awards, losses, or expenses arising out of your violation of these Terms.
 
 ### 8\. Termination
 
@@ -71,21 +77,17 @@ We reserve the right to terminate or suspend your access to the Portal, without 
 
 We may modify these Terms at any time. Changes will be effective immediately upon posting on this page with an updated "Last Updated" date. Your continued use of the Portal after any changes signifies your acceptance of the revised Terms.
 
-### 10\. Governing Law
-
-These Terms are governed by and construed in accordance with the laws of \[Your Country/State\], without regard to its conflict of law provisions.
-
-### 11\. Severability
+### 10\. Severability
 
 If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will remain in full force and effect.
 
-### 12\. Entire Agreement
+### 11\. Entire Agreement
 
 These Terms constitute the entire agreement between you and Transport Data Commons regarding the use of the Portal and supersede any prior agreements.
 
-### 13\. Contact Information
+### 12\. Contact Information
 
 If you have any questions or concerns about these Terms, please contact us at:
 
 **Transport Data Commons Initiative**  
-Email: contact@transport-data.org  
+Email: [contact@transport-data.org](mailto:contact@transport-data.org)
