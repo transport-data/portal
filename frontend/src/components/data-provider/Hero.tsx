@@ -87,7 +87,7 @@ export default function Hero() {
           />
           <img
             className="object-contain w-32 h-16"
-            src={"/images/logos/partners/global_alliance_logo.svg"}
+            src={"/images/logos/partners/global_alliance_logo.png"}
           />
         </div>
         {/* Organisation CTA */}
