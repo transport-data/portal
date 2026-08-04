@@ -83,6 +83,10 @@ export default function Hero() {
           />
           <img
             className="object-contain w-32 h-16"
+            src={"/images/logos/partners/unep-2019-english.jpg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
             src={"/images/logos/partners/climate-trace-colored.png"}
           />
           <img
