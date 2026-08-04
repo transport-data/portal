@@ -55,6 +55,10 @@ export default function Hero() {
           />
           <img
             className="object-contain"
+            src={"/images/logos/partners/ifeu-colored.svg"}
+          />
+          <img
+            className="object-contain"
             src={"/images/logos/partners/irf-colored.svg"}
           />
           <img
@@ -83,7 +87,19 @@ export default function Hero() {
           />
           <img
             className="object-contain w-32 h-16"
+            src={"/images/logos/partners/TfC_Logo.png"}
+          />
+          <img
+            className="object-contain w-32 h-16"
             src={"/images/logos/partners/unep-2019-english.jpg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/ieconnect.png"}
+          />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/Our_World_in_Data_logo.png"}
           />
           <img
             className="object-contain w-32 h-16"
@@ -91,7 +107,15 @@ export default function Hero() {
           />
           <img
             className="object-contain w-32 h-16"
+            src={"/images/logos/partners/mobilise-colored.svg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
             src={"/images/logos/partners/global_alliance_logo.png"}
+          />
+          <img
+            className="object-contain w-32 h-16"
+            src={"/images/logos/partners/agora-vw-logo-rgb-gross-w4t0ah.png"}
           />
         </div>
         {/* Organisation CTA */}
