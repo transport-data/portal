@@ -95,6 +95,10 @@ export default function Hero() {
           />
           <img
             className="object-contain w-32 h-16"
+            src={"/images/logos/partners/the-world-bank-colored.svg"}
+          />
+          <img
+            className="object-contain w-32 h-16"
             src={"/images/logos/partners/ieconnect.png"}
           />
           <img
