@@ -22,6 +22,10 @@ This section allows user to contribute to TDC by redirecting to the `dashboard/d
 
 ![Hero section](hero.png)
 
+Each logo tile belongs to an organisation and links to that organisation's page.
+
+To update this page, e.g. adding a new org tile, go to go to `\frontend\src\components\data-provider\Hero.tsx` and update the partnerLogos list.
+
 ### How TDC datasets work
 
 This section provides an overview of different types of datasets in TDC.
