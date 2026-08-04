@@ -9,6 +9,31 @@ const openNewsletterForm = () =>
     "width=600,height=700,scrollbars=yes,resizable=yes"
   );
 
+const partnerLogos = [
+  { src: "/images/logos/partners/giz-colored.svg", alt: "GIZ", href: "/@giz" },
+  { src: "/images/logos/partners/unece-colored.svg", alt: "UNECE", href: "/@unece" },
+  { src: "/images/logos/partners/caf-colored.svg", alt: "CAF", href: "/@caf-urban-mobility-observatory" },
+  { src: "/images/logos/partners/adb-colored.svg", alt: "ADB", href: "/@ato" },
+  { src: "/images/logos/partners/solcat-colored.svg", alt: "SLOCAT", href: "/@slocat" },
+  { src: "/images/logos/partners/ifeu-colored.svg", alt: "IFEU", href: "/@ifeu" },
+  { src: "/images/logos/partners/irf-colored.svg", alt: "IRF", href: "/@irf" },
+  { src: "/images/logos/partners/iiasa-colored.svg", alt: "IIASA", href: "/@iiasa" },
+  { src: "/images/logos/partners/joint-colored.svg", alt: "JRC", href: "/@jrc" },
+  { src: "/images/logos/partners/ccg-colored.svg", alt: "CCG", href: "/@ccg" },
+  { src: "/images/logos/partners/tumi_logo_rgb_brightbg.png", alt: "TUMI", href: "/@tumi" },
+  { src: "/images/logos/partners/gfei-colored.jpg", alt: "GFEI", href: "/@gfei" },
+  { src: "/images/logos/partners/oica-colored.jpg", alt: "OICA", href: "/@oica" },
+  { src: "/images/logos/partners/TfC_Logo.png", alt: "TfC", href: "/@tfc" },
+  { src: "/images/logos/partners/unep-2019-english.jpg", alt: "UNEP", href: "/@unep" },
+  { src: "/images/logos/partners/the-world-bank-colored.svg", alt: "World Bank", href: "/@world-bank" },
+  { src: "/images/logos/partners/ieconnect.png", alt: "IEConnect", href: "/@ieconnect" },
+  { src: "/images/logos/partners/Our_World_in_Data_logo.png", alt: "Our World in Data", href: "/@our-world-in-data" },
+  { src: "/images/logos/partners/climate-trace-colored.png", alt: "Climate TRACE", href: "/@climate-trace" },
+  { src: "/images/logos/partners/mobilise-colored.svg", alt: "MYC", href: "/@myc" },
+  { src: "/images/logos/partners/global_alliance_logo.png", alt: "Feminist Transport", href: "/@feminist-transport" },
+  { src: "/images/logos/partners/agora-vw-logo-rgb-gross-w4t0ah.png", alt: "Agora Verkehrswende", href: "/@agora-verkehrswende" },
+];
+
 export default function Hero() {
   return (
     <section className="pb-6 pt-[64px] md:pb-[96px]">
@@ -32,96 +57,23 @@ export default function Hero() {
             </p>
           </div>
         </div>
-        <div className="mt-[54px] flex flex-wrap gap-16">
-          <img
-            className="object-contain md:pl-12"
-            src={"/images/logos/partners/giz-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/unece-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/caf-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/adb-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/solcat-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/ifeu-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/irf-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/iiasa-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/joint-colored.svg"}
-          />
-          <img
-            className="object-contain"
-            src={"/images/logos/partners/ccg-colored.svg"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/tumi_logo_rgb_brightbg.png"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/gfei-colored.jpg"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/oica-colored.jpg"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/TfC_Logo.png"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/unep-2019-english.jpg"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/the-world-bank-colored.svg"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/ieconnect.png"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/Our_World_in_Data_logo.png"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/climate-trace-colored.png"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/mobilise-colored.svg"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/global_alliance_logo.png"}
-          />
-          <img
-            className="object-contain w-32 h-16"
-            src={"/images/logos/partners/agora-vw-logo-rgb-gross-w4t0ah.png"}
-          />
+        <div className="mt-[54px] grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {partnerLogos.map((logo) => (
+            <Link
+              key={logo.src}
+              href={logo.href}
+              className="flex h-24 items-center justify-center rounded-lg border border-gray-100 bg-white/70 p-4 shadow-sm transition hover:shadow-md"
+              aria-label={logo.alt}
+            >
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                className="max-h-12 w-full object-contain"
+              />
+            </Link>
+          ))}
         </div>
+        
         {/* Organisation CTA */}
         <div className="mt-12 flex flex-col items-center justify-between gap-6 rounded-2xl bg-gradient-to-r from-[#006064] to-[#00838f] px-8 py-8 shadow-lg sm:flex-row">
           <div className="flex items-center gap-5">
