@@ -10,6 +10,10 @@ export default function OrgInfo({ org }: { org: Organization }) {
     .package_count;
   const descriptionText = org.description?.replace(/<\/?[^>]+(>|$)/g, "") || "No description";
   const shouldShowToggle = descriptionText.length > 180;
+  const displayedDescription =
+    shouldShowToggle && !isExpanded
+      ? `${descriptionText.slice(0, 180)}...`
+      : descriptionText;
 
   return (
     <div className="flex flex-col">
@@ -58,12 +62,8 @@ export default function OrgInfo({ org }: { org: Organization }) {
         </span>
       </div>
       <div className="my-4 border-y py-4">
-        <p
-          className={`text-sm font-normal text-stone-500 whitespace-pre-line ${
-            isExpanded ? "" : "line-clamp-4"
-          }`}
-        >
-          {descriptionText}
+        <p className="whitespace-pre-line text-sm font-normal text-stone-500">
+          {displayedDescription}
         </p>
         {shouldShowToggle && (
           <button
