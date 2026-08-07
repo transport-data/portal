@@ -45,6 +45,9 @@ export async function getStaticPaths() {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  const revalidateOnError = 60;
+
+  let dataset;
   try {
     const datasetName = context.params?.dataset;
     if (!datasetName) {
@@ -52,7 +55,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
-    let dataset = await getDataset({
+    dataset = await getDataset({
       id: datasetName as string,
       apiKey: "",
       include_extras: true,
@@ -62,9 +65,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
-    const locationsGroup = await groupTree({
-      type: "geography",
-    });
+    // Geography metadata is supplementary to the dataset page. Do not turn a
+    // temporary failure here into an authorization redirect for the dataset.
+    let locationsGroup: GroupTree[] = [];
+    try {
+      locationsGroup = await groupTree({
+        type: "geography",
+      });
+    } catch {
+      locationsGroup = [];
+    }
     return {
       props: {
         _dataset: dataset.result,
@@ -76,14 +86,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const error = e as any;
     if (error && error.error && error.error.__type == "Authorization Error") {
       return {
-        redirect: {
-          destination: "/unauthorized",
-          permanent: false,
-        },
+        // This is a public SSG route. Retry transient CKAN failures instead
+        // of permanently caching an unauthorized redirect in ISR.
+        notFound: true,
+        revalidate: revalidateOnError,
       };
     }
     return {
       notFound: true,
+      revalidate: revalidateOnError,
     };
   }
 };
