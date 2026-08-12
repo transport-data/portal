@@ -42,9 +42,10 @@ env = Environment(loader=FileSystemLoader(template_dir))
 
 
 def get_privileged_context():
+    current_user_id = getattr(tk.current_user, "id", None)
     return {
         "ignore_auth": True,
-        'user': tk.current_user.id
+        "user": current_user_id,
     }
 
 
