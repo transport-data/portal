@@ -62,7 +62,7 @@ export default function SearchBar() {
         }
       : {}),
 
-    facetsFields: `["regions", "geographies", "sectors", "modes", "services", "indicator", "temporal_coverage_start", "temporal_coverage_end"]`,
+    facetsFields: `["regions", "geographies", "sectors", "modes", "services", "indicator", "temporal_coverage_start", "temporal_coverage_end", "topics"]`,
   });
 
   const facets: any = {
@@ -85,6 +85,30 @@ export default function SearchBar() {
       ),
     },
 
+    topics: {
+      name: "topic",
+      description: searchbarConfig.topics.description,
+      options: data?.facets?.topics?.items?.sort(
+        (a: { display_name: string }, b: { display_name: string }) =>
+          a.display_name.localeCompare(b.display_name)
+      ),
+    },
+  
+    sectors: {
+      name: "sector",
+      description: searchbarConfig.sectors.description,
+      options: data?.facets?.sectors?.items,
+    },
+    modes: {
+      name: "mode",
+      description: searchbarConfig.modes.description,
+      options: data?.facets?.modes?.items,
+    },
+    services: {
+      name: "service",
+      description: searchbarConfig.services.description,
+      options: data?.facets?.services?.items,
+    },
     startYear: {
       name: "after",
       description: searchbarConfig.startYear.description,
@@ -114,21 +138,6 @@ export default function SearchBar() {
             index === self.findIndex((o) => o.name === obj.name)
         ),
       isMultiple: false,
-    },
-    sectors: {
-      name: "sector",
-      description: searchbarConfig.sectors.description,
-      options: data?.facets?.sectors?.items,
-    },
-    modes: {
-      name: "mode",
-      description: searchbarConfig.modes.description,
-      options: data?.facets?.modes?.items,
-    },
-    services: {
-      name: "service",
-      description: searchbarConfig.services.description,
-      options: data?.facets?.services?.items,
     },
   };
 
