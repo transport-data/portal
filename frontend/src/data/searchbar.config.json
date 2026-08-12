@@ -1,30 +1,34 @@
 {
   "regions": {
     "name": "region",
-    "description": "filter for regions"
+    "description": "filter for regions, e.g., Africa"
   },
   "countries": {
     "name": "country",
-    "description": "filter for countries"
+    "description": "filter for countries, e.g., Afghanistan"
   },
   "startYear": {
     "name": "after",
-    "description": "referencing data after a selected year"
+    "description": "filter for reference period after a selected year, e.g., 2020"
   },
   "endYear": {
     "name": "before",
-    "description": "referencing data before a selected year"
+    "description": "filter for reference period before a selected year, e.g., 2020"
   },
   "sectors": {
     "name": "sector",
-    "description": "road, rail, aviation, water transportation"
+    "description": "filter for sectors, e.g., road transportation"
   },
   "modes": {
     "name": "mode",
-    "description": "cars, cycling, heavy rail"
+    "description": "filter for mode, e.g., walking"
   },
   "services": {
     "name": "service",
-    "description": "passenger or freight"
+    "description": "filter for service, e.g., passenger or freight"
+  },
+  "topics": {
+    "name": "topic",
+    "description": "filter for topics, e.g. aviation"
   }
 }
