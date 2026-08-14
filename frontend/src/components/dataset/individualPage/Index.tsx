@@ -88,7 +88,7 @@ export default function IndexDatasetPage({
                                         content={
                                             <div className="flex flex-col">
                                                 <span className="text-semibold text-sm">
-                                                    TDC Harmonized
+                                                    TDC Harmonised
                                                 </span>
                                                 <div className="text-xs">
                                                     Data have been validated, and derived from multiple
@@ -108,7 +108,7 @@ export default function IndexDatasetPage({
                                             className="mt-4 flex w-fit gap-1 rounded-[6px] bg-yellow-100 px-[10px] py-[2px] text-xs font-medium text-yellow-800 transition-colors focus:outline-none focus:ring-2 
                     focus:ring-ring focus:ring-offset-2"
                                         >
-                                            TDC Harmonized
+                                            TDC Harmonised
                                         </button>
                                     </DefaultTooltip>
                                 )}
@@ -173,12 +173,12 @@ export default function IndexDatasetPage({
                             <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
                                 {overviewTab && (
                                     <TabsTrigger id="overview" value="overview">
-                                        Overview
+                                        Introduction
                                     </TabsTrigger>
                                 )}
                                 {datasetsTab && (
                                     <TabsTrigger id="dataset" value="dataset">
-                                        Dataset
+                                        Preview
                                     </TabsTrigger>
                                 )}
                                 <TabsTrigger id="metadata" value="metadata">
