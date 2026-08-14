@@ -146,19 +146,52 @@ export default function KnowledgeHubPage({ items }: KnowledgeHubProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <article className="group overflow-hidden rounded-lg border border-[#BFE7E9] bg-white shadow-sm transition-all hover:shadow-md">
+                <div className="relative aspect-[16/7] w-full overflow-hidden bg-gradient-to-br from-[#006064] via-[#0B7A7C] to-[#E8FAFB]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(175, 247, 229, 0.9),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(87, 153, 133, 0.25),transparent_38%)]" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="max-w-xs text-sm font-medium leading-6 text-white/90">
+                      Contribute your knowledge to the TDC community.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary">
+                    Share guidance, case studies, and resources
+                  </h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-gray-500">
+                    If you have a guide, note, dataset reference, or local practice that
+                    would help others, use our contribution guide to submit it for
+                    review.
+                  </p>
+
+                  <div className="mt-4">
+                    <a
+                      href="https://docs.google.com/document/d/1kx3t3MsBrLXA7hZo16xsMcVK4HGctV6iOzRWpYoVhgs/edit?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center rounded-md bg-[#006064] px-4 py-2.5 text-sm text-white hover:bg-[#00545a]"
+                    >
+                      Open contribution guide
+                    </a>
+                  </div>
+                </div>
+              </article>
+
               {filteredItems.map((item) => (
                 <article
                   key={item.id}
                   className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md"
                   onClick={() => setSelectedDocId(item.id)}
                 >
-                  <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+                  <div className="relative aspect-[16/7] w-full overflow-hidden bg-gray-100">
                     {item.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={item.imageUrl}
                         alt={`${item.title} preview`}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                        className="h-full w-full object-cover object-top transition-transform group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
