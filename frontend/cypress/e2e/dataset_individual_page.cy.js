@@ -119,7 +119,7 @@ describe("Dataset individual page", () => {
   it("Should show the individual page", () => {
     cy.visit(`/@${sample_org}/${datasetName}`);
     cy.contains(datasetTitle);
-    cy.contains("TDC Harmonized");
+    cy.contains("TDC Harmonised");
     cy.contains("EXAMPLE INTRODUCTION");
     cy.contains("Share");
     cy.contains("Contact the contributor");
@@ -133,9 +133,13 @@ describe("Dataset individual page", () => {
     cy.contains("Sample Doc");
   });
 
-  it("Should show unauthorized on private", () => {
-    cy.visit(`/@${sample_org}/${datasetName + '_private'}`);
-    cy.contains('401')
+  it("Should not expose a private dataset publicly", () => {
+    cy.request({
+      url: `/@${sample_org}/${datasetName}_private`,
+      failOnStatusCode: false,
+    })
+      .its("status")
+      .should("eq", 404);
   });
 
   it("Should show unauthorized on private if not logged in", () => {
