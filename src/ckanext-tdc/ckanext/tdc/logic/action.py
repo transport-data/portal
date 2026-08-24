@@ -400,9 +400,9 @@ def _control_archived_datasets_visibility(data_dict):
         fq = data_dict.get("fq")
 
         if isinstance(fq, list):
-            fq.append("-is_archived:(true)")
-        else:
-            data_dict["fq"] = (fq or "") + " -is_archived:(true)"
+            fq = " ".join(fq)
+
+        data_dict["fq"] = (fq or "") + " -is_archived:(true)"
 
     if "include_archived" in data_dict:
         del data_dict["include_archived"]
