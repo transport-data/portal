@@ -63,6 +63,9 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       GithubProvider({
         clientId: env.GITHUB_CLIENT_ID || "",
         clientSecret: env.GITHUB_CLIENT_SECRET || "",
+        // GitHub added RFC 9207 `iss` to callback responses; openid-client
+        // validates it against the provider's configured issuer.
+        issuer: "https://github.com/login/oauth",
       }),
     ],
     secret: env.NEXTAUTH_SECRET,
