@@ -185,7 +185,7 @@ export default function IndexDatasetPage({
                                     Metadata
                                 </TabsTrigger>
                                 <TabsTrigger id="downloads" value="downloads">
-                                    Downloads
+                                    Resources
                                 </TabsTrigger>
                             </TabsList>
                             <div className="flex w-full items-center justify-end space-x-4 lg:w-auto">
