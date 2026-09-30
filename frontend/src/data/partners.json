@@ -10,6 +10,11 @@
     "url": "https://www.caf.com"
   },
   {
+    "image": "/images/logos/partners/CMS_Original.png",
+    "name": "Centro de Movilidad Sostenible",
+    "url": "https://cmsostenible.org/"
+  },
+  {
     "image": "/images/logos/partners/ccg-colored.svg",
     "name": "Climate Compatible Growth (funded by FCDO)",
     "url": "https://www.ccg.com"
@@ -23,6 +28,11 @@
     "image": "/images/logos/partners/giz-colored.svg",
     "name": "German Development Cooperation (GIZ)",
     "url": "https://www.giz.de"
+  },
+  {
+    "image": "/images/logos/partners/global_alliance_logo.png",
+    "name": "Global Alliance on Feminist Transport",
+    "url": "https://feminist-transport.org/"
   },
   {
     "image": "/images/logos/partners/gfei-colored.jpg",
@@ -80,9 +90,9 @@
     "url": "https://unece.org"
   },
   {
-    "image": "/images/logos/partners/the-world-bank-colored.svg",
-    "name": "World Bank",
-    "url": "https://www.worldbank.org"
+    "image": "/images/logos/partners/unep-2019-english.jpg",
+    "name": "United Nations Environment Programme (UNEP)",
+    "url": "https://www.unep.org/topics/transport"
   },
   {
     "image": "/images/logos/partners/chalmers-colored.svg",
@@ -90,14 +100,14 @@
     "url": "https://www.chalmers.se"
   },
   {
+    "image": "/images/logos/partners/the-world-bank-colored.svg",
+    "name": "World Bank",
+    "url": "https://www.worldbank.org"
+  },
+  {
     "image": "/images/logos/partners/climate-trace-colored.png",
     "name": "Climate TRACE",
     "url": "https://climatetrace.org"
-  },
-  {
-    "image": "/images/logos/partners/unep-2019-english.jpg",
-    "name": "United Nations Environment Programme (UNEP)",
-    "url": "https://www.unep.org/topics/transport"
   },
   {
     "image": "/images/sponsors/hvt.png",
@@ -113,16 +123,6 @@
     "image": "/images/logos/partners/zulip-org-logo.png",
     "name": "Zulip",
     "url": "https://zulip.com/"
-  },
-  {
-    "image": "/images/logos/partners/global_alliance_logo.png",
-    "name": "Global Alliance on Feminist Transport",
-    "url": "https://feminist-transport.org/"
-  },
-  {
-    "image": "/images/logos/partners/CMS_Original.png",
-    "name": "Centro de Movilidad Sostenible",
-    "url": "https://cmsostenible.org/"
   }
   
 
