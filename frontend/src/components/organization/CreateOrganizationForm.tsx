@@ -70,7 +70,7 @@ export const CreateOrganizationForm: React.FC = () => {
           {match(createOrganization.isLoading)
             .with(false, () => (
               <Button type="submit" color="stone" className="mt-8 w-full py-4">
-                Create organisation
+                Create Organisation
               </Button>
             ))
             .otherwise(() => (
