@@ -57,6 +57,7 @@ export const EditOrganizationForm: React.FC<{
           <LoaderButton
             loading={editOrganization.isLoading}
             type="submit"
+            color="stone"
             variant="secondary"
             className="mt-8 w-full py-4"
           >
