@@ -81,7 +81,7 @@ export const CreateOrganizationForm: React.FC = () => {
                 className="mt-8 flex w-full py-4"
               >
                 <Spinner className="text-slate-900" />
-                Create organisation
+                Create Organisation
               </Button>
             ))}
         </div>
