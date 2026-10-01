@@ -1,0 +1,3 @@
+{
+  "installCommand": "npm_config_build_from_source=true npm install"
+}
