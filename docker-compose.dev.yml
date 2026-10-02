@@ -94,7 +94,7 @@ services:
 
   minio:
     container_name: minio-tdc
-    image: minio/minio
+    image: pgsty/minio
     volumes:
       - minio_data:/data
     environment:
@@ -110,7 +110,7 @@ services:
       - ckan-dev
 
   minio-setup:
-    image: minio/mc
+    image: pgsty/mc
     entrypoint: ["/bin/sh"]
     depends_on:
       - minio
