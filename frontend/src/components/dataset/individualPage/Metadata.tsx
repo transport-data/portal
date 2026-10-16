@@ -131,12 +131,12 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
   return (
     <div className="min-h-[500px] bg-gray-50">
       <div className="container grid py-8 lg:grid-cols-2">
-        <div>
+        <div className="min-w-0">
           <h3 className="text-3xl font-semibold leading-loose text-primary">
             Overview
           </h3>
           <p
-            className="prose max-w-lg text-primary"
+            className="prose max-w-lg break-words text-primary [&_a]:break-all"
             dangerouslySetInnerHTML={{
               __html: dataset.overview_text ?? "-",
             }}
