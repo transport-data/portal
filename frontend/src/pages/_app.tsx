@@ -85,7 +85,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <div className={inter.className}>
           <Component {...pageProps} />
         </div>
-        <WelcomeDialog />
       </SessionProvider>
       <PageLoading />
     </ThemeProvider>
