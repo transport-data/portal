@@ -184,6 +184,29 @@ export const VISUALIZATIONS: Visualization[] = [
   },
   */
   {
+    id: "asia-freight-monitor",
+    title: "Asia Freight Decarbonisation Monitor",
+    description: "A regional monitor for freight-related CO₂ emissions, air pollutants, fleet & fuel demand, and the policy landscape driving decarbonisation in China, India, Indonesia and Vietnam.",
+    tags: 'auto', 
+    embedUrl: "https://asia-freight.katha.media/",
+    thumbnailUrl: "/images/showroom/asia-freight-monitor.png",
+    datasets: [
+      {
+        title: "Freight Transport - Tonne-km (Total)",
+        url: "https://portal.transport-data.org/@asian%20transport%20observatory/freight-transport-tonne-km-total-all-ato"
+      },
+      {
+        title: "Freight Transport - Rail",
+        url: "https://portal.transport-data.org/@asian%20transport%20observatory/freight-transport-rail-ato"
+      },
+      {
+        title: "Total Freight Kilometer Travel Mode Share",
+        url: "https://portal.transport-data.org/@asian%20transport%20observatory/total-freight-kilometer-travel-mode-share-all-ato"
+      }
+    ],
+    externalLink: "https://asia-freight.katha.media/",
+  },
+  {
     id: "ndc-tia-freight",
     title: "NDC-TIA Freight Dashboard",
     description: "Assessment of freight transport and logistics in NDCs from China, India and Viet Nam, and comparison to Asia.",
