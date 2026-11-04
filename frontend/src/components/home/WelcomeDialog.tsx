@@ -1,24 +1,41 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { X, ArrowRight, HelpCircle } from "lucide-react";
 import Image from "next/image";
 
 export default function WelcomeDialog() {
   const [isOpen, setIsOpen] = useState(false);
+  const modalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearPendingModalTimer = () => {
+    if (modalTimerRef.current) {
+      clearTimeout(modalTimerRef.current);
+      modalTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const seen = localStorage.getItem("hasSeenWelcome");
     if (!seen) {
-      setTimeout(() => setIsOpen(true), 500);
+      modalTimerRef.current = setTimeout(() => setIsOpen(true), 500);
     }
+
+    return () => {
+      clearPendingModalTimer();
+    };
   }, []);
 
   const handleClose = () => {
+    clearPendingModalTimer();
     setIsOpen(false);
     localStorage.setItem("hasSeenWelcome", "true");
   };
 
   const handleChoice = (choice: "user" | "provider") => {
+    clearPendingModalTimer();
+    setIsOpen(false);
     localStorage.setItem("hasSeenWelcome", "true");
     localStorage.setItem("userType", choice);
   };
@@ -94,7 +111,7 @@ export default function WelcomeDialog() {
               {/* Data User Card */}
               <Link
                 href="/datasets"
-                onClick={() => { handleChoice("user"); handleClose(); }}
+                onClick={() => handleChoice("user")}
                 className="group relative flex flex-col overflow-hidden transition-all hover:bg-[#006064]/5"
               >
                 {/* Illustration */}
@@ -136,7 +153,7 @@ export default function WelcomeDialog() {
               {/* Data Provider Card */}
               <Link
                 href="/data-provider"
-                onClick={() => { handleChoice("provider"); handleClose(); }}
+                onClick={() => handleChoice("provider")}
                 className="group relative flex flex-col overflow-hidden transition-all hover:bg-[#DFF64D]/5"
               >
                 {/* Illustration */}
