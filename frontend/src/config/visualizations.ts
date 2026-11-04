@@ -153,6 +153,9 @@ export const VISUALIZATIONS: Visualization[] = [
     embedUrl: extractUrl(
       `PASTE_YOUR_TABLEAU_OR_POWERBI_SHARE_LINK_HERE`
     ),
+    // ALTERNATIVE
+    // If your visualization is accesible via an own URL, you can directly paste it here
+    embedURL: "your-URL",
     
     // STEP 2: Thumbnail options (choose one):
     
@@ -180,6 +183,36 @@ export const VISUALIZATIONS: Visualization[] = [
     externalLink: "PASTE_YOUR_SHARE_LINK_HERE",
   },
   */
+  {
+    id: "ndc-tia-freight",
+    title: "NDC-TIA Freight Dashboard",
+    description: "Assessment of freight transport and logistics in NDCs from China, India and Viet Nam, and comparison to Asia.",
+    tags: 'auto', 
+    embedUrl: "https://slocat-partnership.github.io/ndc-tia-freight-overview/",
+    thumbnailUrl: "/images/showroom/ndc-tia-freight.png",
+    datasets: [
+      {
+        title: "NDC-TIA Freight Dashboard",
+        url: "https://portal.transport-data.org/@slocat/ndc-tia-freight-dashboard"
+      }
+    ],
+    externalLink: "https://slocat-partnership.github.io/ndc-tia-freight-overview/",
+  },
+  {
+    id: "ndcs-regional",
+    title: "Regional Insights on Transport in Third-Generation NDCs",
+    description: "Regional Insights on Transport in Third-Generation NDCs.",
+    tags: 'auto', 
+    embedUrl: "https://slocat-partnership.github.io/ndc-transport-regions/",
+    thumbnailUrl: "/images/showroom/ndc-regional.png",
+    datasets: [
+      {
+        title: "NDC Transport Tracker",
+        url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
+      }
+    ],
+    externalLink: "https://slocat-partnership.github.io/ndc-transport-regions/",
+  },
   {
     id: "ndcs-regional",
     title: "Regional Insights on Transport in Third-Generation NDCs",
