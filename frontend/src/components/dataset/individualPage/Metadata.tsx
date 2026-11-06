@@ -168,7 +168,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             {dataset.tags && dataset.tags.length > 0 ? (
               <dd className="mt-1 flex flex-wrap gap-2 text-sm leading-6 text-gray-500 sm:mt-2">
                 {dataset.tags?.map((t) => (
-                  <Badge variant="info">{t.display_name ?? t.name}</Badge>
+                  <Badge key={t.name} variant="info">{t.display_name ?? t.name}</Badge>
                 )) ?? "-"}
               </dd>
             ) : (
