@@ -146,6 +146,12 @@ def init_datastore_db():
 
     connection = psycopg2.connect(conn_str)
     cursor = connection.cursor()
+    # Don't wait forever for set-permissions' AccessExclusiveLock on _table_metadata. While
+    # something holds a lock there (the weekly datastore pg_dump does), the request queues every
+    # datastore query behind it, liveness kills all CKAN pods and each restart joins the queue.
+    # Give up after 10 s: the psycopg2.Error handler below
+    # logs it and startup continues; the permissions are already set from earlier starts.
+    cursor.execute("SET lock_timeout = '10s'")
 
     print("[prerun] Initializing datastore db - start")
     try:
