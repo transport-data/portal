@@ -2,6 +2,13 @@
  * Utility to fetch tags from CKAN datasets at build time
  */
 
+import { VISUALIZATIONS, type Visualization } from "@/config/visualizations";
+
+/** A visualization whose tags have been resolved, so they're never 'auto'. */
+export type ResolvedVisualization = Omit<Visualization, "tags"> & {
+  tags?: string[];
+};
+
 interface CKANTag {
   display_name: string;
   id: string;
@@ -99,4 +106,63 @@ export async function fetchTagsFromDatasets(datasetUrls: string[]): Promise<stri
   console.log(`Total unique tags found: ${uniqueTags.length}`);
   
   return uniqueTags.sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Replace 'auto' tags with the tags of the referenced datasets. The tags
+ * property is left out when there are none, since page props can't be undefined.
+ */
+export async function resolveVisualizationTags(
+  viz: Visualization
+): Promise<ResolvedVisualization> {
+  const { tags, ...rest } = viz;
+  const resolvedTags =
+    tags === "auto"
+      ? await fetchTagsFromDatasets(viz.datasets.map((ds) => ds.url))
+      : tags;
+
+  return resolvedTags && resolvedTags.length > 0
+    ? { ...rest, tags: resolvedTags }
+    : rest;
+}
+
+// Long enough to cover a build, and short compared to the pages' hourly revalidation.
+const RESOLVED_VISUALIZATIONS_TTL_MS = 5 * 60 * 1000;
+let resolvedVisualizationsCache:
+  | { fetchedAt: number; result: Promise<ResolvedVisualization[]> }
+  | undefined;
+
+/**
+ * All visualizations with their tags resolved. Every showroom URL needs the whole
+ * list, so this reuses the result rather than repeat the CKAN requests per page.
+ */
+export function getResolvedVisualizations(): Promise<ResolvedVisualization[]> {
+  if (
+    !resolvedVisualizationsCache ||
+    Date.now() - resolvedVisualizationsCache.fetchedAt >
+      RESOLVED_VISUALIZATIONS_TTL_MS
+  ) {
+    resolvedVisualizationsCache = {
+      fetchedAt: Date.now(),
+      result: Promise.all(VISUALIZATIONS.map(resolveVisualizationTags)),
+    };
+  }
+  return resolvedVisualizationsCache.result;
+}
+
+/** The visualizations to list on a dataset's page, by the dataset's CKAN name. */
+export async function getVisualizationsForDataset(
+  datasetName: string
+): Promise<ResolvedVisualization[]> {
+  const belongsOnPage = (
+    viz: Pick<Visualization, "datasets" | "includeOnDatasetPage">
+  ) =>
+    viz.includeOnDatasetPage === true &&
+    viz.datasets.some((ds) => extractDatasetId(ds.url) === datasetName);
+
+  // Most datasets have none, so this avoids CKAN requests for their pages.
+  if (!VISUALIZATIONS.some(belongsOnPage)) return [];
+
+  const visualizations = await getResolvedVisualizations();
+  return visualizations.filter(belongsOnPage);
 }

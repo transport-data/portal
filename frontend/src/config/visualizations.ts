@@ -8,6 +8,11 @@ export type DatasetRef = {
 };
 
 export interface Visualization {
+  /**
+   * Becomes the page URL: /showroom/<id>
+   * Letters, numbers, hyphens and underscores only. Printed links and QR codes
+   * point at this, so don't change it once it's published.
+   */
   id: string;
   title: string;
   description: string;
@@ -22,6 +27,40 @@ export interface Visualization {
    * - Leave undefined for no tags
    */
   tags?: string[] | "auto";
+  /**
+   * Set to true if the embed adapts to narrow screens. Otherwise it's held at
+   * desktop size and scrolls inside its frame on phones, which Tableau and
+   * Power BI dashboards generally need.
+   */
+  responsive?: boolean;
+  /**
+   * Set to true to list this visualization in the Visualisations tab of the
+   * dataset pages it references. Otherwise it only appears in the showroom.
+   */
+  includeOnDatasetPage?: boolean;
+}
+
+/** Throws so that a bad config entry fails the build rather than a live page. */
+export function validateVisualizations(visualizations: Visualization[]): void {
+  const seenIds = new Set<string>();
+
+  for (const viz of visualizations) {
+    if (!/^[A-Za-z0-9_-]+$/.test(viz.id)) {
+      throw new Error(
+        `Visualization id "${viz.id}" can only contain letters, numbers, hyphens and underscores.`,
+      );
+    }
+    if (seenIds.has(viz.id)) {
+      throw new Error(`Visualization id "${viz.id}" is used more than once.`);
+    }
+    seenIds.add(viz.id);
+
+    if (!viz.datasets || viz.datasets.length < 1) {
+      throw new Error(
+        `Visualization "${viz.id}" must reference at least one dataset in config.`,
+      );
+    }
+  }
 }
 
 /**
@@ -136,7 +175,7 @@ export const VISUALIZATIONS: Visualization[] = [
   // ========================================
   /*
   {
-    id: "unique-id-here", //no spaces!
+    id: "unique-id-here", // becomes the URL /showroom/unique-id-here. Letters, numbers, - and _ only
     title: "Your Dashboard Title",
     description: "Describe what insights this dashboard provides.",
     // Option A: Auto-fetch tags from datasets
@@ -185,6 +224,8 @@ export const VISUALIZATIONS: Visualization[] = [
     
     // Optional:
     externalLink: "PASTE_YOUR_SHARE_LINK_HERE",
+    responsive: true, // only if the embed works on phones without a desktop-sized frame
+    includeOnDatasetPage: true, // also list it in the Visualisations tab of the datasets above
   },
   */
   {

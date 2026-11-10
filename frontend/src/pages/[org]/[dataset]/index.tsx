@@ -9,6 +9,10 @@ import { api } from "@utils/api";
 import { createCkanResponse } from "@utils/createCkanResponse";
 import { groupTree } from "@utils/group";
 import { GroupTree } from "@schema/group.schema";
+import {
+  getVisualizationsForDataset,
+  type ResolvedVisualization,
+} from "@utils/fetchDatasetTags";
 
 const backend_url = env.NEXT_PUBLIC_CKAN_URL;
 
@@ -79,6 +83,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       props: {
         _dataset: dataset.result,
         locationsGroup,
+        visualizations: await getVisualizationsForDataset(dataset.result.name),
       },
       revalidate: 1800,
     };
@@ -102,9 +107,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export default function DatasetPage({
   _dataset,
   locationsGroup,
+  visualizations,
 }: {
   _dataset: Dataset;
   locationsGroup: GroupTree[];
+  visualizations: ResolvedVisualization[];
 }): JSX.Element {
   const { data: dataset } = api.dataset.get.useQuery(
     {
@@ -117,8 +124,11 @@ export default function DatasetPage({
   );
   return (
     <IndexDatasetPage
+      // Moving to another dataset shouldn't carry over the selected tab.
+      key={_dataset.name}
       dataset={dataset.result}
       locationsGroup={locationsGroup}
+      visualizations={visualizations}
     />
   );
 }
