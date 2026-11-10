@@ -229,6 +229,24 @@ export const VISUALIZATIONS: Visualization[] = [
   },
   */
   {
+    id: "tracking-global-transport-effort",
+    title: "Tracking the Global Transport Effort",
+    description:
+      "Global progress in transport energy use compared with the IEA’s Net Zero pathway and the Global Transport Effort for 2035.",
+    tags: "auto",
+    embedUrl: "https://transport-data.github.io/gte-tracker/",
+    externalLink: "https://transport-data.github.io/gte-tracker/",
+    thumbnailUrl: "/images/showroom/tracking-global-transport-effort.png",
+    responsive: true,
+    includeOnDatasetPage: true,
+    datasets: [
+      {
+        title: "Towards resilient low-emissions transport",
+        url: "/@giz/towards-resilient-low-emissions-transport",
+      },
+    ],
+  },
+  {
     id: "asia-freight-monitor",
     title: "Asia Freight Decarbonisation Monitor",
     description:
