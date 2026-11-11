@@ -241,8 +241,8 @@ export const VISUALIZATIONS: Visualization[] = [
     includeOnDatasetPage: true,
     datasets: [
       {
-        title: "Towards resilient low-emissions transport",
-        url: "/@giz/towards-resilient-low-emissions-transport",
+        title: "Tracking the Global Transport Effort",
+        url: "/@uc-davis/tracking-the-global-transport-effort",
       },
     ],
   },
