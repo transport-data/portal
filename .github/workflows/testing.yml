@@ -31,15 +31,14 @@ jobs:
       - name: Install `Xvfb` and others to run browsers for end-to-end testing in local CI/CD simulations
         if: ${{ env.ACT }}
         run: sudo apt-get update && sudo apt-get install -y xvfb && npx playwright install-deps
-      - name: DNS diagnostic (temporary)
-        continue-on-error: true
+      - name: Use public DNS for Docker
+        # Containers on the runner use Azure's resolver (168.63.129.16), which
+        # currently times out from inside Docker, so apt in image builds cannot
+        # resolve mirrors. Public resolvers work.
         run: |
-          set +e
-          cat /etc/resolv.conf >/dev/null; resolvectl status 2>&1 | head -20
-          cat /etc/docker/daemon.json 2>&1; docker info 2>&1 | grep -iE "version|dns|cgroup"
-          getent hosts archive.ubuntu.com || echo "host: cannot resolve"
-          docker run --rm ubuntu:jammy sh -c 'cat /etc/resolv.conf; getent hosts archive.ubuntu.com || echo "container: cannot resolve"'
-          docker run --rm --dns 8.8.8.8 ubuntu:jammy sh -c 'getent hosts archive.ubuntu.com || echo "container with 8.8.8.8: cannot resolve"'
+          echo '{"dns":["8.8.8.8","1.1.1.1"]}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+          docker run --rm ubuntu:jammy getent hosts archive.ubuntu.com
       - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
