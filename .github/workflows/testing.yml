@@ -39,14 +39,6 @@ jobs:
           echo '{"dns":["8.8.8.8","1.1.1.1"]}' | sudo tee /etc/docker/daemon.json
           sudo systemctl restart docker
           docker run --rm ubuntu:jammy getent hosts archive.ubuntu.com
-          set +e
-          for h in api.launchpad.net ppa.launchpadcontent.net keyserver.ubuntu.com; do
-            getent ahosts $h | awk '{print $1}' | sort -u | head -4 | tr '\n' ' '; echo "<- $h"
-            for f in -4 -6; do
-              echo "$h curl $f: $(curl $f -s -o /dev/null -m 8 -w '%{http_code}' https://$h/ || echo fail)"
-            done
-          done
-          docker run --rm ubuntu:jammy sh -c 'apt-get update >/dev/null 2>&1; apt-get install -y -qq curl >/dev/null 2>&1; for h in api.launchpad.net ppa.launchpadcontent.net; do for f in -4 -6; do echo "container $h curl $f: $(curl $f -s -o /dev/null -m 8 -w %{http_code} https://$h/ || echo fail)"; done; done'
       - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
