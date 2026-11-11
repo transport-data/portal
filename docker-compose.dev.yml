@@ -39,9 +39,6 @@ services:
     build:
       context: ./datapusher
       dockerfile: Dockerfile
-      # CI runner's build bridge could not resolve archive.ubuntu.com (apt failed);
-      # host network uses the runner's own DNS
-      network: host
     restart: always
     environment:
       - WRITE_ENGINE_URL=postgresql://postgres:postgres@db/datastore
