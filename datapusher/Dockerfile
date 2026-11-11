@@ -47,7 +47,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
    unzip \
    git \
    libpq-dev \
-   file
+   file \
+   ca-certificates
 
 # Install Python 3.9 (check if it's available in the default repo first)
 # If not available, use the previously added PPA
@@ -95,6 +96,11 @@ RUN cd ${SRC_DIR}/datapusher-plus && \
 
 RUN ${VENV}/bin/pip install Flask==2.3.3
 RUN ${VENV}/bin/pip install Werkzeug==2.3.0
+
+# Runs last so no requirements file can pin certifi back to a version that still
+# trusts the compromised eMudhra/emSign roots. The venv is Python 3.9, so pip
+# itself cannot go to 26.2.2 (needs 3.10+); certifi alone is what requests uses.
+RUN ${VENV}/bin/pip install --upgrade "certifi>=2026.10.19"
 
 # Patch ckanserviceprovider to use pool_pre_ping so stale connections from
 # Cloud SQL are detected and replaced instead of causing 500 errors.

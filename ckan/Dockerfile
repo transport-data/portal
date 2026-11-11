@@ -6,6 +6,11 @@ ENV CKANEXT_TDC_HASH 62420531d1369b9ef7696a06a5b903b36cac029e
 
 USER root
 
+# Python's requests trusts certifi, not the OS store, so the eMudhra/emSign
+# roots must be removed from both. pip bundles its own certifi, so upgrade it too.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --upgrade "pip>=26.2.2" "certifi>=2026.10.19"
+
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@27035f4d5b3722c2bc64d39b6c2b1d76c9883636#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/27035f4d5b3722c2bc64d39b6c2b1d76c9883636/test-requirements.txt' && \
