@@ -34,7 +34,8 @@ jobs:
       - name: DNS diagnostic (temporary)
         continue-on-error: true
         run: |
-          cat /etc/resolv.conf; resolvectl status 2>&1 | head -20
+          set +e
+          cat /etc/resolv.conf >/dev/null; resolvectl status 2>&1 | head -20
           cat /etc/docker/daemon.json 2>&1; docker info 2>&1 | grep -iE "version|dns|cgroup"
           getent hosts archive.ubuntu.com || echo "host: cannot resolve"
           docker run --rm ubuntu:jammy sh -c 'cat /etc/resolv.conf; getent hosts archive.ubuntu.com || echo "container: cannot resolve"'
