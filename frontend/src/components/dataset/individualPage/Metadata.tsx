@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -118,6 +119,12 @@ function bibtexAuthor(dataset: Dataset) {
 }
 
 export function Metadata({ dataset }: { dataset: Dataset }) {
+  // Set after mount, so that the citations match the server-rendered page when hydrating.
+  const [pageUrl, setPageUrl] = useState("");
+  useEffect(() => {
+    setPageUrl(window.location.href);
+  }, []);
+
   const { data: geographies } = api.group.tree.useQuery({
     type: "geography",
   });
@@ -135,12 +142,12 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
           <h3 className="text-3xl font-semibold leading-loose text-primary">
             Overview
           </h3>
-          <p
+          <div
             className="prose max-w-lg break-words text-primary [&_a]:break-all"
             dangerouslySetInnerHTML={{
               __html: dataset.overview_text ?? "-",
             }}
-          ></p>
+          ></div>
         </div>
         <div className="flex flex-col gap-y-4 py-4">
           <div className="border-t border-gray-100 px-4 sm:col-span-1 sm:px-0">
@@ -161,7 +168,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
             {dataset.tags && dataset.tags.length > 0 ? (
               <dd className="mt-1 flex flex-wrap gap-2 text-sm leading-6 text-gray-500 sm:mt-2">
                 {dataset.tags?.map((t) => (
-                  <Badge variant="info">{t.display_name ?? t.name}</Badge>
+                  <Badge key={t.name} variant="info">{t.display_name ?? t.name}</Badge>
                 )) ?? "-"}
               </dd>
             ) : (
@@ -320,7 +327,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   }). <i> ${dataset.title ?? dataset.name}</i> [Data set]. ${dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
-                  }. ${typeof window !== "undefined" && window.location.href}`,
+                  }. ${pageUrl}`,
               },
               {
                 type: "quotation",
@@ -332,7 +339,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   }, ${dataset.metadata_modified
                     ? new Date(dataset.metadata_modified).getFullYear()
                     : "(n.d)"
-                  }, ${typeof window !== "undefined" && window.location.href}`,
+                  }, ${pageUrl}`,
               },
               {
                 type: "quotation",
@@ -344,7 +351,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                   }. ${dataset.organization?.display_name ??
                   dataset.organization?.name ??
                   "TDC"
-                  }. ${typeof window !== "undefined" && window.location.href}`,
+                  }. ${pageUrl}`,
               },
               {
                 type: "quotation",
@@ -352,8 +359,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
                 content: `${getLastNameAndInitials(dataset)}. (${dataset.metadata_modified
                     ? new Date(dataset.metadata_modified).getFullYear()
                     : "n.d"
-                  }). '${dataset.title ?? dataset.name}'. Available at: ${typeof window !== "undefined" && window.location.href
-                  }`,
+                  }). '${dataset.title ?? dataset.name}'. Available at: ${pageUrl}`,
               },
             ]}
           />
@@ -376,7 +382,7 @@ export function Metadata({ dataset }: { dataset: Dataset }) {
    title = {${dataset.title ?? dataset.name}},
    institution = {${dataset.organization?.title ?? dataset.organization?.name ?? "TDC"
                   }},
-   url = {${typeof window !== "undefined" && window.location.href}}
+   url = {${pageUrl}}
 }
 `,
               },
