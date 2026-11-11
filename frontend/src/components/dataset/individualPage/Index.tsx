@@ -1,4 +1,6 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import Layout from "@/components/_shared/Layout";
 import { ChevronLeftIcon, ArrowDownToLineIcon, Landmark } from "lucide-react";
 import { CalendarIcon } from "@heroicons/react/20/solid";
@@ -18,15 +20,21 @@ import { api } from "@utils/api";
 import FollowDropdown from "../FollowDropdown";
 import { useSession } from "next-auth/react";
 import { GroupTree } from "@schema/group.schema";
+import { VisualizationGallery } from "@components/showroom/VisualizationGallery";
+import type { ResolvedVisualization } from "@utils/fetchDatasetTags";
+import { Badge } from "@components/ui/badge";
 
 const siteTitle = "TDC Data Portal";
+const VISUALISATIONS_TAB = "visualisations";
 
 export default function IndexDatasetPage({
     dataset,
     locationsGroup,
+    visualizations = [],
 }: {
     dataset: Dataset;
     locationsGroup: GroupTree[];
+    visualizations?: ResolvedVisualization[];
 }): JSX.Element {
     const { data: sessionData } = useSession();
     const { data: datasetDownloads, isLoading } =
@@ -44,6 +52,43 @@ export default function IndexDatasetPage({
         (r) => !!r.datastore_active && !r.hide_preview
     );
     const overviewTab = !!dataset.introduction_text;
+
+    // The Visualisations tab is kept in the URL, so that it's still open when
+    // coming back from a visualization, and so that links can point at it.
+    const router = useRouter();
+    const linksToVisualisations =
+        router.query.tab === VISUALISATIONS_TAB && visualizations.length > 0;
+    const [tab, setTab] = useState(
+        linksToVisualisations
+            ? VISUALISATIONS_TAB
+            : overviewTab
+              ? "overview"
+              : "metadata"
+    );
+
+    // Static pages only get the query after hydration when loaded directly.
+    useEffect(() => {
+        if (linksToVisualisations) setTab(VISUALISATIONS_TAB);
+    }, [linksToVisualisations]);
+
+    const selectTab = (value: string) => {
+        setTab(value);
+        if (value !== VISUALISATIONS_TAB && router.query.tab === undefined) return;
+
+        // Built from asPath, as the /@org part of the URL is rewritten to the route.
+        const url = new URL(router.asPath, window.location.origin);
+        if (value === VISUALISATIONS_TAB) {
+            url.searchParams.set("tab", VISUALISATIONS_TAB);
+        } else {
+            url.searchParams.delete("tab");
+        }
+        void router.replace(
+            `${url.pathname}${url.search}${url.hash}`,
+            undefined,
+            { shallow: true, scroll: false }
+        );
+    };
+
     return (
         <>
             <Head>
@@ -167,7 +212,7 @@ export default function IndexDatasetPage({
                         </div>
                     </div>
                 </div>
-                <Tabs defaultValue={overviewTab ? "overview" : "metadata"}>
+                <Tabs value={tab} onValueChange={selectTab}>
                     <div className="border-b border-gray-200 shadow-sm">
                         <div className="container flex flex-col items-start justify-end gap-y-4 pb-4 lg:flex-row lg:items-center lg:justify-between">
                             <TabsList className="h-14 max-w-[95vw] justify-start overflow-x-auto bg-transparent">
@@ -179,6 +224,14 @@ export default function IndexDatasetPage({
                                 {datasetsTab && (
                                     <TabsTrigger id="dataset" value="dataset">
                                         Preview
+                                    </TabsTrigger>
+                                )}
+                                {visualizations.length > 0 && (
+                                    <TabsTrigger id="visualisations" value="visualisations">
+                                        Visualisations
+                                        <Badge className="ml-2 bg-accent text-accent-foreground hover:bg-accent">
+                                        NEW
+                                        </Badge>
                                     </TabsTrigger>
                                 )}
                                 <TabsTrigger id="metadata" value="metadata">
@@ -246,6 +299,16 @@ export default function IndexDatasetPage({
                     {datasetsTab && (
                         <TabsContent className="mt-0" value="dataset">
                             <DatasetPreview dataset={dataset} />
+                        </TabsContent>
+                    )}
+                    {visualizations.length > 0 && (
+                        <TabsContent className="mt-0" value="visualisations">
+                            <div className="container py-8">
+                                <VisualizationGallery
+                                    visualizations={visualizations}
+                                    fromDataset
+                                />
+                            </div>
                         </TabsContent>
                     )}
                     <TabsContent className="mt-0" value="metadata">
