@@ -79,16 +79,52 @@ jobs:
       - name: Copy .env
         run: cp .env.example .env
         working-directory: ./frontend
+      - name: Install frontend dependencies and Cypress
+        # Only installs; the app is built and started in the steps below so a
+        # failure there shows the server's own output instead of an opaque
+        # "Socket closed before the connection was established" from the action
+        uses: cypress-io/github-action@v6
+        with:
+          runTests: false
+          install-command: npm install
+          working-directory: ./frontend
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./frontend
+      - name: Start frontend server
+        run: |
+          nohup npm run start > "$RUNNER_TEMP/frontend-server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/frontend-server.pid"
+        working-directory: ./frontend
+      - name: Wait for frontend server
+        run: |
+          pid=$(cat "$RUNNER_TEMP/frontend-server.pid")
+          for i in $(seq 1 120); do
+            # Fail fast with the server log if the process died, instead of
+            # waiting out the whole timeout on a port nobody listens on
+            if ! kill -0 "$pid" 2>/dev/null; then
+              echo "Frontend server exited before becoming ready:"
+              cat "$RUNNER_TEMP/frontend-server.log"
+              exit 1
+            fi
+            if curl -s -o /dev/null --max-time 5 http://127.0.0.1:3000; then
+              echo "Frontend server is up after ~$((i * 5))s"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Frontend server did not respond on port 3000 within 600s:"
+          cat "$RUNNER_TEMP/frontend-server.log"
+          exit 1
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
-          install-command: npm install
-          build: npm run build
-          start: npm run start
-          wait-on: 'http://127.0.0.1:3000'
-          wait-on-timeout: 600
+          install: false
           command: npm run test
           working-directory: ./frontend
+      - name: Print frontend server log
+        if: failure()
+        run: cat "$RUNNER_TEMP/frontend-server.log" || true
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
