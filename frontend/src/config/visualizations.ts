@@ -268,6 +268,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@asian%20transport%20observatory/total-freight-kilometer-travel-mode-share-all-ato",
       },
     ],
+    includeOnDatasetPage: true,
     externalLink: "https://asia-freight.katha.media/",
   },
   {
@@ -284,6 +285,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@slocat/ndc-tia-freight-dashboard",
       },
     ],
+    includeOnDatasetPage: true,
     externalLink:
       "https://slocat-partnership.github.io/ndc-tia-freight-overview/",
   },
@@ -300,6 +302,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
       },
     ],
+    includeOnDatasetPage: true,
     externalLink: "https://slocat-partnership.github.io/ndc-transport-regions/",
   },
   {
@@ -319,7 +322,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@tumi/tumi-mobility-data-hub",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink: "https://fuelprices.app/",
   },
   {
@@ -360,7 +363,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@ifeu/ghg-emissions-road-transport-germany?org=IFEU&dataset=ghg-emissions-road-transport-germany",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/ComparisonofroadtransportkeyfiguresGermany/Roadtransport#1",
   },
@@ -383,7 +386,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@oica/passenger-cars-registrations-and-stock-nigeria-2005-2019?org=OICA&amp;amp;dataset=passenger-cars-registrations-and-stock-nigeria-2005-2019",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/StockandnewregistrationsofpassengercarsNigeria/Stock_newregistrations#1",
   },
@@ -408,7 +411,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@ccg/vehicle-stock-from-ccg-transport-starter-data-kits",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/app/profile/ifeu.mobility1285/viz/CarstockinAfricancountriescomparisonofdatasourcesfromTransportStarterDataKits/Dashboard1",
   },
@@ -433,7 +436,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@ifeu/vehicle-age-road-transport-germany",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/views/AgedistributionofcarstockcomparisonwithnewregistrationsGermany/Agedistributioncomparisonnewregvs_stock?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
   },
@@ -456,7 +459,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker?org=GIZ&dataset=gizslocat-transport-climate-tracker",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/views/NDCgenerations/TransportMeasures?:embed=y&:sid=&:redirect=auth&language=en-GB&:display_count=n&:origin=viz_share_link",
   },
@@ -479,7 +482,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@agora-verkehrswende/g20-countries-transport-and-climate-action-snapshot",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://app.powerbi.com/view?r=eyJrIjoiN2RmODMzNDItMGM2Mi00ZGFiLTljZTAtMzBmNDM3MmIxYWIxIiwidCI6IjY0OWVkOWQ3LTllNTItNDJmNi1hMDJjLTdmZWM4YmRhMjJmYyIsImMiOjl9",
   },
@@ -506,7 +509,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@ifeu/road-vehicle-stock-germany",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/views/VehiclestockandnewregistrationsbypowertrainGermany/Dashboard1?:language=de-DE&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link",
   },
@@ -530,7 +533,7 @@ export const VISUALIZATIONS: Visualization[] = [
         url: "https://portal.transport-data.org/@giz/gizslocat-transport-climate-tracker",
       },
     ],
-
+    includeOnDatasetPage: true,
     externalLink:
       "https://public.tableau.com/shared/RQD536548?:display_count=n&:origin=viz_share_link",
   },
