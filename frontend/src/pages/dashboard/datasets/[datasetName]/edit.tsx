@@ -24,6 +24,7 @@ import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { getServerAuthSession } from "@server/auth";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { api } from "@utils/api";
+import { toUtcNoon } from "@utils/calendarDate";
 import { getDataset } from "@utils/dataset";
 import { listUserOrganizations, UserOrganization } from "@utils/organization";
 import { useMachine } from "@xstate/react";
@@ -198,28 +199,8 @@ const EditDatasetDashboard: NextPage<{
   if (!sessionData) return <Loading />;
 
   function onSubmit(data: DatasetFormType) {
-    data.temporal_coverage_start = new Date(
-      Date.UTC(
-        data.temporal_coverage_start.getFullYear(),
-        data.temporal_coverage_start.getMonth(),
-        data.temporal_coverage_start.getDate(),
-        12,
-        0,
-        0,
-        0
-      )
-    );
-    data.temporal_coverage_end = new Date(
-      Date.UTC(
-        data.temporal_coverage_end.getFullYear(),
-        data.temporal_coverage_end.getMonth(),
-        data.temporal_coverage_end.getDate(),
-        12,
-        0,
-        0,
-        0
-      )
-    );
+    data.temporal_coverage_start = toUtcNoon(data.temporal_coverage_start);
+    data.temporal_coverage_end = toUtcNoon(data.temporal_coverage_end);
 
     if (!canReviewDatasets && data.untracked_contributors_ids?.length) {
       const filteredContributors = data.untracked_contributors_ids.filter(
