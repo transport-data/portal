@@ -18,6 +18,7 @@ import datasetOnboardingMachine from "@machines/datasetOnboardingMachine";
 import { DatasetFormType, DatasetSchema } from "@schema/dataset.schema";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { api } from "@utils/api";
+import { toUtcNoon } from "@utils/calendarDate";
 import { useMachine } from "@xstate/react";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
@@ -108,7 +109,11 @@ const CreateDatasetDashboard: NextPage = () => {
       data.untracked_contributors_ids = filteredContributors;
     }
 
-    return createDataset.mutate(data);
+    return createDataset.mutate({
+      ...data,
+      temporal_coverage_start: toUtcNoon(data.temporal_coverage_start),
+      temporal_coverage_end: toUtcNoon(data.temporal_coverage_end),
+    });
   }
   const currentStep = match(current.value)
     .with("general", () => 0)
@@ -401,6 +406,13 @@ export const SaveDraftButton = ({
         createDraftDataset.mutate({
           ...(update ? { id } : {}),
           ...otherValues,
+          // drafts are optional-field forms, so the dates may still be empty
+          temporal_coverage_start: otherValues.temporal_coverage_start
+            ? toUtcNoon(otherValues.temporal_coverage_start)
+            : undefined,
+          temporal_coverage_end: otherValues.temporal_coverage_end
+            ? toUtcNoon(otherValues.temporal_coverage_end)
+            : undefined,
           private: true,
         });
       }
