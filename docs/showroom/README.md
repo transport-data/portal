@@ -126,7 +126,10 @@ Scroll to the bottom of `visualizations.ts` and find the commented template:
       url: "https://portal.transport-data.org/@your-org/emissions-dataset"
     }
   ],
-  
+
+  // Optional: Include visualisation in dataset page(s)
+  includeOnDatasetPage: true,
+
   // Optional: Link to open dashboard externally
   externalLink: "https://public.tableau.com/views/YourWorkbook/YourView",
   
@@ -155,7 +158,7 @@ npm run dev
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `id` | string | Unique identifier (lowercase-with-dashes) | `"ndc-transport-tracker"` |
+| `id` | string | Unique identifier (lowercase-with-dashes) - used for URL | `"ndc-transport-tracker"` |
 | `title` | string | Dashboard title shown in gallery | `"Transport Measures in NDCs"` |
 | `description` | string | Brief description of the dashboard | `"Analysis of transport mitigation..."` |
 | `embedUrl` | string | Embed URL (use `extractUrl()`) | See examples below |
@@ -168,6 +171,7 @@ npm run dev
 | `tags` | string[] | `[]` | Tags for categorization | 
 | `thumbnailUrl` | string | placeholder | Preview image URL |
 | `externalLink` | string | none | Link to open dashboard externally |
+| `includeOnDatasetPage` | bool | false | Add entry to "visualisation" tab on dataset page(s) |
 | `aspectRatio` | string | `"16:9"` | Modal aspect ratio |
 | `minHeightPx` | number | `900` | Min height (if `aspectRatio: "free"`) |
 
@@ -345,7 +349,7 @@ frontend/
       url: "https://portal.transport-data.org/@climate/urban-emissions"
     }
   ],
-  
+  includeOnDatasetPage: true,
   externalLink: "https://public.tableau.com/views/UrbanEmissions/Dashboard1",
   aspectRatio: "16:9",
 },
@@ -376,7 +380,7 @@ frontend/
       url: "https://portal.transport-data.org/@worldbank/lpi"
     }
   ],
-  
+  includeOnDatasetPage: true,
   externalLink: "https://app.powerbi.com/view?r=abc123def456",
   aspectRatio: "16:9",
 },
